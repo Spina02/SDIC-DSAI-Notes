@@ -1,6 +1,8 @@
 #### These are the PDFs of our notes:
 
-- [Advanced Cloud Computing](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf>)
+- [Advanced Cloud Computing](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf>) [WIP]
+- [Advanced Programming](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Programming/main.pdf>) [WIP]
+- [Introduction to Machine Learning](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Introduction%20to%20ML/main.pdf>) [WIP]
 
 <!--
 <table>
@@ -35,12 +37,11 @@
     </tr>
   <tbody>
     <tr>
-      <td>Global and Multi-objective Optimisation</td>
+      <td>Global and Multi-Objective Optimisation</td>
       <td></td>
     </tr>
     <tr>
-      <td></td>
-      <td></td>
+      <th colspan = 2></th>
     </tr>
   </tbody>
   <thead>
