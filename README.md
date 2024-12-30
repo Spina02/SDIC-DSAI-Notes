@@ -2,6 +2,10 @@
 
 - [Advanced Cloud Computing](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf>)
 
+- [Introduction to Machine Learning](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Introduction%20to%20ML/main.tex>)
+
+
+
 <!--
 <table>
   <thead>
@@ -28,6 +32,11 @@
       <td>Algorithms</td>
       <td></td>
     </tr>
+  <tbody>
+    <tr>
+      <td>Introduction to Machine Learning<\td>
+      <td><\td>
+    <\tr>
   </tbody>
     <tr>
       <td>Statistics</td>
@@ -60,3 +69,5 @@
   </tbody>
 </table>
 -->
+
+
