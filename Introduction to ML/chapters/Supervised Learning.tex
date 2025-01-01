@@ -297,6 +297,36 @@ To do so, we need to divide the dataset, since we want to see if the $f'_{predic
 For comparison btw learning techniques, we can use the mean and standard deviation of the performance indexes obtained with the previous division methods. \textbf{Boxplots} are useful in this case.
 
 \section{Tree-based Learning Techniques}
-ddd
 
+\subsection{Decision Trees}
 
+A \textbf{Decision Tree} is a tree where each node is a decision on the value of a feature, and each branch is a possible value of the feature. The leaves are the categories. It can be understood in simpler terms by considering a basic \inlinecode{if-then-else} nested structure.
+
+\begin{center}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\textwidth]{assets/fig11.png}
+        \caption{Decision Tree example}
+    \end{figure}
+\end{center}
+
+This is a binary tree, but it can be n-ary as well. The tree is built by recursively splitting the dataset into subsets, and the splitting is done by selecting the feature that best splits the dataset into the purest subsets. The purity is measured by the \inlinecode{Gini Index} or the \inlinecode{Entropy}, usually.
+
+One can also represent the tree in a compact way:
+\begin{center}
+    $t = [l, t', t'']$
+\end{center}
+
+where $l \in L$ is the \textbf{label} and $t', t'' \in T_L \cup \{\emptyset\}$ are the left and right children.
+
+Also, each \textbf{non-terminal} node is a pair ($j, \tau$), where $j \in \{1, \dots, p\}$ is the index of the independent variable and $\tau \in R$ is the threshold for comparison.
+
+The above figure is then represented as:
+
+\begin{center}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.5\textwidth]{assets/fig12.png}
+        \caption{Compact representation of the Decision Tree}
+    \end{figure}
+\end{center}
