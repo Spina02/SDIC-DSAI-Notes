@@ -1,26 +1,187 @@
 \chapter{Virtualization and Isolation}
 
-\section{Virtual Machines and Hypervisors}
-
-    \subsection{Virtual Machines (VMs)}
-    \subsection{Hypervisors (KVM, QEMU)}
-
 \section{Linux Namespaces}
 
-    \subsection{Process ID (PID)}
-    \subsection{UNIX Time-sharing System (UTS)}
-    \subsection{Inter-Process Communication (IPC)}
-    \subsection{TIME}
-    \subsection{Mount (MNT)}
-    \subsection{Control Groups (CGROUPS)}
+Linux Namespaces enable lightweight isolation by creating separate views of system resources for groups of processes. This capability underpins modern containerization, ensuring that processes running in one namespace remain unaware of those in another. By confining access to system resources, namespaces allow multiple containerized workloads to share a single kernel while maintaining logical separation.
 
-    %\subsection{Network (NET) ?}
-    %\subsection{USER ?}
+\textbf{Process ID (PID)}
+
+The PID namespace gives each container its own process numbering scheme, starting with PID 1. Within this namespace, processes are invisible to those in the host system or other namespaces. This setup allows containers to manage processes as though they are on a dedicated machine, enabling features like container migration or suspension without affecting the global PID space.
+
+\textbf{UNIX Time-sharing System (UTS)}
+
+The UTS namespace isolates hostname and domain name information, letting containers adopt distinct network identities. Updating the hostname inside one UTS namespace will not affect the host or other containers, ensuring clarity in multi-tenant or multi-instance environments.
+
+\textbf{Inter-Process Communication (IPC)}
+
+The IPC namespace confines shared memory regions, semaphores, and message queues to the container, preventing them from overlapping with the host or other containers. This mechanism is essential for complex applications that rely on inter-process communication but also need to remain isolated from external processes.
+
+\textbf{TIME}
+
+The Time namespace allows processes to operate under a virtualized system clock. This feature is particularly valuable in scenarios where an application requires time-dependent testing or simulation without altering the host system’s actual clock. Processes within this namespace perceive a separate notion of system time, enabling careful control of time-related behaviors.
+
+\textbf{Mount (MNT)}
+
+The Mount namespace enables containers to have distinct filesystem views. Changes to mounts inside the namespace, such as mounting or unmounting filesystems, do not propagate to the host or other containers. This strategy is vital for secure sandboxing, as it prevents containers from altering critical host filesystem paths.
+
+\textbf{Control Groups (CGROUPS)}
+Control Groups (\texttt{cgroups}) work in tandem with namespaces to manage resource usage at a granular level. Administrators or container engines can specify memory, CPU, or I/O constraints on groups of processes, ensuring that rogue or heavily loaded containers cannot starve other processes on the system.
+
+\definitionblock[Linux Namespace]{
+A Linux Namespace is a kernel-level isolation mechanism that partitions process views of system resources (e.g., PIDs, networks, filesystems), providing each namespace with a restricted environment that does not interfere with other namespaces or the host system.
+}
 
 \section{The /proc Filesystem and Resource Isolation}
 
-    \subsection{The /proc Filesystem}
-    \subsection{Resource Isolation}
+\textbf{The /proc Filesystem}
 
+The \texttt{/proc} filesystem acts as a dynamic interface to the kernel’s internal data structures. It provides real-time information about running processes, CPU features, and memory statistics. Containers typically rely on this pseudo-filesystem to query system resources and modify runtime parameters. Since each container can mount a tailored view of \texttt{/proc}, they perceive only the resources and processes available in their respective namespaces rather than those of the host.
+
+\textbf{Resource Isolation}
+
+Comprehensive resource isolation in Linux emerges from the combination of namespaces and \texttt{cgroups}. Namespaces enforce logical isolation, so that filesystem operations and process visibility remain confined to each container. \texttt{cgroups} impose physical limits, preventing containers from consuming excessive CPU time, memory, or other resources. This synergy enables secure, scalable environments capable of running numerous containers side by side without significant interference.
+
+\section{Virtual Machines and Hypervisors}
+
+\subsection{Virtual Machines (VMs)}
+
+Virtual Machines (VMs) allow multiple operating systems to run in complete isolation on a single physical machine by emulating hardware through software. Each VM includes its own kernel, resource management, and filesystem, behaving as if it were a standalone system. This design provides robust security boundaries and reliability, making VMs attractive for scenarios requiring strong isolation, such as running untrusted code or simulating entire environments for testing.
+
+However, VMs often incur higher resource usage and slower startup times when compared to container-based solutions. Because each VM replicates an entire operating system, they demand more memory and processing overhead, which can limit efficiency in environments where large numbers of instances need to run concurrently.
+
+\definitionblock[Virtual Machine]{
+A Virtual Machine is a software-based emulation of a physical computer, featuring its own virtualized hardware, kernel, and operating system. This approach provides strong isolation between different workloads on the same host but can lead to increased resource consumption due to the replication of the underlying OS layers.
+}
+
+\subsection{Hypervisors (KVM, QEMU)}
+
+Hypervisors form the foundation of virtualization by allocating and managing the hardware resources that VMs consume. They serve as an abstraction layer between the guest operating systems and the physical hardware, ensuring isolation and controlling how resources like CPU, memory, and storage are shared.
+
+\definitionblock[Hypervisor]{
+A hypervisor is the software or firmware responsible for creating and running virtual machines, isolating their execution environments from each other and from the underlying hardware.
+}
+
+Modern Linux-based hypervisors include \textit{KVM} (Kernel-based Virtual Machine), which takes advantage of hardware virtualization extensions (e.g., Intel VT-x, AMD-V) to provide efficient performance. Meanwhile, \textit{QEMU} is a powerful software emulation tool often paired with KVM to handle additional device emulation tasks, enabling a versatile and configurable virtualization stack. Together, KVM and QEMU provide a solid environment for running multiple VMs on Linux systems without significant overhead.
+
+\section{Containers}
+
+Containers have revolutionized the way applications are developed, deployed, and managed by providing a lightweight and portable environment that encapsulates an application along with its dependencies. Unlike Virtual Machines (VMs), containers share the host operating system's kernel, enabling high efficiency and rapid deployment.
+
+\subsection{Container Definition}
+
+A \textbf{container} is the runtime instantiation of a \textit{container image} from a \textit{repository}. It operates as a standard Linux process, typically created using the \texttt{clone()} system call instead of \texttt{fork()} or \texttt{execvp()}. Containers are further isolated using Linux namespaces and control groups (\texttt{cgroups}), along with security mechanisms like SELinux or AppArmor, ensuring that each container remains isolated from others and the host system.
+
+\definitionblock[Container]{
+A container is a lightweight and portable environment that encapsulates an application together with its necessary dependencies, all running atop the host operating system’s kernel instead of a separate guest OS. This design allows for efficient resource utilization and rapid startup times, making containers ideal for microservices and cloud-native applications.
+}
+
+\subsection{Container Image and Repository}
+
+A \textit{container image} is a packaged set of file system layers and metadata that defines how to run a container. It is typically downloaded from a \textit{registry server} and used locally as a mount point when starting containers. While the term \textit{container image} is often used interchangeably with \textit{repository}, it is important to distinguish that a repository comprises multiple image layers and associated metadata, such as \texttt{manifest.json}.
+
+\definitionblock[Container Image]{
+A container image is a packaged set of file system layers and metadata describing how to run a container. It is typically downloaded from a remote registry and mounted locally to launch container processes.
+}
+
+Common image formats include \textit{Docker}, \textit{Appc}, \textit{LXD}, and the \textit{Open Container Initiative (OCI)} format, with OCI being the most widely adopted standard. Commands like \texttt{docker pull} or \texttt{podman pull} are used to retrieve images from repositories by referencing their repository names and optional tags.
+
+\observationblock[Repository vs. Image]{
+While \textit{images} and \textit{repositories} are often used interchangeably, it is crucial to understand their distinction. A \textbf{repository} is a collection of related image layers and metadata, identified by a unique name and optional tags. For example, the command \texttt{docker pull registry.access.redhat.com/rhel7:latest} fetches an image from the specified repository, which may contain multiple layers representing incremental changes.
+}
+
+\subsection{Container Engines}
+
+A \textbf{container engine} is software that orchestrates the lifecycle of containers. It accepts user requests through interfaces like command-line tools, manages container images by pulling them from registries, and initiates or terminates containers using underlying \textit{container runtimes}.
+
+\definitionblock[Container Engine]{
+A container engine is a software layer that orchestrates container lifecycle operations, including image retrieval, container creation, and container management, typically leveraging an underlying container runtime for the actual process isolation.
+}
+
+Examples of container engines include \textit{Docker}, \textit{Podman}, \textit{RKT}, \textit{CRI-O}, and \textit{LXD}. Cloud providers often implement their own container engines tailored to their platforms. For instance, Docker provides a comprehensive stack involving \texttt{docker-cli}, \texttt{docker-compose}, and the \texttt{dockerd} daemon, which interacts with \texttt{containerd} and \texttt{runc} to manage container processes.
+
+\subsection{Container Runtimes and System Calls}
+
+The \textbf{container runtime} is the low-level component within a container engine responsible for the creation and execution of container processes. Following the OCI Runtime Specification, \texttt{runc} serves as the reference implementation, while alternatives like \texttt{crun}, \texttt{railcar}, and \texttt{katacontainers} offer additional features or optimizations.
+
+\definitionblock[Container Runtime]{
+A container runtime is the lower-level component within a container engine that manages the actual creation and execution of container processes. It interfaces directly with the operating system to apply namespaces, cgroups, and other isolation mechanisms.
+}
+
+Key \textit{system calls} utilized by container runtimes include:
+\begin{itemize}
+    \item \texttt{clone()}: Provides fine-grained control over what is shared between the parent and child processes, including namespaces.
+    \item \texttt{fork()}: Duplicates the calling process to create a new process.
+    \item \texttt{execvp()}: Replaces the current process image with a new one.
+\end{itemize}
+
+These system calls, combined with Linux features like \texttt{cgroups} and namespaces, form the foundation of container isolation and resource management.
+
+\subsection{Docker Stack vs. Podman Stack}
+
+Historically, \textbf{Docker} popularized containerization with a user-friendly CLI and a monolithic daemon (\texttt{dockerd}). The Docker architecture includes:
+\begin{itemize}
+    \item \texttt{docker-cli} or \texttt{docker-compose}
+    \item \texttt{dockerd} (container engine)
+    \item \texttt{containerd} (manager)
+    \item \texttt{containerd-shim}
+    \item \texttt{runc} or a similar runtime
+\end{itemize}
+
+In contrast, \textbf{Podman} offers a daemonless experience, eliminating the need for a central background daemon like \texttt{dockerd}. Instead, \texttt{podman-cli} interacts directly with utilities such as \texttt{conmon} and \texttt{runc}, enabling rootless container execution without the overhead or security concerns associated with a central daemon.
+
+\subsection{Kubernetes Integration}
+
+For large-scale orchestration, \textbf{Kubernetes} utilizes the Container Runtime Interface (CRI) to interact with various container runtimes. While Docker was traditionally the default runtime, many Kubernetes deployments are transitioning to \textbf{CRI-O} or \textbf{containerd} to better align with the CRI specifications. Kubernetes leverages standard APIs to manage container deployment, networking, and scaling across multiple nodes, ensuring seamless operation within a cluster.
+
+\subsection{Capabilities and User Namespaces}
+
+Linux \textbf{capabilities} enhance security by dividing the traditional superuser privileges into distinct, manageable units (e.g., \texttt{CAP\_NET\_ADMIN}, \texttt{CAP\_SYS\_BOOT}). This allows containers to be granted only the specific capabilities they require, minimizing potential security risks.
+
+\definitionblock[Capability]{
+A capability is a distinct unit of privilege that can be independently enabled or disabled for a process. This granularity allows for more secure and controlled permission management compared to the all-or-nothing superuser model.
+}
+
+\textbf{User namespaces} extend the capability concept by allowing a process to appear as root within the container while being an unprivileged user on the host system. This separation ensures that even if a process inside the container has root-like privileges, it does not pose a security threat to the host environment.
+
+Capabilities are tied to user namespaces, meaning each namespace has its own set of capabilities. A child namespace cannot be granted more capabilities than the creating process possesses in its own namespace, ensuring controlled privilege escalation and enhancing overall security.
+
+\subsection{Mount Namespace Propagation}
+
+The \textbf{Mount namespace} plays a critical role in container security and filesystem management. It isolates mount points, ensuring that changes to the filesystem within a container do not affect the host or other containers. Linux defines several mountpoint propagation modes to control how mount events are shared across namespaces:
+\begin{itemize}
+    \item \texttt{shared}: A mount belongs to a group of peers. Any changes propagate to all members.
+    \item \texttt{slave}: One-way propagation where the master propagates changes to the slave, but not vice versa.
+    \item \texttt{private}: Does not receive or forward any propagation events.
+    \item \texttt{unbindable}: Cannot be bind-mounted.
+\end{itemize}
+
+These propagation modes provide flexibility for advanced scenarios, allowing certain filesystem changes to be visible across multiple namespaces while others remain strictly isolated.
+
+% --- COMPARISON BETWEEN VMS AND CONTAINERS ---
 \section{Differences Between VMs and Containers}
 
+Virtual Machines (VMs) and Containers are both technologies that provide isolation and resource management, but they achieve these goals through fundamentally different approaches, resulting in distinct advantages and trade-offs.
+
+\definitionblock[Container]{
+A container is a lightweight and portable environment that encapsulates an application together with its necessary dependencies, all running atop the host operating system’s kernel instead of a separate guest OS.
+}
+
+\textbf{Virtual Machines (VMs)} offer full hardware emulation, including their own operating systems and kernels. This allows VMs to provide strong isolation between different workloads, as each VM operates independently of the host and other VMs. VMs are ideal for scenarios requiring complete isolation and the ability to run different operating systems on the same physical hardware. However, this level of isolation comes at the cost of higher resource consumption and longer startup times, as each VM duplicates the overhead of an entire operating system.
+
+\textbf{Containers}, in contrast, share the host operating system's kernel, providing a much more lightweight form of isolation. Containers encapsulate only the application and its dependencies, avoiding the need to replicate the entire OS. This results in significantly lower resource usage and faster startup times, making containers highly efficient for deploying microservices and cloud-native applications. Containers can be easily scaled and managed, fitting seamlessly into modern DevOps practices and continuous deployment pipelines.
+
+Furthermore, containers offer greater portability across different environments, as they bundle all necessary components to run the application consistently from development to production. This consistency reduces the "it works on my machine" problem and streamlines the deployment process.
+
+In summary, while \textbf{VMs} are suited for applications requiring full isolation and diverse operating systems, \textbf{containers} excel in environments demanding high efficiency, rapid scaling, and portability. The choice between VMs and containers depends on the specific requirements of the workload, balancing the need for isolation against resource efficiency and deployment flexibility.
+
+\definitionblock[Virtual Machine vs. Container]{
+Virtual Machines provide complete hardware virtualization with their own operating systems, offering strong isolation but higher resource usage. Containers share the host OS kernel, delivering lightweight and efficient process-level isolation suitable for scalable and portable applications.
+}
+
+\section{Mount Namespace Propagation}
+
+The Mount namespace is closely related to container security and convenience. It isolates mount points, meaning a container’s filesystem changes do not affect the host or other containers. Linux also defines mountpoint propagation modes such as \texttt{shared}, \texttt{slave}, \texttt{private}, and \texttt{unbindable}, indicating how changes in one namespace might (or might not) be reflected in others. This flexibility supports advanced scenarios where certain filesystem changes must be visible across namespaces while others remain isolated.
+
+\section{Conclusion}
+
+By integrating these definitions and concepts from the slides, we can see how containers build on top of Linux kernel features like namespaces and cgroups to provide efficient and flexible process-level isolation. Container images simplify distribution by bundling application code and dependencies, while container engines and runtimes manage the lifecycle of these images as runnable processes. In contrast, Virtual Machines replicate entire operating systems, thereby delivering stronger hardware-level isolation but incurring heavier resource usage. Ultimately, the right choice depends on workload requirements: containers excel at high density and rapid deployment, whereas VMs may be more suitable where robust isolation or hardware emulation is paramount.
