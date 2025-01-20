@@ -1,0 +1,450 @@
+
+
+
+\chapter{Searching Algorithms}
+
+The search tree data structure supports many dynamic-set operations, including
+SEARCH, MINIMUM, MAXIMUM, PREDECESSOR, SUCCESSOR, INSERT, and
+DELETE. Thus, we can use a search tree both as a dictionary and as a priority
+queue.
+Basic operations on a binary search tree take time proportional to the height of
+the tree. For a complete binary tree with n nodes, such operations run in $\Theta(\log n)$
+worst-case time. If the tree is a linear chain of n nodes, however, the same oper-
+ations take $\Theta(n)$ worst-case time. We shall see that the expected height of a randomly
+built binary search tree is only $\Theta(\log n)$, so that the \textbf{expected} time for these 
+operations is $\Theta(\log n)$.
+
+
+\section{Binary Search Trees}
+
+We can represent a binary tree by a linked data structure in which each node is an object.
+In addition to a \textbf{key} and \textbf{satellite} data, each node contains attributes \textbf{left}, \textbf{right}, and \textbf{p} that
+point to the nodes corresponding to its left child, its right child, and its parent, respectively.
+
+\begin{itemize}
+    \item \textbf{Input}: a SORTED sequence of n keys 
+    \item \textbf{Output}: a position i in the sequence where the key is located
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/binary_tree.png}
+    \caption{Binary Search Tree}
+\end{figure}
+
+The keys in a binary search tree are always stored in such a way as to satisfy the
+\textbf{binary-search-tree property}:
+
+\definitionblock[Binary Search Tree Property]{Let x be a node in a binary search tree. If y is a node in the left subtree of x, then $y.key \leq x.key$. If y is a node in the right subtree of x, then $y.key \geq x.key$.}
+
+The binary-search-tree property allows us to print out all the keys in a binary
+search tree in sorted order by a simple recursive algorithm, called an \textbf{inorder tree
+walk}. This algorithm is so named because it prints the key of the root of a subtree
+between printing the values in its left subtree and printing those in its right subtree.
+(Similarly, a \textbf{preorder tree walk} prints the root before the values in either subtree,
+and a \textbf{postorder tree walk} prints the root after the values in its subtrees.)
+
+\begin{algorithm}
+    \caption{Inorder Tree Walk}
+    \If{$x \neq NIL$}{
+        INORDER-TREE-WALK$(x.left)$\\
+        print $x.key$\\
+        INORDER-TREE-WALK$(x.right)$
+    }
+\end{algorithm}
+
+It takes $\theta(n)$ time to walk an n-node binary search tree, since after the initial call, the procedure calls itself recursively exactly twice for each node in the
+tree—once for its left child and once for its right child.
+
+\newtheorem{binary search}{theorem}
+\begin{theorem}
+    The running time of INORDER-TREE-WALK on a binary search tree of n nodes is $\Theta(n)$.
+\end{theorem}
+
+\begin{proof}
+    \begin{align*}
+    T(n) &\leq T(k) + T(n-k-1) + d \\
+    &= ((c + d)k + c) + ((c + d)(n - k - 1) + c) + d \\
+    &= (c + d)n + c - (c + d) + c + d \\
+    &= (c + d)n + c,
+    \end{align*}
+    Where c and d are constants that represent the time per call to INORDER-TREE-WALK and the time per print statement, respectively.  k is the number of nodes in the left subtree of x, while n - k - 1 is the number of nodes in the right subtree of x. The base case occurs when n = 0, in which case the running time is constant. The recurrence is linear, and so the running time of INORDER-TREE-WALK is $\Theta(n)$.
+\end{proof}
+\newpage
+\subsection{Quering a Binary Search Tree}
+
+We often need to search for a key stored in a binary search tree. Besides the
+SEARCH operation, binary search trees can support such queries as MINIMUM,
+MAXIMUM, SUCCESSOR, and PREDECESSOR. In this section, we shall examine
+these operations and show how to support each one in time O.h/ on any binary
+search tree of height h.
+
+\subsubsection*{Searching}
+
+\definitionblock[Searching]{We use the following procedure to search for a node with a given key in a binary
+search tree. Given a pointer to the root of the tree and a key k, TREE-SEARCH
+returns a pointer to a node with key k if one exists; otherwise, it returns NIL.}
+
+\begin{algorithm}
+    \caption{TREE-SEARCH(x, k)}
+    \While{$x \neq NIL$ and $k \neq x.key$}{
+        \If{$k < x.key$}{
+            $x = x.left$
+        }
+        \Else{
+            $x = x.right$
+        }
+    }
+    \Return x
+\end{algorithm}
+
+\subsubsection*{Minimum and Maximum}
+
+We can always find an element in a binary search tree whose key is a minimum by
+following left child pointers from the root until we encounter a NIL.
+
+\begin{algorithm}
+    \caption{TREE-MINIMUM(x)}
+    \While{$x.left \neq NIL$}{
+        $x = x.left$
+    }
+    \Return x
+\end{algorithm}
+
+Same for the maximum:
+
+\begin{algorithm}
+    \caption{TREE-MAXIMUM(x)}
+    \While{$x.right \neq NIL$}{
+        $x = x.right$
+    }
+    \Return x
+\end{algorithm}
+
+Both of these procedures run in O.h/ time on a tree of height h since, as in TREE-
+SEARCH, the sequence of nodes encountered forms a simple path downward from
+the root.
+
+\subsubsection*{Successor and Predecessor}
+
+Given a node in a binary search tree, sometimes we need to find its successor in
+the sorted order determined by an inorder tree walk. If all keys are distinct, the
+successor of a node x is the node with the smallest key greater than x:key. The
+structure of a binary search tree allows us to determine the successor of a node
+without ever comparing keys. The following procedure returns the successor of a
+node x in a binary search tree if it exists, and NIL if x has the largest key in the
+tree:
+
+\begin{algorithm}
+    \caption{TREE-SUCCESSOR(x)}
+    \If{$x.right \neq NIL$}{
+        \Return TREE-MINIMUM$(x.right)$
+    }
+    $y = x.p$
+    \While{$y \neq NIL$ and $x = y.right$}{
+        $x = y$
+        $y = y.p$
+    }
+    \Return y
+\end{algorithm}
+
+\subsection{Insertion and Deletion}
+
+The operations of insertion and deletion cause the dynamic set represented by a
+binary search tree to change. The data structure must be modified to reflect this
+change, but in such a way that the binary-search-tree property continues to hold.
+
+\subsubsection*{Insertion}
+
+The procedure takes a node z for which $z.key = v$,$ z.left = NIL$ and $z.right = NIL$. 
+It modifies the tree T and some of the attributes of z in such a way that it inserts
+z into the appropriate position in the tree.
+
+\begin{algorithm}
+    \caption{TREE-INSERT(T, z)}
+    $y = NIL$\\
+    $x = T.root$\\
+    \While{$x \neq NIL$}{
+        $y = x$\\
+        \If{$z.key < x.key$}{
+            $x = x.left$
+        }
+        \Else{
+            $x = x.right$
+        }
+    }
+    $z.p = y$\\
+    \If{$y = NIL$}{
+        $T.root = z$ 
+    }
+    \ElseIf{$z.key < y.key$}{
+        $y.left = z$
+    }
+    \Else{
+        $y.right = z$
+    }
+\end{algorithm}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/insertion_bt.png}
+    \caption{Insertion in a Binary Search Tree}
+\end{figure}
+
+\subsubsection*{Deletion}
+
+\begin{itemize}
+    \item \textbf{Case 1}: If node z has no children, then we simply remove it by modifying its parent to replace z with NIL as its child.
+    \item \textbf{Case 2}: If node z has just one child, then we elevate that child to take z’s position in the tree by modifying z’s parent to replace z by z’s child.
+    \item \textbf{Case 3}: If node z has two children, then we find z’s successor y, which lies in z’s right subtree and has no left child. We want to splice y out of its current location and have it replace z in the tree.
+\end{itemize}
+
+\begin{algorithm}
+    \caption{TREE-DELETE(T, z)}
+    \If{$z.left = NIL$}{
+        TRANSPLANT$(T, z, z.right)$
+    }
+    \ElseIf{$z.right = NIL$}{
+        TRANSPLANT$(T, z, z.left)$
+    }
+    \Else{
+        $y = TREE-MINIMUM(z.right)$
+        \If{$y.p \neq z$}{
+            TRANSPLANT$(T, y, y.right)$\\
+            $y.right = z.right$\\
+            $y.right.p = y$
+        }
+        TRANSPLANT$(T, z, y)$\\
+        $y.left = z.left$\\
+        $y.left.p = y$
+    }
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{TRANSPLANT(T, u, v)}
+    \If{$u.p = NIL$}{
+        $T.root = v$
+    }
+    \ElseIf{$u = u.p.left$}{
+        $u.p.left = v$
+    }
+    \Else{
+        $u.p.right = v$
+    }
+    \If{$v \neq NIL$}{
+        $v.p = u.p$
+    }
+\end{algorithm}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/deletion_bt.png}
+    \caption{Deletion in a Binary Search Tree. (a) Node z has no left child. (b) Node z has a left child but not a right child. (c) Node z has two children. (d) Node z has two children, and its successor $y \neq r$ lies between the subtree rooted at r.}
+\end{figure}
+
+\subsection*{Sorting}
+
+\begin{algorithm}
+    \caption{BST-SORT(T)}
+    $T = \emptyset$ \\
+    \For{$i = 1$ to $n$}{
+        $T.root = TREE-INSERT(T, i)$
+    }
+    INORDER-TREE-WALK$(T.root)$\\
+    \tcc{Time complexity: $\Theta(n \log n)$}
+\end{algorithm}
+
+INORDER-TREE-WALK takes $\Theta(n)$ time, and we call it n times, so the total time is $\Theta(n \log n)$.
+
+\section{Red-Black Trees}
+
+It is a BST that enjoys the following properties:
+\begin{itemize}
+    \item Every node is colored, either \textbf{red} or \textbf{black}.
+    \item The root is \textbf{black}.
+    \item Every leaf (NIL) is \textbf{black}.
+    \item If a \textbf{red} node has children, then the children are \textbf{black}.
+    \item All paths from a node to its leaves have the same \textbf{black} height.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering 
+    \includegraphics[width = \textwidth]{assets/RBT.png}
+    \caption{Red-Black Tree}
+\end{figure}
+
+\newtheorem{RBT}{theorem}
+\begin{theorem}
+    Any Red-Black Tree with n keys has the height $h \leq 2\log(n+1)$
+\end{theorem}
+\begin{proof}
+    We start by showing that the subtree rooted at any node \(x\) contains at least \(2^{\text{bh}(x)} - 1\) internal nodes. We prove this claim by induction on the height of \(x\).
+
+    If the height of \(x\) is \(0\), then \(x\) must be a leaf (\(T.\text{nil}\)), and the subtree rooted at \(x\) indeed contains at least 
+    \[
+    2^{\text{bh}(x)} - 1 = 2^0 - 1 = 0
+    \]
+    internal nodes.
+
+    For the inductive step, consider a node \(x\) that has positive height and is an internal node with two children. Each child has a black-height of either \(\text{bh}(x)\) or \(\text{bh}(x) - 1\), depending on whether its color is red or black, respectively. Since the height of a child of \(x\) is less than the height of \(x\) itself, we can apply the inductive hypothesis to conclude that each child has at least 
+    \[
+    2^{\text{bh}(x)-1} - 1
+    \] 
+    internal nodes. Thus, the subtree rooted at \(x\) contains at least 
+    \[
+    \left(2^{\text{bh}(x)-1} - 1\right) + \left(2^{\text{bh}(x)-1} - 1\right) + 1 = 2^{\text{bh}(x)} - 1
+    \] 
+    internal nodes, which proves the claim.
+\end{proof}
+
+\subsection*{Rotations}
+
+The operations TREE-INSERT and TREE-DELETE can violate the properties of a red-black tree. To restore these properties, we use two operations: LEFT-ROTATE and RIGHT-ROTATE.
+\begin{algorithm}[H]
+    \caption{LEFT-ROTATE(T,x)}
+    y = x.right\\
+    x.right = y.left\\
+    \If{$y.left \neq T.nil$}{
+        $y.left.p = x$
+    }
+    y.p = x.p\\
+    \If{$x.p = T.nil$}{
+        $T.root = y$
+    }
+    \ElseIf{$x = x.p.left$}{
+        $x.p.left = y$
+    }
+    \Else{
+        $x.p.right = y$
+    }
+    y.left = x\\
+    x.p = y
+\end{algorithm}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/rotation_rbt.png}
+    \caption{Left Rotation}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/rotation_example_rbt.png}
+    \caption{Example of rotation in a Red-Black Tree}
+\end{figure}
+
+\newpage
+\subsection*{Insertion}
+
+We can insert a new node into a red-black tree by using the following procedure. The procedure takes as input the tree T and a node z to insert into T. It modifies the tree as necessary to maintain the red-black properties.
+
+\begin{algorithm}[H]
+    \caption{RB-INSERT(T,z)}
+    y = T.nil\\
+    x = T.root\\
+    \While{$x \neq T.nil$}{
+        y = x\\
+        \If{$z.key < x.key$}{
+            x = x.left
+        }
+        \Else{
+            x = x.right
+        }
+    }
+    z.p = y\\
+    \If{$y = T.nil$}{
+        T.root = z
+    }
+    \ElseIf{$z.key < y.key$}{
+        y.left = z
+    }
+    \Else{
+        y.right = z
+    }
+    z.left = T.nil\\
+    z.right = T.nil\\
+    z.color = RED\\
+    RB-INSERT-FIXUP(T,z)
+    \tcc{Time complexity: $\Theta(\log n)$}
+\end{algorithm}
+
+\begin{algorithm}
+    \caption{RB-INSERT-FIXUP(T,z)}
+    \While{$z.p.color = RED$}{
+        \If{$z.p = z.p.p.left$}{
+            y = z.p.p.right\\
+            \If{$y.color = RED$}{
+                z.p.color = BLACK\\
+                y.color = BLACK\\
+                z.p.p.color = RED\\
+                z = z.p.p
+            }
+            \Else{
+                \If{$z = z.p.right$}{
+                    z = z.p\\
+                    LEFT-ROTATE(T,z)
+                }
+                z.p.color = BLACK\\
+                z.p.p.color = RED\\
+                RIGHT-ROTATE(T,z.p.p)
+            }
+        }
+        \Else{
+            \tcc{Same as then clause with "right" and "left" exchanged}
+        }
+    }
+    T.root.color = BLACK
+\end{algorithm}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{assets/insertion_rbt.png}
+    \caption{Insertion in a Red-Black Tree}
+\end{figure}
+
+\newpage 
+\subsubsection*{Why RB-INSERT-FIXUP is Necessary}
+
+The \texttt{RB-INSERT-FIXUP} algorithm is necessary to maintain the properties of a red-black tree after the insertion of a new node. When a new node is inserted, it is initially colored red. This can potentially violate the red-black tree properties, specifically:
+
+\begin{itemize}
+    \item Property 2: The root must be black.
+    \item Property 4: Both children of every red node must be black (no two red nodes can be adjacent).
+    \item Property 5: Every path from a node to its descendant NIL nodes must have the same number of black nodes.
+\end{itemize}
+
+The \texttt{RB-INSERT-FIXUP} algorithm corrects any violations of these properties by performing a series of color changes and rotations. This ensures that the tree remains balanced, with a height of at most $2\log(n+1)$, which guarantees that the basic dynamic set operations (such as search, insert, and delete) can be performed in $O(\log n)$ time.
+
+\subsubsection*{Explanation of RB-INSERT-FIXUP Algorithm}
+
+The \texttt{RB-INSERT-FIXUP} algorithm is essential for maintaining the red-black tree properties after an insertion. Here is a step-by-step explanation of why it is necessary:
+
+1. **Initial Insertion**: When a new node \(z\) is inserted, it is colored red. This is done to maintain property 5 (black-height property) without immediately violating it. However, this can lead to a violation of property 4 (no two red nodes can be adjacent).
+
+2. **Fixing Violations**: The algorithm checks for violations of the red-black properties, specifically property 4. If \(z\)'s parent \(z.p\) is red, then there is a violation because \(z\) and \(z.p\) are both red.
+
+3. **Case Handling**: The algorithm handles violations through a series of cases:
+    - **Case 1**: If \(z\)'s uncle \(y\) is red, both \(z.p\) and \(y\) are recolored to black, and \(z.p.p\) is recolored to red. The algorithm then continues to check for violations up the tree.
+    - **Case 2**: If \(z\) is a right child and \(z.p\) is a left child, a left rotation is performed on \(z.p\). This transforms the situation into Case 3.
+    - **Case 3**: \(z.p\) is recolored to black, \(z.p.p\) is recolored to red, and a right rotation is performed on \(z.p.p\).
+
+4. **Termination**: The algorithm terminates when the root is reached or when no violations are found. Finally, the root is colored black to ensure property 2 (the root is black).
+
+By performing these steps, the \texttt{RB-INSERT-FIXUP} algorithm ensures that all red-black tree properties are restored, maintaining the tree's balanced structure and guaranteeing efficient performance for subsequent operations.
+
+
+\subsubsection*{Analysis}
+
+What is the running time of RB-INSERT? Since the height of a red-black tree on n
+nodes is $O(\log n)$, lines 1–16 of RB-INSERT take $O(\log n)$ time. In RB-INSERT-
+FIXUP, the while loop repeats only if case 1 occurs, and then the pointer ´ moves
+two levels up the tree. The total number of times the while loop can be executed
+is therefore $O(\log n)$. Thus, RB-INSERT takes a total of $O(\log n)$ time. 
+
+
+
+
+
+
+
+
