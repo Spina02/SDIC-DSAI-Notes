@@ -17,12 +17,12 @@ It works the following way:
 Contains the configuration and structure of your project. It is a script that CMake uses to generate the build system files.
 It has the following structure:
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    cmake_minimum_required(VERSION 3.10) 
-    project(MyProject)  
+\begin{neonlisting}[language=C++]{}
+cmake_minimum_required(VERSION 3.10) 
+project(MyProject)  
 
-    add_executable(my_project_main.cpp) 
-    \end{neonlisting}
+add_executable(my_project_main.cpp) 
+\end{neonlisting}
 
 \subsection{Minimum Version}
 
@@ -38,7 +38,7 @@ a range like \inlinecode{3.12...3.15}. This is useful when you want to use new f
 
 \subsection{Setting a project}
 Every top-level CMake file will have this line:
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
+\begin{neonlisting}[language=C++]{}
     project(MyProject VERSION 1.0
         DESCRIPTION "My Project"
         LANGUAGES CXX)
@@ -51,8 +51,8 @@ and \inlinecode{PROJECT\_VERSION}. The \inlinecode{LANGUAGES} keyword sets the l
 
 \subsection{Making an executable}
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    add_executable(my_project_main my_project_main.cpp)
+\begin{neonlisting}[language=C++]{}
+add_executable(my_project_main my_project_main.cpp)
 \end{neonlisting}
 
 \inlinecode{my\_project} is both the name of the executable file generate and the name of the CMake target created.
@@ -61,8 +61,8 @@ The headers will be ignored for most purposes; they are there only to be showed 
 
 \subsection{Making a library}
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    add_library(my_library STATIC my_library.cpp)
+\begin{neonlisting}[language=C++]{}
+add_library(my_library STATIC my_library.cpp)
 \end{neonlisting}
 
 \inlinecode{STATIC} is the type of library. It can be \inlinecode{SHARED} or \inlinecode{MODULE}. The source files are the same as for executables.
@@ -76,16 +76,16 @@ CMake is all about targets and properties. An executable is a target, a library 
 application is built as a collection of targets depending on each other.
 
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    target_include_directories(my_library PUBLIC include)
+\begin{neonlisting}[language=C++]{}
+target_include_directories(my_library PUBLIC include)
 \end{neonlisting}
 
 This sets the include directories for the target. The \inlinecode{PUBLIC} keyword means that the include directories will be propagated to any target that links to \inlinecode{my\_library}.
 We can then chain targets:
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    add_library(my_library STATIC my_library.cpp)
-    target_link_libraries(my_project PUBLIC my_library)
+\begin{neonlisting}[language=C++]{}
+add_library(my_library STATIC my_library.cpp)
+target_link_libraries(my_project PUBLIC my_library)
 \end{neonlisting}
 
 This will link \inlinecode{my\_project} to \inlinecode{my\_library}. The \inlinecode{PUBLIC} keyword means that the link will be propagated to any target that links to \inlinecode{my\_project}.
@@ -97,8 +97,8 @@ compile features and more.
 
 \inlinecode{Local variables} are used to store values that are used only in the current scope:
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    set(MY_VAR "some_file") 
+\begin{neonlisting}[language=C++]{}
+set(MY_VAR "some_file") 
 \end{neonlisting}
 
 The names of the variables are case-sensitive and the values are strings. You access a variable by using \inlinecode{\$\{\}}.
@@ -107,8 +107,8 @@ no longer be defined. You can set a variable in the scope immediately above your
 
 One can also set a list of values:
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    set(MY_LIST "value1" "value2" "value3")
+\begin{neonlisting}[language=C++]{}
+set(MY_LIST "value1" "value2" "value3")
 \end{neonlisting}
 
 which internally becomes a string with semicolons. You can access the values with \inlinecode{\$\{MY\_LIST\}}.
@@ -116,27 +116,27 @@ which internally becomes a string with semicolons. You can access the values wit
 If you want to set a variable from the command line, CMake offers a variable cache.
 \inlinecode{Cache variables} are used to interact with the command line:
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    set(MY_CACHE_VAR "VALUE" CACHE STRING "Description")
+\begin{neonlisting}[language=C++]{}
+set(MY_CACHE_VAR "VALUE" CACHE STRING "Description")
 
-    option(MY_OPTION "Set from command line" ON)
+option(MY_OPTION "Set from command line" ON)
 \end{neonlisting}
 
 Then:
-\begin{neonlisting}[language=bash]{CMakeLists.txt}
-    cmake /path/to/src/ \
-    -DMY_CACHE_VAR="some_value" \
-    -DMY_OPTION=OFF
+\begin{neonlisting}[language=bash]{}
+cmake /path/to/src/ \
+-DMY_CACHE_VAR="some_value" \
+-DMY_OPTION=OFF
 \end{neonlisting}
 
 \inlinecode{Environment variables} are used to interact with the environment:
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    # Read
-    message(STATUS $ENV{MY_ENV_VAR})
-    
-    # Write
-    set(ENV{MY_ENV_VAR} "some_value")
+\begin{neonlisting}[language=bash]{}
+# Read
+message(STATUS $ENV{MY_ENV_VAR})
+
+# Write
+set(ENV{MY_ENV_VAR} "some_value")
     
 \end{neonlisting}
 
@@ -146,8 +146,8 @@ But it is not recommended to use environment variables in CMake.
 
 The other way to set properties is to use the \inlinecode{set\_property} command:
 
-\begin{neonlisting}[language=C++]{CMakeLists.txt}
-    set_property(TARGET my_library PROPERTY CXX_STANDARD 17)
+\begin{neonlisting}[language=C++]{}
+set_property(TARGET my_library PROPERTY CXX_STANDARD 17)
 \end{neonlisting}
 
 This is like a variable, but it is attached to a target. The \inlinecode{PROPERTY} keyword is optional. The \inlinecode{CXX\_STANDARD} is a property that sets the C++ standard for the target.
