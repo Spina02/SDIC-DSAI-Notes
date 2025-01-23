@@ -27,9 +27,9 @@ The Mount namespace enables containers to have distinct filesystem views. Change
 \textbf{Control Groups (CGROUPS)}
 Control Groups (\texttt{cgroups}) work in tandem with namespaces to manage resource usage at a granular level. Administrators or container engines can specify memory, CPU, or I/O constraints on groups of processes, ensuring that rogue or heavily loaded containers cannot starve other processes on the system.
 
-\definitionblock[Linux Namespace]{
+\begin{definitionblock}[Linux Namespace]
 A Linux Namespace is a kernel-level isolation mechanism that partitions process views of system resources (e.g., PIDs, networks, filesystems), providing each namespace with a restricted environment that does not interfere with other namespaces or the host system.
-}
+\end{definitionblock}
 
 \section{The /proc Filesystem and Resource Isolation}
 
@@ -49,17 +49,17 @@ Virtual Machines (VMs) allow multiple operating systems to run in complete isola
 
 However, VMs often incur higher resource usage and slower startup times when compared to container-based solutions. Because each VM replicates an entire operating system, they demand more memory and processing overhead, which can limit efficiency in environments where large numbers of instances need to run concurrently.
 
-\definitionblock[Virtual Machine]{
+\begin{definitionblock}[Virtual Machine]
 A Virtual Machine is a software-based emulation of a physical computer, featuring its own virtualized hardware, kernel, and operating system. This approach provides strong isolation between different workloads on the same host but can lead to increased resource consumption due to the replication of the underlying OS layers.
-}
+\end{definitionblock}
+
+\begin{definitionblock}[Hypervisor]
+A hypervisor is the software or firmware responsible for creating and running virtual machines, isolating their execution environments from each other and from the underlying hardware.
+\end{definitionblock}
 
 \subsection{Hypervisors (KVM, QEMU)}
 
 Hypervisors form the foundation of virtualization by allocating and managing the hardware resources that VMs consume. They serve as an abstraction layer between the guest operating systems and the physical hardware, ensuring isolation and controlling how resources like CPU, memory, and storage are shared.
-
-\definitionblock[Hypervisor]{
-A hypervisor is the software or firmware responsible for creating and running virtual machines, isolating their execution environments from each other and from the underlying hardware.
-}
 
 Modern Linux-based hypervisors include \textit{KVM} (Kernel-based Virtual Machine), which takes advantage of hardware virtualization extensions (e.g., Intel VT-x, AMD-V) to provide efficient performance. Meanwhile, \textit{QEMU} is a powerful software emulation tool often paired with KVM to handle additional device emulation tasks, enabling a versatile and configurable virtualization stack. Together, KVM and QEMU provide a solid environment for running multiple VMs on Linux systems without significant overhead.
 
@@ -71,31 +71,31 @@ Containers have revolutionized the way applications are developed, deployed, and
 
 A \textbf{container} is the runtime instantiation of a \textit{container image} from a \textit{repository}. It operates as a standard Linux process, typically created using the \texttt{clone()} system call instead of \texttt{fork()} or \texttt{execvp()}. Containers are further isolated using Linux namespaces and control groups (\texttt{cgroups}), along with security mechanisms like SELinux or AppArmor, ensuring that each container remains isolated from others and the host system.
 
-\definitionblock[Container]{
+\begin{definitionblock}[Container]
 A container is a lightweight and portable environment that encapsulates an application together with its necessary dependencies, all running atop the host operating system’s kernel instead of a separate guest OS. This design allows for efficient resource utilization and rapid startup times, making containers ideal for microservices and cloud-native applications.
-}
+\end{definitionblock}
 
 \subsection{Container Image and Repository}
 
 A \textit{container image} is a packaged set of file system layers and metadata that defines how to run a container. It is typically downloaded from a \textit{registry server} and used locally as a mount point when starting containers. While the term \textit{container image} is often used interchangeably with \textit{repository}, it is important to distinguish that a repository comprises multiple image layers and associated metadata, such as \texttt{manifest.json}.
 
-\definitionblock[Container Image]{
+\begin{definitionblock}[Container Image]
 A container image is a packaged set of file system layers and metadata describing how to run a container. It is typically downloaded from a remote registry and mounted locally to launch container processes.
-}
+\end{definitionblock}
 
 Common image formats include \textit{Docker}, \textit{Appc}, \textit{LXD}, and the \textit{Open Container Initiative (OCI)} format, with OCI being the most widely adopted standard. Commands like \texttt{docker pull} or \texttt{podman pull} are used to retrieve images from repositories by referencing their repository names and optional tags.
 
-\observationblock[Repository vs. Image]{
+\begin{observationblock}[Repository vs. Image]
 While \textit{images} and \textit{repositories} are often used interchangeably, it is crucial to understand their distinction. A \textbf{repository} is a collection of related image layers and metadata, identified by a unique name and optional tags. For example, the command \texttt{docker pull registry.access.redhat.com/rhel7:latest} fetches an image from the specified repository, which may contain multiple layers representing incremental changes.
-}
+\end{observationblock}
 
 \subsection{Container Engines}
 
 A \textbf{container engine} is software that orchestrates the lifecycle of containers. It accepts user requests through interfaces like command-line tools, manages container images by pulling them from registries, and initiates or terminates containers using underlying \textit{container runtimes}.
 
-\definitionblock[Container Engine]{
+\begin{definitionblock}[Container Engine]
 A container engine is a software layer that orchestrates container lifecycle operations, including image retrieval, container creation, and container management, typically leveraging an underlying container runtime for the actual process isolation.
-}
+\end{definitionblock}
 
 Examples of container engines include \textit{Docker}, \textit{Podman}, \textit{RKT}, \textit{CRI-O}, and \textit{LXD}. Cloud providers often implement their own container engines tailored to their platforms. For instance, Docker provides a comprehensive stack involving \texttt{docker-cli}, \texttt{docker-compose}, and the \texttt{dockerd} daemon, which interacts with \texttt{containerd} and \texttt{runc} to manage container processes.
 
@@ -103,9 +103,9 @@ Examples of container engines include \textit{Docker}, \textit{Podman}, \textit{
 
 The \textbf{container runtime} is the low-level component within a container engine responsible for the creation and execution of container processes. Following the OCI Runtime Specification, \texttt{runc} serves as the reference implementation, while alternatives like \texttt{crun}, \texttt{railcar}, and \texttt{katacontainers} offer additional features or optimizations.
 
-\definitionblock[Container Runtime]{
+\begin{definitionblock}[Container Runtime]
 A container runtime is the lower-level component within a container engine that manages the actual creation and execution of container processes. It interfaces directly with the operating system to apply namespaces, cgroups, and other isolation mechanisms.
-}
+\end{definitionblock}
 
 Key \textit{system calls} utilized by container runtimes include:
 \begin{itemize}
@@ -137,9 +137,9 @@ For large-scale orchestration, \textbf{Kubernetes} utilizes the Container Runtim
 
 Linux \textbf{capabilities} enhance security by dividing the traditional superuser privileges into distinct, manageable units (e.g., \texttt{CAP\_NET\_ADMIN}, \texttt{CAP\_SYS\_BOOT}). This allows containers to be granted only the specific capabilities they require, minimizing potential security risks.
 
-\definitionblock[Capability]{
+\begin{definitionblock}[Capability]
 A capability is a distinct unit of privilege that can be independently enabled or disabled for a process. This granularity allows for more secure and controlled permission management compared to the all-or-nothing superuser model.
-}
+\end{definitionblock}
 
 \textbf{User namespaces} extend the capability concept by allowing a process to appear as root within the container while being an unprivileged user on the host system. This separation ensures that even if a process inside the container has root-like privileges, it does not pose a security threat to the host environment.
 
@@ -162,9 +162,9 @@ These propagation modes provide flexibility for advanced scenarios, allowing cer
 
 Virtual Machines (VMs) and Containers are both technologies that provide isolation and resource management, but they achieve these goals through fundamentally different approaches, resulting in distinct advantages and trade-offs.
 
-\definitionblock[Container]{
+\begin{definitionblock}[Container]
 A container is a lightweight and portable environment that encapsulates an application together with its necessary dependencies, all running atop the host operating system’s kernel instead of a separate guest OS.
-}
+\end{definitionblock}
 
 \textbf{Virtual Machines (VMs)} offer full hardware emulation, including their own operating systems and kernels. This allows VMs to provide strong isolation between different workloads, as each VM operates independently of the host and other VMs. VMs are ideal for scenarios requiring complete isolation and the ability to run different operating systems on the same physical hardware. However, this level of isolation comes at the cost of higher resource consumption and longer startup times, as each VM duplicates the overhead of an entire operating system.
 
@@ -174,14 +174,10 @@ Furthermore, containers offer greater portability across different environments,
 
 In summary, while \textbf{VMs} are suited for applications requiring full isolation and diverse operating systems, \textbf{containers} excel in environments demanding high efficiency, rapid scaling, and portability. The choice between VMs and containers depends on the specific requirements of the workload, balancing the need for isolation against resource efficiency and deployment flexibility.
 
-\definitionblock[Virtual Machine vs. Container]{
+\begin{definitionblock}[Virtual Machine vs. Container]
 Virtual Machines provide complete hardware virtualization with their own operating systems, offering strong isolation but higher resource usage. Containers share the host OS kernel, delivering lightweight and efficient process-level isolation suitable for scalable and portable applications.
-}
+\end{definitionblock}
 
 \section{Mount Namespace Propagation}
 
 The Mount namespace is closely related to container security and convenience. It isolates mount points, meaning a container’s filesystem changes do not affect the host or other containers. Linux also defines mountpoint propagation modes such as \texttt{shared}, \texttt{slave}, \texttt{private}, and \texttt{unbindable}, indicating how changes in one namespace might (or might not) be reflected in others. This flexibility supports advanced scenarios where certain filesystem changes must be visible across namespaces while others remain isolated.
-
-\section{Conclusion}
-
-By integrating these definitions and concepts from the slides, we can see how containers build on top of Linux kernel features like namespaces and cgroups to provide efficient and flexible process-level isolation. Container images simplify distribution by bundling application code and dependencies, while container engines and runtimes manage the lifecycle of these images as runnable processes. In contrast, Virtual Machines replicate entire operating systems, thereby delivering stronger hardware-level isolation but incurring heavier resource usage. Ultimately, the right choice depends on workload requirements: containers excel at high density and rapid deployment, whereas VMs may be more suitable where robust isolation or hardware emulation is paramount.

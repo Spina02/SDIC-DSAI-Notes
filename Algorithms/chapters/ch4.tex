@@ -1,7 +1,8 @@
-
 \chapter{Graph Algorithms}
 
-\definitionblock[Graph]{A graph $G$ is a pair $(V, E)$, where $V$ is a set of vertices and $E$ is a set of edges. Each edge is a pair of vertices.}
+\begin{definitionblock}[Graph]
+A graph $G$ is a pair $(V, E)$, where $V$ is a set of vertices and $E$ is a set of edges. Each edge is a pair of vertices.
+\end{definitionblock}
 
 We can choose between two standard ways to represent a graph $G = (V,E)$:
 as a collection of adjacency lists or as an adjacency matrix. Either way applies
@@ -10,14 +11,13 @@ provides a compact way to represent sparse graphs, it is usually the method of c
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/undirected_graph.png}
+    \includegraphics[width=0.9\textwidth]{assets/undirected_graph.png}
     \caption{Undirected raph}
     \label{fig:undirected_graph}
-\end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/directed_graph.png}
+    \vspace{1em}
+
+    \includegraphics[width=0.9\textwidth]{assets/directed_graph.png}
     \caption{Directed graph}
     \label{fig:directed_graph}
 \end{figure}
@@ -35,25 +35,25 @@ The \textbf{adjacency-list representation} of a graph $G = (V, E)$ consists of a
 We can adapt the adjacency-list representation to represent weighted graphs by storing, for each vertex $v$, not only the vertices adjacent to $v$ but also the weights of the edges incident on $v$.
 
 The \textbf{adjacency-matrix representation} of a graph $G = (V, E)$ consists of a $|V| \times |V|$ matrix $W = (w_{ij})$, where
-\[
+$$
     w_{ij} = 
     \begin{cases}
         1 & \text{if } (i, j) \in E, \\
         0 & \text{otherwise}.
     \end{cases}
-\]
+$$
 The adjacency-matrix representation is particularly convenient when the graph is dense, that is, when $|E|$ is close to $|V|^2$.
 
 \section{Breadth-First Search}
 
 Given a graph $G = (V, E)$ and a distinguished source vertex $s$, breadth-first search systematically explores the edges of $G$ to discover every vertex that is reachable from $s$. It computes the distance (smallest number of edges) from $s$ to each reachable vertex.
 It also produces a \textbf{breadth-first tree} with root $s$ that contains all reachable vertices. For any vertex $v$ reachable from $s$, the simple path in the breadth-first tree from $s$ to $v$ corresponds to a shortest path from $s$ to $v$ in $G$, that is, a path containing the smallest number of edges.
-The algorithm discovers all vertices at distance k from s before discovering any
+The algorithm discovers all vertices at distance $k$ from $s$ before discovering any
 vertices at distance $k+1$.
 
-\observationblock[Data structure used]{
-    The algorithm uses a first-in first-out queue $Q$ to manage the set of gray vertices. 
-}
+\begin{observationblock}[Data structure used]
+The algorithm uses a first-in first-out queue $Q$ to manage the set of gray vertices. 
+\end{observationblock}
 
 \begin{figure}[H]
     \centering
@@ -64,51 +64,45 @@ vertices at distance $k+1$.
 
 \begin{algorithm}[H]
     \caption{BFS(G, s)}
-    \For{each vertex $u \in V - \{s\}$}{
-        color[$u$] = WHITE \\
-        $d[u] = \infty$ \\
-        $\pi[u] = NIL$
-    }
-    \tcc{Initialization: $O(|V|)$}
-    color[$s$] = GRAY \\
-    $d[s] = 0$ \\
-    $\pi[s] = NIL$ \\
-    $Q = \emptyset$ \\
-    ENQUEUE($Q, s$) \\
-    \tcc{Visit of the source: $O(1)$}
-    \While{$Q \neq \emptyset$}{
-        $u = DEQUEUE(Q)$ \\
-        \For{each vertex $v \in Adj[u]$}{
-            \If{color[$v$] == WHITE}{
-                color[$v$] = GRAY \\
-                $d[v] = d[u] + 1$ \\
-                $\pi[v] = u$ \\
-                ENQUEUE($Q, v$)
-            }
-        }
-        color[$u$] = BLACK
-    }
-    \tcc{Visit of the vertices: $O(|E|)$}
+    \begin{algorithmic}[1]
+        \For{each vertex u $\in$ V - \{s\}} \Comment{Initialization: $O(|V|)$}
+            \State color[u] $\gets$ WHITE
+            \State d[u] $\gets \infty$
+            \State $\pi$[u] $\gets$ NIL
+        \EndFor
+        \State 
+        \State color[s] $\gets$ GRAY \Comment{Visit of the source: $O(1)$}
+        \State d[s] $\gets$ 0
+        \State $\pi$[s] $\gets$ NIL
+        \State Q $\gets \emptyset$
+        \State ENQUEUE(Q, s)
+        \State 
+        \While{Q $\neq \emptyset$} \Comment{Visit of the vertices: $O(|E|)$}
+            \State u $\gets$ DEQUEUE(Q)
+            \For{each vertex $v$ $\in$ Adj[u]}
+                \If{color[v] = WHITE}
+                    \State color[v] $\gets$ GRAY
+                    \State d[v] $\gets$ d[u] + 1
+                    \State $\pi$[v] $\gets$ u
+                    \State ENQUEUE(Q, v)
+                \EndIf
+            \EndFor
+            \State color[u] $\gets$ BLACK
+        \EndWhile
+    \end{algorithmic}
 \end{algorithm}
 
 \subsection*{Analysis}
 
-After initialization, breadth-first
-search never whitens a vertex, and thus the test in line 13 ensures that each vertex
-is enqueued at most once, and hence dequeued at most once. The operations of
-enqueuing and dequeuing take $O(1)$ time, and so the total time devoted to queue
-operations is $O(V)$. Because the procedure scans the adjacency list of each vertex
-only when the vertex is dequeued, it scans each adjacency list at most once. Since
-the sum of the lengths of all the adjacency lists is $\Theta(E)$, the total time spent in
-scanning adjacency lists is $O(E)$. The overhead for initialization is $O(V)$, and
-thus the total running time of the BFS procedure is $O(V + E)$. Thus, breadth-first
-search runs in time linear in the size of the adjacency-list representation of G.
+After initialization, breadth-first search never whitens a vertex, and thus the test in line 13 ensures that each vertex is enqueued at most once, and hence dequeued at most once. The operations of enqueuing and dequeuing take $O(1)$ time, and so the total time devoted to queue operations is $O(V)$. Because the procedure scans the adjacency list of each vertex only when the vertex is dequeued, it scans each adjacency list at most once. Since the sum of the lengths of all the adjacency lists is $\Theta(E)$, the total time spent in scanning adjacency lists is $O(E)$. The overhead for initialization is $O(V)$, and thus the total running time of the BFS procedure is $O(V + E)$. Thus, breadth-first search runs in time linear in the size of the adjacency-list representation of $G$.
+
+\newpage
 
 \subsection*{Shortest Paths}
 
-Define the \textbf{shortest path distance} $\delta(s,v)$ from s to as the minimum num-
-ber of edges in any path from vertex s to vertex ; if there is no path from s to ,
-then $\delta(s,v) = \infty$.
+\begin{definitionblock}[Shortest Path Distance]
+    Define the \textbf{shortest path distance} $\delta(s,v)$ from $s$ to $v$ as the minimum number of edges in any path from vertex $s$ to vertex $v$; if there is no path from $s$ to $v$, then $\delta(s,v) = \infty$.
+\end{definitionblock}
 
 \newtheorem{shortest path}{Lemma}
 \begin{theorem}
@@ -117,12 +111,12 @@ then $\delta(s,v) = \infty$.
 \end{theorem}
 
 \begin{proof}
-    If u is reachable from s, then so is . In this case, the shortest path from s
-    to cannot be longer than the shortest path from s to u followed by the edge .u; /,
-    and thus the inequality holds. If u is not reachable from s, then $\delta(s,v) = \infty$, and
+    If $u$ is reachable from $s$, then so is $v$. In this case, the shortest path from $s$
+    to $v$ cannot be longer than the shortest path from $s$ to $u$ followed by the edge $(u,v)$,
+    and thus the inequality holds. If $u$ is not reachable from $s$, then $\delta(s,v) = \infty$, and
     the inequality holds.
 \end{proof}
-\newpage
+
 \newtheorem{shortest path 2}{Lemma}
 \begin{theorem}
     Let $G = (V, E)$ be a directed or undirected graph, and suppose BFS is run on G
@@ -147,7 +141,7 @@ then $\delta(s,v) = \infty$.
     from a given source $s \in V$. Then during its execution, BFS discovers every vertex
     $v \in V$ that is reachable from $s$, and upon termination, $v.d = \delta(s, v)$.
     Moreover, for any vertex $v \neq s$ that is reachable from s, one of the shortest paths 
-    from s to v is a shortest path from s to $v.\pi$ followed by the edge $(v.\pi, v)$.
+    from $s$ to $v$ is a shortest path from $s$ to $v.\pi$ followed by the edge $(v.\pi, v)$.
 \end{theorem}
 \begin{proof}
     Assume, for the purpose of contradiction, that some vertex $v$ receives a $d$-value not equal to its shortest-path distance $\delta(s, v)$. Let $v$ be the vertex with the minimum $\delta(s, v)$ that receives such an incorrect $d$-value. Clearly, $v \neq s$. Since 
@@ -183,35 +177,33 @@ then $\delta(s,v) = \infty$.
         $v.d > \delta(s, v)$.
     \end{itemize}
 
-    Thus, 
-    $v.d = \delta(s, v)$ 
-    for all $v \in V$. Since all vertices reachable from $s$ must be discovered, the proof is complete. Finally, if 
-    $v.\pi = u$, 
-    then 
-    $v.d = u.d + 1$, 
-    ensuring that a shortest path from $s$ to $v$ is obtained by traversing 
-    $(v.\pi, v)$.
+    Thus, $v.d = \delta(s, v)$ for all $v \in V$. Since all vertices reachable from $s$ must be discovered, the proof is complete. Finally, if $v.\pi = u$, then $v.d = u.d + 1$, ensuring that a shortest path from $s$ to $v$ is obtained by traversing $(v.\pi, v)$.
 \end{proof}
 
 \newpage
+
 \section{Single Source Shortest Paths}
 
 In a \textbf{shortest-path problem}, we are given a weighted, directed graph $G = (V, E)$, with weight function $w : E \to \mathbb{R}$ mapping edges to 
 real-values weights. the \textbf{weight} $w(p)$ of path $p = \langle v_0,v_1,\dots,v_k \rangle$ is the sum of the weights of its constituent edges:
-\[
+
+$$
     w(p) = \sum_{i=1}^{k} w(v_{i-1}, v_i)
-\]
+$$
+
 We define the \textbf{shortest-path weight} $\delta(u,v)$ from $u$ to $v$ as the minimum weight of any path from $u$ to $v$:
-\[
+
+$$
     \delta(u,v) = 
     \begin{cases}
         \min \{ w(p) : \text{p is a path from u to v} \} & \text{if there is a path from u to v}, \\
         \infty & \text{otherwise}.
     \end{cases}
-\]
-\warningblock[BFS]{
-    BFS is used to compute shortest paths in unweighted graphs. In weighted graphs, BFS can be used to compute shortest paths only when all edge weights are equal.
-}
+$$
+
+\begin{warningblock}[BFS]
+BFS is used to compute shortest paths in unweighted graphs. In weighted graphs, BFS can be used to compute shortest paths only when all edge weights are equal.
+\end{warningblock}
 
 \newtheorem{subpaths}{Lemma}
 \begin{theorem}
@@ -219,13 +211,13 @@ We define the \textbf{shortest-path weight} $\delta(u,v)$ from $u$ to $v$ as the
 \end{theorem}
 \begin{proof}
     Decompose the path $p$ into three segments: $p_{0i}$ from $v_0$ to $v_i$, $p_{ij}$ from $v_i$ to $v_j$, and $p_{jk}$ from $v_j$ to $v_k$. Then, the weight of $p$ is given by:
-    \[
+    $$
     w(p) = w(p_{0i}) + w(p_{ij}) + w(p_{jk}).
-    \]
+    $$
     Assume there exists a path $p'_{ij}$ from $v_i$ to $v_j$ with weight $w(p'_{ij}) < w(p_{ij})$. Then, the path $p' = \langle p_{0i}, p'_{ij}, p_{jk} \rangle$ would have weight:
-    \[
+    $$
     w(p') = w(p_{0i}) + w(p'_{ij}) + w(p_{jk}),
-    \]
+    $$
     which is less than $w(p)$. This contradicts the assumption that $p$ is a shortest path from $v_0$ to $v_k$. Thus, $p_{ij}$ must be a shortest path from $v_i$ to $v_j$. 
 \end{proof}
 
@@ -251,21 +243,24 @@ Nor it can contain a positive cycle, since the path can be made shorter by remov
 To compute shortest paths, not only the weights but also the vertices on the paths are maintained. For a graph $G = (V, E)$, each vertex $v \in V$ has a predecessor $\pi(v)$, which is either another vertex or $\text{NIL}$. The $\pi$ values represent the chain of predecessors that define the shortest path from a source vertex $s$ to $v$. The procedure \texttt{PRINT-PATH}$(G, s, v)$ can reconstruct this shortest path.
 
 In shortest-path algorithms, the $\pi$ values define a \textit{predecessor subgraph} $G_\pi = (V_\pi, E_\pi)$:
-\[
+
+$$
 V_\pi = \{v \in V : \pi(v) \neq \text{NIL}\} \cup \{s\},
-\]
-\[
+\\
 E_\pi = \{(\pi(v), v) \in E : v \in V_\pi \setminus \{s\}\}.
-\]
+$$
 
 At termination, $G_\pi$ forms a \textit{shortest-path tree}, which is a rooted tree with:
-1. $V'$, the set of vertices reachable from $s$ in $G$.
-2. A root at $s$ and edges $E'$ such that:
-   \begin{itemize}
-       \item $V' \subseteq V$,
-       \item $E' \subseteq E$.
-   \end{itemize}
-3. For all $v \in V'$, the unique simple path from $s$ to $v$ in $G'$ is the shortest path in $G$.
+
+\begin{enumerate}
+    \item $V'$, the set of vertices reachable from $s$ in $G$.
+    \item A root at $s$ and edges $E'$ such that:
+    \begin{itemize}
+        \item $V' \subseteq V$,
+        \item $E' \subseteq E$.
+    \end{itemize}
+    \item For all $v \in V'$, the unique simple path from $s$ to $v$ in $G'$ is the shortest path in $G$.
+\end{enumerate}
 
 A shortest-path tree extends the concept of a breadth-first tree to account for edge weights.
 
@@ -276,123 +271,89 @@ A shortest-path tree extends the concept of a breadth-first tree to account for 
     \label{fig:representation_shortest_path}
 \end{figure}
 
-\newpage
 \subsection*{Relaxation}
 
 For each vertex $v \in V$, we maintain an attribute $v.d$ that is an upper bound on the weight of a shortest path from source $s$ to $v$. We call $v.d$ a \textbf{shortest-path estimate}. We initialize the shortest-path estimates and predecessors by the following $\Theta(V)$-time procedure:
-\begin{algorithm}
+
+\begin{algorithm}[H]
     \caption{INITIALIZE-SINGLE-SOURCE(G, s)}
-    \For{each vertex $v \in V$}{
-        $v.d = \infty$ \\
-        $\pi(v) = \text{NIL}$
-    }
-    $s.d = 0$
+    \begin{algorithmic}[1]
+        \For{each vertex $v$ $\in$ V}
+            \State v.d $\gets \infty$
+            \State $\pi$(v) $\gets$ NIL
+        \EndFor
+        \State s.d $\gets$ 0
+    \end{algorithmic}
 \end{algorithm}
 
-The process of \textbf{relaxing} an edge $(u, v)$ consists of testing whether we can im-
-prove the shortest path to found so far by going through u and, if so, updating $v.d$ and $v.\pi$.
+\vspace{-1em}
+
+The process of \textbf{relaxing} an edge $(u, v)$ consists of testing whether we can improve the shortest path to found so far by going through u and, if so, updating $v.d$ and $v.\pi$.
 A relaxation step may decrease the value of $v.d$ and update $v.\pi$. The following code performs a relaxation step on edge $(u, v)$:
-\begin{algorithm}
+
+\begin{algorithm}[H]
     \caption{RELAX(u, v, w)}
-    \If{$v.d > u.d + w(u, v)$}{
-        $v.d = u.d + w(u, v)$ \\
-        $v.\pi = u$
-    }
+    \begin{algorithmic}[1]
+        \If{v.d > u.d + w(u, v)}
+            \State v.d $\gets$ u.d + w(u, v)
+            \State v.$\pi$ $\gets$ u
+        \EndIf
+    \end{algorithmic}
 \end{algorithm}
+
+\vspace{-1em}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{assets/relaxation.png}
+    \includegraphics[width=0.6\textwidth]{assets/relaxation.png}
     \caption{Relaxation}
     \label{fig:relaxation}
 \end{figure}
 
-\newpage
-\subsection*{Algorithm}
-\begin{algorithm}
+\vspace{-1em}
+
+\subsection*{Bellman-Ford Algorithm}
+
+\vspace{-1em}
+
+\begin{algorithm}[H]
     \caption{Bellman-Ford(G, w, s)}
-    INITIALIZE-SINGLE-SOURCE(G, s) \\
-    \For{$i = 1$ to $|V| - 1$}{
-        \For{each edge $(u, v) \in E$}{
-            RELAX(u, v, w)
-        }
-    }
-    \For{each edge $(u, v) \in E$}{
-        \If{$v.d > u.d + w(u, v)$}{
-            \Return{FALSE}
-        }
-    }
-    \Return{TRUE}
+    \begin{algorithmic}[1]
+        \State INITIALIZE-SINGLE-SOURCE(G, s)
+        \For{i = 1 \textbf{ to } |V| - 1}
+            \For{each edge (u, v) $\in$ E}
+                \State RELAX(u, v, w)
+            \EndFor
+        \EndFor
+        \For{each edge (u, v) $\in$ E}
+            \If{v.d > u.d + w(u, v)}
+                \State \Return FALSE
+            \EndIf
+        \EndFor
+        \State \Return TRUE
+    \end{algorithmic}
 \end{algorithm}
-\warningblock[Bellman-Ford]{
-    This algorithm can be used to detect negative cycles. If the algorithm returns \texttt{FALSE}, then there is a negative cycle reachable from the source vertex.
-    This means that it \textbf{does not} work with negative cycles.
-}
 
+\vspace{-1em}
 
+\begin{warningblock}[Bellman-Ford]
+This algorithm can be used to detect negative cycles. If the algorithm returns \plaintt{FALSE}, then there is a negative cycle reachable from the source vertex.
+This means that it \textbf{does not} work with negaive cycles.
+\end{warningblock}
 
-
+\newpage
 
 \section{Depth-First Search}
 
-The strategy followed by depth-first search is, as its name implies, to search
-“deeper” in the graph whenever possible. Depth-first search explores edges out
-of the most recently discovered vertex that still has unexplored edges leaving it.
-Once all of ’s edges have been explored, the search “backtracks” to explore edges
-leaving the vertex from which was discovered. This process continues until we
-have discovered all the vertices that are reachable from the original source vertex.
-If any undiscovered vertices remain, then depth-first search selects one of them as
-a new source, and it repeats the search from that source. The algorithm repeats this
-entire process until it has discovered every vertex.
+The strategy followed by depth-first search is, as its name implies, to search “deeper” in the graph whenever possible. Depth-first search explores edges out of the most recently discovered vertex that still has unexplored edges leaving it. Once all of ’s edges have been explored, the search “backtracks” to explore edges leaving the vertex from which was discovered. This process continues until we have discovered all the vertices that are reachable from the original source vertex. If any undiscovered vertices remain, then depth-first search selects one of them as a new source, and it repeats the search from that source. The algorithm repeats this entire process until it has discovered every vertex.
 
-Unlike breadth-first search,whose predecessor subgraph forms a tree, the predecessor subgraph produced by
-a depth-first search may be composed of several trees, because the search may
-repeat from multiple sources. Therefore, we define the predecessor subgraph of
-a depth-first search slightly differently from that of a breadth-first search:
-we let $G_{\pi} = (V, E_{\pi})$, where $E_{\pi} = \{(\pi(v), v) : v \in V \text{ and } \pi(v) \neq \text{NIL}\}$.
+Unlike breadth-first search,whose predecessor subgraph forms a tree, the predecessor subgraph produced by a depth-first search may be composed of several trees, because the search may repeat from multiple sources. Therefore, we define the predecessor subgraph of a depth-first search slightly differently from that of a breadth-first search: we let $G_{\pi} = (V, E_{\pi})$, where $E_{\pi} = \{(\pi(v), v) : v \in V \text{ and } \pi(v) \neq \text{NIL}\}$.
 
-The predecessor subgraph of a depth-first search forms a depth-first forest com-
-prising several depth-first trees.
+The predecessor subgraph of a depth-first search forms a depth-first forest comprising several depth-first trees.
 
-As in breadth-first search, depth-first search colors vertices during the search to
-indicate their state. Each vertex is initially white, is grayed when it is discovered
-in the search, and is blackened when it is finished, that is, when its adjacency list
-has been examined completely.
+As in breadth-first search, depth-first search colors vertices during the search to indicate their state. Each vertex is initially white, is grayed when it is discovered in the search, and is blackened when it is finished, that is, when its adjacency list has been examined completely.
 
-Besides creating a depth-first forest, depth-first search also \textbf{timestamps} each vertex. 
-Each vertex $v$ has two timestamps: the first timestamp $v.d$ records when $v$
-is first discovered (and grayed), and the second timestamp $v.f$ records when the
-search finishes examining $v$’s adjacency list (and blackens $v$). 
-
-\newpage 
-\begin{algorithm}
-    \caption{DFS(G)}
-    \For{each vertex $u \in V$}{
-        color[$u$] = WHITE \\
-        $\pi[u] = \text{NIL}$
-    }
-    time = 0 \\
-    \For{each vertex $u \in V$}{
-        \If{color[$u$] == WHITE}{
-            DFS-VISIT($G, u$)
-        }
-    }
-\end{algorithm}
-\begin{algorithm}
-    \caption{DFS-VISIT(G, u)}
-    time = time + 1 \\
-    $u.d = time$ \\
-    color[$u$] = GRAY \\
-    \For{each vertex $v \in Adj[u]$}{
-        \If{color[$v$] == WHITE}{
-            $\pi[v] = u$ \\
-            DFS-VISIT($G, v$)
-        }
-    }
-    color[$u$] = BLACK \\
-    time = time + 1 \\
-    $u.f = time$
-\end{algorithm}
+Besides creating a depth-first forest, depth-first search also assigns each vertex $v$ two timestamps: a discovery time $v.d$ when $v$ is first visited (colored gray), and a finishing time $v.f$ when $v$'s adjacency list is fully examined (colored black).
 
 \begin{figure}[H]
     \centering
@@ -406,32 +367,35 @@ search finishes examining $v$’s adjacency list (and blackens $v$).
 The running time of depth-first search is $O(V + E)$, which is the same as the running time of breadth-first search. The time is proportional to the sum of the lengths of the adjacency lists of all the vertices. The depth-first search algorithm is a simple algorithm that is easy to implement and efficient when the graph is represented by the adjacency-list structure.
 The running time of DFS consists of two main parts:
 \begin{itemize}
-    \item The loops on lines 1--3 and lines 5--7 of DFS take time $\Theta(V)$, where $V$ is the number of vertices in the graph.
+    \item The loops on lines 1-3 and lines 5-7 of DFS take time $\Theta(V)$, where $V$ is the number of vertices in the graph.
     \item The time for executing the \texttt{DFS-VISIT} procedure.
 \end{itemize}
 
 Using aggregate analysis:
 \begin{itemize}
     \item The procedure \texttt{DFS-VISIT} is called exactly once for each vertex $v \in V$, since a vertex is painted gray the first time it is visited.
-    \item During an execution of \texttt{DFS-VISIT}$(G, v)$, the loop on lines 4--7 is executed $|Adj[v]|$ times, where $Adj[v]$ is the adjacency list of vertex $v$.
+    \item During an execution of \texttt{DFS-VISIT}$(G, v)$, the loop on lines 4-7 is executed $|Adj[v]|$ times, where $Adj[v]$ is the adjacency list of vertex $v$.
 \end{itemize}
 
-The total cost of all executions of lines 4--7 is:
-\[
+The total cost of all executions of lines 4-7 is:
+
+$$
 \sum_{v \in V} |Adj[v]| = \Theta(E),
-\]
+$$
+
 where $E$ is the number of edges in the graph.
 
 Thus, the overall running time of DFS is:
-\[
+
+$$
 \Theta(V + E).
-\]
+$$
 
 \section{Topological Sort}
 
 A \textbf{topological sort} of a directed acyclic graph $G = (V, E)$ is a linear ordering of all its vertices such that if $G$ contains an edge $(u, v)$, then $u$ appears before $v$ in the ordering. A topological sort of a directed acyclic graph is not unique. If the graph has a cycle, then no linear ordering is possible.
 
-\begin{algorithm}
+\begin{algorithm}[H]
     \caption{TOPOLOGICAL-SORT(G)}
     call DFS(G) to compute finishing times $v.f$ for each vertex $v$ \\
     as each vertex is finished, insert it onto the front of a linked list \\
@@ -440,30 +404,14 @@ A \textbf{topological sort} of a directed acyclic graph $G = (V, E)$ is a linear
 
 We can perform a topological sort in time $O(V + E)$, since the time to call DFS is $O(V + E)$ and the time to insert each of the $V$ vertices onto the front of the linked list is $O(1)$.
 
-\newpage 
 \section{Dijkstra's Algorithm}
 
 Dijkstra's algorithm solves the single-source shortest-paths problem on a weighted, directed graph $G = (V, E)$ for the case in which all edge weights are nonnegative.
 It maintains a set $S$ of vertices whose final shortest-path
-weights from the source s have already been determined. The algorithm repeatedly selects the vertex $u \in V - S$
+weights from the source $s$ have already been determined. The algorithm repeatedly selects the vertex $u \in V - S$
 with the minimum shortest-path estimate, adds $u$ to $S$, and relaxes all edges leaving $u$.
 
-\begin{algorithm}
-    \caption{DIJKSTRA(G, w, s)}
-    INITIALIZE-SINGLE-SOURCE(G, s) \\
-    $S = \emptyset$ \\
-    $Q = V$ \\
-    \While{$Q \neq \emptyset$}{
-        $u = EXTRACT-MIN(Q)$ \\
-        $S = S \cup \{u\}$ \\
-        \For{each vertex $v \in Adj[u]$}{
-            RELAX(u, v, w)
-        }
-    }
-\end{algorithm}
-
-Because it always chooses the “lightest” or “closest” vertex
-in V S to add to set S, we say that it uses a greedy strategy.
+Because it always chooses the "lightest" or "closest" vertex in $V - S$ to add to set $S$, we say that it uses a greedy strategy.
 
 \begin{theorem}
     Dijkstra’s algorithm, run on a weighted, directed graph $G = (V, E)$ with non-negative weight function w and source s, terminates with $u.d = \delta(s, u) \forall u \in V$.
