@@ -159,9 +159,9 @@ The IPv4 datagram (\cref{fig:datagram}) includes important fields like the versi
 
 An IPv4 address is a 32-bit number divided into four octets, each representing a decimal number (e.g., 172.16.254.1). The address is used to uniquely identify a device on a network, typically paired with a subnet mask (e.g., /24) to define the network range.
 
-\observationblock[IPv6]{
+\begin{observationblock}[IPv6]
     While these notes focus on IPv4 addressing and datagrams, it is important to acknowledge the growing significance of \textbf{IPv6} in modern networking. IPv6, with its 128-bit address space, was designed to address the limitations of IPv4, particularly the exhaustion of available addresses. Although not covered here, further exploration of IPv6 is recommended for a comprehensive understanding of contemporary network protocols.
-}
+\end{observationblock}
 
 \subsection{Hostnames and DNS}
 \label{hostnames_dns}
@@ -179,9 +179,9 @@ Well-known ports (0-1023) are reserved for common services such as HTTP (\texttt
 
 Proper management of network ports is crucial for both functionality and security. Open ports can be potential entry points for unauthorized access, making it important to monitor and control port usage through firewalls and security policies.
 
-\warningblock[Port Security]{
+\begin{warningblock}[Port Security]
     Unsecured open ports can be exploited by malicious actors to gain unauthorized access or disrupt services. Regularly auditing open ports and implementing strict firewall rules are essential practices to protect network integrity.
-}
+\end{warningblock}
 
 \subsection{Core Network Services}
 \label{core_network_services}
@@ -191,7 +191,7 @@ Proper management of network ports is crucial for both functionality and securit
 
 \textbf{Classless Inter-Domain Routing (CIDR)} notation enhances IP address allocation by using the format \texttt{a.b.c.d/x}, where \texttt{x} indicates the number of bits in the network prefix. Introduced to improve the scalability of IP addressing, CIDR allows for more flexible and efficient use of IP address spaces compared to the traditional class-based system. By aggregating IP addresses into variable-length blocks, CIDR reduces the size of routing tables and optimizes routing efficiency.
 
-\exampleblock[CIDR Notation Example]{
+\begin{exampleblock}[CIDR Notation Example]
     Consider the network 192.168.1.0/24:
     \begin{itemize}
         \item Network address: 192.168.1.0
@@ -201,14 +201,14 @@ Proper management of network ports is crucial for both functionality and securit
         \item Broadcast address: 192.168.1.255
         \item Total IPs: 256 (254 usable)
     \end{itemize}
-    $\\$
+    \vspace{1em}
     Another example with 192.168.0.0/16:
     \begin{itemize}
         \item Network range: 192.168.0.0 to 192.168.255.255
         \item Subnet mask: 255.255.0.0
         \item Total IPs: 65,536 (65,534 usable)
     \end{itemize}
-}
+\end{exampleblock}
 
 \subsubsection{NAT}
 \label{nat}
@@ -222,9 +222,9 @@ Proper management of network ports is crucial for both functionality and securit
     \label{fig:nat_process}
 \end{figure}
 
-\observationblock[NAT and IPv6]{
+\begin{observationblock}[NAT and IPv6]
     While NAT has been instrumental in conserving IPv4 addresses, the adoption of \textbf{IPv6} eliminates the need for NAT by providing a vast address space. IPv6 allows for direct end-to-end connectivity, simplifying network configurations and improving performance.
-}
+\end{observationblock}
 
 \subsubsection{DHCP}
 \label{dhcp}
