@@ -3,9 +3,7 @@
 - [Advanced Cloud Computing](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf>) [WIP]
 - [Advanced Programming](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Programming/main.pdf>) [WIP]
 - [Introduction to Machine Learning](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Introduction%20to%20ML/main.pdf>) [WIP]
-
-- [Introduction to Machine Learning](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Introduction%20to%20ML/main.pdf>) [WIP]
-
+- [Algorithms](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Algorithms/main.pdf>) [WIP]
 
 
 <!--
