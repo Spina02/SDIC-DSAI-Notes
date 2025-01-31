@@ -613,7 +613,275 @@ void example() {                  //        Lifetime:
     \end{itemize}
 \end{tipsblock}
 
-\Large To be continued... \normalsize
+\section{Condition Statements}
+
+\subsection{If-Else Statements}
+
+The \texttt{if-else} statement is used to execute code based on a condition. If the condition is true, the code inside the \texttt{if} block is executed; otherwise, the code inside the \texttt{else} block is executed.
+
+\begin{exampleblock}[If-Else Statement]
+    \begin{codeblock}[language=C++]
+int x = 15;
+if (x != 10) {
+    std::cout << "x is not equal to 10" << std::endl;
+} else {
+    std::cout << "x is equal to 10" << std::endl;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection{Switch Statements}
+
+The \texttt{switch} statement is used to select one of many code blocks to be executed. It evaluates an expression and compares it with case values. If a match is found, the corresponding block is executed.
+
+\begin{exampleblock}[Switch Statement]
+    \begin{codeblock}[language=C++]
+int day = 3;
+switch (day) {
+    case 1:
+        std::cout << "Monday" << std::endl;
+        break;
+    case 2:
+        std::cout << "Tuesday" << std::endl;
+        break;
+    default:
+        std::cout << "Invalid day" << std::endl;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection{For loop}
+
+The \texttt{for} loop is used to execute a block of code a specified number of times. It consists of three parts: initialization, condition, and increment/decrement.
+
+\begin{exampleblock}[For Loop]
+    \begin{codeblock}[language=C++]
+for (int i = 0; i < 5; i++) {
+    std::cout << i << std::endl;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection{While Loop}
+
+The \texttt{while} loop is used to execute a block of code as long as a specified condition is true.
+
+\begin{exampleblock}[While Loop]
+    \begin{codeblock}[language=C++]
+int i = 0;
+while (i < 5) {
+    std::cout << i << std::endl;
+    i++;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\section{Functions and operators}
+
+\subsection{Functions}
+
+Functions are blocks of code that perform a specific task. They are defined with a return type, name, parameters, and a body. Functions can be called from other parts of the program to execute the code inside them.
+
+\begin{exampleblock}[Function Definition]
+    \begin{codeblock}[language=C++]
+int add(int a, int b) {
+    return a + b;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+If a function does not output a value, its return type is \texttt{void}.    
+A function can also output a general \texttt{auto} type, which allows the compiler to deduce the return type based on the return statement.
+
+Passing parameters by \textbf{value} creates a copy of the argument, while passing by \textbf{reference} allows the function to modify the original argument.
+
+The function can also return pointers or references, enabling the caller to access or modify the original data.
+
+\begin{exampleblock}[Function Parameters]
+    \begin{codeblock}[language=C++]
+void increment(int& x) {
+    x++;
+}
+auto add(int a, int b) {
+    return a + b;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\begin{warningblock}[const correctedness]
+    const correctedness is a valuable practice for writing safe and maintainable code. It ensures that functions do not modify the input parameters unless explicitly intended.
+    Use \plaintt{const} for parameters that should not be modified, it indicates read-only data and functions. 
+    \begin{itemize}
+        \item \textbf{Prevents unintended modifications}: helps avoid accidental data modifications, enhancing
+        code safety.
+        \item \textbf{Self-documenting code}: makes code more self-documenting by indicating the intent of data
+        usage.
+        \item \textbf{Compiler optimizations}: allows the compiler to perform certain optimizations, as it knows that
+        const data won't change.
+    \end{itemize}
+    \begin{codeblock}[language=C++]
+void print(const std::string& message) {
+    std::cout << message << std::endl;
+}
+    \end{codeblock}
+\end{warningblock}
+
+
+\newpage
+\section{Operators}
+
+\subsection{Increment and Decrement Operators}
+
+\begin{enumerate}
+    \item \textbf{Increment Operator (\texttt{++})}: Increases the value of a variable by 1.
+    \item \textbf{Decrement Operator (\texttt{--})}: Decreases the value of a variable by 1.
+\end{enumerate}
+
+\begin{exampleblock}[Increment and Decrement Operators]
+\begin{codeblock}[language=C++]
+int x = 5;
+x++; // x is now 6
+x--; // x is now 5
+\end{codeblock}
+\end{exampleblock}
+
+\subsection{Function Overloading}
+Function overloading is a feature in C++ that allows you to define multiple functions with the
+same name but different parameters. The compiler selects the appropriate function based on the number or types of arguments
+during the function call.
+
+\begin{exampleblock}[Function Overloading]
+\begin{codeblock}[language=C++]
+int add(int a, int b) {
+    return a + b;
+}
+int add(double a, double b) {
+    return a + b;
+}
+\end{codeblock}
+\end{exampleblock}
+
+
+
+\newpage
+\section{User-defined types}
+
+\begin{itemize}
+    \item \textbf{enum}: Defines a set of named constant values.
+    \begin{codeblock}[language=C++]
+enum Color { RED, GREEN, BLUE };
+Color c = RED;
+    \end{codeblock}
+    \item \textbf{union}: Allows multiple data members to share the same memory location.
+    \begin{codeblock}[language=C++]
+union Data {
+    int x;
+    float y;
+};
+Data d;
+d.x = 10;
+d.y = 3.14; // Overwrites 'x'
+    \end{codeblock}
+    \item \textbf{struct}: Groups related data members into a single unit.
+    \begin{codeblock}[language=C++]
+struct Point {
+    int x;
+    int y;
+};
+Point p = {10, 20};
+    \end{codeblock}
+    \item \textbf{class}: Similar to a struct but with additional features like access control (public, private, protected).
+    \begin{codeblock}[language=C++]
+class Circle {
+public:
+    double radius;
+    double area() {
+        return 3.14 * radius * radius;
+    }
+};
+Circle c;
+c.radius = 5.0;
+double a = c.area();
+    \end{codeblock}
+\end{itemize}
+
+
+
+\section{Declarations and Definitions}
+
+\begin{itemize}
+    \item \textbf{Declaration}: Introduces the name and type of a variable, function, or class without allocating memory or defining its implementation.
+    \item \textbf{Definition}: Allocates memory and provides the implementation details for a variable, function, or class.
+\end{itemize}
+
+\begin{exampleblock}[Declaration and Definition]
+\begin{codeblock}[language=C++]
+// Declaration
+extern int x;
+void foo();
+
+// Definition
+int x = 10;
+void foo() {
+    std::cout << "Hello, world!" << std::endl;
+}
+\end{codeblock}
+\end{exampleblock}
+
+
+
+\section{Code Organization}
+
+\textbf{Modular programming} is a software design technique that divides code into separate modules, each responsible for a specific functionality. This approach enhances code readability, maintainability, and reusability.
+C++ modules can be organized into header files (\texttt{.h}), for declarations, and source files (\texttt{.cpp}), for definitions.
+
+\begin{exampleblock}[Header and Source Files]
+\begin{codeblock}[language=C++]
+// module.h (Header file)
+#ifndef MODULE_H
+#define MODULE_H
+
+void foo();
+
+#endif
+
+// module.cpp (Source file)
+#include "module.h"
+
+void foo() {
+    std::cout << "Hello, world!" << std::endl;
+}
+\end{codeblock}
+\end{exampleblock}
+
+\subsection{Best practices}
+
+\begin{itemize}
+    \item \textbf{Header Guards}: Prevent multiple inclusions of the same header file.
+    \item \textbf{Include Guards}: Use \texttt{\#pragma once} or \texttt{\#ifndef} guards to avoid redundant includes.
+    \item \textbf{Separation of Concerns}: Keep declarations in header files and definitions in source files.
+    \item \textbf{Forward Declarations}: Use forward declarations to reduce dependencies and improve compilation times.
+    \item \textbf{Namespace Usage}: Enclose code in namespaces to prevent naming conflicts.
+\end{itemize}
+
+\begin{exampleblock}[namespace usage]
+\begin{codeblock}[language=C++]
+namespace math {
+    int add(int a, int b) {
+        return a + b;
+    }
+}
+
+int main() {
+    int sum = math::add(10, 20);
+    return 0;
+}
+\end{codeblock}
+\end{exampleblock}
+
+
+
+
 
 \newpage
 
@@ -629,7 +897,7 @@ The build process starts with the \textbf{preprocessor} (\texttt{cpp}) and the \
 
 These steps are often combined when using a compiler command like \texttt{g++} or \texttt{clang++}.
 
-\begin{exampleblock}[Preprocessor and Compiler]
+
     For a project with three files (\plaintt{module.hpp}, \plaintt{module.cpp}, \plaintt{main.cpp}), the following commands illustrate preprocessing and compilation:
     
     \begin{codeblock}[language=bash, numbers=none]
@@ -641,17 +909,17 @@ g++ -E main.cpp -I/path/to/include/dir -o main_preprocessed.cpp
 g++ -c module_preprocessed.cpp -o module.o
 g++ -c main_preprocessed.cpp -o main.o
     \end{codeblock}
-\end{exampleblock}
+
 
 \subsection{Linker}
 
 The \textbf{linker} (\texttt{ld}) combines object files into an executable program by resolving external references between them. It also links external libraries if required.
 
-\begin{exampleblock}[Linker]
+
     \begin{codeblock}[language=bash, numbers=none]
 g++ module.o main.o -o my_program
     \end{codeblock}
-\end{exampleblock}
+
 
 \textbf{Linking Against Libraries}
 
