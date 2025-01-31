@@ -196,7 +196,7 @@ Execute the compiled program from the terminal, optionally passing command-line 
 
 Verify the program's execution status by examining its exit code (0 typically indicates success):
 \begin{codeblock}[language=bash, numbers=none]
-echo $?
+echo $?$
 \end{codeblock}
 
 \subsection{C++ as a Strongly Typed Language}
@@ -222,18 +222,23 @@ C++ provides various built-in types to handle data of different kinds and sizes.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{|l|c|}
+    \begin{tabular}{|l|c|c|}
         \hline
-        \textbf{Data Type} & \textbf{Size (Bytes)} \\ \hline
-        \plaintt{bool} & 1 \\ 
-        (\plaintt{unsigned}) \plaintt{char} & 1 \\
-        (\plaintt{unsigned}) \plaintt{short} & 2 \\
-        (\plaintt{unsigned}) \plaintt{int} & 4 \\
-        (\plaintt{unsigned}) \plaintt{long} & 4 or 8 \\
-        (\plaintt{unsigned}) \plaintt{long long} & 8 \\
-        \plaintt{float} & 4 \\
-        \plaintt{double} & 8 \\
-        \plaintt{long double} & 8, 12, or 16 \\ \hline
+        \textbf{Data Type} & \textbf{Size (Bytes)} & \textbf{\texttt{<cstdint>}} \\ \hline
+        \texttt{bool} & 1 &  \\ \hline
+        \texttt{char} & 1 &  \\ \hline
+        \texttt{signed char} & 1 & \texttt{int8\_t} \\ \hline
+        \texttt{unsigned char} & 1 & \texttt{uint8\_t} \\ \hline
+        \texttt{short} & 2 & \texttt{int16\_t} \\ \hline
+        \texttt{unsigned short} & 2 & \texttt{uint16\_t} \\ \hline
+        \texttt{int} & 4 & \texttt{int32\_t} \\ \hline
+        \texttt{unsigned int} & 4 & \texttt{uint32\_t} \\ \hline
+        \texttt{long int} & 4 or 8 & \texttt{int32\_t} or \texttt{int64\_t} \\ \hline
+        \texttt{long unsigned int} & 4 or 8 & \texttt{uint32\_t} or \texttt{uint64\_t} \\ \hline
+        \texttt{long long int} & 8 & \texttt{int64\_t} \\ \hline
+        \texttt{long long unsigned int} & 8 & \texttt{uint64\_t} \\ \hline
+        \texttt{float} & 4 &  \\ \hline
+        \texttt{double} & 8 &  \\ \hline
     \end{tabular}
     \caption{Sizes of Fundamental Types in C++}
 \end{table}
@@ -306,6 +311,71 @@ if (std::abs((a + b) - c) < 1e-9) {
     \end{codeblock}
 \end{exampleblock}
 
+
+
+\subsection{Representation of \texttt{NULL}}
+
+\texttt{NULL} is used to represent a null pointer or an invalid memory address. Its representation depends on the system and context:
+
+\begin{itemize}
+    \item In C/C++, \texttt{NULL} is typically defined as \texttt{0} or \texttt{(void*)0}.
+    \item In memory, a null pointer is often represented by a sequence of \textbf{all-zero bits}. For example:
+    \begin{itemize}
+        \item On a 32-bit system: \texttt{0x00000000}
+        \item On a 64-bit system: \texttt{0x0000000000000000}
+    \end{itemize}
+    \newpage
+    \item Example in C/C++:
+\begin{exampleblock}[Representation of NULL]
+    \begin{codeblock}[language=C++]
+int* ptr = NULL; // ptr points to memory address 0x00000000
+if (ptr == NULL) {
+    printf("Pointer is NULL\n");
+}
+    \end{codeblock}
+\end{exampleblock}
+\end{itemize}
+
+\subsection{Representation of \texttt{NaN}}
+
+\texttt{NaN} (Not a Number) is a special value used in floating-point arithmetic to represent undefined or unrepresentable results. Its representation is defined by the \textbf{IEEE 754 floating-point standard}:
+
+\begin{itemize}
+    \item A \texttt{NaN} value is represented by an \textbf{exponent filled with 1s} (all bits set to 1) and a \textbf{non-zero significand}.
+    \item There are two types of \texttt{NaN}:
+    \begin{itemize}
+        \item \textbf{Quiet NaN (qNaN)}: Used for undefined or unrepresentable results. It has a leading \texttt{1} in the significand.
+        \item \textbf{Signaling NaN (sNaN)}: Used to trigger exceptions in certain operations. It has a leading \texttt{0} in the significand.
+    \end{itemize}
+    \item Example in C/C++:
+\begin{exampleblock}[Representation of NaN]
+    \begin{codeblock}[language=C++]
+#include <cmath>
+#include <cstdio>
+
+int main() {
+    double result = 0.0 / 0.0; // Results in NaN
+    if (isnan(result)) {
+        printf("Result is NaN\n");
+    }
+    return 0;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\end{itemize}
+
+\subsection{Key Differences}
+
+\begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Feature} & \textbf{\texttt{NULL}} & \textbf{\texttt{NaN}} \\ \hline
+    Purpose & Represents a null pointer & Represents an undefined floating-point value \\ \hline
+    Data Type & Used with pointers & Used with floating-point numbers \\ \hline
+    Representation & All-zero bits (e.g., \texttt{0x00000000}) & Exponent filled with 1s and non-zero significand \\ \hline
+    Context & Memory addresses, pointers & Floating-point arithmetic \\ \hline
+\end{tabular}
+
 \subsubsection{Characters and Strings}
 
 Characters in C++ are represented using the \texttt{char} type, while strings are sequences of characters represented by the \texttt{std::string} class.
@@ -362,6 +432,10 @@ Initialization assigns an initial value to a variable at the time of declaration
     \end{codeblock}
 \end{exampleblock}
 
+
+
+\newpage
+
 \subsection{The \plaintt{auto} Keyword and Type conversion}
 
 The \texttt{auto} keyword allows the compiler to deduce the type of a variable based on its initialization value. This is useful for simplifying code and avoiding verbose type declarations.
@@ -401,34 +475,86 @@ int w = static_cast<int>(z); // double to int (explicit).
 
 \section{Memory Management}
 
-\subsection{Heap vs. Stack}
+In computer programming, memory is divided into two main regions: the \textbf{stack} and the \textbf{heap}. These regions serve different purposes and are managed differently. Below is a detailed explanation of their differences.
 
-Programs utilize two primary memory regions for storing data: the stack and the heap.
+\subsection{Stack Memory}
 
-The \textbf{Stack Memory} is used for storing function call frames, local variables, and control information. It is:
+The \textbf{stack} is used for \textbf{static memory allocation}, where memory is allocated and deallocated in a last-in, first-out (LIFO) order.
+
+\subsubsection{Key Characteristics of Stack Memory}
 \begin{itemize}
-    \item Allocated and deallocated automatically.
-    \item Suitable for small, short-lived variables.
-    \item Limited in size and operates in a last-in, first-out (LIFO) manner.
+    \item \textbf{Purpose}: Used for storing local variables, function parameters, and return addresses.
+    \item \textbf{Management}: Memory allocation and deallocation are handled automatically by the compiler.
+    \item \textbf{Speed}: Accessing the stack is very fast because it uses a simple pointer-based mechanism (the stack pointer).
+    \item \textbf{Size}: The stack has a limited size, which is determined at the start of the program. If the stack exceeds its size, a \textbf{stack overflow} occurs.
+    \item \textbf{Lifetime}: Memory is automatically freed when the function or block that allocated it exits.
+    \item \textbf{Fragmentation-Free}: The stack does not suffer from fragmentation because memory is always allocated and freed in a strict order.
 \end{itemize}
 
-The \textbf{Heap Memory} is used for dynamic memory allocation, which is:
-\begin{itemize}
-    \item Manually managed through \texttt{new} and \texttt{delete}.
-    \item Suitable for objects with varying sizes or extended lifetimes.
-    \item Larger in size than the stack but slower due to manual management.
-\end{itemize}
 
-\begin{exampleblock}[Stack vs. Heap]
+\begin{exampleblock}[Stack Memory Example]
     \begin{codeblock}[language=C++]
-int stack_var = 42;          // Stored on the stack.
-int* heap_ptr = new int(42); // Stored on the heap.
-
-// Cleanup for heap memory.
-delete heap_ptr;
-heap_ptr = nullptr;
+void foo() {
+    int x = 10; // 'x' is allocated on the stack
+    // Memory for 'x' is automatically freed when 'foo' exits
+}
     \end{codeblock}
 \end{exampleblock}
+
+\subsection{Heap Memory}
+
+The \textbf{heap} is used for \textbf{dynamic memory allocation}, where memory can be allocated and deallocated in any order.
+
+\subsubsection{Key Characteristics of Heap Memory}
+\begin{itemize}
+    \item \textbf{Purpose}: Used for dynamically allocated data (e.g., arrays, objects, or data structures whose size is not known at compile time).
+    \item \textbf{Management}: Memory allocation and deallocation are managed manually by the programmer (e.g., using \texttt{malloc}/\texttt{free} in C or \texttt{new}/\texttt{delete} in C++).
+    \item \textbf{Speed}: Accessing the heap is slower than the stack because it involves more complex memory management.
+    \item \textbf{Size}: The heap is much larger than the stack and can grow dynamically as needed (limited only by the system's available memory).
+    \item \textbf{Lifetime}: Memory remains allocated until it is explicitly freed by the programmer. If not freed, it leads to \textbf{memory leaks}.
+    \item \textbf{Fragmentation}: The heap can suffer from fragmentation over time, as memory is allocated and freed in arbitrary order.
+\end{itemize}
+
+\begin{exampleblock}[Heap Memory Example]
+    \begin{codeblock}[language=C++]
+void bar() {
+    int* ptr = new int(20); // 'ptr' points to memory allocated on the heap
+    // Memory for 'ptr' must be explicitly freed
+    delete ptr; // Free the memory to avoid a memory leak
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection{Key Differences Between Stack and Heap}
+
+\begin{tabular}{|l|l|l|}
+    \hline
+    \textbf{Feature} & \textbf{Stack Memory} & \textbf{Heap Memory} \\ \hline
+    Purpose & Static memory allocation & Dynamic memory allocation \\ \hline
+    Management & Automatic (compiler-managed) & Manual (programmer-managed) \\ \hline
+    Speed & Very fast & Slower \\ \hline
+    Size & Limited (predefined size) & Large (limited by system memory) \\ \hline
+    Lifetime & Automatically freed when scope ends & Must be explicitly freed \\ \hline
+    Fragmentation & No fragmentation & Can suffer from fragmentation \\ \hline
+    Usage & Local variables, function parameters & Dynamically allocated data \\ \hline
+\end{tabular}
+
+\subsection{When to Use Stack vs. Heap}
+
+\begin{itemize}
+    \item \textbf{Use the Stack}:
+    \begin{itemize}
+        \item For small, short-lived data (e.g., local variables, function parameters).
+        \item When the size of the data is known at compile time.
+        \item When you want fast and automatic memory management.
+    \end{itemize}
+    \item \textbf{Use the Heap}:
+    \begin{itemize}
+        \item For large or dynamically sized data (e.g., arrays, objects).
+        \item When the lifetime of the data extends beyond the current scope.
+        \item When you need flexibility in memory allocation and deallocation.
+    \end{itemize}
+\end{itemize}
 
 \subsection{Variables and Pointers}
 

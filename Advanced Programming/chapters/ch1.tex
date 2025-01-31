@@ -50,7 +50,7 @@ A=1
 To retrieve a variable's value, the dollar sign (\texttt{\$}) and curly braces are used. For example:
 
 \begin{neonlisting}[language=bash]{Displaying a Variable's Value}
-echo ${A}
+echo ${A}$
 \end{neonlisting}
 
 Certain variables, called \textbf{environmental variables}, influence how processes run on the system. These variables are often predefined. For instance, to display the user’s home directory, use: \texttt{echo \$\{HOME\}}
@@ -58,7 +58,7 @@ Certain variables, called \textbf{environmental variables}, influence how proces
 To create an environmental variable, prepend the command \texttt{export}. For example, to add \texttt{/usr/sbin} to the \texttt{PATH} environmental variable:
 
 \begin{neonlisting}[language=bash]{Exporting a Variable}
-export PATH="/usr/sbin:$PATH"
+export PATH="/usr/sbin:$PATH$"
 \end{neonlisting}
 
 The \texttt{PATH} variable specifies directories where executable programs are located, ensuring commands can be executed without specifying full paths.
@@ -196,7 +196,7 @@ Scripts or functions can access \textbf{input arguments} passed to them using sp
     An example function that prints the sum of two numbers:
     \begin{codeblock}
 function sum() {
-    echo $(($1 + $2))
+    echo $(($1 + $2))$
 }
     \end{codeblock}
 \end{exampleblock}
@@ -278,7 +278,7 @@ Quoting affects how strings and variables are interpreted:
 \begin{exampleblock}[Quoting]
     \begin{codeblock}
 a=yes
-echo "$a" # Outputs "yes".
+echo "$a" # Outputs "$yes".
 echo '$a' # Outputs "$a".
     \end{codeblock}
 \end{exampleblock}
@@ -286,7 +286,7 @@ echo '$a' # Outputs "$a".
 The output of a command can be converted into a string and assigned to a variable for later reuse: 
 
 \begin{neonlisting}[language=bash]{Output conversion}
-list=$(ls -l) 
+list=$(ls -l)$
 # or equivalently:
 list=`ls -l`
 \end{neonlisting}
@@ -314,3 +314,73 @@ Processes in the background are terminated when the terminal closes unless start
         \item \plaintt{info command}: Show detailed information (if available).
     \end{itemize}
 \end{tipsblock}
+
+
+\newpage
+\section{Git introduction}
+
+\href{https://ndpsoftware.com/git-cheatsheet.html#loc=workspace}{Git Cheatsheet}
+
+Version control is the practice of tracking and managing the changes in the software code. \texttt{Git} is an open-source version control system, 
+which helps teams manage changes to the source code over time. It is \textbf{distributed}, that is, every developer has the full history of their code repository locally.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/git.png}
+    \caption{Git Cheatsheet}
+    \label{fig:git_cs}
+\end{figure}
+
+Basic Git commands:
+\begin{itemize}
+    \item \texttt{git init}: Initialize a new Git repository.
+    \item \texttt{git clone <url>}: Clone a repository from a URL.
+    \item \texttt{git status}: Show the status of the working directory.
+    \item \texttt{git add <file>}: Add a file to the staging area.
+    \item \texttt{git commit -m "message"}: Commit changes to the repository.
+    \item \texttt{git push origin <branch>}: Push changes to a remote repository.
+    \item \texttt{git pull origin <branch>}: Pull changes from a remote repository.
+    \item \texttt{git branch}: List all branches in the repository.
+    \item \texttt{git checkout <branch>}: Switch to a different branch.
+    \item \texttt{git merge <branch>}: Merge changes from a branch into the current branch.
+    \item \texttt{git log}: Show the commit history.
+\end{itemize}
+
+To collaborate, just remember to pull the changes made by your colleagues before pushing your own changes. If you are working on the same files, the best practice is to create a new \textbf{branch},
+such that you can merge the changes only when you are sure that everything works as expected.
+
+When you create a branch, Git basically adds a new pointer to the latest commit. This pointer moves forward as you add new commits. 
+When you switch branches, Git moves the pointer to the latest commit of the branch you are switching to.
+When you merge branches, Git combines the changes of the two branches and moves the pointer to the latest commit of the merged branches. If it encounters some conflics, it will ask you to solve them.
+Rebasing allow you to move the commits of a branch on top of another branch, so that the history is linear.
+
+Best practices:
+\begin{itemize}
+    \item Commit often, with meaningful messages.
+    \item Use branches to isolate changes.
+    \item Pull before pushing.
+    \item Write tests for your code.
+    \item Use a \texttt{.gitignore} file to exclude files from version control.
+\end{itemize}
+
+\subsection{SSH Authentication}
+
+To avoid typing your username and password every time you push or pull from a repository, you can use SSH keys for authentication.
+
+\begin{tipsblock}[SSH Keys]
+    \begin{enumerate}
+        \item Generate a new SSH key: \texttt{ssh-keygen -t rsa -b 4096 -C "your\@email"}.
+        \item Add the SSH key to the SSH agent: \texttt{eval "\$(ssh-agent -s)"; ssh-add \textasciitilde/.ssh/id\_rsa}.
+        \item Add the SSH key to your Git account.
+        \item Test the SSH connection: \texttt{ssh -T} \
+        \item Change the remote URL to the SSH URL: \texttt{git remote set-url origin} \
+        \item Test the connection: \texttt{git pull}.
+    \end{enumerate}
+\end{tipsblock}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ssh.png}
+    \caption{SSH}
+    \label{fig:ssh}
+\end{figure}
