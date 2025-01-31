@@ -43,23 +43,24 @@ A \textbf{non-interactive shell}, however, is typically executed in automated en
 
 Shells, like any program, use variables to store data. Variables are assigned values using the equals sign (\texttt{=}) without spaces. For example, to assign the value \texttt{1} to the variable \texttt{A}, one would type:
 
-\begin{neonlisting}[language=bash]{Assigning a Value to a Variable}
+\begin{codeblock}[language=bash, numbers=none]
 A=1
-\end{neonlisting}
+\end{codeblock}
 
 To retrieve a variable's value, the dollar sign (\texttt{\$}) and curly braces are used. For example:
 
-\begin{neonlisting}[language=bash]{Displaying a Variable's Value}
+\begin{codeblock}[language=bash, numbers=none]
 echo ${A}
-\end{neonlisting}
+\end{codeblock}
 
-Certain variables, called \textbf{environmental variables}, influence how processes run on the system. These variables are often predefined. For instance, to display the user’s home directory, use: \texttt{echo \$\{HOME\}}
+Certain variables, called \textbf{environmental variables}, influence how processes run on the system. These variables are often predefined. For instance, to display the user’s home directory, use: \texttt{echo \$\{HOME\}}. To create an environmental variable, prepend the command \texttt{export}.
 
-To create an environmental variable, prepend the command \texttt{export}. For example, to add \texttt{/usr/sbin} to the \texttt{PATH} environmental variable:
-
-\begin{neonlisting}[language=bash]{Exporting a Variable}
+\begin{exampleblock}[Setting the PATH]
+    For example, to add \plaintt{/usr/sbin} to the \plaintt{PATH} environmental variable:
+    \begin{codeblock}[language=bash, numbers=none]
 export PATH="/usr/sbin:$PATH"
-\end{neonlisting}
+    \end{codeblock}
+\end{exampleblock}
 
 The \texttt{PATH} variable specifies directories where executable programs are located, ensuring commands can be executed without specifying full paths.
 
@@ -119,19 +120,18 @@ To become familiar with the shell, let’s start with some fundamental commands:
 \end{itemize}
 
 \begin{warningblock}[Remove Command]
-    Be cautious when using the \phantom{ }\plaintt{rm}\phantom{ } command, as it permanently deletes files and directories \textbf{without moving them to the trash}.
+    Be cautious when using the \plaintt{rm} command, as it permanently deletes files and directories \textbf{without moving them to the trash}.
 \end{warningblock}
 
 \subsection{Shell Scripts}
 
 Commands can be written in a script file, which is a text file containing instructions for the shell to execute. 
-
 The first line of the script, known as the \textbf{shebang}, specifies the interpreter to use.
 
-\begin{neonlisting}[language=bash]{Bash Shebang}
+\begin{codeblock}[language=bash, numbers=none]
 #!/bin/bash
 #!/usr/bin/env python
-\end{neonlisting}
+\end{codeblock}
 
 To make a script executable, you need to change its permissions:
 \texttt{chmod +x script\_file}
@@ -164,6 +164,8 @@ To determine the type of a command and its location you can use:
     \item \texttt{which command\_name} to find the exact location of an executable in the file system.
 \end{itemize}
 
+\newpage
+
 \begin{warningblock}[Spaces in File Names]
     Avoid using spaces or accented characters in file names. Instead, use:
     \begin{itemize}
@@ -177,11 +179,11 @@ To determine the type of a command and its location you can use:
 \subsection{Functions}
 
 A \textbf{function} in a shell script is a reusable block of code. The syntax is:
-\begin{neonlisting}[language=bash]{Function Syntax}
+\begin{codeblock}[language=bash]
 function_name() {
     # Commands to execute
 }
-\end{neonlisting}
+\end{codeblock}
 
 Scripts or functions can access \textbf{input arguments} passed to them using special variables:
 \begin{itemize}
@@ -194,8 +196,8 @@ Scripts or functions can access \textbf{input arguments} passed to them using sp
 
 \begin{exampleblock}[Sum Function]
     An example function that prints the sum of two numbers:
-    \begin{codeblock}
-function sum() {
+    \begin{codeblock}[language=bash]
+sum() {
     echo $(($1 + $2))
 }
     \end{codeblock}
@@ -250,8 +252,8 @@ Commands can be combined using operators to manipulate input and output streams:
     \end{itemize}
     \item \texttt{sed}: A \textit{stream editor} for text processing.
     \begin{itemize}
-        \item Example: \texttt{echo "UNIX is great" | sed "s/UNIX/Linux/"} replaces "UNIX" with "Linux".
-        \item Example: \texttt{echo "1\textbackslash n2\textbackslash n3" | sed "2d"} deletes the second line.
+        \item Example: \texttt{echo 'UNIX is great' | sed 's/UNIX/Linux/'} replaces 'UNIX' with 'Linux'.
+        \item Example: \texttt{echo "1\textbackslash{}n2\textbackslash{}n3" | sed "2d"} deletes the second line.
     \end{itemize}
     \item \texttt{cut}: Extracts specific sections from lines of text.
     \begin{itemize}
@@ -276,10 +278,10 @@ Quoting affects how strings and variables are interpreted:
 \end{itemize}
 
 \begin{exampleblock}[Quoting]
-    \begin{codeblock}
+    \begin{codeblock}[language=bash]
 a=yes
-echo "$a" # Outputs "yes".
-echo '$a' # Outputs "$a".
+echo "\$a" # Outputs "yes".
+echo '\$a' # Outputs "\$a".
     \end{codeblock}
 \end{exampleblock}
 
