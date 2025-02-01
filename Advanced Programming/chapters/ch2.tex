@@ -69,28 +69,28 @@ The build process for a C++ program involves several steps:
         Original source code:
         
         \begin{codeblock}[language=C++]
-    #include <iostream>
-    #define GREETING "Hello, World!"
-    
-    int main() {
-        std::cout << GREETING << std::endl;
-        return 0;
-    }
+#include <iostream>
+#define GREETING "Hello, World!"
+
+int main() {
+    std::cout << GREETING << std::endl;
+    return 0;
+}
         \end{codeblock}
         
         Preprocessed source code:
         
         \begin{codeblock}[language=C++]
-    // Content of <iostream>, simplified for demonstration
-    namespace std {
-        extern ostream cout; 
-        extern ostream endl;
-    }
-    
-    int main() {
-        std::cout << "Hello, World!" << std::endl;
-        return 0;
-    }
+// Content of <iostream>, simplified for demonstration
+namespace std {
+    extern ostream cout; 
+    extern ostream endl;
+}
+
+int main() {
+    std::cout << "Hello, World!" << std::endl;
+    return 0;
+}
         \end{codeblock}
     \end{exampleblock}    
 
@@ -106,9 +106,9 @@ The build process for a C++ program involves several steps:
         \item \textbf{Output}: Produces object files containing machine code.
     \end{enumerate}
     
-    \begin{neonlisting}[language=bash]{Compiling a C++ File}
+    \begin{codeblock}[language=bash]
 g++ main.cpp -o main.o
-    \end{neonlisting}
+    \end{codeblock}
     
     Common compiler options include:
     \begin{itemize}
@@ -129,9 +129,9 @@ g++ main.cpp -o main.o
         \item \textbf{Linker Errors/Warnings}: Identifies missing symbols or conflicts.
     \end{enumerate}
     
-    \begin{neonlisting}[language=bash]{Linking Object Files}
+    \begin{codeblock}[language=bash]{Linking Object Files}
     g++ main.o helper.o -o my_program
-    \end{neonlisting}
+    \end{codeblock}
     
     Linking can be static or dynamic:
     \begin{itemize}
