@@ -287,11 +287,11 @@ echo '$a' # Outputs "$a".
 
 The output of a command can be converted into a string and assigned to a variable for later reuse: 
 
-\begin{neonlisting}[language=bash]{Output conversion}
+\begin{codeblock}[language=bash, numbers=none]
 list=$(ls -l)$
 # or equivalently:
 list=`ls -l`
-\end{neonlisting}
+\end{codeblock}
 
 \subsubsection{Processes}
 
@@ -372,10 +372,10 @@ To avoid typing your username and password every time you push or pull from a re
 \begin{tipsblock}[SSH Keys]
     \begin{enumerate}
         \item Generate a new SSH key: \plaintt{ssh-keygen -t rsa -b 4096 -C "your\@email"}.
-        \item Add the SSH key to the SSH agent: \plaintt{eval "\$(ssh-agent -s)"; ssh-add \textasciitilde/.ssh/id\_rsa}.
+        \item Add the SSH key to the SSH agent: \newline \plaintt{eval "\$(ssh-agent -s)"; ssh-add \textasciitilde/.ssh/id\_rsa}.
         \item Add the SSH key to your Git account.
-        \item Test the SSH connection: \plaintt{ssh -T} \
-        \item Change the remote URL to the SSH URL: \plaintt{git remote set-url origin} \
+        \item Test the SSH connection: \plaintt{ssh -T}
+        \item Change the remote URL to the SSH URL: \plaintt{git remote set-url origin}
         \item Test the connection: \plaintt{git pull}.
     \end{enumerate}
 \end{tipsblock}
