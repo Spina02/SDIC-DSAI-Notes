@@ -106,7 +106,7 @@ int main() {
         \item \textbf{Output}: Produces object files containing machine code.
     \end{enumerate}
     
-    \begin{codeblock}[language=bash]
+    \begin{codeblock}[language=bash, numbers=none]
 g++ main.cpp -o main.o
     \end{codeblock}
     
@@ -159,7 +159,7 @@ g++ main.cpp -o main.o
 
 A typical C++ program is composed of a collection of functions. Every C++ program must include the \texttt{main()} function, which serves as the entry point. Additional functions can be defined as needed, and their statements are enclosed in curly braces \texttt{\{\}}. Statements are executed sequentially unless control structures like loops or conditionals are applied.
 
-\begin{exampleblock}{Basic Program Structure}
+\begin{exampleblock}[Basic Program Structure]
     \begin{codeblock}[language=C++]
 #include <iostream>
 
@@ -168,6 +168,7 @@ int main() { // Entry point of the program.
     return 0; // Indicates successful execution.
 }
 \end{codeblock}
+\end{exampleblock}
 
 \begin{itemize}
     \item \plaintt{\#include <iostream>}: Includes the Input/Output stream library.
@@ -178,7 +179,6 @@ int main() { // Entry point of the program.
     \item \plaintt{<< std::endl}: Outputs a newline character and flushes the stream.
     \item \plaintt{return 0;}: Indicates successful program termination.
 \end{itemize}
-\end{exampleblock}
 
 \subsubsection{How to Compile and Run}
 
@@ -196,12 +196,39 @@ Execute the compiled program from the terminal, optionally passing command-line 
 
 Verify the program's execution status by examining its exit code (0 typically indicates success):
 \begin{codeblock}[language=bash, numbers=none]
-echo $?$
+echo $?
 \end{codeblock}
 
 \subsection{C++ as a Strongly Typed Language}
 
 C++ enforces strict type checking during compilation. Variables must be declared with a specific type, ensuring type safety and reducing runtime errors. 
+
+\vspace{0.5em}
+
+It provides various built-in "\textbf{Fundamental Types}" to handle data of different kinds and sizes. These types include integers, floating-point numbers, characters, Booleans, and more.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|c|c|}
+        \hline
+        \textbf{Data Type} & \textbf{Size (Bytes)} & \textbf{\plaintt{<cstdint>}} \\ \hline
+        \plaintt{bool} & 1 &  \\ \hline
+        \plaintt{char} & 1 &  \\ \hline
+        \plaintt{signed char} & 1 & \plaintt{int8\_t} \\ \hline
+        \plaintt{unsigned char} & 1 & \plaintt{uint8\_t} \\ \hline
+        \plaintt{short} & 2 & \plaintt{int16\_t} \\ \hline
+        \plaintt{unsigned short} & 2 & \plaintt{uint16\_t} \\ \hline
+        \plaintt{int} & 4 & \plaintt{int32\_t} \\ \hline
+        \plaintt{unsigned int} & 4 & \plaintt{uint32\_t} \\ \hline
+        \plaintt{long int} & 4 or 8 & \plaintt{int32\_t} or \plaintt{int64\_t} \\ \hline
+        \plaintt{long unsigned int} & 4 or 8 & \plaintt{uint32\_t} or \plaintt{uint64\_t} \\ \hline
+        \plaintt{long long int} & 8 & \plaintt{int64\_t} \\ \hline
+        \plaintt{long long unsigned int} & 8 & \plaintt{uint64\_t} \\ \hline
+        \plaintt{float} & 4 &  \\ \hline
+        \plaintt{double} & 8 &  \\ \hline
+    \end{tabular}
+    \caption{Sizes of Fundamental Types in C++}
+\end{table}
 
 \begin{exampleblock}[Strong Typing in C++]
     \begin{codeblock}[language=C++]
@@ -216,56 +243,20 @@ unsigned int y{3.0}; // Uniform initialization: illegal.
     \end{codeblock}
 \end{exampleblock}
 
-\section{Fundamental Types}
+C++ supports several \textbf{integer types} with varying sizes and value ranges. Common types include \texttt{int}, \texttt{short}, \texttt{long}, and \texttt{long long}.
 
-C++ provides various built-in types to handle data of different kinds and sizes. These types include integers, floating-point numbers, characters, Booleans, and more.
-
-\begin{table}[H]
-    \centering
-    \begin{tabular}{|l|c|c|}
-        \hline
-        \textbf{Data Type} & \textbf{Size (Bytes)} & \textbf{\texttt{<cstdint>}} \\ \hline
-        \texttt{bool} & 1 &  \\ \hline
-        \texttt{char} & 1 &  \\ \hline
-        \texttt{signed char} & 1 & \texttt{int8\_t} \\ \hline
-        \texttt{unsigned char} & 1 & \texttt{uint8\_t} \\ \hline
-        \texttt{short} & 2 & \texttt{int16\_t} \\ \hline
-        \texttt{unsigned short} & 2 & \texttt{uint16\_t} \\ \hline
-        \texttt{int} & 4 & \texttt{int32\_t} \\ \hline
-        \texttt{unsigned int} & 4 & \texttt{uint32\_t} \\ \hline
-        \texttt{long int} & 4 or 8 & \texttt{int32\_t} or \texttt{int64\_t} \\ \hline
-        \texttt{long unsigned int} & 4 or 8 & \texttt{uint32\_t} or \texttt{uint64\_t} \\ \hline
-        \texttt{long long int} & 8 & \texttt{int64\_t} \\ \hline
-        \texttt{long long unsigned int} & 8 & \texttt{uint64\_t} \\ \hline
-        \texttt{float} & 4 &  \\ \hline
-        \texttt{double} & 8 &  \\ \hline
-    \end{tabular}
-    \caption{Sizes of Fundamental Types in C++}
-\end{table}
-
-\vspace{-2em}
-\subsubsection{Integer Numbers}
-
-C++ supports several integer types with varying sizes and value ranges. Common types include \texttt{int}, \texttt{short}, \texttt{long}, and \texttt{long long}.
-
-\begin{exampleblock}{Integer Types} 
-    \begin{codeblock}[language=C++]
+\begin{codeblock}[language=C++, numbers=none]
 int age = 30;
 short population = 32000;
 long long large_number = 123456789012345;
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
-\subsubsection{Floating-Point Numbers}
+\textbf{Floating-point types} represent real numbers. These include \texttt{float}, \texttt{double}, and \texttt{long double}. They are ideal for representing decimal values.
 
-Floating-point types represent real numbers. These include \texttt{float}, \texttt{double}, and \texttt{long double}. They are ideal for representing decimal values.
-
-\begin{exampleblock}{Integer Types}
-    \begin{codeblock}[language=C++]
+\begin{codeblock}[language=C++, numbers=none]
 float pi = 3.14;
 double gravity = 9.81;
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
 \subsubsection{Floating-Point Arithmetic}
 
@@ -277,18 +268,6 @@ Floating-point numbers in C++ are represented using the format $\pm f \cdot 2^e$
 \end{itemize}
 
 This representation enables efficient handling of very large or very small values but comes with certain limitations, such as rounding errors.
-
-\paragraph{Normalized Numbers:} 
-In normalized form, the most significant bit of the significand is always 1, which ensures efficient use of available precision and avoids redundant representations.
-
-\paragraph{IEEE 754 Standard:}
-The IEEE 754 Standard defines how floating-point numbers are represented and manipulated. It specifies:
-\begin{itemize}
-    \item Standardized formats for \texttt{float}, \texttt{double}, and \texttt{long double}.
-    \item Rounding rules to maintain accuracy.
-    \item Special values such as \texttt{NaN} (Not-a-Number) and infinity for handling exceptional cases.
-\end{itemize}
-
 
 \begin{exampleblock}
     \begin{codeblock}[language=C++]
@@ -311,21 +290,56 @@ if (std::abs((a + b) - c) < 1e-9) {
     \end{codeblock}
 \end{exampleblock}
 
+\textbf{Normalized Numbers}: In normalized form, the most significant bit of the significand is always 1, which ensures efficient use of available precision and avoids redundant representations.
+
+\textbf{IEEE 754 Standard}: The IEEE 754 Standard defines how floating-point numbers are represented and manipulated. It specifies:
+
+\begin{itemize}
+    \item Standardized formats for \texttt{float}, \texttt{double}, and \texttt{long double}.
+    \item Rounding rules to maintain accuracy.
+    \item Special values such as \texttt{NaN} (Not-a-Number) and infinity for handling exceptional cases.
+\end{itemize}
 
 
-\subsection{Representation of \texttt{NULL}}
+\subsubsection{Characters and Strings}
+
+Characters in C++ are represented using the \texttt{char} type, while strings are sequences of characters represented by the \texttt{std::string} class.
+
+\begin{codeblock}[language=C++, numbers=none]
+char letter = 'A'; // Single character.
+std::string name = "Alice"; // String of characters.
+std::string greeting = "Hello, " + name + "!"; // Concatenation.
+\end{codeblock}
+
+\subsubsection{Boolean Types}
+
+C++ provides a built-in \plaintt{bool} type for logical values. A \texttt{bool} variable can hold one of two values, \texttt{true} or \texttt{false}, useful for conditional statements and logical operations. 
+
+\begin{codeblock}[language=C++, numbers=none]
+bool flag = true;
+if (flag) {
+    std::cout << "Flag is true" << std::endl;
+}
+\end{codeblock}
+
+Note that numbers can be implicitly converted to \texttt{bool}: 0 is \texttt{false}, while any other value is \texttt{true}.
+
+\begin{codeblock}[language=C++, numbers=none]
+if (0)    // false
+if (42)   // true
+\end{codeblock}
+
+\subsection{\texttt{NULL}, \texttt{NaN}, and Key Differences}
+
+\subsubsection{NULL}
 
 \texttt{NULL} is used to represent a null pointer or an invalid memory address. Its representation depends on the system and context:
 
 \begin{itemize}
     \item In C/C++, \texttt{NULL} is typically defined as \texttt{0} or \texttt{(void*)0}.
-    \item In memory, a null pointer is often represented by a sequence of \textbf{all-zero bits}. For example:
-    \begin{itemize}
-        \item On a 32-bit system: \texttt{0x00000000}
-        \item On a 64-bit system: \texttt{0x0000000000000000}
-    \end{itemize}
-    \newpage
-    \item Example in C/C++:
+    \item In memory, a null pointer is often represented by a sequence of \textbf{all-zero bits}. (e.g. 32-bit system: \texttt{0x00000000}; 64-bit system: \texttt{0x0000000000000000})
+\end{itemize}
+
 \begin{exampleblock}[Representation of NULL]
     \begin{codeblock}[language=C++]
 int* ptr = NULL; // ptr points to memory address 0x00000000
@@ -334,122 +348,73 @@ if (ptr == NULL) {
 }
     \end{codeblock}
 \end{exampleblock}
-\end{itemize}
 
-\subsection{Representation of \texttt{NaN}}
+\subsubsection{NaN}
 
 \texttt{NaN} (Not a Number) is a special value used in floating-point arithmetic to represent undefined or unrepresentable results. Its representation is defined by the \textbf{IEEE 754 floating-point standard}:
 
 \begin{itemize}
     \item A \texttt{NaN} value is represented by an \textbf{exponent filled with 1s} (all bits set to 1) and a \textbf{non-zero significand}.
-    \item There are two types of \texttt{NaN}:
+    \item There are two types of \texttt{NaN}, \texttt{qNaN} and \texttt{sNaN}:
     \begin{itemize}
-        \item \textbf{Quiet NaN (qNaN)}: Used for undefined or unrepresentable results. It has a leading \texttt{1} in the significand.
-        \item \textbf{Signaling NaN (sNaN)}: Used to trigger exceptions in certain operations. It has a leading \texttt{0} in the significand.
+        \item \textbf{Quiet NaN}: Used for undefined or unrepresentable results. It has a leading \texttt{1} in the significand.
+        \item \textbf{Signaling NaN}: Used to trigger exceptions in certain operations. It has a leading \texttt{0} in the significand.
     \end{itemize}
-    \item Example in C/C++:
+\end{itemize}
+    
 \begin{exampleblock}[Representation of NaN]
     \begin{codeblock}[language=C++]
-#include <cmath>
-#include <cstdio>
-
-int main() {
-    double result = 0.0 / 0.0; // Results in NaN
-    if (isnan(result)) {
-        printf("Result is NaN\n");
-    }
-    return 0;
+double x = 0.0 / 0.0; // Creates NaN
+if (isnan(x)) {
+    std::cout << "x is NaN\n";
 }
     \end{codeblock}
 \end{exampleblock}
 
-\end{itemize}
-
-\subsection{Key Differences}
+\subsubsection{Key Differences}
 
 \begin{tabular}{|l|l|l|}
     \hline
     \textbf{Feature} & \textbf{\texttt{NULL}} & \textbf{\texttt{NaN}} \\ \hline
     Purpose & Represents a null pointer & Represents an undefined floating-point value \\ \hline
     Data Type & Used with pointers & Used with floating-point numbers \\ \hline
-    Representation & All-zero bits (e.g., \texttt{0x00000000}) & Exponent filled with 1s and non-zero significand \\ \hline
+    Representation & All-zero bits & Exponent filled with 1s and non-zero significand \\ \hline
     Context & Memory addresses, pointers & Floating-point arithmetic \\ \hline
 \end{tabular}
 
-\subsubsection{Characters and Strings}
+\subsection{Initialization and Aliases}
 
-Characters in C++ are represented using the \texttt{char} type, while strings are sequences of characters represented by the \texttt{std::string} class.
-
-\begin{exampleblock}[Working with Characters and Strings]
-    \begin{codeblock}[language=C++]
-char letter = 'A'; // Single character.
-std::string name = "Alice"; // String of characters.
-std::string greeting = "Hello, " + name + "!"; // Concatenation.
-    \end{codeblock}
-\end{exampleblock}
-
-\subsubsection{Boolean Types}
-
-C++ provides a built-in \plaintt{bool} type for logical values. A \texttt{bool} variable can hold one of two values, \texttt{true} or \texttt{false}, useful for conditional statements and logical operations.
-
-Note that numbers can be implicitly converted to \texttt{bool}: 0 is \texttt{false}, while any other value is \texttt{true}.
-
-\begin{exampleblock}[Boolean]
-    \begin{codeblock}[language=C++]
-bool is_happy = true;
-bool is_sad = false;
-
-if (is_happy) {
-    std::cout << "You are happy!" << std::endl;
-}
-    \end{codeblock}
-    \begin{codeblock}[language=C++]
-if (-1.5) // true
-if (0)    // false
-    \end{codeblock}
-\end{exampleblock}
-
-\subsubsection{Initialization and Aliases}
+\vspace{-0.5em}
 
 Initialization assigns an initial value to a variable at the time of declaration. C++ supports several initialization methods: direct, copy, and uniform initialization.
 
+\begin{codeblock}[language=C++, numbers=none]
+int x = 42;     // Direct initialization.
+int y(30);      // Constructor-style initialization.
+int z{15};      // Uniform initialization (preferred).
+\end{codeblock}
+
 \textbf{Type Aliases} can create alternative names for existing types using \texttt{using} or \texttt{typedef}.
 
-\begin{exampleblock}[Initialization and Type Aliases]
-    Variable Initialization:
-    \begin{codeblock}[language=C++]
-        int x = 42;     // Direct initialization.
-        int y(30);      // Constructor-style initialization.
-        int z{15};      // Uniform initialization (preferred).
-    \end{codeblock}
-    Type Aliases:
-    \begin{codeblock}[language=C++]
-        using integer = int;    // Alias for int.
-        integer count = 100;
-        
-        typedef float distance; // Alias for float.
-        distance meters = 250.5;
-    \end{codeblock}
-\end{exampleblock}
-
-
-
-\newpage
+\begin{codeblock}[language=C++, numbers=none]
+using integer = int;    // Alias for int.
+typedef float distance; // Alias for float.
+\end{codeblock}
 
 \subsection{The \plaintt{auto} Keyword and Type conversion}
 
+\vspace{-0.5em}
+
 The \texttt{auto} keyword allows the compiler to deduce the type of a variable based on its initialization value. This is useful for simplifying code and avoiding verbose type declarations.
 
-\begin{exampleblock}[The \plaintt{auto} Keyword]
-    \begin{codeblock}[language=C++]
+\begin{codeblock}[language=C++, numbers=none]
 auto a{42};         // int.
 auto b{12L};        // long.
 auto c{5.0F};       // float.
 auto d{10.0};       // double.
 auto e{false};      // bool.
 auto f{"string"};   // char[7].
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
 \begin{tipsblock}[Best Practices]
     \begin{itemize}
@@ -473,13 +438,19 @@ int w = static_cast<int>(z); // double to int (explicit).
     \end{codeblock}
 \end{exampleblock}
 
+\vspace{-0.8em}
+
 \section{Memory Management}
 
 In computer programming, memory is divided into two main regions: the \textbf{stack} and the \textbf{heap}. These regions serve different purposes and are managed differently. Below is a detailed explanation of their differences.
 
+\vspace{-0.5em}
+
 \subsection{Stack Memory}
 
 The \textbf{stack} is used for \textbf{static memory allocation}, where memory is allocated and deallocated in a last-in, first-out (LIFO) order.
+
+\vspace{-0.5em} 
 
 \subsubsection{Key Characteristics of Stack Memory}
 \begin{itemize}
@@ -503,13 +474,15 @@ void foo() {
 
 \subsection{Heap Memory}
 
-The \textbf{heap} is used for \textbf{dynamic memory allocation}, where memory can be allocated and deallocated in any order.
+\vspace{-0.5em}
+
+The \textbf{heap} is used for \textbf{dynamic allocation}, where memory can be allocated and deallocated in any order.
 
 \subsubsection{Key Characteristics of Heap Memory}
 \begin{itemize}
     \item \textbf{Purpose}: Used for dynamically allocated data (e.g., arrays, objects, or data structures whose size is not known at compile time).
     \item \textbf{Management}: Memory allocation and deallocation are managed manually by the programmer (e.g., using \texttt{malloc}/\texttt{free} in C or \texttt{new}/\texttt{delete} in C++).
-    \item \textbf{Speed}: Accessing the heap is slower than the stack because it involves more complex memory management.
+    \item \textbf{Speed}: Accessing the heap is slower than the stack as it involves complex memory management.
     \item \textbf{Size}: The heap is much larger than the stack and can grow dynamically as needed (limited only by the system's available memory).
     \item \textbf{Lifetime}: Memory remains allocated until it is explicitly freed by the programmer. If not freed, it leads to \textbf{memory leaks}.
     \item \textbf{Fragmentation}: The heap can suffer from fragmentation over time, as memory is allocated and freed in arbitrary order.
@@ -619,62 +592,56 @@ void example() {                  //        Lifetime:
 
 The \texttt{if-else} statement is used to execute code based on a condition. If the condition is true, the code inside the \texttt{if} block is executed; otherwise, the code inside the \texttt{else} block is executed.
 
-\begin{exampleblock}[If-Else Statement]
-    \begin{codeblock}[language=C++]
+\begin{codeblock}[language=C++]
 int x = 15;
 if (x != 10) {
     std::cout << "x is not equal to 10" << std::endl;
 } else {
     std::cout << "x is equal to 10" << std::endl;
 }
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
 \subsection{Switch Statements}
 
-The \texttt{switch} statement is used to select one of many code blocks to be executed. It evaluates an expression and compares it with case values. If a match is found, the corresponding block is executed.
+The \texttt{switch} statement executes different code blocks based on the value of an expression. When a matching case is found, its code block is executed.
 
-\begin{exampleblock}[Switch Statement]
-    \begin{codeblock}[language=C++]
-int day = 3;
-switch (day) {
+\begin{codeblock}[language=C++]
+int choice = 2;
+swit77ch (choice) {
     case 1:
-        std::cout << "Monday" << std::endl;
+        // Code for first option
         break;
     case 2:
-        std::cout << "Tuesday" << std::endl;
+        // Code for second option
         break;
+    // ...
     default:
-        std::cout << "Invalid day" << std::endl;
+        // Code for when no cases match
+        break;
 }
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
 \subsection{For loop}
 
 The \texttt{for} loop is used to execute a block of code a specified number of times. It consists of three parts: initialization, condition, and increment/decrement.
 
-\begin{exampleblock}[For Loop]
-    \begin{codeblock}[language=C++]
+\begin{codeblock}[language=C++]
 for (int i = 0; i < 5; i++) {
     std::cout << i << std::endl;
 }
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
 \subsection{While Loop}
 
 The \texttt{while} loop is used to execute a block of code as long as a specified condition is true.
 
-\begin{exampleblock}[While Loop]
-    \begin{codeblock}[language=C++]
+\begin{codeblock}[language=C++]
 int i = 0;
 while (i < 5) {
     std::cout << i << std::endl;
     i++;
 }
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
 \section{Functions and operators}
 
@@ -682,52 +649,43 @@ while (i < 5) {
 
 Functions are blocks of code that perform a specific task. They are defined with a return type, name, parameters, and a body. Functions can be called from other parts of the program to execute the code inside them.
 
-\begin{exampleblock}[Function Definition]
-    \begin{codeblock}[language=C++]
+\begin{codeblock}[language=C++, numbers = none]
 int add(int a, int b) {
     return a + b;
 }
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
 If a function does not output a value, its return type is \texttt{void}.    
 A function can also output a general \texttt{auto} type, which allows the compiler to deduce the return type based on the return statement.
 
 Passing parameters by \textbf{value} creates a copy of the argument, while passing by \textbf{reference} allows the function to modify the original argument.
-
 The function can also return pointers or references, enabling the caller to access or modify the original data.
 
-\begin{exampleblock}[Function Parameters]
-    \begin{codeblock}[language=C++]
+\begin{codeblock}[language=C++, numbers = none]
 void increment(int& x) {
     x++;
 }
 auto add(int a, int b) {
     return a + b;
 }
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
-\begin{warningblock}[const correctedness]
-    const correctedness is a valuable practice for writing safe and maintainable code. It ensures that functions do not modify the input parameters unless explicitly intended.
-    Use \plaintt{const} for parameters that should not be modified, it indicates read-only data and functions. 
+\begin{warningblock}[const correctness]
+    \plaintt{const} correctness is essential for writing safe and maintainable code. It prevents unintended modifications by marking parameters as read-only when they should not be altered.
+    
     \begin{itemize}
-        \item \textbf{Prevents unintended modifications}: helps avoid accidental data modifications, enhancing
-        code safety.
-        \item \textbf{Self-documenting code}: makes code more self-documenting by indicating the intent of data
-        usage.
-        \item \textbf{Compiler optimizations}: allows the compiler to perform certain optimizations, as it knows that
-        const data won't change.
+        \item \textbf{Avoids unintended changes}: Prevents accidental modifications, improving safety.
+        \item \textbf{Improves readability}: Clearly expresses the intent of function parameters.
+        \item \textbf{Enables optimizations}: Helps the compiler optimize code by ensuring immutability.
     \end{itemize}
-    \begin{codeblock}[language=C++]
+
+    \begin{codeblock}[language=C++, numbers = none]
 void print(const std::string& message) {
     std::cout << message << std::endl;
 }
     \end{codeblock}
 \end{warningblock}
 
-
-\newpage
 \section{Operators}
 
 \subsection{Increment and Decrement Operators}
@@ -737,20 +695,15 @@ void print(const std::string& message) {
     \item \textbf{Decrement Operator (\texttt{--})}: Decreases the value of a variable by 1.
 \end{enumerate}
 
-\begin{exampleblock}[Increment and Decrement Operators]
 \begin{codeblock}[language=C++]
 int x = 5;
 x++; // x is now 6
 x--; // x is now 5
 \end{codeblock}
-\end{exampleblock}
 
 \subsection{Function Overloading}
-Function overloading is a feature in C++ that allows you to define multiple functions with the
-same name but different parameters. The compiler selects the appropriate function based on the number or types of arguments
-during the function call.
+Function overloading is a feature in C++ that allows you to define multiple functions with the same name but different parameters. The compiler selects the appropriate function based on the number or types of arguments during the function call.
 
-\begin{exampleblock}[Function Overloading]
 \begin{codeblock}[language=C++]
 int add(int a, int b) {
     return a + b;
@@ -759,11 +712,7 @@ int add(double a, double b) {
     return a + b;
 }
 \end{codeblock}
-\end{exampleblock}
 
-
-
-\newpage
 \section{User-defined types}
 
 \begin{itemize}
@@ -811,23 +760,20 @@ double a = c.area();
 
 \begin{itemize}
     \item \textbf{Declaration}: Introduces the name and type of a variable, function, or class without allocating memory or defining its implementation.
-    \item \textbf{Definition}: Allocates memory and provides the implementation details for a variable, function, or class.
-\end{itemize}
-
-\begin{exampleblock}[Declaration and Definition]
-\begin{codeblock}[language=C++]
+\begin{codeblock}[language=C++, numbers=none]
 // Declaration
 extern int x;
 void foo();
-
+\end{codeblock}
+    \item \textbf{Definition}: Allocates memory and provides the implementation details for a variable, function, or class.
+\begin{codeblock}[language=C++, numbers=none]
 // Definition
 int x = 10;
 void foo() {
     std::cout << "Hello, world!" << std::endl;
 }
 \end{codeblock}
-\end{exampleblock}
-
+\end{itemize}
 
 
 \section{Code Organization}
@@ -879,11 +825,6 @@ int main() {
 \end{codeblock}
 \end{exampleblock}
 
-
-
-
-
-\newpage
 
 \section{The Build toolchain in practice}
 
