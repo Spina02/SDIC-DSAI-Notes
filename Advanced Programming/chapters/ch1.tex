@@ -34,7 +34,6 @@ A \textbf{non-login shell}, on the other hand, does not require the user to log 
 \subsubsection{Interactive vs. Non-interactive Shell}
 
 An \textbf{interactive shell} allows users to type commands and receive immediate feedback. Both login and non-login shells can be interactive. Examples include graphical terminals and virtual terminals. In interactive shells, the prompt (\texttt{\$PS1}) must be set, which provides the user interface for command input.
-
 A \textbf{non-interactive shell}, however, is typically executed in automated environments, such as scripts or batch processes. Input and output are generally hidden unless explicitly managed by the calling process. Non-interactive shells are usually non-login shells since the user is already authenticated. For instance, when a script is executed, it runs in a non-interactive shell. However, scripts can emulate interactivity by prompting users for input.
 
 \section{Shell Scripting}
@@ -143,7 +142,7 @@ Commands in the shell can behave differently depending on how they are executed.
 \begin{tipsblock}[Running Commands]
     \begin{itemize}
         \item \textbf{Subprocess}: Subprocesses can't modify the parent shell's environment or state. Changes made in subprocesses don't persist.
-        \item \textbf{\plaintt{source}}: The \plaintt{source} command (or \plaintt{.}) runs scripts in the current shell context, allowing environment modifications.
+        \item \textbf{\plaintt{source}}: The \plaintt{source} command \ (or \plaintt{.}) \ runs scripts in the current shell context, allowing environment modifications.
         \item \textbf{Scripts}: Running with \plaintt{./script\_file} creates a subprocess, isolating effects from the parent shell.
     \end{itemize}
 \end{tipsblock}
@@ -164,8 +163,6 @@ To determine the type of a command and its location you can use:
     \item \texttt{which command\_name} to find the exact location of an executable in the file system.
 \end{itemize}
 
-\newpage
-
 \begin{warningblock}[Spaces in File Names]
     Avoid using spaces or accented characters in file names. Instead, use:
     \begin{itemize}
@@ -176,6 +173,8 @@ To determine the type of a command and its location you can use:
     Spaces complicate scripts and make parsing error-prone.
 \end{warningblock}
 
+\newpage
+
 \subsection{Functions}
 
 A \textbf{function} in a shell script is a reusable block of code. The syntax is:
@@ -184,6 +183,8 @@ function_name() {
     # Commands to execute
 }
 \end{codeblock}
+
+\vspace{-0.3em}
 
 Scripts or functions can access \textbf{input arguments} passed to them using special variables:
 \begin{itemize}
@@ -194,8 +195,7 @@ Scripts or functions can access \textbf{input arguments} passed to them using sp
     \item \texttt{\$*}: All arguments as a single word (rarely used).
 \end{itemize}
 
-\begin{exampleblock}[Sum Function]
-    An example function that prints the sum of two numbers:
+\begin{exampleblock}[Function that prints the sum of two numbers]
     \begin{codeblock}[language=bash]
 sum() {
     echo $(($1 + $2))
@@ -203,20 +203,25 @@ sum() {
     \end{codeblock}
 \end{exampleblock}
 
+\vspace{-0.5em}
+
 \subsection{Additional Shell Commands}
+\vspace{-0.3em}
 
 \subsubsection{More Commands}
+\vspace{-0.3em}
 
 \begin{itemize}
-    \item \texttt{cat}: Stands for \textit{Concatenate}. Reads and outputs the contents of files. It can read multiple files and concatenate their content.
-    \item \texttt{wc}: Short for \textit{Word Count}. Provides statistics like newline count, word count, and byte count for a list of files.
-    \item \texttt{grep}: Stands for \textit{Global Regular Expression Print}. Searches for lines containing a specific string or matching a given pattern.
+    \item \texttt{cat}: \textit{Concatenate}. Reads and outputs the contents of files. It can read multiple files and concatenate their content.
+    \item \texttt{wc}: \textit{Word Count}. Provides statistics like newline, word and byte count for a list of files.
+    \item \texttt{grep}: \textit{Global Regular Expression Print}. Searches for lines containing a specific string or matching a given pattern.
     \item \texttt{head}: Displays the first few lines of a file.
     \item \texttt{tail}: Displays the last few lines of a file.
     \item \texttt{file}: Examines specified files to determine their type.
 \end{itemize}
 
 \subsubsection{Redirection, Pipelines, and Filters}
+\vspace{-0.3em}
 
 Commands can be combined using operators to manipulate input and output streams:
 \begin{itemize}
@@ -233,9 +238,6 @@ Commands can be combined using operators to manipulate input and output streams:
     \item \textbf{Logical operators}:
     \begin{itemize}
         \item \texttt{\&\&}: Executes the next command only if the previous one succeeds.
-        
-        Example: \texttt{sudo apt update \&\& sudo apt upgrade}.
-        
         \item \texttt{||}: Executes the next command only if the previous one fails.
         \item \texttt{;}: Executes commands sequentially, regardless of the status of the previous command.
     \end{itemize}
@@ -244,30 +246,100 @@ Commands can be combined using operators to manipulate input and output streams:
 
 \subsubsection{Advanced Commands}
 
-\begin{itemize}
-    \item \texttt{tr}: Stands for \textit{Translate}. Performs character transformations.
-    \begin{itemize}
-        \item Example: \texttt{echo "abc" | tr [a-z] [A-Z]} converts lowercase to uppercase.
-        \item Example: \texttt{echo "123abc" | tr -d [:digit:]} removes digits.
-    \end{itemize}
-    \item \texttt{sed}: A \textit{stream editor} for text processing.
-    \begin{itemize}
-        \item Example: \texttt{echo 'UNIX is great' | sed 's/UNIX/Linux/'} replaces 'UNIX' with 'Linux'.
-        \item Example: \texttt{echo "1\textbackslash{}n2\textbackslash{}n3" | sed "2d"} deletes the second line.
-    \end{itemize}
-    \item \texttt{cut}: Extracts specific sections from lines of text.
-    \begin{itemize}
-        \item Example: \texttt{cut -b 1-3 file.txt} extracts the first three bytes of each line.
-        \item Example: \texttt{echo "1,2,3" | cut -d "," -f 1} retrieves the first column.
-    \end{itemize}
-    \item \texttt{find}: Searches for files based on conditions.
-    
-    Example: \texttt{find . -type d -name "*lib*"} searches for directories containing "lib".
+\vspace{-1em}
 
-    \item \texttt{locate}: Faster alternative to \texttt{find}, relying on a pre-built database. Update the database with \texttt{updatedb}.
+\begin{table}[H]
+    \centering
+    %\newcommand{\midsize}{\fontsize{9pt}{9pt}\selectfont}
+    \renewcommand{\arraystretch}{1.3} % Adjust row height for better spacing
+    \begin{tabular}{>{\centering\scriptsize\ttfamily\bfseries}p{0.08\textwidth} >{\small\raggedright\arraybackslash}p{0.58\textwidth} >{\scriptsize\ttfamily\raggedright\arraybackslash}p{0.29\textwidth}}
+        \toprule
+        \multicolumn{1}{c}{\textbf{Cmd}} & 
+        \multicolumn{1}{c}{\textbf{Description}} & 
+        \multicolumn{1}{c}{\textbf{Syntax}} \\
+        \midrule
+        tr & \begin{minipage}{0.58\textwidth}Translates characters in \texttt{\scriptsize{SET1}} to corresponding characters in \texttt{\scriptsize{SET2}}. If \texttt{\scriptsize{SET2}} is omitted, deletes characters in \texttt{\scriptsize{SET1}}.\\
+        \textbf{Options:}
+        \begin{itemize}
+            \item \texttt{-d}: Delete characters in \texttt{\scriptsize{SET1}}.
+            \item \texttt{-s}: Squeeze repeated characters.
+        \end{itemize} 
+        \end{minipage} & tr [options] SET1 [SET2] \\
+        \midrule
+        sed & \begin{minipage}{0.58\textwidth}Stream editor for filtering and transforming text.\\
+        \textbf{Common uses:}
+        \begin{itemize}
+            \item Substitution: \texttt{\scriptsize{'s/pattern/replacement/flags'}}
+            \item Deletion: \texttt{\scriptsize{'Nd'}} deletes the N-th line.
+        \end{itemize}
+        \textbf{Flags:}
+        \begin{itemize}
+            \item \texttt{\scriptsize{g}}: Global replacement.
+            \item \texttt{\scriptsize{n}}: Replace n-th occurrence.
+        \end{itemize} 
+        \end{minipage} & sed [options] 'command' file \\
+        \midrule
+        cut & \begin{minipage}{0.58\textwidth}Removes sections from each line.\\
+        \textbf{Extraction methods:}
+        \begin{itemize}
+            \item \texttt{\scriptsize{-b}} \textit{list}: Select bytes.
+            \item \texttt{\scriptsize{-c}} \textit{list}: Select characters.
+            \item \texttt{\scriptsize{-f}} \textit{list}: Select fields; delimiter specified with \texttt{-d}.
+        \end{itemize} 
+        \end{minipage} & cut [options] file \\
+        \midrule
+        find & \begin{minipage}{0.58\textwidth}Searches for files in a directory hierarchy.\\
+        \textbf{Expressions:}
+        \begin{itemize}
+            \item \texttt{\scriptsize{-name pattern}}: Matches filenames.
+            \item \texttt{\scriptsize{-type [f|d]}}: Finds files (\texttt{\scriptsize{f}}) or directories (\texttt{\scriptsize{d}}).
+            \item \texttt{\scriptsize{-exec command \{\} \textbackslash;}}: Executes command on each match.
+        \end{itemize} 
+        \end{minipage} & find [path...] [expression] \\
+        \midrule
+        locate & \begin{minipage}{0.58\textwidth}Searches a database for filenames matching a pattern. Faster than \texttt{\scriptsize{find}}, but requires database updates.\\
+        \textbf{Options:}
+        \begin{itemize}
+            \item \texttt{\scriptsize{-i}}: Ignore case.
+            \item \texttt{\scriptsize{-r}}: Use regular expressions.
+        \end{itemize} 
+        \end{minipage} & locate [options] pattern \\
+        \bottomrule
+    \end{tabular}
+\end{table}    
     
-    Example: \texttt{locate -i foo} finds items containing "foo", ignoring case.
-\end{itemize}
+\begin{exampleblock}[Usage cases]
+    
+    \begin{itemize}
+        \item \texttt{tr}:
+        \begin{itemize}
+            \item \texttt{\scriptsize{echo "hello" | tr 'a-z' 'A-Z'}}: Converts lowercase letters to uppercase.
+            \item \texttt{\scriptsize{echo "hello123" | tr -d '0-9'}}: Removes digits from the input.
+        \end{itemize}
+        \item \texttt{sed}:
+        \begin{itemize}
+            \item \texttt{\scriptsize{echo 'UNIX is great' | sed 's/UNIX/Linux/'}}: Replaces 'UNIX' with 'Linux'.
+            \item \texttt{\scriptsize{echo -e "1\\n2\\n3" | sed '2d'}}: Deletes the second line.
+        \end{itemize}
+        \item \texttt{cut}:
+        \begin{itemize}
+            \item \texttt{\scriptsize{cut -d ',' -f 1 file.csv}}: Extracts the first field from a CSV file.
+            \item \texttt{\scriptsize{cut -c 1-5 file.txt}}: Extracts the first five characters of each line.
+        \end{itemize}
+        \item \texttt{find}:
+        \begin{itemize}
+            \item \texttt{\scriptsize{find ~ -type f -name "*.txt"}}: Finds all text files in the user's home directory.
+            \item \texttt{\scriptsize{find . -type d -name "lib*"}}: Finds all directories in the current directory whose names start with "lib".
+        \end{itemize}
+        \item \texttt{locate}:
+        \begin{itemize}
+            \item \texttt{\scriptsize{locate -i foo}}: Finds all files or directories whose name contains 'foo', ignoring case.
+            \item \texttt{\scriptsize{locate -r '.*\textbackslash{}.txt'}}: Finds all files ending with '.txt' using a regular expression.
+        \end{itemize}
+    \end{itemize}
+    
+\end{exampleblock}
+    
 
 \subsubsection{Quoting in Shell}
 
@@ -277,13 +349,11 @@ Quoting affects how strings and variables are interpreted:
     \item \texttt{''}: Single quotes treat everything as literal.
 \end{itemize}
 
-\begin{exampleblock}[Quoting]
-    \begin{codeblock}[language=bash]
+\begin{codeblock}[language=bash]
 a=yes
 echo "$a" # Outputs "yes".
 echo '$a' # Outputs "$a".
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
 The output of a command can be converted into a string and assigned to a variable for later reuse: 
 
@@ -347,6 +417,8 @@ Basic Git commands:
     \item \texttt{git merge <branch>}: Merge changes from a branch into the current branch.
     \item \texttt{git log}: Show the commit history.
 \end{itemize}
+
+
 
 To collaborate, just remember to pull the changes made by your colleagues before pushing your own changes. If you are working on the same files, the best practice is to create a new \textbf{branch},
 such that you can merge the changes only when you are sure that everything works as expected.

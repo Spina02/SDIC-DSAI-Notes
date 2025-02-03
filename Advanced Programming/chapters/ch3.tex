@@ -1,0 +1,929 @@
+\chapter{Object-Oriented Programming}
+
+\section{Introduction}
+\subsubsection{What is OOP}
+
+Object-Oriented Programming (OOP) is a programming paradigm that emphasizes the use of objects to represent real-world entities and concepts.
+
+\begin{definitionblock}[OOP in C++]
+    C++ is not (only) an OOP language. It is a \textbf{multi-paradigm programming language} that supports procedural, object-oriented, and generic programming. 
+    C++ allows developers to combine these paradigms effectively for various programming tasks.
+\end{definitionblock}
+
+\subsubsection{Key Principles of OOP}
+
+OOP is based on several key principles:
+
+\begin{itemize}
+    \item \textbf{Encapsulation}: bundles data (attributes) and the functions (methods) that operate on the data into a single unit called an \textit{object}. This promotes data hiding and reduces code complexity.
+    \item \textbf{Inheritance}: allows you to create new classes (derived or child classes) based on existing classes (base or parent classes). It enables code reuse and the creation of class hierarchies.
+    \item \textbf{Polymorphism}: enables objects from different derived classes to be handled through a common base class. This facilitates code reuse and provides a way to handle objects abstractly.
+\end{itemize}
+
+\subsubsection{RAII (Resource Acquisition Is Initialization)}
+
+RAII is a C++ idiom that binds resource management to an object's lifetime. Resources are acquired in the constructor and released in the destructor, ensuring automatic cleanup when the object goes out of scope.
+
+\begin{itemize}
+    \item Eliminates manual resource management and reduces leaks.
+    \item Ensures deterministic resource release, even in case of exceptions.
+    \item Manages memory, file handles, locks, and network connections efficiently.
+\end{itemize}
+
+\subsubsection{Advantages of OOP}
+
+OOP offers numerous advantages, including:
+
+\begin{itemize}
+    \item \textbf{Modularity}: OOP encourages the division of a complex system into smaller, manageable objects, promoting code modularity and reusability.
+    \item \textbf{Maintenance}: Objects are self-contained, making it easier to maintain and update specific parts of the code without affecting other parts.
+    \item \textbf{Flexibility}: Inheritance and polymorphism provide flexibility, allowing you to extend and modify the behavior of classes without altering their existing code.
+    \item \textbf{Readability}: OOP promotes code readability by organizing data and functions related to a specific object within a class.
+\end{itemize}
+
+\newpage
+
+\section{Classes and Objects in C++}
+
+\subsection{Classes and Members}
+
+In C++, a class encapsulates \texttt{data} (member variables) and \texttt{behavior} (member functions), providing a blueprint for creating objects. This encapsulation ensures that data and related functionality are bundled together, promoting modularity and reusability.
+
+The following example defines a simple \texttt{Car} class that models a real-world vehicle. It includes attributes such as the manufacturer, model, and year, along with a method to start the engine.
+\begin{codeblock}[language=C++]
+class Car {
+public:
+    std::string manufacturer;
+    std::string model;
+    unsigned int year;
+
+    void start_engine() {
+        std::cout << "Engine started!" << std::endl;
+    }
+};
+\end{codeblock}
+
+\subsubsection{Creating and Using Objects}
+
+Once a class is defined, objects can be instantiated to represent real entities. You can create an instance of the \texttt{Car} class and interact with its members using the dot (\texttt{.}) operator.
+
+\begin{codeblock}[language=C++, firstnumber=11]
+Car my_car;                     // Creating an object of class Car.
+my_car.manufacturer = "BMW";
+my_car.model = "X5";
+my_car.year = 2024;
+my_car.start_engine();          // Invoking a method.
+\end{codeblock}
+
+C++ allows objects to be managed dynamically using pointers. This provides flexibility, especially when working with objects whose lifetimes extend beyond the current scope. The arrow operator (\texttt{->}) is used to access members of a pointer to an object.
+
+\begin{codeblock}[language=C++, firstnumber=16]
+Car* my_car_ptr = new Car{};
+my_car_ptr->manufacturer = "Alfa Romeo";
+my_car_ptr->model = "Giulietta";
+my_car_ptr->year = 2010;
+my_car_ptr->start_engine();     // Invoking a method.
+delete my_car_ptr;              // Releasing allocated memory.
+\end{codeblock}
+
+\subsubsection{Member Variables and Functions}
+
+A class consists of two main components:
+
+\begin{itemize}
+    \item \textbf{Member Variables}: Store the state of an object. They are also known as attributes or fields.
+    \item \textbf{Member Functions}: Define the behavior of an object. They are also known as methods.
+\end{itemize}
+
+\vspace{1em}
+
+In the previous example, the member variables (\texttt{manufacturer}, \texttt{model}, \texttt{engine\_running}) store the car's state, while member functions (\texttt{start\_engine}, \texttt{is\_running}) define its behavior.
+
+\subsubsection{Static Members}
+
+Static members are shared by all instances of a class. They are declared with the \texttt{static} keyword and accessed using the class name rather than an object. Consider the \texttt{Circle} class below, which uses a static constant for \texttt{PI}:
+
+\begin{codeblock}[language=C++]
+class Circle {
+public:
+    static const double PI = 3.14159265359;   // Static member.
+    double radius;                            // Non-static member.
+
+    double calculate_area() {
+        return PI * radius * radius;
+    }
+    
+    static void print_shape_name() {
+        std::cout << "This is a circle." << std::endl;
+    }
+};
+\end{codeblock}
+Static members can be accessed using the class name directly, while non-static members require an instance of the object:
+
+\begin{codeblock}[language=C++, firstnumber=14]
+Circle circle;
+circle.radius = 5.0;
+const double area = circle.calculate_area();  // non-static member.
+const double pi_value = Circle::PI;           // static member.
+Circle::print_shape_name();
+\end{codeblock}
+
+\subsubsection{Const Members}
+
+The keyword \texttt{const} can be applied to member variables and member functions to indicate immutability. In the example below, the constructor initializes a constant member, and the member function \texttt{print\_value} is declared as \texttt{const} to signal that it does not modify the object.
+
+\begin{codeblock}[language=C++]
+class MyClass {
+public:
+    MyClass(int x) : value(x) {}
+        
+    void print_value() const {
+        // value *= 2; // Illegal: cannot modify a const member.
+        std::cout << "Const version: " << value << std::endl;
+    }
+    
+    const int value;
+};
+\end{codeblock}
+
+\begin{tipsblock}[\plaintt{mutable} Keyword]
+    If a const member function needs to modify a member variable, that variable can be declared as \plaintt{mutable} (although this should be used sparingly).
+
+\begin{codeblock}[language=C++, numbers=none]
+mutable int var = 0; // Can be modified in a const member function
+\end{codeblock}
+\end{tipsblock}
+\begin{exampleblock}[Const and Non-Const Member Functions]
+    Here is an example illustrating both const and non-const versions of a member function:
+    \begin{codeblock}[language=C++]
+class Counter {
+public:
+    Counter() : count(0) {}
+
+    // Non-const version can modify the object
+    void increment() {
+        count++;
+    }
+
+    // Const version can only read the object
+    int get_count() const {
+        return count;
+    }
+
+private:
+    int count;
+};
+
+Counter c1;       // Non-const object
+const Counter c2; // Const object
+
+c1.get_count();   // OK      non-const obj can call const func
+c1.increment();   // OK      non-const obj can call non-const func
+
+c2.get_count();   // OK      const obj can call const func
+c2.increment();   // Error   const obj cannot call non-const func
+    \end{codeblock}
+\end{exampleblock}
+
+\subsubsection{The \texttt{this} Pointer}
+
+The \texttt{this} pointer is automatically passed to non-static member functions and points to the object invoking the function. It is useful for resolving ambiguity between member variables and parameters.
+
+\begin{codeblock}[language=C++]
+class MyClass {
+public:
+    int x;
+
+    void print_x() const {
+        std::cout << "Value of x: " << this->x << std::endl;
+    }
+};
+\end{codeblock}
+
+
+\subsection{Constructors and Destructors}
+
+Constructors are special member functions that initialize objects when they are created. They share the same name as the class and may accept arguments to initialize member variables.
+
+\subsubsection{Default Constructor}
+
+A default constructor takes no arguments. If a class has no explicitly defined constructor, C++ generates a default constructor automatically.
+
+\begin{codeblock}[language=C++]
+class MyClass {
+public:
+    // Default constructor.
+    MyClass() = default;
+
+    std::string name;
+    unsigned int length;
+};
+
+MyClass obj;    // Default initialization.
+MyClass obj2{}; // Uniform initialization (preferred).
+MyClass* ptr = new MyClass(); // Calls the default constructor.
+\end{codeblock}
+
+\begin{observationblock}[Default Constructor and Initialization]
+If you provide any custom constructors, C++ \textit{will not generate a default constructor} unless explicitly defined.
+
+Default initialization of primitive types (e.g., \plaintt{int}, \plaintt{double}) sets them to zero, while objects may be initialized by their own default constructors.
+\end{observationblock}
+
+\vspace{-0.5em}
+
+\subsubsection{Parameterized Constructor}
+
+\vspace{-0.3em}
+
+A parameterized constructor allows objects to be initialized with specific values.
+
+\vspace{-0.3em}
+
+\begin{codeblock}[language=C++]
+class Student {
+public:
+    Student(std::string name, unsigned int age) {
+        this->name = name;
+        this->age = age;
+    }
+
+    std::string name;
+    unsigned int age;
+};
+
+Student student1("Alice", 20); // initialization using a constructor.
+Student student2{"Bob", 23}; // Uniform initialization.
+\end{codeblock}
+
+\vspace{-0.3em}
+
+A good practice is to use an \textbf{initializer list} to initialize member variables in the constructor:
+
+\vspace{-0.3em}
+
+\begin{codeblock}[language=C++]
+class Rect {
+public:
+    Rect(double length, double width) : length(length), width(width) {
+        // Constructor body (if needed).
+    }
+
+    double calculate_area() const {
+        return length * width;
+    }
+
+    double length;
+    double width;
+};
+
+Rect rect{5.0, 3.0}; // initialization using an initializer list.
+const double area = rect.calculate_area();
+\end{codeblock}
+
+When using an initializer list, the member variables \textbf{must be initialized in the order they are declared} in the class definition.
+
+\vspace{-0.3em}
+
+\begin{tipsblock}[Initializer List]
+Using an initializer list avoids redundant assignments and improves efficiency.
+\end{tipsblock}
+
+\vspace{-1em}
+
+\subsubsection{Copy Constructor and Copy Assignment}
+
+\vspace{-0.3em}
+
+A copy constructor creates a new object as a copy of an existing one, while the copy assignment operator assigns the contents of one object to another existing object.
+
+\vspace{-0.3em}
+
+\begin{codeblock}[language=C++, numbers=none]
+class Book {
+public:
+    Book(std::string title, std::string author) 
+        : title(title), author(author) {}
+
+    // Copy constructor.
+    Book(const Book& other)
+        : title(other.title), author(other.author) {}
+
+    // Copy assignment operator.
+    Book& operator=(const Book& other) {
+        if (this != &other) {
+            title = other.title;
+            author = other.author;
+        }
+        return *this;
+    }
+
+    void display_info() const {
+        std::cout << "Title:" << title << ", Author:" << author << "\n";
+    }
+
+    std::string title;
+    std::string author;
+};
+
+Book book1{"The Catcher in the Rye", "J.D. Salinger"};
+Book book2 = book1; // Copy constructor.
+Book book3{"Marcovaldo", "I. Calvino"};
+book3 = book1; // Copy assignment operator.
+\end{codeblock}
+
+\begin{observationblock}[Pass and Return by Value]
+    When passing or returning objects by value, the copy constructor is invoked to create a copy of the object.
+
+\begin{codeblock}[language=C++]
+void some_function(Student s) {
+    // Calls the copy constructor when s is passed.
+}
+
+Student create_student() {
+    Student s{"Bob", 22};
+    return s; // Calls the copy constructor when s is returned.
+}
+\end{codeblock}
+\end{observationblock}
+
+\subsubsection{Destructor}
+
+\vspace{-0.2em}
+
+A destructor is a special member function that cleans up resources when an object is destroyed. It has the same name as the class but is prefixed with \texttt{\textasciitilde}. Destructors are automatically called when:
+\begin{itemize}
+    \item An object goes out of scope
+    \item The \texttt{delete} operator is used on a pointer to the object
+    \item The program ends and static/global objects are destroyed
+\end{itemize}
+
+\vspace{-0.5em}
+
+\begin{codeblock}[language=C++]
+class FileHandler {
+public:
+    FileHandler(std::string filename) : filename(filename) {
+        file.open(filename);
+    }
+
+    ~FileHandler() {
+        if (file.is_open()) {
+            file.close();
+        }
+    }
+
+    std::string filename;
+    std::ofstream file;
+};
+
+{ // The object is automatically destroyed when it goes out of scope.
+    FileHandler file{"data.txt"};
+} // Destructor is called here, ensuring proper resource cleanup.
+\end{codeblock}
+
+\vspace{-0.7em}
+
+\begin{observationblock}[Rule of Three]
+    Copy constructor, copy assignment operator and destructor are part of the \textbf{Rule of Three} in C++, which states that if a class defines any of the following:
+    \begin{itemize}
+        \item Destructor
+        \item Copy constructor
+        \item Copy assignment operator
+    \end{itemize}
+    then it should provide all three to ensure proper memory management.
+\end{observationblock}
+
+\vspace{-0.8em}
+
+\subsubsection{Compiler-Generated Special Member Functions}
+
+\vspace{-1em}
+
+\renewcommand{\arraystretch}{1.35}
+\setlength{\tabcolsep}{2.8pt}
+
+\begin{table}[H]
+    \centering
+    \captionsetup{justification=centering, margin=0.1cm, labelfont=bf, font=small}
+    \caption{The compiler automatically generates special member functions when not explicitly defined. \cite{howardhinnant}}
+    \label{tab:special_members}
+    \vspace{-0.4em}
+    \small
+    \begin{tabular}{|>{\centering\columncolor{gray!20}\arraybackslash}m{2.9cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|}
+    \hline
+    \rowcolor{gray!30} \textbf{user declares} & \textbf{default constructor} & \textbf{destructor} & \textbf{copy constructor} & \textbf{copy assignment} & \textbf{move constructor} & \textbf{move assignment} \\
+    \hline
+    Nothing & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted \\
+        \hline
+        Any constructor & \cellcolor{yellow!20}not declared & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted \\
+        \hline
+        default constructor & \cellcolor{green!20}user declared & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted \\
+        \hline
+        destructor & \cellcolor{blue!15}defaulted & \cellcolor{green!20}user declared & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{yellow!20}not declared & \cellcolor{yellow!20}not declared \\
+        \hline
+        copy constructor & \cellcolor{yellow!20}not declared & \cellcolor{blue!15}defaulted & \cellcolor{green!20}user declared & \cellcolor{blue!15}defaulted & \cellcolor{yellow!20}not declared & \cellcolor{yellow!20}not declared \\
+        \hline
+        copy assignment & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{green!20}user declared & \cellcolor{yellow!20}not declared & \cellcolor{yellow!20}not declared \\
+        \hline
+        move constructor & \cellcolor{yellow!20}not declared & \cellcolor{blue!15}defaulted & \cellcolor{red!20}deleted & \cellcolor{red!20}deleted & \cellcolor{green!20}user declared & \cellcolor{yellow!20}not declared \\
+        \hline
+        move assignment & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{red!20}deleted & \cellcolor{red!20}deleted & \cellcolor{yellow!20}not declared & \cellcolor{green!20}user declared \\
+        \hline
+        \end{tabular}
+        \vspace{-0.5em}
+    \end{table}
+
+\newpage
+\subsection{The \texttt{inline} Directive}
+
+The \texttt{inline} keyword in C++ suggests that the compiler replaces a function call with the actual function code at the call site. This can reduce function call overhead and improve performance for small, frequently used functions.
+
+\textbf{Syntax}
+\begin{codeblock}[language=C++, numbers=none]
+// Inline function definition.
+inline int add(int a, int b) {
+    return a + b;
+}
+
+// Function call.
+const int result = add(5, 7);
+std::cout << "Result: " << result << std::endl;
+\end{codeblock}
+
+Inline functions have the following characteristics:
+
+\begin{itemize}
+    \item \textbf{Limited to small functions}: Inlining is beneficial for short functions but can lead to code bloat for larger functions.
+    \item \textbf{Compiler optimization}: The \texttt{inline} keyword is only a suggestion; the compiler may choose whether to inline a function based on optimization settings.
+    \item \textbf{Usage in header files}: Inline functions should be defined in header files to avoid multiple definition errors, but proper use of header guards is essential.
+    \item \textbf{Impact on readability}: Excessive inlining can make debugging harder and lead to poor code organization.
+\end{itemize}
+
+    \textbf{Advantages}
+    \begin{itemize}
+        \item Reduces function call overhead.
+        \item Eliminates stack frame creation for simple functions.
+        \item Helps avoid multiple definitions across translation units.
+        \item Useful for small, performance-critical functions.
+    \end{itemize}
+    
+    \textbf{Considerations}
+    \begin{itemize}
+        \item Excessive use can increase executable size.
+        \item Compiler may ignore the \texttt{inline} directive if deemed inefficient.
+        \item Debugging inlined functions is more difficult.
+        \item Should be used cautiously to maintain code clarity.
+    \end{itemize}
+
+\begin{tipsblock}[When to Use \plaintt{inline}]
+
+    The \plaintt{inline} directive is most effective when:
+
+    \begin{itemize}
+        \item Use for very small functions, such as one-liners.
+        \item Use when function call overhead is significant.
+        \item Avoid inlining large or recursive functions.
+        \item Ensure proper placement in header files to prevent linkage issues.
+    \end{itemize}
+\end{tipsblock}
+
+\newpage
+
+\subsection{In-Class and Out-of-Class Definitions}
+
+In C++, member functions of a class can be defined either inside the class declaration (in-class, implicitly \texttt{inline}) or separately in a source file (out-of-class). Each approach has its advantages and trade-offs.
+
+\vspace{-0.5em}
+
+\subsubsection{In-Class Definition (Implicitly Inline)}
+
+\vspace{-0.5em}
+
+A member function defined inside the class is automatically considered \texttt{inline}. This is common for short functions that are one-liners or concise operations.
+
+\begin{codeblock}[language=C++, numbers=none]
+// my_class.hpp
+class MyClass {
+public:
+    // Inline function defined inside the class.
+    int add(int a, int b) {
+        return a + b;
+    }
+};
+\end{codeblock}
+
+The compiler treats this as if it were explicitly marked \texttt{inline} when defined outside the class.
+
+\begin{codeblock}[language=C++, numbers=none]
+// my_class.hpp
+class MyClass {
+public:
+    int add(int a, int b);
+};
+
+// Inline keyword is implicit when defined inside the class.
+inline int MyClass::add(int a, int b) {
+    return a + b;
+}
+\end{codeblock}
+
+\begin{minipage}[H]{0.48\textwidth}
+    \textbf{Advantages}
+    \begin{itemize}
+        \item Improves readability for simple functions.
+        \item Allows potential inlining by the compiler, reducing function call overhead.
+    \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}[H]{0.49\textwidth}
+    \textbf{Disadvantages}
+    \begin{itemize}
+        \item May lead to code bloat with large functions.
+        \item Changes to the function force recompilation of all translation units, including header files.
+    \end{itemize}
+\end{minipage}
+
+\subsubsection{Out-of-Class Definition (Separation of Interface and Implementation)}
+
+Member functions can also be declared in the class but defined separately in a source file (\texttt{.cpp}). This is typically done for larger functions or when separating interface from implementation.
+
+\begin{codeblock}[language=C++, numbers=none]
+// my_class.hpp
+class MyClass {
+public:
+    int add(int a, int b); // Function declaration.
+};
+\end{codeblock}
+
+\begin{codeblock}[language=C++, numbers=none]
+// my_class.cpp
+#include "my_class.hpp"
+
+int MyClass::add(int a, int b) {
+    return a + b;
+}
+\end{codeblock}
+
+\begin{minipage}{0.48\textwidth}
+    \textbf{Advantages}
+    \begin{itemize}
+        \item Improves code organization.
+        \item Changes to function implementation do not require recompilation of all translation units.
+    \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \textbf{Disadvantages}
+    \begin{itemize}
+        \item Slightly more verbose.
+        \item Requires managing separate \texttt{.cpp} files.
+    \end{itemize}
+\end{minipage}
+
+\begin{tipsblock}[Best Practices for Function Definitions]
+    \begin{enumerate}
+        \item Use \textbf{in-class definitions} for very short functions (e.g., accessors, mutators) where inlining might improve performance.
+        \item Use \textbf{out-of-class definitions} for more complex functions to keep headers clean and separate interface from implementation.
+        \item Balance readability, maintainability, and performance when deciding where to define functions.
+    \end{enumerate}
+\end{tipsblock}
+
+In practice, a combination of both approaches is used to maintain structured and efficient code.
+
+
+\subsection{Encapsulation and Access Control}
+
+Encapsulation is a key principle in object-oriented programming (OOP) that bundles data (attributes) and methods (functions) into a single unit: an object.
+
+It restricts direct access to an object's internal state, ensuring data integrity and security.
+
+\subsubsection{Encapsulation in C++}
+
+Encapsulation allows defining a clear interface while hiding implementation details. Data members should generally be private, with public methods providing controlled access.
+
+\begin{exampleblock}[Encapsulation Example]
+\begin{codeblock}[language=C++, numbers=none]
+class BankAccount {
+public:
+    BankAccount(std::string account_holder, double balance)
+        : account_holder(account_holder), balance(balance) {}
+
+    void deposit(double amount) {
+        balance += amount;
+    }
+
+    double get_balance() const {
+        return balance;
+    }
+
+private:
+    std::string account_holder;
+    double balance;
+};
+\end{codeblock}
+\end{exampleblock}
+
+\subsubsection{Access Specifiers in C++}
+
+C++ provides three access specifiers to control member visibility:
+
+\begin{itemize}
+    \item \texttt{public}: Accessible from any part of the program (forms the class's public interface).
+    \item \texttt{private}: Only accessible within the class itself (internal implementation).
+    \item \texttt{protected}: Similar to \texttt{private}, but also accessible in derived classes (used in inheritance).
+\end{itemize}
+
+\begin{codeblock}[language=C++, numbers=none]
+class MyClass {
+public:
+    int public_var;      // Accessible from anywhere.
+    void public_func() { /* ... */ }
+
+private:
+    int private_var;     // Accessible only within this class.
+    void private_func() { /* ... */ }
+};
+\end{codeblock}
+
+\subsection{Class vs. Struct}
+
+In C++, both \texttt{class} and \texttt{struct} can be used to define objects with member variables and functions.
+
+\vspace{0.5em}
+
+The primary difference between them lies in their \textbf{default access specifiers}:
+
+\begin{itemize}
+    \item In a \texttt{class}, members are \textbf{private} by default.
+    \item In a \texttt{struct}, members are \textbf{public} by default.
+\end{itemize}
+
+\begin{codeblock}[language=C++, numbers=none]
+// Class vs. Struct Example
+class MyClass {
+    int x; // Private by default.
+public:
+    int y; // Explicitly public.
+};
+
+struct MyStruct {
+    int x; // Public by default.
+private:
+    int y; // Explicitly private.
+};
+\end{codeblock}
+
+\subsubsection{When to Use Class vs. Struct}
+
+While functionally equivalent, structs and classes serve different purposes in common C++ conventions.
+
+\vspace{0.5em}
+
+Use \texttt{class} when:
+\vspace{0.5em}
+\begin{itemize}
+    \item Encapsulating data with private members
+    \item Defining objects with complex behavior
+    \item Implementing OOP concepts (e.g. inheritance)
+    \item Maintaining strong encapsulation
+\end{itemize}
+
+\vspace{0.5em}
+
+Use \texttt{struct} when:
+\vspace{0.5em}
+\begin{itemize}
+    \item Grouping related public variables
+    \item Using simple data structures (e.g. point, color)
+    \item Interacting with C-style structs or APIs
+    \item Defining POD (Plain Old Data) types
+\end{itemize}
+
+\subsection{Getter and Setter Methods}
+
+Getter and setter methods (also known as \textbf{accessors and mutators}) provide controlled access to private member variables.
+
+\begin{itemize}
+    \item \textbf{Getters}: Allow reading private data.
+    \item \textbf{Setters}: Allow modifying private data with validation or restrictions.
+\end{itemize}
+
+\begin{exampleblock}[Getter and Setter]
+\begin{codeblock}[language=C++]
+class TemperatureSensor {
+public:
+    double get_temperature() const {
+        return temperature;
+    }
+
+    void set_temperature(double new_temperature) {
+        if (new_temperature >= -50.0 && new_temperature <= 150.0) {
+            temperature = new_temperature;
+        } else {
+            std::cout << "Invalid temperature value!" << std::endl;
+        }
+    }
+
+private:
+    double temperature;
+};
+\end{codeblock}
+\end{exampleblock}
+
+Using getters and setters enforces encapsulation while allowing controlled data access.
+
+\subsection{Friend Classes}
+
+A \texttt{friend} class allows another class to access its private and protected members. This is useful when two classes need close interaction but maintaining strict encapsulation is impractical.
+
+\vspace{0.5em}
+
+Let's consider a \texttt{Circle} class with a private member \texttt{radius}.
+
+\begin{codeblock}[language=C++, numbers=none]
+// circle.hpp
+class Circle {
+public:
+    friend class Cylinder;
+    // Cylinder class has access to private members of Circle.
+
+    Circle(double r) : radius(r) {}
+
+    double get_area() const {
+        return 3.14159265359 * radius * radius;
+    }
+
+private:
+    double radius;
+};
+\end{codeblock}
+
+Let's consider now a \texttt{Cylinder} class that requires access to the private member \texttt{radius} of the \texttt{Circle} class:
+
+\begin{codeblock}[language=C++, numbers=none]
+// cylinder.hpp
+class Cylinder {
+public:
+    Cylinder(const Circle &circle, double height)
+        : circle(circle), height(height) {}
+    
+    double get_volume() const {
+        // Accessing the private member 'radius' of Circle.
+        return circle.radius * circle.radius * height;
+    }
+
+private:
+    double height;
+    const Circle circle;
+};
+
+Circle circle{1.0};
+Cylinder cylinder{circle, 0.5};
+const double volume = cylinder.get_volume();
+\end{codeblock}
+
+\begin{tipsblock}[Best Practices for Friend Classes]
+    \begin{itemize}
+        \item \textbf{Minimize usage}: Prefer encapsulation unless two classes require deep interaction.
+        \item \textbf{Use only when necessary}: Friend classes break encapsulation, so they should be well justified.
+        \item \textbf{Maintain modularity}: Avoid excessive interdependencies between classes.
+    \end{itemize}
+\end{tipsblock}
+
+Friend classes allow controlled access to private members but should be used sparingly to maintain encapsulation principles.
+
+
+\subsection{Operator Overloading}
+
+Operator overloading in C++ allows defining custom behaviors for operators when used with user-defined classes. This makes objects behave more naturally and improves code readability.
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{20pt}
+    \begin{tabulary}{\linewidth}{@{} L C @{}}
+        \toprule
+        \hfill \textbf{Category} \hfill & \textbf{Operators} \\
+        \midrule
+        Arithmetic & \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{\%} \\
+        Comparison & \texttt{==}, \texttt{!=}, \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}, \texttt{<=>} (C++20) \\
+        Assignment & \texttt{=}, \texttt{+=}, \texttt{-=}, \texttt{*=} \\
+        Increment/Decrement & \texttt{++}, \texttt{--} \\
+        Stream & \texttt{<<} (output), \texttt{>>} (input) \\
+        Subscript & \texttt{[]} (array-like behavior) \\
+        Function Call & \texttt{()} (used in functor classes) \\
+        Pointer & \texttt{->}, \texttt{*} (smart pointers, iterators) \\
+        \bottomrule
+    \end{tabulary}
+    \caption{Commonly Overloaded Operators in C++}
+    \end{table}
+
+\newpage
+
+By overloading operators you can extend their functionality for custom types. Instead of writing verbose function calls, operator overloading lets you use familiar syntax for objects.
+
+\begin{exampleblock}[Operator Overloading]
+\begin{codeblock}[language=C++, numbers=none]
+class Complex {
+public:
+    Complex(double r, double i) : real(r), imag(i) {}
+
+    // Overloading the + operator.
+    Complex operator+(const Complex& other) {
+        return Complex(real + other.real, imag + other.imag);
+    }
+
+    void print() const {
+        std::cout << real << " + " << imag << "i" << std::endl;
+    }
+
+private:
+    double real, imag;
+};
+
+Complex a{2.0, 3.0};
+Complex b{1.0, 2.0};
+Complex c = a + b; // Using the overloaded '+' operator.
+c.print();
+\end{codeblock}
+\end{exampleblock}
+
+Operators can be overloaded as \textbf{member functions} or \textbf{non-member functions}.
+
+\subsubsection{Overloading as a Member Function}
+
+If the left operand is an object of the class, the operator can be overloaded as a member function.
+
+\begin{codeblock}[language=C++, numbers=none]
+// Overloading as a Member Function
+class Vector {
+public:
+    Vector(int x, int y) : x(x), y(y) {}
+
+    Vector operator+(const Vector& other) {
+        return Vector(x + other.x, y + other.y);
+    }
+
+    void print() const {
+        std::cout << "(" << x << ", " << y << ")" << std::endl;
+    }
+
+private:
+    int x, y;
+};
+
+Vector v1{2, 3}, v2{1, 1};
+Vector result = v1 + v2; // Works because + is a member function.
+result.print();
+\end{codeblock}
+
+\subsubsection{Overloading as a Non-Member Function}
+
+If the left operand is not an object of the class, the operator must be overloaded as a non-member function.
+
+\begin{codeblock}[language=C++, numbers=none]
+// Overloading as a Non-Member Function (Friend Function)
+class MyClass {
+public:
+    MyClass(int v) : value(v) {}
+
+    // Declaring the '<<' operator as a friend function.
+    friend std::ostream& operator<<(std::ostream& os, const MyClass& obj);
+
+private:
+    int value;
+};
+
+// Overloading the '<<' operator as a non-member function.
+std::ostream& operator<<(std::ostream& os, const MyClass& obj) {
+    os << obj.value;
+    return os;
+}
+
+MyClass obj{42};
+std::cout << obj << std::endl; // Calls the overloaded operator.
+\end{codeblock}
+
+\begin{tipsblock}[Operator Overloading Guidelines]
+    \begin{enumerate}
+
+        \item \textbf{Operators that cannot be overloaded}
+        
+        Some operators like \plaintt{::}, \plaintt{.*}, and \plaintt{? :} cannot be overloaded.
+        
+        \item \textbf{Preserve the operator's meaning}
+        
+        Overloading should make sense in the class's context (e.g., \plaintt{+} for addition).
+        
+        \item \textbf{Respect operator precedence}
+        
+        Overloaded operators should follow the same precedence as their built-in counterparts.
+        
+        \item \textbf{Avoid excessive overloading}
+        
+        Overloading too many operators can make code hard to maintain.
+
+    \end{enumerate}
+\end{tipsblock}
+
+Operator overloading enhances code readability when used correctly, making custom types feel like native types.
