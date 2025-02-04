@@ -1,0 +1,194 @@
+
+\chapter{Optimization, Debugging, Profiling and Testing}
+
+\section{Optimization}
+
+\begin{definitionblock}{Optimization}
+    \textbf{Code Optimization} is the process of enhancing a program's preformance, efficiency and resource utilization without changing its functionality. It involves improving execution speed, reducing memory usage and enhancing overall system responsiveness.
+\end{definitionblock}
+
+Techniques for optimization:
+\begin{itemize}
+    \item \textbf{Algorithmic optimization}: changing the algorithm used to solve the problem.
+    \item \textbf{Code optimization}: changing the code to make it more efficient.
+    \item \textbf{Compiler optimization}: using compiler flags to optimize the code.
+    \item \textbf{Hardware optimization}: using hardware features to optimize the code.
+    \item \textbf{Profiling}: analyzing the code to identify bottlenecks and optimize them.
+\end{itemize}
+
+\subsection*{Loop unrolling}
+
+Loop unrolling is a technique used to optimize loops by reducing the overhead of loop control. It involves replicating the loop body multiple times to reduce the number of iterations. This can improve performance by reducing the number of loop control instructions and improving instruction-level parallelism.
+
+\begin{codeblock}[language=c++]
+    for (int i = 0; i < n; ++i) {
+        for (int k = 0; k < 3; ++k) {
+            a[k] += b[k] * c[i];
+        }
+    }
+    // becomes
+    for (int i = 0; i < n; i += 3) {
+        a[0] += b[0] * c[i];
+        a[1] += b[1] * c[i];
+        a[2] += b[2] * c[i];
+    }
+\end{codeblock}
+
+Prefetch also constant values inside the loop for further optimization:
+\begin{codeblock}[language=c++]
+    for (int i = 0; i < n; i += 3) {
+        const int c0 = c[i];
+        a[0] += b[0] * c0;
+        a[1] += b[1] * c0;
+        a[2] += b[2] * c0;
+    }
+\end{codeblock}
+
+\subsection*{Avoid \texttt{if} inside nested loops}
+
+\begin{codeblock}[language=c++]
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            if (a[i][j] > 0) {
+                b[i][j] = a[i][j];
+            }
+        }
+    }
+    // becomes
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            b[i][j] = std::max(a[i][j], 0);
+        }
+    }
+\end{codeblock}
+
+\subsection*{Sum of vectors}
+\begin{codeblock}[language=c++]
+    double sum1(double *data, const size_t &size) {
+        double sum = 0;
+        for (size_t i = 0; i < size; ++i) {
+            sum += data[i];
+        }
+        return sum;
+    }
+    // vs 
+    double sum2(double *data, const size_t &size) {
+        double sum{0}, sum1{0}, sum2{0}, sum3{0};
+        size_t j;
+        for (j = 0; j < size - 3; j += 4) {
+            sum += data[j];
+            sum1 += data[j + 1];
+            sum2 += data[j + 2];
+            sum3 += data[j + 3];
+        }
+        for (; j < size; ++j) {
+            sum += data[j];
+        }
+        return sum + sum1 + sum2 + sum3;
+    }
+\end{codeblock}
+
+Here, \texttt{sum2} is 10 times faster than \texttt{sum1}. This is because of the loop unrolling technique.
+
+\subsection*{Cache friendliness}
+Efficiency often depends on how variables are accessed in memory. Access variables contiguously for cache pre-fetching effectiveness. For example, if \texttt{mat} us a dynamic matrix organized row-wise:
+\begin{codeblock}[language=c++]
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < m; ++j) {
+            sum += mat[i][j];
+        }
+    }
+    // becomes
+    for (int j = 0; j < m; ++j) {
+        for (int i = 0; i < n; ++i) {
+            sum += mat[i][j];
+        }
+    }
+\end{codeblock}
+
+\section{Debugging}
+
+\textbf{Static Analysis} analyzes the code without executing it. It can detect potential bugs, security vulnerabilities, and code smells. It can also provide insights into code complexity, maintainability, and performance. Static Analysis tools analyze source code by inspecting it for potential issues or vulnerabilities. 
+An example is \texttt{cling}, an interactive C++ interpreter.
+
+\textbf{Debugging}, instead, is the process of identifying and fixing bugs in a program. It involves tracing the execution of the program, inspecting variables, and analyzing the program's behavior to identify the root cause of the bug. Debuggers are software tools that enable developers to inspect, analyze and troubleshoot code during the development process. An example is \texttt{gdb}, the GNU Debugger.
+
+They differ in:
+\begin{itemize}
+    \item \textbf{Timing}: Static analysis is done before the code is executed, while debugging is done during or after execution.
+    \item \textbf{Focus}: Static analysis focuses on potential issues in the code, while debugging focuses on specific bugs that are causing problems.
+    \item \textbf{Use cases}: Static analysis is used to prevent bugs and improve code quality, while debugging is used to fix bugs that have already occurred.
+    \item \textbf{Automation}: Static analysis can be automated and integrated into the development process, while debugging is typically done manually.
+    \item \textbf{Complementarity}: Static analysis and debugging are complementary techniques that can be used together to improve code quality and reliability.
+\end{itemize}
+
+\section{Profiling}
+
+\begin{definitionblock}
+    \textbf{Profiling} is the process of analyzing a program's performance to identify bottlenecks and optimize its execution. It involves measuring various metrics such as CPU usage, memory usage, and execution time to identify areas of improvement. Profiling tools provide insights into how a program is performing and help developers optimize its performance.
+\end{definitionblock}
+
+A \textbf{profiler} in software development is a tool or set of tools designed to analyze the runtime behavior of a program. It provides detailed information about resource utilization, execution times, and function calls during the program's execution. Its main objectives are:
+\begin{itemize}
+    \item \textbf{Performance analysis}, to know how much time a program spends in differnt functions
+    \item \textbf{Resource usage}
+    \item \textbf{Function call tracing}, to understand the flow of execution
+\end{itemize}
+
+\texttt{gprof} is a popular profiler for C and C++ programs. It generates a call graph showing the time spent in each function and the number of calls to each function. It can help identify bottlenecks and optimize the code.
+
+\section{Testing}
+
+\textbf{Verification} ensures the correct implementation of a program, it tests individual components separately. 
+\textbf{Validation}, instead, confirms the desired behavior, assessing if the code produces the intended outcome. 
+
+Exist different types of testing:
+\begin{itemize}
+    \item \textbf{Unit testing}: Testing individual components or units of code in isolation.
+    \item \textbf{Integration testing}: Testing the interaction between different components or units of code.
+    \item \textbf{Regression testing}: Testing to ensure that new code changes do not introduce new bugs.
+\end{itemize}
+
+In C++, unit testing often uses frameworks like \texttt{Catch2} or \texttt{Google Test}. These frameworks provide tools for writing and running tests, as well as reporting results.
+
+\begin{exampleblock}[Using gtest]
+    \begin{codeblock}[language=c++]
+        #include <gtest/gtest.h>
+        
+        int add(int a, int b) {
+            return a + b;
+        }
+        
+        TEST(AddTest, PositiveNumbers) {
+            EXPECT_EQ(add(1, 2), 3);
+        }
+        
+        TEST(AddTest, NegativeNumbers) {
+            EXPECT_EQ(add(-1, -2), -3);
+        }
+        
+        int main(int argc, char **argv) {
+            ::testing::InitGoogleTest(&argc, argv);
+            return RUN_ALL_TESTS();
+        }
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection*{Test-driven development (TDD)}
+
+\textbf{TDD} is a software development approach where tests are written before the actuaò code. The cycle is writing a test, implementing the code to pass the test, and refactoring the code. The advantages include better code quality, improved design, and faster development.
+
+\subsection*{Continuous integration (CI)}
+
+\textbf{CI} is a software development practice where code changes are automatically tested and integrated into the main codebase. It helps identify bugs early, ensure code quality, and improve collaboration among developers. CI tools like \texttt{Jenkins} or \texttt{Travis CI} automate the testing and integration process.
+
+\subsection*{Code coverage}
+
+Code coverage is a metric used in software testing to measure the extent to which source code is executed during the testing process. It provides insights into which parts of the codebase have been exercised by the test suite and which parts remain untested. The key concepts are:
+\begin{itemize}
+    \item \textbf{Lines of code}: The number of lines of code executed by the test suite. Since it is expressed in percentage, it is better to have it as close to 100\% as possible.
+    \item \textbf{Branches of code}: The number of branches of code executed by the test suite. It is important to test all possible branches to ensure code correctness.
+\end{itemize}
+
+
+
