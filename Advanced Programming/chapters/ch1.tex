@@ -65,6 +65,7 @@ The \texttt{PATH} variable specifies directories where executable programs are l
 
 When a terminal is launched, the UNIX system invokes the shell interpreter specified in the \texttt{SHELL} environment variable. If \texttt{SHELL} is unset, the system default is used. After sourcing initialization files, the shell presents the prompt, which is defined by the \texttt{\$PS1} environment variable.
 
+
 \subsection{Initialization Files}
 
 Initialization files are scripts or configuration files executed when a shell session starts. They set up the shell environment, define default settings, and customize behavior. Depending on the type of shell (login, non-login, interactive, or non-interactive), different initialization files are sourced.
@@ -99,6 +100,7 @@ Initialization files are scripts or configuration files executed when a shell se
         \item Depending on the shell, the file specified in the \texttt{\$ENV} (or \texttt{\$BASH\_ENV}) environment variable may also be read.
     \end{itemize}
 \end{itemize}
+
 
 \subsection{Basic Shell Commands}
 
@@ -248,6 +250,8 @@ Commands can be combined using operators to manipulate input and output streams:
 
 \vspace{-1em}
 
+
+
 \begin{table}[H]
     \centering
     %\newcommand{\midsize}{\fontsize{9pt}{9pt}\selectfont}
@@ -258,88 +262,96 @@ Commands can be combined using operators to manipulate input and output streams:
         \multicolumn{1}{c}{\textbf{Description}} & 
         \multicolumn{1}{c}{\textbf{Syntax}} \\
         \midrule
-        tr & \begin{minipage}{0.58\textwidth}Translates characters in \texttt{\scriptsize{SET1}} to corresponding characters in \texttt{\scriptsize{SET2}}. If \texttt{\scriptsize{SET2}} is omitted, deletes characters in \texttt{\scriptsize{SET1}}.\\
+        tr & \begin{minipage}{0.58\textwidth}Translates characters in \plaintt{\scriptsize{SET1}} to corresponding characters in \plaintt{\scriptsize{SET2}}. If \plaintt{\scriptsize{SET2}} is omitted, deletes characters in \plaintt{\scriptsize{SET1}}.\\
         \textbf{Options:}
         \begin{itemize}
-            \item \texttt{-d}: Delete characters in \texttt{\scriptsize{SET1}}.
-            \item \texttt{-s}: Squeeze repeated characters.
+            \item \plaintt{-d}: Delete characters in \plaintt{\scriptsize{SET1}}.
+            \item \plaintt{-s}: Squeeze repeated characters.
         \end{itemize} 
         \end{minipage} & tr [options] SET1 [SET2] \\
         \midrule
         sed & \begin{minipage}{0.58\textwidth}Stream editor for filtering and transforming text.\\
         \textbf{Common uses:}
         \begin{itemize}
-            \item Substitution: \texttt{\scriptsize{'s/pattern/replacement/flags'}}
-            \item Deletion: \texttt{\scriptsize{'Nd'}} deletes the N-th line.
+            \item Substitution: \plaintt{\scriptsize{'s/pattern/replacement/flags'}}
+            \item Deletion: \plaintt{\scriptsize{'Nd'}} deletes the N-th line.
         \end{itemize}
         \textbf{Flags:}
         \begin{itemize}
-            \item \texttt{\scriptsize{g}}: Global replacement.
-            \item \texttt{\scriptsize{n}}: Replace n-th occurrence.
+            \item \plaintt{\scriptsize{g}}: Global replacement.
+            \item \plaintt{\scriptsize{n}}: Replace n-th occurrence.
         \end{itemize} 
         \end{minipage} & sed [options] 'command' file \\
         \midrule
         cut & \begin{minipage}{0.58\textwidth}Removes sections from each line.\\
         \textbf{Extraction methods:}
         \begin{itemize}
-            \item \texttt{\scriptsize{-b}} \textit{list}: Select bytes.
-            \item \texttt{\scriptsize{-c}} \textit{list}: Select characters.
-            \item \texttt{\scriptsize{-f}} \textit{list}: Select fields; delimiter specified with \texttt{-d}.
+            \item \plaintt{\scriptsize{-b}} \textit{list}: Select bytes.
+            \item \plaintt{\scriptsize{-c}} \textit{list}: Select characters.
+            \item \plaintt{\scriptsize{-f}} \textit{list}: Select fields; delimiter specified with \plaintt{-d}.
         \end{itemize} 
         \end{minipage} & cut [options] file \\
         \midrule
         find & \begin{minipage}{0.58\textwidth}Searches for files in a directory hierarchy.\\
         \textbf{Expressions:}
         \begin{itemize}
-            \item \texttt{\scriptsize{-name pattern}}: Matches filenames.
-            \item \texttt{\scriptsize{-type [f|d]}}: Finds files (\texttt{\scriptsize{f}}) or directories (\texttt{\scriptsize{d}}).
-            \item \texttt{\scriptsize{-exec command \{\} \textbackslash;}}: Executes command on each match.
+            \item \plaintt{\scriptsize{-name pattern}}: Matches filenames.
+            \item \plaintt{\scriptsize{-type [f|d]}}: Finds files (\plaintt{\scriptsize{f}}) or directories (\plaintt{\scriptsize{d}}).
+            \item \plaintt{\scriptsize{-exec command \{\} \textbackslash;}}: Executes command on each match.
         \end{itemize} 
         \end{minipage} & find [path...] [expression] \\
         \midrule
-        locate & \begin{minipage}{0.58\textwidth}Searches a database for filenames matching a pattern. Faster than \texttt{\scriptsize{find}}, but requires database updates.\\
+        locate & \begin{minipage}{0.58\textwidth}Searches a database for filenames matching a pattern. Faster than \plaintt{\scriptsize{find}}, but requires database updates.\\
         \textbf{Options:}
         \begin{itemize}
-            \item \texttt{\scriptsize{-i}}: Ignore case.
-            \item \texttt{\scriptsize{-r}}: Use regular expressions.
+            \item \plaintt{\scriptsize{-i}}: Ignore case.
+            \item \plaintt{\scriptsize{-r}}: Use regular expressions.
         \end{itemize} 
         \end{minipage} & locate [options] pattern \\
         \bottomrule
     \end{tabular}
 \end{table}    
     
+
+
+
 \begin{exampleblock}[Usage cases]
     
     \begin{itemize}
-        \item \texttt{tr}:
+        \item \plaintt{tr}:
         \begin{itemize}
-            \item \texttt{\scriptsize{echo "hello" | tr 'a-z' 'A-Z'}}: Converts lowercase letters to uppercase.
-            \item \texttt{\scriptsize{echo "hello123" | tr -d '0-9'}}: Removes digits from the input.
+            \item \plaintt{\scriptsize{echo "hello" | tr 'a-z' 'A-Z'}}: Converts lowercase letters to uppercase.
+            \item \plaintt{\scriptsize{echo "hello123" | tr -d '0-9'}}: Removes digits from the input.
         \end{itemize}
-        \item \texttt{sed}:
+        \item \plaintt{sed}:
         \begin{itemize}
-            \item \texttt{\scriptsize{echo 'UNIX is great' | sed 's/UNIX/Linux/'}}: Replaces 'UNIX' with 'Linux'.
-            \item \texttt{\scriptsize{echo -e "1\\n2\\n3" | sed '2d'}}: Deletes the second line.
+            \item \plaintt{\scriptsize{echo 'UNIX is great' | sed 's/UNIX/Linux/'}}: Replaces 'UNIX' with 'Linux'.
+            \item \plaintt{\scriptsize{echo -e "1\\n2\\n3" | sed '2d'}}: Deletes the second line.
         \end{itemize}
-        \item \texttt{cut}:
+        \item \plaintt{cut}:
         \begin{itemize}
-            \item \texttt{\scriptsize{cut -d ',' -f 1 file.csv}}: Extracts the first field from a CSV file.
-            \item \texttt{\scriptsize{cut -c 1-5 file.txt}}: Extracts the first five characters of each line.
+            \item \plaintt{\scriptsize{cut -d ',' -f 1 file.csv}}: Extracts the first field from a CSV file.
+            \item \plaintt{\scriptsize{cut -c 1-5 file.txt}}: Extracts the first five characters of each line.
         \end{itemize}
-        \item \texttt{find}:
+        \item \plaintt{find}:
         \begin{itemize}
-            \item \texttt{\scriptsize{find ~ -type f -name "*.txt"}}: Finds all text files in the user's home directory.
-            \item \texttt{\scriptsize{find . -type d -name "lib*"}}: Finds all directories in the current directory whose names start with "lib".
+            \item \plaintt{\scriptsize{find ~ -type f -name "*.txt"}}: Finds all text files in the user's home directory.
+            \item \plaintt{\scriptsize{find . -type d -name "lib*"}}: Finds all directories in the current directory whose names start with "lib".
         \end{itemize}
-        \item \texttt{locate}:
+        \item \plaintt{locate}:
         \begin{itemize}
-            \item \texttt{\scriptsize{locate -i foo}}: Finds all files or directories whose name contains 'foo', ignoring case.
-            \item \texttt{\scriptsize{locate -r '.*\textbackslash{}.txt'}}: Finds all files ending with '.txt' using a regular expression.
+            \item \plaintt{\scriptsize{locate -i foo}}: Finds all files or directories whose name contains 'foo', ignoring case.
+            \item \plaintt{\scriptsize{locate -r '.*\textbackslash{}.txt'}}: Finds all files ending with '.txt' using a regular expression.
         \end{itemize}
     \end{itemize}
     
 \end{exampleblock}
     
+
+
+
+
+
 
 \subsubsection{Quoting in Shell}
 
@@ -458,3 +470,5 @@ To avoid typing your username and password every time you push or pull from a re
     \caption{SSH}
     \label{fig:ssh}
 \end{figure}
+
+    
