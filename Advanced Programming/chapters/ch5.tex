@@ -488,3 +488,642 @@ int main() {
 \end{exampleblock}
 
 
+
+
+
+
+\newpage
+\section{Smart Pointers}
+
+\begin{definitionblock}[RAII]
+    \textbf{Resource Acquisition Is Initialization} plays a significant role in C++. It essentially means that an object should be responsible for both the creation and destruction of the resources it owns.
+\end{definitionblock}
+
+\begin{exampleblock}[RAII Compliant]
+    \begin{codeblock}[language=C++]
+std::array<double, 10> p;  // var p creates and destroys the array
+    \end{codeblock}
+\end{exampleblock}
+
+In C++, \textbf{smart pointers} are important tools to implement RAII.
+
+Types of pointers:
+\begin{itemize}
+    \item \textbf{Standard Pointers}: use them only to watch and operate on an object whose lfespan is independent of the one of the pointer.
+    \item \textbf{Smart Pointers}: they control the lifespan of an object. 
+    \begin{itemize}
+        \item \texttt{std::unique\_ptr}: manages a single object. The owned resource is destroyed when the pointer goes out of scope.
+        \item \texttt{std::shared\_ptr}: manages a shared object. The owned resource is destroyed when the \textbf{last} shared pointer goes out of scope.
+        \item \texttt{std::weak\_ptr}: observes a shared object without owning it. It is used to break circular references between \texttt{std::shared\_ptr}s.
+    \end{itemize}
+\end{itemize}
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++] 
+#include <iostream>
+
+class MyClass {
+public:
+        set_polygon(std::unique_ptr<Polygon> p) {
+            polygon = std::move(p);
+        }
+private:
+        std::unique_ptr<Polygon> polygon;
+};
+
+std::unique_ptr<Polygon> create_polygon() {
+    switch(t){
+        case "Triangle":
+            return std::make_unique<Triangle>();
+        case "Rectangle":
+            return std::make_unique<Rectangle>();
+        default:
+            return nullptr;
+    }
+}
+
+MyClass obj;
+obj.set_polygon(create_polygon("Triangle"));
+
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection{std::unique\_ptr}
+A \texttt{std::unique\_ptr} serves as the unique owner of the object of type \texttt{T} it refers to. The object is destroyed automatically when the \texttt{std::unique\_ptr} goes out of scope.
+It implements the \texttt{*} and \texttt{->} operators to access the object it owns, so it can be used as standard pointer, but can only be initialized through the constructor. 
+
+The default contructor produces a \textbf{null pointer}. 
+
+\begin{warningblock}[Copying]
+    By definition, unique pointers cannot be \textbf{copied}, but their ownership can be transferred using the \plaintt{std::move} function. The previous owner will be left with a null pointer.
+\end{warningblock}
+
+\subsection{std::shared\_ptr}
+
+For instance you have several objects that refer to a resource (e.g., a matrix, a shape, ...) that is
+build dynamically (and maybe is a polymorphic object). You want to keep track of all the
+references in such a way that when (and only when) the last one gets destroyed the resource is
+also destroyed.
+
+A \texttt{Shared Pointer} implements the semantics of \textit{clean it up} when the resource is no longer needed. 
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+#include <iostream>
+
+class MyClass { ... };
+
+class Preprocessor {
+public: 
+    Preprocessor(std::shared_ptr<Data> &data, ...) : data(data) {}
+private:
+    std::shared_ptr<Data> data;
+};
+
+class NumericalSolver {
+public:
+    NumericalSolver(std::shared_ptr<Data> &data, ...) : data(data) {}
+private:
+    std::shared_ptr<Data> data;
+};
+
+int main() {
+    std::shared_ptr<Data> data = std::make_shared<Data>();
+    Preprocessor preprocessor(data, ...);
+    preprocessor.preprocess();
+    // shared\_data will still be used by other resources, hence it cannot be destroyed here.
+    NumericalSolver solver(data, ...);
+    solver.solve();
+    return 0;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\subsubsection*{How a shared pointer works}
+The \texttt{std::shared\_ptr} keeps track of the number of shared references to an object through reference counting. 
+When the reference count
+reaches zero, the object is automatically deallocated, preventing memory leaks.
+It implements \texttt{*} and \texttt{->} operators to access the object it owns, so it can be used as a standard pointer.
+Moreover, it provides copy constructors and assignment operators.
+
+
+\subsection{std::weak\_ptr}
+The \texttt{std::weak\_ptr} is a smart pointer that holds a non-owning (weak) reference to an object
+managed by a \texttt{std::shared\_ptr}. It is used to break circular references between shared pointers.
+It must also be converted to a \texttt{std::shared\_ptr} to access the object it refers to.
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+#include <iostream>
+
+std::shared_ptr<int> shared = std::make_shared<int>(42);
+std::weak_ptr<int> weak = shared;  // Get pointer to data without taking ownership.
+    \end{codeblock}
+\end{exampleblock}
+
+
+
+\section{Move Semantics}
+
+\textbf{Problem}: how can I swap two objects in an efficient way?
+
+Before C++11 one could have used a special method or a friend function. 
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+#include <iostream>
+
+void swap_with_move(Matrix& a, Matrix& b) {
+    // swap rows and cols 
+
+    double* tmp = a.data; // save the pointer 
+    a.data = b.data // copy the pointer
+    b.data = tmp; // copy the pointer
+}
+    \end{codeblock}
+\end{exampleblock}
+
+But this way it is not generalizable, since I cannot write a function template \texttt{swap\_with\_move<T>}, because I need to know how data is stored in \texttt{T} for each case.
+
+\subsection*{Lvalues}
+\begin{definitionblock}
+    An \textbf{lvalue} (left value) is an expression that refers to a specific memory location and persists beyond a single expression.
+\end{definitionblock}
+
+\begin{itemize}
+    \item They have an \textbf{identifiable memory location}.
+    \item They can be \textbf{modified} (unless they are \texttt{const}).
+    \item They can be \textbf{bound to lvalue references} (\texttt{T\&}).
+\end{itemize}
+
+\begin{exampleblock}
+\begin{codeblock}[language=C++]
+int x = 10;  // 'x' is an lvalue
+x = 20;      // Valid: lvalues can appear on the left side of an assignment
+
+int& ref = x;  // Valid: lvalues can be bound to lvalue references
+\end{codeblock}
+\end{exampleblock}
+
+A \texttt{const} lvalue is still an lvalue but cannot be modified:
+\begin{codeblock}[language=C++]
+const int y = 5;
+y = 10;  // Error: lvalue is read-only
+\end{codeblock}
+
+\subsection*{Rvalues}
+\begin{definitionblock}
+    An \textbf{rvalue} (right value) is an expression that does \textbf{not persist beyond a single expression} and does not have a specific memory location that can be accessed.
+\end{definitionblock}
+
+\begin{itemize}
+    \item They are \textbf{temporary} and cannot be assigned to.
+    \item They \textbf{cannot be bound to lvalue references} (\texttt{T\&}), but they \textbf{can be bound to rvalue references} (\texttt{T\&\&}).
+\end{itemize}
+
+\begin{exampleblock}
+\begin{codeblock}[language=C++]
+int x = 10;
+int y = x + 5;  // 'x + 5' is an rvalue
+\end{codeblock}
+\end{exampleblock}
+
+C++11 introduced \textbf{rvalue references} to allow functions to take ownership of temporary values:
+\begin{codeblock}[language=C++]
+void foo(int&& a) {  // Accepts only rvalues
+    std::cout << "Rvalue: " << a << std::endl;
+}
+
+foo(10);  // Valid: '10' is an rvalue
+int x = 5;
+foo(x);   // Error: 'x' is an lvalue
+\end{codeblock}
+
+\subsection*{Lvalues vs. Rvalues in Function Overloading}
+Functions can be overloaded based on lvalue and rvalue references:
+\begin{codeblock}[language=C++]
+void process(int& x) {
+    std::cout << "Lvalue reference" << std::endl;
+}
+
+void process(int&& x) {
+    std::cout << "Rvalue reference" << std::endl;
+}
+
+int main() {
+    int a = 10;
+    process(a);   // Calls lvalue version
+    process(20);  // Calls rvalue version
+}
+\end{codeblock}
+
+
+\subsection{How Move Semantics is implemented}
+
+The following is the standard signature of a move operation for a class \texttt{Matrix}:
+\begin{codeblock}[language=C++]
+    Matrix(Matrix&&); // move constructor
+    Matrix& operator=(Matrix&&); // move assignment operator
+\end{codeblock}
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+#include <iostream>
+
+Matrix(Matrix&& rhs) : data(rhs.data), nr(rhs.nr), nc(rhs.nc) {
+    rhs.data = nullptr;
+    rhs.nr = 0;
+    rhs.nc = 0;
+}
+
+Matrix& operator=(Matrix&& rhs) {
+    delete[] this -> data; // release the resource
+    data = rhs.data; // shallow copy 
+    // Fix rhs so it is a valid empty matrix
+    rhs.data = nullptr;
+    rhs.nr = 0;
+    rhs.nc = 0;
+}
+
+int main() {
+    Matrix foo();
+    // ... 
+    Matrix a;
+    a = foo(); // move assignment is called 
+    return 0;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\begin{observationblock}[std::move]
+    The \texttt{std::move} function is used to convert an lvalue to an rvalue reference, allowing it to be moved instead of copied. It basically cast the value to an rvalue, making it available to be copied. 
+\end{observationblock}
+
+\begin{codeblock}[language=C++]
+    template<class T>
+    void swap(T& a, T& b) {
+        T tmp = std::move(a);
+        a = std::move(b);
+        b = std::move(tmp);
+    }
+    // or simpler 
+    std::swap(a, b);
+\end{codeblock}
+
+The solution is to force the move:
+\begin{codeblock}[language=C++]
+    class Foo{
+    public:
+        Foo(Matrix&& m) : my_m(std::move(m)) {}
+        // ... 
+    private:
+        Matrix my_m;
+    }
+\end{codeblock}
+
+Now, m is moved into my\_m. 
+
+\textbf{All} standard containers support move semantic, and all standard algorithms are written so
+that if the contained type implements move semantics, the creation of unnecessary temporaries
+can be avoided. All containers also have a \texttt{swap()} method that performs swaps intelligently.
+
+
+
+
+
+\section{Exceptions}
+
+A \textbf{function} can be seen as a mapping from input data to output data. 
+The conditions under which the input data is considered valid is called \textbf{precondition}, 
+while the conditions under which the output data is considered valid is called \textbf{postcondition}.
+Failure to meet these conditions is considered a \textbf{failure} or \textbf{bug}.
+
+An \textbf{invariant} is a condition that must always be true during the execution of a program.
+    An object is considered to be in an \textbf{inconsistent state} if the invariants are not met.
+
+\begin{definitionblock}[Exception]
+    An \textbf{exception} is an anomalous condition that disrupts the normal flow of a program's execution
+    when left unhandled. It is not the result of incorrect coding but rather arises from challenging or
+    unpredictable circumstances.
+\end{definitionblock}
+
+
+\subsection{Run-time assertions}
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+double calculate(double operand1, double operand2) {
+    assert(operand2 != 0.0 && "Division by zero");
+    return operand1 / operand2;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+For improved efficiency, all assertions can be disabled by defining the \texttt{NDEBUG} macro:
+\begin{codeblock}[language=bash]
+    g++ -DNDEBUG -o program program.cpp
+\end{codeblock}
+
+
+\subsection{Compile-time assertions}
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+template <typename T>
+void process(T value) {
+    static_assert(std::is_integral<T>::value, "T must be an integral type");
+    // Process the value
+}
+    \end{codeblock}
+\end{exampleblock}
+If the condition is met, the error message is printed to the standard error and compilation will fail.
+
+
+\subsection{Exception handling in C++}
+
+The basic structure to handle exceptions is:
+\begin{itemize}
+    \item Using the \texttt{throw} command to indicate that an exception has occurred. You can throw an
+    object containing information about the exception.
+    \item Employing the \texttt{try-catch} blocks to catch and handle exceptions. If an exception is not
+    caught, it will propagate up the call stack and might lead to program termination.
+\end{itemize}
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+int divide(int dividend, int divisor) {
+    if (divisor == 0) {
+        throw std::runtime_error("Division by zero");
+    }
+    return dividend / divisor;
+}
+
+try{
+    const int result = divide(10, 0);
+    std::cout << "Result: " << result << std::endl;
+} catch (const std::runtime_error& e) {
+    std::cerr << "Exception: " << e.what() << std::endl;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+Standard exceptions examples are:
+\begin{itemize}
+    \item \texttt{std::exception}: Base class for all standard exceptions.
+    \item \texttt{std::runtime\_error}: Exception used to report runtime errors.
+    \item \texttt{std::logic\_error}: Exception used to report errors in the program's logic.
+    \item \texttt{std::invalid\_argument}: Exception used to report invalid arguments.
+    \item \texttt{std::out\_of\_range}: Exception used to report out-of-range errors.
+    \item \texttt{std::bad\_alloc}: Exception used to report memory allocation errors.
+    \item \texttt{std::bad\_cast}: Exception used to report casting errors.
+\end{itemize}
+
+\begin{observationblock}
+    In situations where an algorithm's failure is one of its expected outcomes (e.g., the failure of
+    convergence in an iterative method), returning a \textbf{status} rather than throwing an exception may be
+    more suitable. Instead of terminating the program, a status variable is used to indicate the
+    outcome, which can be checked by the caller. See also \plaintt{std::terminate} , \plaintt{std::abort} and \plaintt{std::exit}.
+\end{observationblock}
+
+Note, also, that \textbf{floating-point exceptions} do not result in program failure, instead they produce special numerical values like \texttt{NaN} or \texttt{Inf}, and the operations continue. 
+
+
+\section{STL Utilities}
+
+\subsection{I/O Streams}
+
+Input/Output (I/O) streams in C++ provide a convenient way to perform input and output
+operations, allowing you to work with various data sources and destinations, such as files,
+standard input/output, strings, and more.
+
+The key components are:
+\begin{itemize}
+    \item \textbf{iostream}: Provides the basic input/output operations. It is used for interacting with the standard input and output streams.
+    \item \textbf{ifstream}: This class is used for reading data from files. You can open a file for input and
+    read data from it.
+    \begin{codeblock}[language=C++]
+        std::ifstream file("input.txt");
+
+        if (file.is_open()) {
+            std::string line;
+            while (std::getline(file, line)) {
+                std::cout << line << std::endl;
+            }
+            file.close();
+        } else {
+            std::cerr << "Failed to open the file." << std::endl;
+        }
+    \end{codeblock}
+    \item \textbf{ofstream}: This class is used for writing data to files. You can open a file for output and write data to it.
+    \begin{codeblock}[language=C++]
+        std::ofstream file("output.txt");
+
+        if (file.is_open()) {
+            file << "Hello, World!" << std::endl;
+            file.close();
+        } else {
+            std::cerr << "Failed to open the file." << std::endl;
+        }
+    \end{codeblock}
+    \item \textbf{stringstream}: This class is used for reading and writing data to and from strings. It provides a way to work with strings as if they were streams.
+    \begin{codeblock}[language=C++]
+        std::stringstream ss;
+        ss << "Hello, World!";
+        std::string str = ss.str();
+        std::cout << str << std::endl;
+
+        // Passing data from a string using std::stringstream.
+        std::string data = "42 3.14 Hello";
+        std::stringstream ss(data);
+        int num;
+        double d;
+        std::string word;
+        ss >> num >> d >> word;
+    \end{codeblock}
+\end{itemize}
+
+\subsection{Random Numbers}
+
+The capability of generating random numbers is essential not only for statistical purposes but also
+for internet communications. But an algorithm is deterministic. However, several techniques have
+been developed to generate pseudo-random numbers. They are not really random, but they show
+a low level of auto-correlation.
+
+To generate them, you need the \texttt{<random>} header, and the chosen design is bsed on two types of objects:
+\begin{itemize}
+    \item \textbf{Engines}: They are the source of randomness. They are used to generate random numbers.
+    \item \textbf{Distributions}: They are used to transform the random numbers generated by the engine into a specific range.
+\end{itemize}
+
+\subsubsection*{Engines}
+Random number engines generate pseudo-random numbers using seed data as an entropy
+source. Several different classes of pseudo-random number generation algorithms are
+implemented as templates that can be customized. 
+
+For simplicity, the library provides predefined engines, such as \texttt{std::default\_random\_engine},
+which balances efficiency and quality. There are also non-deterministic engines, like \texttt{std::random\_device}, which generate non-deterministic random numbers based on hardware
+data.
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+std::default_random_engine engine;  // with default seed
+std::default_random_engine engine(42);  // with seed 42
+    \end{codeblock}
+\end{exampleblock}
+
+\subsubsection*{Distributions}
+
+Distributions are template classes that implement a call operator () to transform a random
+sequence into a specific distribution. You need to pass a random engine to the distribution to
+generate numbers according to the desired distribution. For example:
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+std::random_device rd;
+std::default_random_engine engine(rd());
+std::uniform_int_distribution<int> dist(1, 6);  // [1, 6]
+int num = dist(engine);
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection{Shuffling}
+
+In C++ you can shuffle a range of elements using the \texttt{std::shuffle} algorithm from the \texttt{<algorithm>} header. It rearranges the elements in the range \texttt{[first, last)} randomly using a random number generator.
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+std::vector<int> vec = {1, 2, 3, 4, 5};
+std::random_device rd;
+std::mt19937 engine(rd());
+std::shuffle(vec.begin(), vec.end(), engine);
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection{Sampling}
+
+The \texttt{std::sample} algorithm from the \texttt{<algorithm>} header is used to sample elements from a range. It selects a random subset of elements from the input range and stores them in the output range.
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+std::vector<int> vec = {1, 2, 3, 4, 5};
+std::vector<int> sample(3);
+std::random_device rd;
+std::mt19937 engine(rd());
+std::sample(vec.begin(), vec.end(), sample.begin(), 3, engine);
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection{Time Measuring}
+
+C++ provides three types of clock:
+\begin{itemize}
+    \item \texttt{std::chrono::system\_clock}: Represents the system-wide real time wall clock.
+    \item \texttt{std::chrono::steady\_clock}: Represents the monotonic clock that is not affected by system clock adjustments.
+    \item \texttt{std::chrono::high\_resolution\_clock}: Represents the clock with the shortest tick period available on the system.
+\end{itemize}
+
+\begin{exampleblock}
+    \begin{codeblock}[language=C++]
+auto start = std::chrono::high_resolution_clock::now();
+// Perform some operation
+auto end = std::chrono::high_resolution_clock::now();
+auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection{Filesystem Utilities}
+
+The C++17 standard introduced the \texttt{<filesystem>} library, which provides facilities for performing operations on file systems and their components, such as paths, regular files, and directories.
+
+\subsubsection*{Key Components}
+\begin{itemize}
+    \item \texttt{std::filesystem::path}: Represents a path in the filesystem.
+    \item \texttt{std::filesystem::directory\_entry}: Represents a directory entry.
+    \item \texttt{std::filesystem::directory\_iterator}: Iterates over the contents of a directory.
+    \item \texttt{std::filesystem::recursive\_directory\_iterator}: Recursively iterates over the contents of a directory.
+\end{itemize}
+
+\subsubsection*{Common Operations}
+\begin{itemize}
+    \item \texttt{std::filesystem::exists}: Checks if a file or directory exists.
+    \item \texttt{std::filesystem::create\_directory}: Creates a new directory.
+    \item \texttt{std::filesystem::remove}: Removes a file or directory.
+    \item \texttt{std::filesystem::rename}: Renames a file or directory.
+    \item \texttt{std::filesystem::copy}: Copies a file or directory.
+\end{itemize}
+
+\begin{exampleblock}
+\begin{codeblock}[language=C++]
+#include <iostream>
+#include <filesystem>
+
+int main() {
+    std::filesystem::path p = "example.txt";
+
+    // Check if the file exists
+    if (std::filesystem::exists(p)) {
+        std::cout << p << " exists." << std::endl;
+    } else {
+        std::cout << p << " does not exist." << std::endl;
+    }
+
+    // Create a new directory
+    std::filesystem::create_directory("new_directory");
+
+    // Remove a file
+    std::filesystem::remove("example.txt");
+
+    // Rename a file
+    std::filesystem::rename("old_name.txt", "new_name.txt");
+
+    // Copy a file
+    std::filesystem::copy("source.txt", "destination.txt");
+
+    return 0;
+}
+\end{codeblock}
+\end{exampleblock}
+
+\subsubsection*{Iterating Over Directory Contents}
+You can use \texttt{std::filesystem::directory\_iterator} to iterate over the contents of a directory.
+
+\begin{exampleblock}
+\begin{codeblock}[language=C++]
+#include <iostream>
+#include <filesystem>
+
+int main() {
+    std::filesystem::path dir = "some_directory";
+
+    // Iterate over the contents of the directory
+    for (const auto& entry : std::filesystem::directory_iterator(dir)) {
+        std::cout << entry.path() << std::endl;
+    }
+
+    return 0;
+}
+\end{codeblock}
+\end{exampleblock}
+
+\subsubsection*{Recursive Directory Iteration}
+You can use \texttt{std::filesystem::recursive\_directory\_iterator} to iterate over the contents of a directory recursively.
+
+\begin{exampleblock}
+\begin{codeblock}[language=C++]
+#include <iostream>
+#include <filesystem>
+
+int main() {
+    std::filesystem::path dir = "some_directory";
+
+    // Recursively iterate over the contents of the directory
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
+        std::cout << entry.path() << std::endl;
+    }
+
+    return 0;
+}
+\end{codeblock}
+\end{exampleblock}
+
+
