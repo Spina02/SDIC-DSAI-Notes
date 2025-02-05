@@ -1,0 +1,467 @@
+
+\chapter{Introduction to Python}
+
+\section{Introduction}
+
+Python is a high-level, interpreted programming language. It is a general-purpose language that is designed to be easy to read and write. Python is a popular language for web development, scientific computing, and data analysis. It is also widely used in education and research.
+Why Python?
+\begin{itemize}
+    \item Python is easy to learn and use.
+    \item Python is a versatile language that can be used for a wide range of applications.
+    \item Python has a large and active community of developers who contribute to the language and its libraries.
+    \item Python has a rich ecosystem of libraries and tools that make it easy to work with data, build web applications, and more.
+    \item Python is open source and free to use.
+    \item Python is cross-platform, meaning it can run on Windows, macOS, and Linux.
+\end{itemize}
+
+\subsection*{Python Installation}
+
+To work  wiht Python, you need to set up a development environment.
+Basic steps are:
+\begin{itemize}
+    \item Download and install Python from the official website: \url{https://www.python.org/downloads/}
+    \item Install an Integrated Development Environment (IDE) for Python. Some popular IDEs are PyCharm, Visual Studio Code, and Jupyter Notebook.
+    \item Install the required libraries using the package manager pip.
+    \item (Optional) Install a virtual environment to manage dependencies for different projects.
+\end{itemize}
+
+\section{Built-in Data Types}
+
+Python typing is \textbf{dynamic}, meaning you do not have to declare the type of a variable when you create it. Python will automatically infer the type based on the value assigned to the variable. Python typing is also \textbf{strong}, such that you cannot merge different types of data together.
+\begin{codeblock}[language=python]
+# Integer
+x = 10
+# String
+name = "Alice"
+
+'Alice' + x # TypeError: cannot concatenate 'str' and 'int' objects
+\end{codeblock}
+
+\begin{table}[h!]
+    \centering
+    \begin{adjustbox}{width=\textwidth} % Adjust the width if necessary
+    \begin{tabular}{|l|l|p{5cm}|l|}
+    \hline
+    \textbf{Type Name} & \textbf{Type Category} & \textbf{Description} & \textbf{Example} \\ \hline
+    int & Numeric & Integer numbers & \texttt{x = 10} \\ \hline
+    float & Numeric & Floating-point numbers & \texttt{y = 3.14} \\ \hline
+    str & Sequence & Textual data & \texttt{name = "Alice"} \\ \hline
+    list & Sequence & Ordered collection of items & \texttt{numbers = [1, 2, 3]} \\ \hline
+    tuple & Sequence & Immutable ordered collection of items & \texttt{point = (1, 2)} \\ \hline
+    dict & Mapping & Collection of key-value pairs & \texttt{person = \{"name": "Alice", "age": 30\}} \\ \hline
+    set & Set & Unordered collection of unique items & \texttt{unique\_numbers = \{1, 2, 3\}} \\ \hline
+    bool & Boolean & True or False values & \texttt{is\_valid = True} \\ \hline
+    \end{tabular}
+    \end{adjustbox}
+    \caption{Python Built-in Data Types}
+    \label{tab:data_types}
+\end{table}
+
+\subsection{Numeric, Boolean, Strings}
+
+\begin{itemize}
+    \item \textbf{Numeric Types}
+    Exist three numeric types in Python: \texttt{int}, \texttt{float}, and \texttt{complex}. We can determine the type of an object 
+    with the \texttt{type()} function. Usual Arithmetic Operations are available.
+    \item \textbf{Boolean Type}
+    The boolean type is used to represent truth values. It has two possible values: \texttt{True} and \texttt{False}. Usual comparison operators are available. There are also the \textit{boolean operators}, which evaluate to \texttt{True} or \texttt{False}.
+    Python also has \textbf{bitwise operations} like AND (\texttt{\&}), OR (\texttt{|}), XOR (\texttt{\^}), NOT (\texttt{\~}) and SHIFT (\texttt{<<}, \texttt{>>}).
+    \item \textbf{Strings}
+    They represent sequences of characters. Are created using single (\texttt{'}) or double (\texttt{"}) quotes. Strings are immutable, meaning that once they are created, they cannot be changed. Strings can be concatenated using the \texttt{+} operator. Strings can be formatted using the \texttt{format()} method or f-strings.
+    \begin{exampleblock}
+    \begin{codeblock}[language=python]
+name = "Alice"
+
+# Concatenation
+greeting = "Hello, " + name
+
+# Formatting
+formatted_message = f"Hello, {name}"
+    \end{codeblock}
+    \end{exampleblock}
+\end{itemize}
+
+\subsection{Lists and Tuples}
+
+\begin{itemize}
+    \item \textbf{Lists}
+    Lists are mutable, ordered collections of items. Elements can be added, removed or modified.
+    \begin{exampleblock}
+    \begin{codeblock}[language=python]
+numbers = [1, 2, 3]
+
+# Add an element
+numbers.append(4)
+
+# Remove an element
+numbers.remove(2)
+
+# Accessing an element
+second_number = numbers[1]
+
+# Slicing
+first_two_numbers = numbers[:2]
+    \end{codeblock}
+    \end{exampleblock}
+    \item \textbf{Tuples}
+    Tuples are immutable, ordered collections of items. Once created, they cannot be changed.
+    \begin{exampleblock}
+    \begin{codeblock}[language=python]
+point = (1, 2)
+
+# Unpacking
+x, y = point
+
+# Repetition
+point = (0, 0) * 3
+
+# Concatenation
+points = (1, 2) + (3, 4)
+
+# Slicing
+first_point = points[:2]
+
+# Accessing elements
+x = points[0]
+    \end{codeblock}
+    \end{exampleblock}
+\end{itemize}
+
+
+\subsection{Dictionaries and Sets}
+
+\begin{itemize}
+    \item \textbf{Sets}
+    Sets store an unordered list of unique items. Being unordered, sets do not record element position or oder of insertion and so do not support indexing. 
+    \begin{exampleblock}
+    \begin{codeblock}[language=python]
+unique_numbers = {1, 2, 3}
+
+# Add an element
+unique_numbers.add(4)
+
+# Remove an element
+unique_numbers.remove(2)
+
+{1, 2, 3} == {1, 2, 3} # True
+[1, 2, 3] == [1, 2, 3] # False
+    \end{codeblock}
+    \end{exampleblock}
+    \item \textbf{Dictionaries}
+    Dictionaries store a collection of key-value pairs. Keys are unique within a dictionary, while values may not be. The values of a dictionary can be of any type, but the keys must be of an immutable data type such as strings, numbers, or tuples.
+    \begin{exampleblock}
+    \begin{codeblock}[language=python]
+person = {"name": "Alice", "age": 30}
+
+# Accessing a value
+name = person["name"]
+
+# Adding a key-value pair
+person["city"] = "New York"
+
+# Remove a key-value pair
+del person["age"]
+    \end{codeblock}
+    \end{exampleblock}
+\end{itemize}
+
+\subsection{Casting}
+
+Python allows you to convert one data type to another. This process is known as \textbf{casting}. To cast a variable to a different type, you can use the built-in functions \texttt{int()}, \texttt{float()}, \texttt{str()}, \texttt{list()}, \texttt{tuple()}, \texttt{dict()}, and \texttt{set()}.
+\begin{exampleblock}
+\begin{codeblock}[language=python]
+# Casting to int
+x = int(3.14)
+
+# Casting to float
+y = float(10)
+
+# Casting to float 
+z = float("Hello") # ValueError: could not convert string to float: 'Hello'
+\end{codeblock}
+\end{exampleblock}
+
+
+
+
+\section{Control Structures}
+
+\subsection*{Conditional Statements}
+
+\textbf{Conditional statements} allow us to write programs where only certain blocks of code are executed depending on the state of the program. 
+\begin{exampleblock}
+\begin{codeblock}[language=python]
+x = 10
+
+if x > 0:
+    print("Positive")
+elif x < 0:
+    print("Negative")
+else:
+    print("Zero")
+\end{codeblock}
+\end{exampleblock}
+
+We can also write simple \texttt{if} statements \textit{inline}, meaning in a single line, in this way:
+\begin{codeblock}[language=python]
+x = 10
+message = "Positive" if x > 0 else "Negative"
+\end{codeblock}
+
+\subsection*{For Loops}
+
+\textbf{For loops} allow us to iterate over a sequence of items, such as a list, tuple, or string.
+\begin{exampleblock}
+\begin{codeblock}[language=python]
+numbers = [1, 2, 3]
+
+for number in numbers:
+    print(number)
+\end{codeblock}
+\end{exampleblock}
+
+\subsection*{Range}
+
+The \texttt{range()} function generates a sequence of numbers. It can take up to three arguments: \texttt{start}, \texttt{stop}, and \texttt{step}.
+\begin{exampleblock}
+\begin{codeblock}[language=python]
+for i in range(5):
+    print(i)
+
+for i in range(1, 5):
+    print(i)
+
+for i in range(1, 5, 2):
+    print(i)
+\end{codeblock}
+\end{exampleblock}
+
+\subsection*{zip}
+
+The \texttt{zip()} function takes two or more sequences and pairs them element-wise. It returns a list of tuples.
+
+\begin{exampleblock}
+\begin{codeblock}[language=python]
+names = ["Alice", "Bob", "Charlie"]
+ages = [30, 25, 35]
+
+for name, age in zip(names, ages):
+    print(f"{name} is {age} years old")
+\end{codeblock}
+\end{exampleblock}
+
+\subsection*{enumerate}
+
+The \texttt{enumerate()} function takes a sequence and returns an iterator that pairs each element with its index.
+
+\begin{codeblock}[language=python]
+names = ["Alice", "Bob", "Charlie"]
+
+for i, name in enumerate(names):
+    print(f"{i}: {name}")
+\end{codeblock}
+
+\subsection*{While Loops}
+
+\textbf{While loops} allow us to execute a block of code as long as a condition is true.
+\begin{exampleblock}
+\begin{codeblock}[language=python]
+x = 0
+
+while x < 5:
+    print(x)
+    x += 1
+\end{codeblock}
+\end{exampleblock}
+
+\subsection*{Break and Continue}
+
+The \texttt{break} statement is used to exit a loop prematurely. The \texttt{continue} statement is used to skip the rest of the code in a loop and move to the next iteration.
+
+\begin{exampleblock}
+\begin{codeblock}[language=python]
+for i in range(10):
+    if i == 5:
+        break
+    print(i)
+
+for i in range(10):
+    if i % 2 == 0:
+        continue
+    print(i)
+\end{codeblock}
+\end{exampleblock}
+
+
+
+\section{Comprehensions}
+
+Comprehensions allow us to build lists/tuples/sets/dictionaries in one convenient, compact line of code. 
+
+\begin{codeblock}[language=python]
+    words = ["apple", "banana", "cherry"]
+    letters = [word[0] for word in words] # List comprehension
+\end{codeblock}
+
+\begin{codeblock}[language=python]
+    # Multiple Comprehensions
+    [(i,j) for i in range(3) for j in range(4)]
+\end{codeblock}
+
+\begin{codeblock}[language=python]
+    numbers = [1, 2, 3, 4, 5]
+    squares = {number: number ** 2 for number in numbers} # Dictionary comprehension
+\end{codeblock}
+
+
+\section{Exceptions}
+
+When something goes wrong, we do not want our code to crash, but to \textbf{fail gracefully}. 
+In Python we can handle exceptions using the \texttt{try} and \texttt{except} blocks.
+
+\begin{exampleblock}
+\begin{codeblock}[language=python]
+try:
+    x = 10 / 0
+except ZeroDivisionError:
+    print("Cannot divide by zero")
+else:
+    print("Division successful")
+finally:
+    print("End of program")
+\end{codeblock}
+\end{exampleblock}
+
+We can also write code that raises exceptions on purpose using the \texttt{raise} statement.
+
+\begin{codeblock}[language=python]
+x = -1
+
+if x < 0:
+    raise ValueError("x must be positive")
+\end{codeblock}
+
+This is useful when your function is complicated and would fail in a complicated way, with an error message. You can make the cause of the error much clearer to the user of the function. 
+
+
+\section{Functions}
+
+\begin{definitionblock}[Function]
+    A \textbf{function} is a reusable piece of code that can accept input parameters, also known as \textit{arguments}. 
+\end{definitionblock}
+
+They begin with the \texttt{def} keyword, then the function name, arguments in parentheses and then a colon. The output is specified with the \texttt{return} keyword. 
+
+\begin{codeblock}[language=python]
+def greet(name):
+    return f"Hello, {name}"
+\end{codeblock}
+
+When you create a variable inside a function, it is \textbf{local}, which means that it only exist inside the function. 
+
+\begin{warningblock}
+    In Python, input arguments are passed by \textbf{reference}, meaning that if you modify the argument inside the function (and it is \textbf{mutable}), the change will be reflected outside the function.
+\end{warningblock}
+
+\subsection*{Type Hints}
+
+\textbf{Type hinting} is a way to specify the type of a variable, function argument, or return value. It is not enforced by Python, but it can help you catch errors early and make your code easier to understand. It is just another level of documentation. 
+
+\begin{codeblock}[language=python]
+def greet(name: str) -> str:
+    return f"Hello, {name}"
+\end{codeblock}
+
+\subsection*{Multiple return values}
+
+Python functions can return multiple values. This is done by separating the values with a comma.
+
+\begin{codeblock}[language=python]
+def min_max(numbers):
+    return min(numbers), max(numbers)
+\end{codeblock}
+
+\subsection*{Unpacking}
+
+In Python, the asterisk (\texttt{*}) is used to unpack a sequence into individual elements, i.e., it allows you to extract the elements from an iterable or the key-value pairs from a dictionary.
+
+\begin{codeblock}[language=python]
+    def add_numbers(a, b, c):
+        return a + b + c
+    
+        numbers = [1, 2, 3]
+        result = add_numbers(*numbers)
+        print(results) # 6
+\end{codeblock}
+
+\begin{codeblock}[language=python]
+    # Unpacking in iterables
+    first = [1, 2, 3]
+    second = [4, 5, 6]
+    combined = [*first, *second]
+    print(combined) # [1, 2, 3, 4, 5, 6]
+
+    # Unpacking in dictionary merging
+    first = {"a": 1, "b": 2}
+    second = {"c": 3, "d": 4}
+    combined = {**first, **second}
+    print(combined) # {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+
+    # Unpacking in function definitions
+    def example_function(a, b, *args, **kwargs):
+        print(a)
+        print(b)
+        print(args)
+        print(kwargs)
+\end{codeblock}
+
+In Python, \texttt{*args} and \texttt{**kwargs} are used in function definitions to allow a variable number of arguments:
+\begin{itemize}
+    \item \texttt{*args} is used to pass a variable number of non-keyword arguments to a function.
+    \begin{codeblock}[language=python]
+def add_numbers(*args):
+    return sum(args)
+    \end{codeblock}
+    \item \texttt{**kwargs} is used to pass a variable number of keyword arguments to a function.
+    \begin{codeblock}[language=python]
+def print_person(**kwargs):
+    for key, value in kwargs.items():
+        print(f"{key}: {value}")
+    \end{codeblock}
+\end{itemize}
+
+\subsection*{Lambda Functions}
+
+\textbf{Lambda functions} are small, anonymous functions that can have any number of arguments, but only one expression. They are defined using the \texttt{lambda} keyword.
+
+\begin{codeblock}[language=python]
+add = lambda x, y: x + y
+result = add(1, 2)
+\end{codeblock}
+
+Lambda functions are often used as arguments to higher-order functions, such as \texttt{map()}, \texttt{filter()}, and \texttt{sorted()}.
+
+
+
+\section{Docstrings}
+
+The \textbf{Docstrings} are used to document Python code. They are written between triple quotes and are used to describe what a function does, what arguments it takes, and what it returns.
+
+\begin{codeblock}[language=python]
+def greet(name):
+    """
+    This function greets the user by name.
+    
+    Args:
+        name (str): The name of the user.
+    
+    Returns:
+        str: A greeting message.
+    """
+    return f"Hello, {name}"
+\end{codeblock}
+
+
+
+
+
