@@ -1,0 +1,330 @@
+\chapter{Integration with Python}
+
+\section{Introduction}
+
+C++ and Python are powerful in their own right, but they excel in different areas. C++ is renowned
+for its performance and control over system resources, making it ideal for CPU-intensive tasks and
+systems programming. Python, on the other hand, is celebrated for its simplicity, readability, and
+vast ecosystem of libraries, especially in data science, machine learning, and web development.
+\begin{itemize}
+    \item In research areas like machine learning, scientific computing, and data analysis, the need for
+    processing speed and efficient resource management is critical.
+    \item The industry often requires solutions that are both efficient and rapidly developed.
+\end{itemize}
+By integrating C++ with Python, you can create applications that harness the raw power of C++
+and the versatility and ease-of-use of Python. Python, despite its popularity in these fields, often
+falls short in terms of performance. Knowledge of how to integrate C++ and Python equips with a
+highly valuable skill set.
+
+Several libraries are available for this, each with its own set of advantages and drawbacks.
+We will use \texttt{pybind11}, a lightweight header-only library that exposes C++ types in Python and viceversa.
+
+\section{pybind11}
+
+\subsection{Overview}
+
+pybind11 is a lightweight, header-only library that connects C++ types with Python. This tool is
+crucial for creating Python bindings of existing C++ code. Its design and functionality are similar to
+the Boost.Python library but with a focus on simplicity and minimalism. pybind11 stands out for its
+ability to avoid the complexities associated with Boost by leveraging C++11 features.
+
+To install it on your system, you can use the following command:
+
+\begin{itemize}
+    \item \textbf{pip}: \phantom{wcoi} \texttt{pip install pybind11}
+
+    \item \textbf{conda}: \phantom{w} \texttt{conda install -c conda-forge pybind11}
+
+    \item \textbf{brew}: \phantom {da.} \texttt{brew install pybind11}
+
+\end{itemize}
+
+You can also include it as a submodule in your project:
+
+\begin{codeblock}[language=bash]
+git submodule add -b stable https://github.com/pybind/pybind11 extern/pybind11
+git submodule update --init 
+\end{codeblock}
+
+This method assumes dependency placement in extern/. Remember that some servers might require the .git externsion.
+After setup, include extern/pybind11/include in your project, or employ pybind11's integration tools.
+
+\subsection{Basics}
+
+All pybind11 code is written in C++. The following lines must always be included in your code:
+
+\begin{codeblock}[language=C++]
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+\end{codeblock}
+
+The first line includes the pybind11 library, while the second line creates an alias for the pybind11 namespace. This alias is used to simplify the code and make it more readable.
+In practice, implementation and binding code will generally be located in separate files.
+
+The \texttt{PYBIND11\_MODULE} macro is used to create a Python module. The first argument is the module name, while the second argument is the module's scope. The module name is the name of the Python module that will be created, while the scope is the C++ namespace that contains the functions to be exposed and is the main interface for creating bindings.
+Example:
+
+\begin{codeblock}[language=C++]
+#include <pybind11/pybind11.h>
+namespace py = pybind11;
+
+int add(int i, int j) {
+    return i + j;
+}
+PYBIND11_MODULE(example, m) {
+    m.def("add", &add, "A function that adds two numbers");
+}
+\end{codeblock}
+
+Here we define a simple function that adds two numbers and bind it to a Python module named example. The function add is exposed to Python using the m.def() function. The first argument is the function name in Python, the second argument is the C++ function, and the third argument is the function's docstring.
+
+\begin{observationblock}[pybind11]
+    Notice how little code was needed to expose our function to Python: all details regarding the
+    function's parameters and return value were automatically inferred using template
+    metaprogramming. This overall approach and the used syntax are borrowed from Boost.Python,
+    though the underlying implementation is very different.
+\end{observationblock}
+
+Being it a header-only library, pybind11 does not require any additional linking or compilation steps. You can compile the code as you would any other C++ code. The resulting shared library can be imported into Python using the import statement.
+Compile the example in Linux with the following command:
+
+\begin{codeblock}[language = bash]
+g++ -O3 -Wall -shared -std=c++11 -fPIC 
+\$(python3 -m pybind11 --includes)
+example.cpp -o example\$(python3-config --extension-suffix)
+\end{codeblock}
+
+If you included pybind11 as a submodule, you can use the following command: 
+
+\begin{codeblock}[language = bash]
+g++ -O3 -Wall -shared -std=c++11 -fPIC 
+-Iextern/pybind11/include 
+\$(python3-config --incldudes) Iextern/pybind11/include
+example.cpp -o example\$(python3-config --extension-suffix)
+\end{codeblock}
+
+This assumes that pybind11 has been installed with \texttt{pip} or \texttt{conda}, otherwise you can manually specify
+\texttt{-I <path-to-pybind11>/include} together with the Python includes path \texttt{python3-config --includes}.
+
+\begin{warningblock}[On macOS]
+    the build command is almost the same but it also requires passing the \plaintt{-undefined dynamic\_lookup} flag so as to ignore missing symbols when building the module.
+\end{warningblock}
+
+Building the C++ code will produce a binary module file that can be imported in Python with the \texttt{import} statement. The module name is the name of the shared library file without the extension. In this case, the module name is example. The shared library file is named example.so on Linux and example.dylib on macOS.
+
+\begin{codeblock}[language=python]
+import example
+print(example.add(1, 2)) #output: 3
+\end{codeblock}
+
+With a simple modification, you can inform Pythn about the names of the arguments:
+
+\begin{codeblock}[language=C++]
+m.def("add", &add, "A function that adds two numbers", 
+py::arg("i"), py::arg("j"));
+\end{codeblock}
+
+You can now call the function using keyword arguments:
+
+\begin{codeblock}[language=python]
+import example
+print(example.add(i=1, j=2)) #output: 3
+\end{codeblock}
+
+\begin{observationblock}[Documentation]
+    The docstring is automatically extracted from the C++ function and displayed in Python. This
+    feature is useful for documenting the function's purpose and parameters. The docstring can be
+    accessed in Python using the \texttt{\_\_doc\_\_} attribute.
+
+    help(example) 
+
+    \dots 
+
+    FUNCTIONS
+
+        add(\dots)
+
+            Signature: add(i: int, j: int) -> int
+
+
+            A function that adds two numbers
+\end{observationblock}
+
+There is a shorthand notation 
+
+\begin{codeblock}[language=C++]
+using namespace py::literals;
+m.def("add", add, "Docstring", "i"_a, "j"_a=1);
+\end{codeblock}
+
+The \_a suffix is a user-defined literal that creates a py::arg object. This object is used to specify the argument's name and type. The shorthand notation is more concise and easier to read than the previous method.
+The second argument is optional and specifies the \texttt{default} value of the argument. If the argument is not provided, the default value is used.
+
+\texttt{py::cast} is used to convert between Python and C++ types. The following example demonstrates how to convert a Python list to a C++ vector:
+
+\begin{codeblock}[language=C++]
+std::vector<int> list_to_vector(py::list l) {
+    std::vector<int> v;
+    for (auto item : l) {
+        v.push_back(py::cast<int>(item));
+    }
+    return v;
+}
+PYBIND11_MODULE(example, m) {
+    m.def("list_to_vector", &list_to_vector, "Convert a Python list to a C++ vector");
+}
+\end{codeblock}
+
+To export variables, use the \texttt{attr} function. Built-in types and general objects are automatically converted when assigned as attributed, 
+and can be explicitly converted using \texttt{py::cast}.
+
+\begin{codeblock}[language=C++]
+int value = 42;
+m.attr("value") = value;
+\end{codeblock}
+
+\begin{codeblock}[language=python]
+import example
+print(example.value) #output: 42
+\end{codeblock}
+
+\subsection{Binding OO code}
+
+pybind11 supports object-oriented programming, allowing you to bind classes, methods, and attributes. The following example demonstrates how to bind a simple class:
+
+\begin{codeblock}[language=C++]
+Pet(const std::string &name, int age) : name(name), age(age) {}
+void set_name(const std::string &name_) { name = name_; }
+void set_age(int age_) { age = age_; }
+std::string get_name() const { return name; }
+int get_age() const { return age; }
+\end{codeblock}
+
+\begin{codeblock}[language=C++]
+PYBIND11_MODULE(example, m) {
+    py::class_<Pet>(m, "Pet")
+        .def(py::init<const std::string &, int>())
+        .def("set_name", &Pet::set_name)
+        .def("set_age", &Pet::set_age)
+        .def("get_name", &Pet::get_name)
+        .def("get_age", &Pet::get_age);
+}
+\end{codeblock}
+
+The \texttt{py::class\_} function is used to bind a C++ class to Python. The first argument is the module, the second argument is the class name, and the third argument is the class type. The \texttt{def} function is used to bind class methods to Python. The first argument is the method name in Python, and the second argument is the C++ method.
+
+\begin{codeblock}[language=python]
+import example
+pet = example.Pet("Tom", 5)
+print(pet.get_name()) #output: Tom
+print(pet.get_age()) #output: 5
+pet.set_name("Jerry")
+pet.set_age(3)
+print(pet.get_name()) #output: Jerry
+print(pet.get_age()) #output: 3
+\end{codeblock}
+
+In the case above, the \texttt{print(pet)} statement will output the memory address of the object. To change this behavior, you can define a \texttt{\_\_str\_\_} method in the C++ class:
+
+\begin{codeblock}[language=C++]
+std::string __str__() const {
+    return name + " is " + std::to_string(age) + " years old";
+}
+\end{codeblock}
+
+\begin{codeblock}[language=C++]ì
+.def("__str__", &Pet::__str__);
+\end{codeblock}
+
+\begin{codeblock}[language=python]
+import example
+pet = example.Pet("Tom", 5)
+print(pet) #output: Tom is 5 years old
+\end{codeblock}
+
+You can also expose the name field with the \texttt{def\_readwrite} function:
+
+\begin{codeblock}[language=C++]
+.def_readwrite("name", &Pet::name)
+\end{codeblock}
+
+\begin{codeblock}[language=python]
+import example
+pet = example.Pet("Tom", 5)
+print(pet.name) #output: Tom
+pet.name = "Jerry"
+print(pet.name) #output: Jerry
+\end{codeblock}
+
+Dynamic attributes can be added to the class using the \texttt{def\_property} function:
+
+\begin{codeblock}[language=C++]
+.def_property("description", &Pet::__str__, &Pet::set_name)
+\end{codeblock}
+
+\begin{codeblock}[language=python]
+import example
+pet = example.Pet("Tom", 5)
+print(pet.description) #output: Tom is 5 years old
+pet.description = "Jerry"
+print(pet.get_name()) #output: Jerry
+\end{codeblock}
+
+\subsection{Inheritance and Polymorphism}
+
+pybind11 supports inheritance and polymorphism, allowing you to bind base classes and derived classes. The following example demonstrates how to bind a base class and a derived class:
+
+\begin{codeblock}[language=C++]
+class Animal {
+public:
+    virtual std::string speak() const {
+        return "I am an animal";
+    }
+};
+class Dog : public Animal {
+public:
+    std::string speak() const override {
+        return "I am a dog";
+    }
+};
+\end{codeblock}
+
+There are two ways to bind the derived class. The first method is to bind the base class and derived class separately, specifying the base class as an extra template parameter of the \texttt{class\_}:
+
+\begin{codeblock}[language=C++]
+PYBIND11_MODULE(example, m) {
+    py::class_<Animal>(m, "Animal")
+        .def("speak", &Animal::speak);
+    py::class_<Dog, Animal>(m, "Dog")
+        .def(py::init<>());
+        .def("speak", &Dog::speak);
+}
+\end{codeblock}
+
+\begin{codeblock}[language=python]
+import example
+animal = example.Animal()
+dog = example.Dog()
+print(animal.speak()) #output: I am an animal
+print(dog.speak()) #output: I am a dog
+\end{codeblock}
+
+the second method is to assign a name to the previously bound \texttt{Pet class\_} object and reference it when binding the Dog class:
+
+\begin{codeblock}[language=C++]
+py::class_<Pet> pet(m, "Pet");
+pet.def(\dots);
+py::class_<Dog>(m, "Dog", pet)
+    .def(py::init<>());
+    .def("speak", &Dog::speak);
+\end{codeblock}
+
+\begin{codeblock}[language=python]
+import example
+animal = example.Pet()
+dog = example.Dog()
+print(animal.speak()) #output: I am an animal
+print(dog.speak()) #output: I am a dog
+\end{codeblock}
+
+
