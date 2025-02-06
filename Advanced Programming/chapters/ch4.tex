@@ -1,1 +1,428 @@
-\chapter{Function Templates}
+\chapter{Advanced Topics on Functions}
+
+\vspace{-1em}
+
+\section{Callable Objects}
+
+\vspace{-0.5em}
+
+A \textbf{callable object} is any entity that can be invoked using the function call operator \texttt{()}. Callable objects in C++ include:
+
+\vspace{-0.7em}
+
+\begin{multicols}{2}
+\begin{itemize}
+    \item \textbf{Functions} (free or member functions).
+    \item \textbf{Function pointers}.
+    \item \textbf{Member function pointers}.
+    \item \textbf{Functors (function objects)}.
+    \item \textbf{Lambda expressions} (introduced in C++11).
+    \item \textbf{Function wrappers} (\plaintt{std::function}).
+\end{itemize}
+\end{multicols}
+
+\vspace{-1.5em}
+
+\subsection{Functions}
+
+In C++, functions can be categorized as \textbf{free functions} (standalone functions) or \textbf{member functions} (methods of a class). Additionally, functions can be classified as \textbf{normal functions} or \textbf{template functions}, including functions that employ automatic return type deduction.
+
+For a free, non-template function, the typical declaration syntax is:
+
+\vspace{-0.5em}
+
+\begin{codeblock}[language=C++, numbers=none]
+return_type function_name(...);
+
+auto function_name(...) -> return_type;
+
+auto function_name(...); // The compiler deduces the return type.
+\end{codeblock}
+
+\vspace{-0.5em}
+
+The first two forms are functionally equivalent, while the third allows the compiler to deduce the return type automatically.
+
+\vspace{-0.5em}
+
+\subsubsection{Function Identifiers}
+
+\vspace{-0.5em}
+
+A function in C++ is uniquely identified by:
+
+\begin{itemize}
+    \item Its \textbf{name}, which includes its fully qualified name (e.g., \plaintt{std::transform}).
+    \item The number and type of its \textbf{parameters}.
+    \item The presence of the \textbf{const} qualifier (for member functions).
+    \item The type of the enclosing class (for member functions).
+\end{itemize}
+
+\begin{warningblock}[Return Type and Function Identification]
+    The return type is \textbf{not} part of a function's identifier. Functions cannot be overloaded based solely on differing return types.
+\end{warningblock}
+
+\subsubsection{Why Use Free Functions?}
+
+\vspace{-0.5em}
+
+Free functions represent pure mappings from inputs to outputs, adhering to the mathematical notion of a function, $f: U \rightarrow V$. Since they are generally \textbf{stateless} (except when using \texttt{static} variables), the same input always produces the same output.
+
+Key advantages include:
+\begin{itemize}
+    \item \textbf{Clarity:} They model functions in a mathematical sense without side effects.
+    \item \textbf{Modularity:} They separate functionality from class definitions, enhancing code reusability.
+    \item \textbf{Simplicity:} Their lack of state minimizes dependencies and simplifies debugging.
+\end{itemize}
+
+\subsubsection{Returning Values from Functions}
+
+\vspace{-0.5em}
+
+Returning a reference rather then a value avoids creating a copy of the object, which can be more efficient, especially for large objects.
+
+\vspace{-0.5em}
+
+\begin{codeblock}[language=C++, numbers=none]
+std::ostream &operator<<(std::ostream &os, const MyClass &obj) {
+    // ...
+    return os;
+}
+
+std::cout << x << " concatenated with " << y; // Enables chaining.
+\end{codeblock}
+
+\vspace{-0.5em}
+
+Returning a reference is often used in operator overloading (e.g., \texttt{<<}) to enable chaining and in methods that modify an object and return it for further operations.
+
+\begin{warningblock}
+    Be cautious when returning references, as the object being referred to must outlive the reference.  Returning a reference to a local variable, for example, leads to undefined behavior.
+\end{warningblock}
+
+\subsubsection{Default Parameters}
+
+Default values can be assigned to function parameters, reducing redundancy in function calls and simplifying the interface for users who only need the most common functionality.
+
+\vspace{-0.5em}
+
+\begin{codeblock}[language=C++, numbers=none]
+std::vector<double> cross_prod(const std::vector<double> &a,
+                               const std::vector<double> &b,
+                               const unsigned int ndim = 2); // Default
+// Usage:
+a = cross_prod(c, d); // 'ndim' defaults to 2.
+\end{codeblock}
+
+\begin{observationblock}[Default Parameters and Function Overloading]
+    We remember that \hyperref[function-overloading]{function overloading} allows multiple functions to share the same name, provided they have different signatures. Default parameters can be used to achieve the same effect without creating multiple functions.
+\end{observationblock}
+
+\subsection{Function Pointers}
+
+\vspace{-0.5em}
+
+Function pointers allow passing functions as arguments and selecting functions dynamically at runtime, offering a level of indirection that enhances code modularity. They are particularly useful when the specific function to be executed is not known at compile time.
+
+\vspace{-0.5em}
+
+\begin{codeblock}[language=C++, numbers=none]
+double integrand(double x);
+
+using f_ptr = double (*)(double); // Function pointer type
+double integrate(double a, double b, const f_ptr fun);
+
+double I = integrate(0, 3.14, integrand); // Passing function as pointer
+// Implicitly equivalent to:
+f_ptr f = &integrand; // Assigning function to pointer
+I = integrate(0, 3.14, f); // Passing pointer to function
+\end{codeblock}
+
+\vspace{-0.5em}
+
+Function pointers are useful, but \plaintt{std::function} offers greater flexibility and type safety as it can encapsulate any callable object (including function pointers, lambdas, and function objects) with a compatible signature.
+
+\subsubsection{Dynamic Function Selection}
+
+Function pointers enable selecting functions dynamically.
+
+\begin{codeblock}[language=C++, numbers=none]
+int add(int a, int b) { return a + b; }
+int subtract(int a, int b) { return a - b; }
+
+int (*operation)(int, int);
+
+if (user_input == "add") {
+    operation = add;
+} else {
+    operation = subtract;
+}
+
+const int result = operation(10, 5); // Calls selected function.
+\end{codeblock}
+
+\subsubsection{Member Function Pointers}
+
+Member function pointers provide a way to call member functions (methods) of a class through a pointer. Unlike regular function pointers, member function pointers require an object instance to operate on because they are bound to a specific class. This allows you to call different implementations of a virtual function based on the object's actual type at runtime, or to store and invoke methods dynamically.
+
+\begin{codeblock}[language=C++, numbers=none]
+std::vector<Shape*> shapes = {new Circle(3.0), new Rectangle(2.0, 4.0)};
+
+double (Shape::*area_fun)() const = &Shape::area;
+
+for (const auto shape : shapes) {
+    const double area = (shape->*area_fun)();
+    std::cout << "Area: " << area << std::endl;
+}
+\end{codeblock}
+
+\subsection{Functors (Function Objects)}
+
+A \textbf{functor} (function object) is a class that overloads the function call operator \texttt{operator()}. This makes instances of the class callable like functions. Functors can maintain state, which distinguishes them from simple functions, and are often used to pass operations to algorithms, providing more flexibility than function pointers or lambdas.
+
+\begin{codeblock}[language=C++]
+class Cube {
+public:
+    double operator()(const double &x) const { return x * x * x; }
+};
+
+Cube cube;
+auto y = cube(3.4); // Calls cube.operator()(3.4)
+auto z = Cube{}(8.0); // Creates a temporary Cube object and calls its operator()(8.0)
+\end{codeblock}
+
+If \texttt{operator()} returns a \texttt{bool}, the functor is often referred to as a \textbf{predicate}. Declaring \texttt{operator()} as \texttt{const} ensures that calling the functor does not modify its internal state, which is good practice for functors that represent stateless operations.
+
+One of the key advantages of functors is their ability to maintain state across multiple calls. This allows them to be used in situations where a regular function would not be sufficient. For example:
+
+\begin{codeblock}[language=C++]
+class Calculator {
+public:
+    int result = 0;
+
+    class Add {
+    public:
+        Calculator& calc;
+        Add(Calculator& c) : calc(c) {}
+        void operator()(int x, int y) { calc.result = x + y; }
+    };
+};
+
+int main() {
+    Calculator calc;
+    Calculator::Add add(calc);
+    add(5, 3); // Calls add.operator()(5, 3), result stored in calc.result.
+    std::cout << calc.result << std::endl; // Output: 8
+    return 0;
+}
+\end{codeblock}
+
+In this example, the \texttt{Add} functor stores the result of the addition in the \texttt{Calculator} object's \texttt{result} member. This stateful behavior is not possible with regular functions without using global variables or other less desirable approaches. Functors are particularly useful with standard library algorithms like \texttt{std::transform} and \texttt{std::for\_each}, where they can be used to apply a stateful operation to a range of elements.
+
+\subsubsection{Predefined Functors in the STL}
+
+The \hyperref[ch:stl]{STL} provides predefined functors under \texttt{<functional>}. These functors perform common operations like addition, subtraction, multiplication, division, and logical operations.
+
+\begin{codeblock}[language=C++]
+#include <functional> // Essential for STL functors
+#include <numeric>    // Essential for std::accumulate
+// other includes 
+
+// Inside main
+std::vector<int> in = {1, 2, 3, 4, 5};
+std::vector<int> out;
+
+std::transform(in.begin(), in.end(), std::back_inserter(out), std::negate<int>()); // Negates each element
+
+const double prod = std::accumulate(in.begin(), in.end(), 1.0, std::multiplies<int>()); // Multiplies all elements
+\end{codeblock}
+
+Using predefined functors reduces the need to write custom function objects for simple operations, leading to more concise and readable code.
+
+\subsection{Lambda Functions}
+
+C++ supports a streamlined syntax for defining anonymous functions known as \textbf{lambda expressions}. These inline functions allow you to write short, self-contained functions directly where they are needed, eliminating the overhead of separately declaring and defining a function. Lambda expressions are analogous to Python's \texttt{lambda} functions or MATLAB's anonymous functions but integrate closely with C++'s type deduction and template mechanisms.
+
+\begin{codeblock}[language=C++]
+auto f = [](double x) { return 3 * x; }; // Lambda function.
+
+auto y = f(9.0); // y = 27.0.
+\end{codeblock}
+
+In these examples, the compiler deduces the return type automatically from the lambda's return statement, making the code both succinct and expressive.
+
+\subsubsection{Capture Specification}
+
+Lambda expressions can capture variables from their surrounding scope in various ways. This capture mechanism allows the lambda to access and use local variables without needing to pass them as parameters.
+
+\vspace{0.5em}
+
+The available capture options include:
+
+\begin{itemize}
+    \item \texttt{[]}:+ Captures no variables.
+    \item \texttt{[\&]}:+ Captures all variables from the enclosing scope by reference.
+    \item \texttt{[=]}:+ Captures all variables from the enclosing scope by copy.
+    \item \texttt{[y]}:+ Captures the variable \texttt{y} by copy.
+    \item \texttt{[\&y]}:+ Captures the variable \texttt{y} by reference.
+    \item \texttt{[=, \&x]}:+ Captures all variables by copy except for \texttt{x}, which is captured by reference.
+    \item \texttt{[this]}:+ Captures the \texttt{this} pointer, thereby providing access to all members of the enclosing class.
+    \item \texttt{[*this]}:+ Captures a copy of the entire enclosing object.
+\end{itemize}
+
+\vspace{0.5em}
+
+These capture options provide flexibility when designing lambdas, enabling you to control how data is accessed and modified within the lambda's body.
+
+\subsubsection{Using \texttt{[this]}}
+
+Capturing \texttt{this} allows a lambda to access and modify members of its enclosing class. This is particularly useful when working within member functions, as it enables concise operations over class variables using standard algorithms or other lambda-driven constructs.
+
+\begin{codeblock}[language=C++]
+class MyClass {
+public:
+    void compute(double a) {
+        auto prod = [this, &a]() { x *= a; };
+        std::for_each(v.begin(), v.end(), prod);
+    }
+private:
+    double x = 1.0;
+    std::vector<double> v;
+};
+\end{codeblock}
+
+\subsection{Function Wrappers}
+
+\subsubsection{Introduction to Function Wrappers}
+
+\texttt{std::function} is a polymorphic wrapper that can store any callable object, including function pointers, functors, and lambda functions.
+
+\begin{codeblock}[language=C++]
+int add(int a, int b) {
+    return a + b;
+}
+
+std::function<int(int, int)> func = add;
+const int result = func(2, 3);
+\end{codeblock}
+
+Function wrappers provide a common interface for different callable objects, making them useful in situations like callback functions.
+
+\subsubsection{Function Wrappers and Polymorphism}
+
+\begin{codeblock}[language=C++]
+class Shape {
+public:
+    virtual double area() const = 0;
+};
+
+class Circle : public Shape {
+public:
+    Circle(double radius) : radius(radius) {}
+    double area() const override { return 3.14159265359 * radius * radius; }
+private:
+    double radius;
+};
+
+auto compute_area = [](const Shape& s) { return s.area(); };
+Circle circle(5.0);
+std::cout << "Circle area: " << compute_area(circle) << std::endl;
+\end{codeblock}
+
+\subsubsection{Storing Multiple Callable Objects}
+
+\begin{codeblock}[language=C++]
+int func(int, int); // A free function.
+
+class Functor {
+public:
+    int operator()(int, int) const;
+};
+
+std::vector<std::function<int(int, int)>> tasks;
+tasks.push_back(func);
+tasks.push_back(Functor{});
+tasks.push_back([](int x, int y){ return x * y; });
+
+for (const auto& t : tasks)
+    std::cout << t(3, 4) << std::endl;
+\end{codeblock}
+
+\section{\texttt{std::bind} and Function Adapters}
+
+\subsection{Binding Function Arguments}
+
+\texttt{std::bind} creates a function object with pre-defined argument values.
+
+\begin{codeblock}[language=C++]
+int add(int a, int b) {
+    return a + b;
+}
+
+std::function<int(int)> add5 = std::bind(add, 5, std::placeholders::_1);
+const int result = add5(3); // Equivalent to add(5, 3).
+\end{codeblock}
+
+Modern C++ favors lambda expressions over \texttt{std::bind} for readability and maintainability.
+
+\section{Generic Programming and Templates}
+
+\subsection{Introduction to Generic Programming}
+
+Generic programming allows writing reusable and type-independent code using templates. It reduces code duplication and improves maintainability.
+
+\textbf{Key benefits:}
+
+\begin{itemize}
+    \item \textbf{Code Reusability} -- Define once, use with multiple data types.
+    \item \textbf{Type Safety} -- Errors are detected at compile time.
+    \item \textbf{Performance} -- Optimized code for different types.
+\end{itemize}
+
+\subsection{Function Templates}
+
+Function templates enable writing type-independent functions:
+
+\begin{codeblock}[language=C++]
+template <typename T>
+T add(T a, T b) {
+    return a + b;
+}
+
+const int result = add(5, 3); // T deduced as int.
+const double result2 = add(2.5, 3.7); // T deduced as double.
+\end{codeblock}
+
+\subsection{Default Template Parameters}
+
+\begin{codeblock}[language=C++]
+template <typename T, typename U = double>
+T multiply_and_add(T a, U b, T c) {
+    return a * b + c;
+}
+
+const int result = multiply_and_add(5, 2.5, 3); // Uses default U = double.
+\end{codeblock}
+
+This enables defining default behavior while keeping flexibility.
+
+\subsection{Template Specialization}
+
+You can specialize a function template for a specific type:
+
+\begin{codeblock}[language=C++]
+template <typename T>
+T max(T a, T b) {
+    return (a > b) ? a : b;
+}
+
+template <>
+char max(char a, char b) {
+    return (std::toupper(a) > std::toupper(b)) ? a : b;
+}
+\end{codeblock}
+
+Specialization ensures customized behavior for specific types.
+
+This structured approach maintains clarity and efficiency while leveraging generic programming capabilities.
+
