@@ -927,3 +927,410 @@ std::cout << obj << std::endl; // Calls the overloaded operator.
 \end{tipsblock}
 
 Operator overloading enhances code readability when used correctly, making custom types feel like native types.
+
+\newpage
+
+\section{Inheritance and Polymorphism}
+
+\subsection{Class Collaborations}
+
+In object-oriented programming, classes do not exist in isolation; they often collaborate in various ways to form complex software systems.
+
+\vspace{0.8em}
+
+These collaborations can be classified into different types of relationships.
+
+\subsubsection{Association}
+
+A \textbf{"\textit{loose}" relationship} where one class holds a reference or pointer to another but does not control its lifetime. This is useful for relationships where objects interact without being strongly coupled.
+
+\vspace{0.5em}
+
+Here's an example of Association: A Student can be associated with multiple Courses.
+
+Let's firstly define the \texttt{Course} class:
+
+\begin{codeblock}[language=C++]
+// course.hpp
+class Course {
+public:
+    Course(const std::string& name) : course_name(name) {}
+
+    const std::string& get_course_name() const {
+        return course_name;
+    }
+
+private:
+    std::string course_name;
+};
+\end{codeblock}
+
+Next, let's define the \texttt{Student} class which can maintain associations with multiple courses through enrollment:
+
+\begin{codeblock}[language=C++]
+// student.hpp
+class Student {
+public:
+    Student(const std::string& name) : student_name(name) {}
+
+    void enroll_course(Course *course) {
+        enrolled_courses.push_back(course);
+    }
+
+    void list_enrolled_courses() const {
+        std::cout << student_name << " is enrolled in:" << std::endl;
+        for (const auto& course : enrolled_courses) {
+            std::cout << "- " << course->get_course_name() << std::endl;
+        }
+    }
+
+private:
+    std::string student_name;
+    std::vector<Course*> enrolled_courses; // Association with Course.
+};
+\end{codeblock}
+
+The \texttt{Student} class has a vector of \texttt{Course} pointers, representing an association between the two classes.
+
+This implements a many-to-many relationship pattern, where a student can be enrolled in multiple courses, and courses can have multiple students.
+
+\vspace{-0.5em}
+
+\begin{codeblock}[language=C++]
+// main.cpp
+Course math{"Math"};
+Course physics{"Physics"};
+Course biology{"Biology"};
+
+Student alice{"Alice"};
+Student bob{"Bob"};
+
+alice.enroll_course(&math);
+alice.enroll_course(&physics);
+bob.enroll_course(&biology);
+bob.enroll_course(&physics);
+
+alice.list_enrolled_courses(); // Alice is enrolled in: - Math - Physics
+bob.list_enrolled_courses(); // Bob is enrolled in: - Biology - Physics
+\end{codeblock}
+
+\vspace{-0.5em}
+
+Associations are useful for modeling relationships between classes without strong dependencies: one class can exist without the other.
+
+\vspace{-0.5em}
+
+\subsubsection{Aggregation}
+
+A \textbf{"\textit{has-a}" relationship} where one class contains another, but the contained object can exist independently.
+
+\begin{codeblock}[language=C++, numbers=none]
+class Wheel {
+public:
+    void rotate() { /* ... */ }
+};
+
+class Car {
+private:
+    std::vector<Wheel*> wheels; // Car uses existing Wheels.
+
+public:
+    Car(std::vector<Wheel*>& wheels) : wheels(wheels) {}
+
+    void drive() {
+        for (auto* wheel : wheels) {
+            wheel->rotate();
+        }
+    }
+};
+\end{codeblock}
+
+In this example \texttt{Wheel} objects wheels can exist independently of the \texttt{Car}:
+
+\begin{codeblock}[language=C++]
+    Wheel front_left, front_right, rear_left, rear_right;
+    std::vector<Wheel*> wheel_set = {&front_left, &front_right, &rear_left, &rear_right};
+    
+    Car my_car(wheel_set); // Car uses externally created Wheels.
+    my_car.drive(); // Wheels are rotated.
+\end{codeblock}
+
+Aggregation is useful for modeling objects that are composed of other objects but can exist independently.
+
+\subsubsection{Composition}
+
+Composition is a stronger \textbf{"\textit{part-of}" relationship} where the contained object is an integral part of the containing object and cannot exist independently. The lifetime of the contained object is tied directly to the containing object's lifetime.
+
+\begin{codeblock}[language=C++, numbers=none]
+class Room {
+public:
+    void clean() { /* ... */ }
+};
+
+class Apartment {
+private:
+    Room living;  // Rooms cannot exist without an Apartment.
+    Room kitchen;
+    Room bedroom;
+
+public:
+    void clean() { 
+        living.clean(); 
+        kitchen.clean(); 
+        bedroom.clean(); 
+    }
+};
+\end{codeblock}
+
+\vspace{-0.5em}
+
+When the containing object is destroyed, all composed objects are automatically destroyed as well.
+
+\vspace{-0.5em}
+
+\begin{codeblock}
+Apartment my_apartment;
+my_apartment.clean(); // Cleans all rooms.    
+\end{codeblock}
+
+\subsubsection{Views (Proxies)}
+
+A proxy (or view) is a specialized form of aggregation that provides an alternative interface for accessing an object's elements. A proxy does not store the actual data but redirects access to another underlying object while applying specific transformations or constraints.
+
+\begin{codeblock}[language=C++, numbers=none]
+class Matrix {
+public:
+    double & operator()(int i, int j);
+};
+
+class DiagonalView {
+public:
+    DiagonalView(Matrix &mat) : mat(mat) {}
+
+    double & operator()(int i, int j) {
+        return (i == j) ? mat(i, i) : 0.0; 
+    }
+
+private:
+    Matrix &mat;
+};
+\end{codeblock}
+
+in the example above, \texttt{DiagonalView} provides a restricted view of a Matrix, allowing access only to diagonal elements. It prevents modifications to off-diagonal elements by returning \texttt{0.0} for those cases.
+
+\subsection{Inheritance}
+
+Inheritance is a fundamental concept in object-oriented programming that allows a new class (the derived or subclass) to inherit properties and behaviors from an existing class (the base or superclass). It establishes an \textbf{"\textit{is-a}" relationship}, enabling code reuse and extension.
+
+For example, a `Shape` class can serve as a base for `Circle`, `Rectangle`, and `Triangle` classes, all of which share common characteristics while extending functionality.
+
+\subsubsection{Inheritance in C++}
+
+In C++, inheritance is specified using using the \texttt{class} or \texttt{struct} keyword followed by a colon \texttt{:} followed by an access specifier (`public`, `protected`, or `private`) and the name of the base class.
+
+\begin{exampleblock}[Inheritance]
+
+    An example of inheritance is shown below, where the `Circle` class inherits from the `Shape` class:
+
+\begin{codeblock}[language=C++]
+class Shape { // Base class.
+public:
+    void f() { std::cout << "f (base class)." << std::endl; }
+    void draw() { std::cout << "Drawing a shape." << std::endl; }
+};
+
+class Circle : public Shape { // Derived class.
+public:
+    void g() { std::cout << "g (derived class)." << std::endl; }
+    void draw() { std::cout << "Drawing a circle." << std::endl; }
+};
+
+Circle circle;
+circle.f();    // Calls f() from Shape
+circle.g();    // Calls g() from Circle
+circle.draw(); // Calls draw() from Circle (overrides Shape method)
+\end{codeblock}
+\end{exampleblock}
+
+\subsubsection{Inheritance and Access Control}
+
+The choice of access specifier determines how base class members are inherited:
+
+\begin{itemize}
+    \item \textbf{Public Inheritance}: Preserves the original access specifiers. Public members remain public, protected members remain protected.
+    \item \textbf{Protected Inheritance}: Public members become protected; protected members remain protected.
+    \item \textbf{Private Inheritance}: Public and protected members become private.
+\end{itemize}
+
+\begin{codeblock}[language=C++]
+class Base {
+public:
+    int public_data;
+protected:
+    int protected_data;
+private:
+    int private_data;
+};
+\end{codeblock}
+
+\vspace{1em}
+
+The accessibility of each member in the derived class varies based on the inheritance type. The \cref{tab:inheritance_access} below illustrates how different inheritance types affect member accessibility:
+
+\renewcommand{\arraystretch}{1}  % Reduce row height (default is 1.0)
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabular}{|p{3.5cm}|p{3.5cm}|p{3.5cm}|}
+        \hline
+        \textbf{Member} & \textbf{Original Access} & \textbf{Inherited Access} \\
+        \hline
+        \multicolumn{3}{|c|}{\textbf{Public Inheritance}} \\
+        \hline
+        public\_data & public & public \\
+        protected\_data & protected & protected \\
+        private\_data & private & inaccessible \\
+        \hline
+        \multicolumn{3}{|c|}{\textbf{Protected Inheritance}} \\
+        \hline
+        public\_data & public & protected \\
+        protected\_data & protected & protected \\
+        private\_data & private & inaccessible \\
+        \hline
+        \multicolumn{3}{|c|}{\textbf{Private Inheritance}} \\
+        \hline
+        public\_data & public & private \\
+        protected\_data & protected & private \\
+        private\_data & private & inaccessible \\
+        \hline
+    \end{tabular}
+    \caption{Access Control in Different Types of Inheritance}
+    \label{tab:inheritance_access}
+\end{table}
+
+\begin{codeblock}[language=C++]
+class DerivedPublic : public Base { 
+    // public_data remains public.
+    // protected_data remains protected.
+    // private_data is inaccessible.
+};
+
+class DerivedProtected : protected Base { 
+    // public_data becomes protected.
+    // protected_data remains protected.
+    // private_data is inaccessible.
+};
+
+class DerivedPrivate : private Base { 
+    // public_data becomes private.
+    // protected_data becomes private.
+    // private_data is inaccessible.
+};
+\end{codeblock}
+
+\subsubsection{Construction of a Derived Class}
+
+When constructing a derived object:
+
+\begin{enumerate}
+    \item The base class constructor is called first.
+    \item The derived class constructor executes, initializing its own members.
+\end{enumerate}
+
+\begin{codeblock}[language=C++, numbers=none]
+class BaseClass {
+public:
+    BaseClass(int base_param) { /* Initialize base members */ }
+};
+
+class DerivedClass : public BaseClass {
+public:
+    DerivedClass(int derived_param, int base_param) 
+        : BaseClass(base_param) { /* Initialize derived members */ }
+};
+\end{codeblock}
+
+\subsubsection{Delegating Constructor}
+
+In the constructor of a derived class, you can call the constructor of the base class, which is useful if you need to pass arguments. If no arguments are passed, the default constructor of the base class is used (in this case, the base class must be default constructible).
+
+\begin{codeblock}[language=C++]
+class B {
+public:
+    B(double x) : x(x) { /* ... */ }
+private:
+    double x;
+};
+
+class D : public B {
+public:
+    D(int i, double x) : B(x), my_i(i) { }
+private:
+    int my_i;
+};
+
+D d(4, 12.0); // Initializes d.x = 12.0, d.my_i = 4
+\end{codeblock}
+
+\subsubsection{Inheriting Constructors}
+
+Constructors are not inherited by default, but they can be explicitly made available in a derived class using `using`.
+
+\begin{codeblock}[language=C++]
+class B {
+public:
+    B(double x) : x(x) { /* ... */ }
+};
+
+class D : public B {
+    using B::B; // Inherits B constructor.
+private:
+    int my_i = 10;
+};
+
+D d(12.0);
+\end{codeblock}
+
+In the example above, when you create an instance like D d(12.0), the using declaration makes \texttt{B}'s constructor available in \texttt{D}. The constructor \texttt{B::B(double)} is called with \texttt{12.0}, setting \texttt{d.x} accordingly, while \texttt{d.my\_i} is automatically initialized to its default value of \texttt{10}.
+
+\subsubsection{Destruction of a Derived Class}
+
+When an object of a derived class is destroyed:
+
+\begin{enumerate}
+    \item The derived class destructor is executed first.
+    \item The base class destructor is called automatically.
+\end{enumerate}
+
+\begin{codeblock}[language=C++, numbers=none]
+DerivedClass::~DerivedClass() {
+    // Clean up derived class resources.
+    // ~BaseClass() is automatically called after this.
+}
+\end{codeblock}
+
+\subsubsection{Multiple Inheritance}
+
+C++ allows multiple inheritance, where a class inherits from more than one base class. If multiple base classes have methods with the same name, ambiguity arises, which can be resolved using fully qualified names.
+
+\begin{codeblock}[language=C++, numbers=none]
+class B { public: double f() { return 1.0; } };
+class C { public: double f() { return 2.0; } };
+
+class D : public B, public C {
+public:
+    void fun() {
+        double x = B::f(); // Resolving ambiguity by specifying base class.
+    }
+};
+\end{codeblock}
+
+Multiple inheritance can lead to the \textit{\textbf{diamond problem}}, where a class indirectly inherits from the same base class through multiple paths. C++ provides `virtual` inheritance to ensure that only one instance of a shared base class is created.
+
+\begin{codeblock}[language=C++, numbers=none]
+class A { /* Base class */ };
+class B : virtual public A { /* Inherits A virtually */ };
+class C : virtual public A { /* Inherits A virtually */ };
+class D : public B, public C { /* D contains only 1 instance of A */ };
+\end{codeblock}
+
