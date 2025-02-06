@@ -512,7 +512,7 @@ void bar() {
     Usage & Local variables, function parameters & Dynamically allocated data \\ \hline
 \end{tabular}
 
-\subsection{When to Use Stack vs. Heap}
+\subsubsection{When to Use Stack vs. Heap}
 
 \begin{itemize}
     \item \textbf{Use the Stack}:
@@ -549,7 +549,7 @@ heap_var = nullptr;   // Reset pointer.
     \end{codeblock}
 \end{exampleblock}
 
-\subsection{Lifetime and Scope}
+\subsubsection{Lifetime and Scope}
 
 The lifetime of a variable refers to the duration it exists in memory, while its scope defines where it is accessible in code.
 
@@ -686,7 +686,21 @@ void print(const std::string& message) {
     \end{codeblock}
 \end{warningblock}
 
-\section{Operators}
+
+
+\subsubsection{Function Overloading} \label{function-overloading}
+Function overloading is a feature in C++ that allows you to define multiple functions with the same name but different parameters. The compiler selects the appropriate function based on the number or types of arguments during the function call.
+
+\begin{codeblock}[language=C++]
+int add(int a, int b) {
+    return a + b;
+}
+int add(double a, double b) {
+    return a + b;
+}
+\end{codeblock}
+
+\subsection{Operators}
 
 \subsubsection{Increment and Decrement Operators}
 
@@ -699,18 +713,6 @@ void print(const std::string& message) {
 int x = 5;
 x++; // x is now 6
 x--; // x is now 5
-\end{codeblock}
-
-\subsubsection{Function Overloading}
-Function overloading is a feature in C++ that allows you to define multiple functions with the same name but different parameters. The compiler selects the appropriate function based on the number or types of arguments during the function call.
-
-\begin{codeblock}[language=C++]
-int add(int a, int b) {
-    return a + b;
-}
-int add(double a, double b) {
-    return a + b;
-}
 \end{codeblock}
 
 \section{User-defined types}
