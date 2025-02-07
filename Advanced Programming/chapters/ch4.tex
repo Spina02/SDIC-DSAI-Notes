@@ -6,7 +6,9 @@
 
 \vspace{-0.5em}
 
-A \textbf{callable object} is any entity that can be invoked using the function call operator \texttt{()}. Callable objects in C++ include:
+A \textbf{callable object} is any entity that can be invoked using the function call operator \texttt{()}.
+
+Callable objects in C++ include:
 
 \vspace{-0.7em}
 
@@ -133,18 +135,17 @@ using f_ptr = double (*)(double); // Function pointer type
 double integrate(double a, double b, const f_ptr fun);
 
 double I = integrate(0, 3.14, integrand); // Passing function as pointer
-// Implicitly equivalent to:
-f_ptr f = &integrand; // Assigning function to pointer
-I = integrate(0, 3.14, f); // Passing pointer to function
 \end{codeblock}
 
 \vspace{-0.5em}
+
+The name of the function is interpreted as a pointer to that function. However, you may precede it by \texttt{\&}: \texttt{f\_ptr f = \&integrand}.
 
 Function pointers are useful, but \plaintt{std::function} offers greater flexibility and type safety as it can encapsulate any callable object (including function pointers, lambdas, and function objects) with a compatible signature.
 
 \subsubsection{Dynamic Function Selection}
 
-Function pointers enable selecting functions dynamically.
+You can use function pointers to select and call functions at runtime based on runtime conditions.
 
 \begin{codeblock}[language=C++, numbers=none]
 int add(int a, int b) { return a + b; }
@@ -152,7 +153,7 @@ int subtract(int a, int b) { return a - b; }
 
 int (*operation)(int, int);
 
-if (user_input == "add") {
+if (user_input == "add") { // User input determines operation.
     operation = add;
 } else {
     operation = subtract;
@@ -187,13 +188,14 @@ public:
 };
 
 Cube cube;
-auto y = cube(3.4); // Calls cube.operator()(3.4)
-auto z = Cube{}(8.0); // Creates a temporary Cube object and calls its operator()(8.0)
+auto y = cube(3.4);   // Calls cube.operator()(3.4)
+auto z = Cube{}(8.0); // Creates a temporary Cube object and 
+                      //     calls its operator()(8.0)
 \end{codeblock}
 
 If \texttt{operator()} returns a \texttt{bool}, the functor is often referred to as a \textbf{predicate}. Declaring \texttt{operator()} as \texttt{const} ensures that calling the functor does not modify its internal state, which is good practice for functors that represent stateless operations.
 
-One of the key advantages of functors is their ability to maintain state across multiple calls. This allows them to be used in situations where a regular function would not be sufficient. For example:
+One of the key advantages of functors is their ability to \textbf{maintain state across multiple calls}. This allows them to be used in situations where a regular function would not be sufficient. For example:
 
 \begin{codeblock}[language=C++]
 class Calculator {
@@ -208,40 +210,61 @@ public:
     };
 };
 
-int main() {
-    Calculator calc;
-    Calculator::Add add(calc);
-    add(5, 3); // Calls add.operator()(5, 3), result stored in calc.result.
-    std::cout << calc.result << std::endl; // Output: 8
-    return 0;
-}
+// in main
+Calculator calc;
+Calculator::Add add(calc);
+add(5, 3); // Calls add.operator()(5, 3), result stored in calc.result.
 \end{codeblock}
 
-In this example, the \texttt{Add} functor stores the result of the addition in the \texttt{Calculator} object's \texttt{result} member. This stateful behavior is not possible with regular functions without using global variables or other less desirable approaches. Functors are particularly useful with standard library algorithms like \texttt{std::transform} and \texttt{std::for\_each}, where they can be used to apply a stateful operation to a range of elements.
+The \texttt{Add} functor stores the result in the \texttt{Calculator} object's \texttt{result} member. This behavior is not possible with regular functions without using global variables or other less desirable approaches. Functors are particularly useful with standard library algorithms like \texttt{std::transform} and \texttt{std::for\_each}, where they can be used to apply a stateful operation to a range of elements.
 
 \subsubsection{Predefined Functors in the STL}
 
 The \hyperref[ch:stl]{STL} provides predefined functors under \texttt{<functional>}. These functors perform common operations like addition, subtraction, multiplication, division, and logical operations.
 
 \begin{codeblock}[language=C++]
-#include <functional> // Essential for STL functors
-#include <numeric>    // Essential for std::accumulate
-// other includes 
-
-// Inside main
 std::vector<int> in = {1, 2, 3, 4, 5};
 std::vector<int> out;
 
-std::transform(in.begin(), in.end(), std::back_inserter(out), std::negate<int>()); // Negates each element
-
-const double prod = std::accumulate(in.begin(), in.end(), 1.0, std::multiplies<int>()); // Multiplies all elements
+std::transform(
+    in.begin(), in.end(),     // Source
+    std::back_inserter(out),  // Destination
+    std::negate<int>()        // Negates each element
+);
 \end{codeblock}
 
 Using predefined functors reduces the need to write custom function objects for simple operations, leading to more concise and readable code.
 
+\vspace{-0.5em}
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{l|l}
+    \hline
+    \hfill \textbf{Functor} \hfill & \hfill \textbf{Description} \hfill \\
+    \hline
+    \plaintt{plus<T>, minus<T>} & Addition/Subtraction (Binary) \\
+    \plaintt{multiplies<T>, divides<T>} & Multiplication/Division (Binary) \\
+    \plaintt{modulus<T>} & Modulus (Unary) \\
+    \plaintt{negate<T>} & Negative (Unary) \\
+    \plaintt{equal\_to<T>, not\_equal\_to<T>} & (Non-)Equality Comparison (Binary) \\
+    \plaintt{greater}, \plaintt{less}, \plaintt{greater\_equal}, \plaintt{less\_equal} & Comparison (Binary) \\
+    \plaintt{logical\_and<T>, logical\_or<T>, logical\_not<T>} & Logical AND/OR/NOT (Binary) \\
+    \hline
+    \end{tabular}
+    \vspace{-0.5em}
+    \caption{Some predefined functors in the STL. \cite{cplusplus}}
+    \label{tab:functors}
+    \end{table}
+    
+    \vspace{-1em}
+
 \subsection{Lambda Functions}
 
 C++ supports a streamlined syntax for defining anonymous functions known as \textbf{lambda expressions}. These inline functions allow you to write short, self-contained functions directly where they are needed, eliminating the overhead of separately declaring and defining a function. Lambda expressions are analogous to Python's \texttt{lambda} functions or MATLAB's anonymous functions but integrate closely with C++'s type deduction and template mechanisms.
+
+\vspace{-0.5em}
 
 \begin{codeblock}[language=C++]
 auto f = [](double x) { return 3 * x; }; // Lambda function.
@@ -249,34 +272,36 @@ auto f = [](double x) { return 3 * x; }; // Lambda function.
 auto y = f(9.0); // y = 27.0.
 \end{codeblock}
 
+\vspace{-0.5em}
+
 In these examples, the compiler deduces the return type automatically from the lambda's return statement, making the code both succinct and expressive.
+
+\vspace{-0.5em}
 
 \subsubsection{Capture Specification}
 
 Lambda expressions can capture variables from their surrounding scope in various ways. This capture mechanism allows the lambda to access and use local variables without needing to pass them as parameters.
 
-\vspace{0.5em}
-
 The available capture options include:
 
 \begin{itemize}
-    \item \texttt{[]}:+ Captures no variables.
-    \item \texttt{[\&]}:+ Captures all variables from the enclosing scope by reference.
-    \item \texttt{[=]}:+ Captures all variables from the enclosing scope by copy.
-    \item \texttt{[y]}:+ Captures the variable \texttt{y} by copy.
-    \item \texttt{[\&y]}:+ Captures the variable \texttt{y} by reference.
-    \item \texttt{[=, \&x]}:+ Captures all variables by copy except for \texttt{x}, which is captured by reference.
-    \item \texttt{[this]}:+ Captures the \texttt{this} pointer, thereby providing access to all members of the enclosing class.
-    \item \texttt{[*this]}:+ Captures a copy of the entire enclosing object.
+    \item \texttt{[]}: Captures no variables.
+    \item \texttt{[\&]}: Captures all variables from the enclosing scope by reference.
+    \item \texttt{[=]}: Captures all variables from the enclosing scope by copy.
+    \item \texttt{[y]}: Captures the variable \texttt{y} by copy.
+    \item \texttt{[\&y]}: Captures the variable \texttt{y} by reference.
+    \item \texttt{[=, \&x]}: Captures all variables by copy except for \texttt{x}, which is captured by reference.
+    \item \texttt{[this]}: Captures the \texttt{this} pointer, thereby providing access to all members of the enclosing class.
+    \item \texttt{[*this]}: Captures a copy of the entire enclosing object.
 \end{itemize}
-
-\vspace{0.5em}
 
 These capture options provide flexibility when designing lambdas, enabling you to control how data is accessed and modified within the lambda's body.
 
 \subsubsection{Using \texttt{[this]}}
 
 Capturing \texttt{this} allows a lambda to access and modify members of its enclosing class. This is particularly useful when working within member functions, as it enables concise operations over class variables using standard algorithms or other lambda-driven constructs.
+
+\vspace{-0.5em}
 
 \begin{codeblock}[language=C++]
 class MyClass {
@@ -291,109 +316,211 @@ private:
 };
 \end{codeblock}
 
-\subsection{Function Wrappers}
+\vspace{-0.5em}
 
-\subsubsection{Introduction to Function Wrappers}
+Here, \texttt{compute()} uses the lambda \texttt{prod} that changes the member \texttt{x}. To be more explicit, you can write \texttt{this->x *= a;}
 
-\texttt{std::function} is a polymorphic wrapper that can store any callable object, including function pointers, functors, and lambda functions.
+\subsection{Function Wrappers (\texttt{std::function})}
+A \textbf{function wrapper} is a polymorphic wrapper that can store \textit{any} callable object, including free functions, function pointers, functors, and lambdas. The standard C++ library provides this capability through \texttt{std::function} (declared in \texttt{<functional>}). By using \texttt{std::function}, you can treat different callable objects as first-class citizens with a uniform interface.
 
 \begin{codeblock}[language=C++]
+#include <functional>
+#include <iostream>
+
 int add(int a, int b) {
     return a + b;
 }
 
-std::function<int(int, int)> func = add;
-const int result = func(2, 3);
+int main() {
+    std::function<int(int,int)> func = add;  // Wraps a free function
+    const int result = func(2, 3);
+    std::cout << "Result: " << result << std::endl;  // Prints 5
+    return 0;
+}
 \end{codeblock}
 
-Function wrappers provide a common interface for different callable objects, making them useful in situations like callback functions.
+Using \texttt{std::function} is extremely helpful when you need a generic, uniform way to store or pass around callable entities of different types.
+
+\begin{warningblock}[Performance Overhead]
+Although \plaintt{std::function} is very convenient, be aware that it introduces a small level of indirection (and hence some overhead), because the callable object is stored internally via type-erasure. In most cases, this overhead is negligible compared to the flexibility gained.
+\end{warningblock}
 
 \subsubsection{Function Wrappers and Polymorphism}
+The \texttt{std::function} wrapper is not limited to functions that share primitive argument types. It can also handle more complex scenarios, such as virtual member functions. The following example demonstrates how \texttt{std::function} can be used alongside polymorphic classes:
 
 \begin{codeblock}[language=C++]
+#include <functional>
+#include <iostream>
+
 class Shape {
 public:
     virtual double area() const = 0;
+    virtual ~Shape() = default;
 };
 
 class Circle : public Shape {
 public:
-    Circle(double radius) : radius(radius) {}
-    double area() const override { return 3.14159265359 * radius * radius; }
+    explicit Circle(double r) : radius(r) {}
+    double area() const override {
+        return 3.14159265359 * radius * radius;
+    }
 private:
     double radius;
 };
+\end{codeblock}
+\begin{codeblock}[language=C++]
+int main() {
+    // A lambda that calls the virtual method area() on a Shape
+    std::function<double(const Shape&)> compute_area =
+        [](const Shape& s){ return s.area(); };
 
-auto compute_area = [](const Shape& s) { return s.area(); };
-Circle circle(5.0);
-std::cout << "Circle area: " << compute_area(circle) << std::endl;
+    Circle circle(5.0);
+    std::cout << "Circle area: " << compute_area(circle) << std::endl;
+    return 0;
+}
 \end{codeblock}
 
-\subsubsection{Storing Multiple Callable Objects}
+Here, the lambda captures nothing but simply invokes \texttt{area()} on the passed \texttt{Shape}. Under the hood, \texttt{std::function} can store this lambda and call it later as needed.
+
+\subsubsection{A Vector of Functions}
+Because \texttt{std::function} can wrap any callable type with a given signature, we can store multiple, different callables in a single container:
 
 \begin{codeblock}[language=C++]
-int func(int, int); // A free function.
+#include <functional>
+#include <iostream>
+#include <vector>
 
-class Functor {
+int func(int x, int y) { return x + y; }
+
+class F2 {
 public:
-    int operator()(int, int) const;
+    int operator()(int x, int y) const {
+        return x - y;
+    }
 };
 
-std::vector<std::function<int(int, int)>> tasks;
-tasks.push_back(func);
-tasks.push_back(Functor{});
-tasks.push_back([](int x, int y){ return x * y; });
+int main() {
+    std::vector<std::function<int(int,int)>> tasks;
 
-for (const auto& t : tasks)
-    std::cout << t(3, 4) << std::endl;
+    // Wrap a free function
+    tasks.push_back(func);
+
+    // Wrap a functor
+    F2 func2;
+    tasks.push_back(func2);
+
+    // Wrap a lambda
+    tasks.push_back([](int x, int y){ return x * y; });
+
+    for (auto &t : tasks) {
+        std::cout << t(3, 4) << std::endl;
+    }
+    return 0;
+}
 \end{codeblock}
 
-\section{\texttt{std::bind} and Function Adapters}
+In this loop, each callable is invoked as \texttt{t(3, 4)}, printing:
 
-\subsection{Binding Function Arguments}
 
-\texttt{std::bind} creates a function object with pre-defined argument values.
+$$
+   \text{func}(3,4) = 7, \quad \text{func2}(3,4) = -1, \quad 3 \times 4 = 12.
+$$
+
+\subsubsection{\texttt{std::bind} and Function Adapters}
+The C++ standard library provides \texttt{std::bind} (also in \texttt{<functional>}) to create \textit{adapted} or \textit{partially applied} functions. It allows you to fix (bind) certain parameters of a function, producing a new callable that can be invoked with fewer parameters.
 
 \begin{codeblock}[language=C++]
+#include <functional>
+#include <iostream>
+
 int add(int a, int b) {
     return a + b;
 }
 
-std::function<int(int)> add5 = std::bind(add, 5, std::placeholders::_1);
-const int result = add5(3); // Equivalent to add(5, 3).
+int main() {
+    // Create a new function that binds 'a' to 5
+    std::function<int(int)> add5 =
+        std::bind(add, 5, std::placeholders::_1);
+
+    std::cout << add5(3) << std::endl; // Prints 8
+    return 0;
+}
 \end{codeblock}
 
-Modern C++ favors lambda expressions over \texttt{std::bind} for readability and maintainability.
+\begin{observationblock}[Modern Alternatives]
+Although \plaintt{std::bind} is powerful, modern C++ often prefers \textbf{lambdas} for readability. Still, \plaintt{std::bind} is quite useful in complex scenarios or when you need to systematically reuse partially-applied arguments.
+\end{observationblock}
 
+
+%------------------------------------------------------
 \section{Generic Programming and Templates}
 
-\subsection{Introduction to Generic Programming}
+Generic programming is a \textbf{paradigm} that aims to write code that is independent of any particular data type, making it reusable, type-safe, and efficient. C++ achieves generic programming primarily through \emph{templates}, which allow you to write code that is instantiated for different data types as needed.
 
-Generic programming allows writing reusable and type-independent code using templates. It reduces code duplication and improves maintainability.
+\subsection{Overview of Generic Programming}
+\subsubsection{Concept and Motivation.}
+Generic programming focuses on designing algorithms and data structures in a way that they can operate on a broad range of types. Rather than writing multiple versions of the same functionality for each type, you write a \emph{single} version of an algorithm (e.g., \texttt{sort}) and let the compiler automatically generate the correct variant for an \textit{int} array, a \textit{double} array, a \textit{std::string} array, and so on.
 
-\textbf{Key benefits:}
-
+\subsubsection{Key Benefits.}
 \begin{itemize}
-    \item \textbf{Code Reusability} -- Define once, use with multiple data types.
-    \item \textbf{Type Safety} -- Errors are detected at compile time.
-    \item \textbf{Performance} -- Optimized code for different types.
+    \item \textbf{Reusability:} Write the code once and reuse it for multiple types.
+    \item \textbf{Type Safety:} Many errors that involve type mismatches are caught at compile time.
+    \item \textbf{Performance:} The compiler generates code specialized for each type, often comparable to handwritten type-specific code.
+    \item \textbf{Expressiveness:} Templates reduce boilerplate and improve readability, as the type details are factored out.
 \end{itemize}
 
+\subsubsection{Examples and Use Cases.}
+\begin{itemize}
+    \item \textbf{STL (Standard Template Library):} Provides generic containers (\texttt{std::vector}, \texttt{std::list}, \dots) and algorithms (\texttt{std::sort}, \texttt{std::accumulate}, \dots).
+    \item \textbf{Function Templates:} Write one function that works for any type supporting the required operations (e.g., \texttt{operator+}).
+    \item \textbf{Class Templates:} Implement a type-safe container or data structure (e.g., \texttt{std::stack}).
+    \item \textbf{Custom Data Structures and Algorithms:} From binary trees to mathematical computations, templates give great flexibility.
+\end{itemize}
+
+
+%------------------------------------------------------
 \subsection{Function Templates}
 
-Function templates enable writing type-independent functions:
+\begin{exampleblock}[Function Templates]
+A function like \texttt{less\_than} for multiple types leads to code duplication:
+
+\begin{codeblock}[language=C++]
+bool less_than(char x1, char x2) { return (x1 < x2); }
+bool less_than(double x1, double x2) { return (x1 < x2); }
+\end{codeblock}
+
+Since the logic remains unchanged, a \textbf{function template} generalizes the function:
 
 \begin{codeblock}[language=C++]
 template <typename T>
-T add(T a, T b) {
-    return a + b;
-}
-
-const int result = add(5, 3); // T deduced as int.
-const double result2 = add(2.5, 3.7); // T deduced as double.
+bool less_than(T x1, T x2) { return (x1 < x2); }
 \end{codeblock}
 
-\subsection{Default Template Parameters}
+When calling \texttt{less\_than(3.0, 2.5)}, the compiler generates \texttt{less\_than<double>(double, double)} automatically. You can also specify the template argument explicitly: \texttt{less\_than<int>(10, 5)}.
+
+\end{exampleblock}
+
+\subsubsection{Defining and Using Function Templates}
+Function templates allow generic operations on different types without redundancy. Here's an example of an addition function:
+
+\vspace{-0.5em}
+
+\begin{codeblock}[language=C++]
+template <typename T>
+T add(T a, T b) { return a + b; }
+
+int main() {
+    int i = add(5, 3);        // T deduced as int
+    double d = add(2.5, 3.7); // T deduced as double
+}
+\end{codeblock}
+
+\vspace{-0.5em}
+
+\subsubsection{Default Template Parameters}
+Templates support default parameters to simplify function calls:
+
+\vspace{-0.5em}
 
 \begin{codeblock}[language=C++]
 template <typename T, typename U = double>
@@ -401,28 +528,478 @@ T multiply_and_add(T a, U b, T c) {
     return a * b + c;
 }
 
-const int result = multiply_and_add(5, 2.5, 3); // Uses default U = double.
+// T is int; U defaults to double
+int result = multiply_and_add(5, 2.5, 3);
 \end{codeblock}
 
-This enables defining default behavior while keeping flexibility.
-
-\subsection{Template Specialization}
-
-You can specialize a function template for a specific type:
+\subsubsection{Template Specialization}
+Sometimes, a general template needs custom behavior for specific types:
 
 \begin{codeblock}[language=C++]
 template <typename T>
-T max(T a, T b) {
-    return (a > b) ? a : b;
-}
+T max(T a, T b) { return (a > b) ? a : b; }
 
+// Specialization for char: compare in uppercase
 template <>
 char max(char a, char b) {
     return (std::toupper(a) > std::toupper(b)) ? a : b;
 }
 \end{codeblock}
 
-Specialization ensures customized behavior for specific types.
+\begin{exampleblock}[Summing Elements in a Vector]
 
-This structured approach maintains clarity and efficiency while leveraging generic programming capabilities.
+Templates can work with different types as long as necessary operators exist:
 
+\begin{codeblock}[language=C++]
+template <typename T>
+T vector_sum(const std::vector<T>& vec) {
+    T sum{};
+    for (const auto &elem : vec) sum += elem;
+    return sum;
+}
+\end{codeblock}
+
+This function sums numeric values or concatenates strings if \texttt{operator+} is defined.
+\end{exampleblock}
+\subsubsection{Key Properties of Templates}
+\begin{itemize}
+    \item \textbf{Lazy Instantiation:} Templates are compiled only when instantiated.
+    \item \textbf{Late Error Detection:} Compilation errors may arise only when the template is used.
+\end{itemize}
+
+\subsubsection{Constant values as template parameters}
+
+You can give defaults to the rightmost parameters (this applies also).
+
+A template parameter may also be an integral value.
+
+\begin{codeblock}[language=C++]
+template <int N, int M = 3>
+constexpr int multiply() {
+    return N * M;
+}
+
+constexpr int result1 = multiply<5>();    // calc. 5 * 3 at compile-time
+constexpr int result2 = multiply<2, 7>(); // calc. 2 * 7 at compile-time
+\end{codeblock}
+
+Only integral types can be used (e.g., integers, enumerations, pointers, ...).
+
+\texttt{constexpr} can be applied to variables, functions, and constructors, to ensure that they are evaluated at compile time.
+
+\subsubsection{Advantages and Disadvantages of Generic Programming}
+\begin{itemize}
+    \item \textbf{Pros:} Code reuse, type-safety, efficiency, and cleaner code.
+    \item \textbf{Cons:} Complex error messages, longer compile times, and difficult debugging in advanced cases.
+\end{itemize}
+
+%------------------------------------------------------
+\subsection{Class Templates}
+
+\subsubsection{Introduction}
+
+A \textbf{class template} generalizes an entire class definition for use with arbitrary data types. Instead of creating separate classes, such as \texttt{IntList}, \texttt{DoubleList}, or \texttt{StringList}, a single \textit{blueprint} can adapt to any type. Standard library containers like \plaintt{std::vector<T>} or \plaintt{std::map<K,V>} are prime examples of class templates.
+
+\begin{codeblock}[language=C++]
+template <typename T>
+class List {
+public:
+    // ...
+private:
+    T value;
+    List* next;
+};
+\end{codeblock}
+
+In this example, \texttt{List} is a template that can hold objects of type \texttt{T}. The compiler will generate distinct \texttt{List} classes internally, depending on the specific \texttt{T} you use in your code.
+
+When you want to create instances of a class template, you must \emph{instantiate} it by providing the required type parameters:
+
+\begin{codeblock}[language=C++, numbers=none]
+List<int> list_int;       // List of int
+List<double> list_double; // List of double
+\end{codeblock}
+
+Here, \texttt{T} is deduced to be \texttt{int} for the first instantiation and \texttt{double} for the second. Each instantiation behaves as though you wrote a specialized \texttt{List} class for that type.
+
+\subsubsection{Class Template Specialization}
+
+Sometimes, the general-purpose implementation is not sufficient or needs distinct logic for a particular type. In these cases, you can \emph{specialize} a class template:
+
+\begin{codeblock}[language=C++]
+template <typename T>
+class Vector {
+    // Generic version of Vector<T>
+};
+
+// Full specialization for std::string
+template <>
+class Vector<std::string> {
+    // Specialized version for std::string
+};
+\end{codeblock}
+
+Whenever \texttt{Vector<std::string>} is instantiated, the specialized version is used instead of the generic one.
+
+\subsubsection{Partial Specialization}
+
+\textbf{Partial specialization} refines the template when some, but not all, of the template parameters are fixed. This is particularly useful when you want a custom implementation for a certain subset of parameters (e.g., arrays of size 1):
+
+\begin{codeblock}[language=C++]
+// Generic template
+template <typename T, int N>
+class Array {
+private:
+    T data[N];
+};
+
+// Partial specialization for arrays of size 1.
+template <typename T>
+class Array<T, 1> {
+private:
+    T element; // No need to store an array for a single variable!
+};
+
+Array<int, 3> arr1;  // Generic template for arrays of size 3
+Array<char, 1> arr2; // Partially specialized template if size is 1
+\end{codeblock}
+
+
+
+\subsubsection{Template Aliases}
+
+A \textbf{template alias} allows you to define a simpler or more meaningful name for a complex template. This improves readability and helps avoid repeated verbose declarations:
+
+\begin{codeblock}[language=C++, numbers=none]
+template <typename T, int N>
+class Array {
+    T data[N];
+};
+
+// Alias for an Array of int
+template <int N>
+using IntArray = Array<int, N>;
+
+IntArray<5> arr; // Creates an Array<int, 5>
+\end{codeblock}
+
+Here, \texttt{IntArray<5>} is equivalent to \texttt{Array<int, 5>}, but shorter and more expressive in context.
+
+\begin{tipsblock}[Best Practices]
+    \begin{itemize}
+        \item \plaintt{Use descriptive parameter names:}
+        
+        For clarity, prefer using \plaintt{template <typename Key, typename Value>} instead of using \plaintt{template <typename T, typename U>}, especially if the roles of those parameters are distinct.
+
+        \item \textbf{Only specialize when necessary:}
+        
+        Overusing specializations can clutter code. Specialize class templates only if the type truly needs unique behavior.
+
+        \item \textbf{Organize definitions sensibly:}
+        
+        Placing large definitions in a separate \plaintt{.tpl.hpp} (or similar) file improves readability, but remember that templates must be visible where they're instantiated.
+
+    \end{itemize}
+\end{tipsblock}
+
+\begin{exampleblock}[Templated Stack Class]
+To see a more concrete scenario, consider a simple stack implementation where \texttt{T} represents the element type:
+
+\begin{codeblock}[language=C++]
+template <typename T>
+class Stack {
+public:
+    void push(const T &value) {
+        elements.push_back(value);
+    }
+
+    T pop() {
+        if (elements.empty()) {
+            std::cerr << "Stack is empty\n";
+            std::exit(1);
+        }
+        T top = elements.back();
+        elements.pop_back();
+        return top;
+    }
+
+private:
+    std::vector<T> elements;
+};
+\end{codeblock}
+
+This \plaintt{Stack<T>} can store and manage elements of type \plaintt{T}. For instance, you can instantiate \plaintt{Stack<int>} or \plaintt{Stack<std::string>} without rewriting any logic.
+
+\begin{codeblock}[language=C++]
+Stack<int> int_stack;
+int_stack.push(10);
+int_stack.push(20);
+std::cout << int_stack.pop() << std::endl; // Prints 20
+\end{codeblock}
+\end{exampleblock}
+
+\subsection{Notes on Code Organization}
+
+\subsubsection{Template Instantiation and Linkage}
+
+The \texttt{compiler} produces the code corresponding to \textbf{function templates} and \textbf{class template members} that are instantiated in each translation unit. It means that all translation units that contain, for instance, an instruction of the type \texttt{std::vector<double> a;} produce the machine code corresponding to the default constructor of a \texttt{std::vector<double>}. If we then have \texttt{a.push\_back(5.0)}, the code for the \texttt{push\_back} method is produced, and so on. If the same is true in other compilation units, the same machine code is produced several times. It is the \texttt{linker} that eventually produces the executable by selecting only one instance.
+
+\subsubsection{The Core Problem}
+\textbf{Template definitions need to be available at the point of instantiation.} When a template is used with specific type arguments, the compiler needs to see the template definition to generate the code for that particular instantiation. Placing the template definition in a source file would make it unavailable for instantiation in other source files.
+
+If you place template definitions in source files and use the template in multiple source files, you may encounter linker errors due to multiple definitions of the same template. \textbf{Placing the template definitions in a header file} ensures that the definition is available for all source files that include it, and the linker can consolidate the definitions as needed.
+
+\subsubsection{Possible File Organizations}
+
+\begin{enumerate}
+    \item \textbf{Leave everything in a header file.} However, if the functions/methods are long, it may be worthwhile, for the sake of clarity, to separate definitions from declarations. You can put declarations at the beginning of the file and only short definitions. Then, at the end of the file, add the long definitions for readability.
+    
+    \item \textbf{Separate declarations \texttt{module.hpp} and definitions \texttt{module.tpl.hpp}} when templates are long and complex. Then add \texttt{\#include "module.tpl.hpp"} at the end of \texttt{module.hpp} (before closing its header guard).
+
+    \item \textbf{Explicitly instantiate for a specific list of types.} Only in this case, definitions can go to a source file. But if you instantiate a template for other types not explicitly instantiated, the compiler will not have access to the definition, leading to linker errors.
+\end{enumerate}
+
+\subsubsection{Explicit Instantiation}
+
+Explicit instantiation tells the compiler to produce code for selected template instantiations in one translation unit. If a source file contains, for instance:
+
+\begin{codeblock}[language=C++, numbers=none]
+// In some .cpp file
+template double func(const double&);
+template class MyClass<double>;
+template class MyClass<int>;
+\end{codeblock}
+
+then the corresponding object file will contain the code corresponding to the template function \texttt{double func<T>(const T \&)} with \texttt{T=double} and that of all methods of the template class \texttt{MyClass<T>} with \texttt{T=double} and \texttt{T=int}.
+
+\vspace{ 0.5em}
+
+This can be useful to save compile time when debugging template classes (since the code for all class methods is generated).
+
+\subsection{Advanced Template Techniques and Concepts}
+
+\subsubsection{Type Deduction and \texttt{auto}}
+
+Type deduction allows the compiler to determine the data type of variables and return values automatically.
+
+Using \texttt{auto} can simplify code by letting the compiler deduce variable types:
+
+\begin{codeblock}[language=C++, numbers=none]
+template <typename T>
+T add(T a, T b) { return a + b; }
+
+int main() {
+    auto x = add(5, 3);      // Deduces T as int
+    auto y = add(2.5, 1.5);  // Deduces T as double
+}
+\end{codeblock}
+
+While \texttt{auto} is convenient, overusing it can harm readability. Aim for a balance where type deduction does not obscure intent.
+
+\subsubsection{Name Lookup and \texttt{this} in Templates}
+
+When working with class templates, the compiler resolves non-template names immediately, while names dependent on the template parameter are resolved only when the class is instantiated. This distinction can lead to issues in name lookup, particularly when inheriting from a base class template.
+
+Consider the following example:
+
+\begin{exampleblock}[Problem: Ambiguous Name Lookup]
+\begin{codeblock}[language=C++, numbers=none]
+void my_fun() { /* Global function */ }
+
+template <typename T>
+class Base {
+public:
+    void my_fun(); // Member function in Base<T>
+};
+
+template <typename T>
+class Derived : public Base<T> {
+public:
+    void foo() {
+        my_fun(); // Ambiguity: calls global my_fun(), not Base<T>::my_fun()
+    }
+};
+\end{codeblock}
+\end{exampleblock}
+
+Since \texttt{Base<T>} is a template, \texttt{my\_fun()} is not immediately recognized as a member of \texttt{Base<T>}, and the compiler assumes it refers to the global function instead. To explicitly indicate that \texttt{my\_fun()} belongs to the base class, we must use either:
+
+\begin{itemize}
+    \item The \texttt{this->} pointer.
+    \item A qualified name like \texttt{Base<T>::my\_fun()}.
+\end{itemize}
+
+Using \texttt{this->my\_fun()} ensures that the compiler correctly recognizes \texttt{my\_fun()} as a member function of \texttt{Base<T>}.
+
+\begin{codeblock}[language=C++, numbers=none]
+template <typename T>
+class Base {
+public:
+    void foo() {}
+};
+
+template <typename T>
+class Derived : public Base<T> {
+public:
+    void bar() {
+        this->foo();       // Explicitly accesses Base<T>::foo()
+        Base<T>::foo();    // Alternative qualified name
+    }
+};
+\end{codeblock}
+
+Using \texttt{this->foo()} ensures that the compiler correctly recognizes \texttt{foo()} as a member function of \texttt{Base<T>}. This technique is essential for avoiding name lookup ambiguities in template-based inheritance.
+
+
+\subsubsection{Template Template Parameters}
+
+Template template parameters let you pass an entire template as a parameter to another template. This technique is useful for creating flexible and reusable code that can work with a variety of template classes.
+
+\begin{codeblock}[language=C++]
+template <typename T, template <typename> class C = std::complex>
+class MyClass {
+private:
+    C<T> a;
+};
+
+MyClass<double, std::vector> x; // 'a' is a std::vector<double>.
+
+MyClass<int> x; // 'a' is a std::complex<int>.
+\end{codeblock}
+
+This feature allows to write expressions like \texttt{std::vector<std::complex<double>>}.
+
+In general, this technique helps when you want to provide a configurable \texttt{template} type, like a custom allocator or a specific internal container.
+
+\subsubsection{Template Metaprogramming and SFINAE}
+
+\textbf{Template metaprogramming} performs compile-time computations, enabling highly optimized or specialized code. \textbf{SFINAE} (\textit{Substitution Failure Is Not An Error}) is a related rule that selectively enables or disables template overloads based on whether certain expressions are valid. This technique is often used to implement type traits or to enable/disable functions based on type properties.
+
+The following example defines a type trait \texttt{has\_print<T>} that determines whether a given type \texttt{T} has a member named \texttt{print}.
+
+\begin{exampleblock}[Type Traits with SFINAE]
+\begin{codeblock}[language=C++]
+template <typename T>
+class has_print {
+public:
+    template <typename U>
+    static std::true_type test(decltype(U::print)*);
+
+    template <typename U>
+    static std::false_type test(...);
+
+    static constexpr bool value = decltype(test<T>(0))::value;
+};
+
+class MyType {
+public:
+    void print() {}
+};
+
+std::cout << std::boolalpha;
+std::cout << has_print<MyType>::value << std::endl; // true
+std::cout << has_print<int>::value << std::endl;    // false
+\end{codeblock}
+\end{exampleblock}
+
+    The function \texttt{test} is overloaded:
+\begin{itemize}
+    \item The first version takes \texttt{decltype(U::print)*}, which is valid only if \texttt{U} has a member \texttt{print}, selecting \texttt{std::true\_type}.
+    \item The second version is a fallback that catches all other cases, returning \texttt{std::false\_type}.
+\end{itemize}
+By calling \texttt{test<T>(0)}, the compiler selects the appropriate overload, determining whether \texttt{T} has \texttt{print} at compile time.
+
+\begin{exampleblock}[Fibonacci with Template Metaprogramming]
+\begin{codeblock}[language=C++, numbers=none]
+template <int N>
+class Fibonacci {
+public:
+    static constexpr int value = Fibonacci<N - 1>::value + Fibonacci<N - 2>::value;
+};
+
+template <>
+class Fibonacci<0> {
+public:
+    static constexpr int value = 0;
+};
+
+template <>
+class Fibonacci<1> {
+public:
+    static constexpr int value = 1;
+};
+
+constexpr int n = Fibonacci<10>::value; // Calc. at compile-time.
+\end{codeblock}
+\end{exampleblock}
+
+\subsubsection{Variadic Templates}
+
+\textbf{Variadic templates} allow functions and classes to accept a variable number of arguments. The \texttt{...} syntax is used to define them. This feature is particularly useful for functions like \texttt{printf} or \texttt{std::make\_tuple} that can accept an arbitrary number of arguments.
+
+\begin{codeblock}[language=C++, numbers=none]
+template <typename T>
+T sum(T value) {
+    return value;
+}
+
+template <typename T, typename... Args>
+T sum(T first, Args... rest) {
+    // Consume the first argument, then recurse over remaining arguments
+    return first + sum(rest...);
+}
+\end{codeblock}
+
+This allows elegant handling of calls like \texttt{sum(1, 2, 3, 4.5, 6)} without writing multiple overloads.
+
+\newpage
+
+\subsubsection{CRTP (Curiously Recurring Template Pattern)}
+
+\textbf{CRTP} is a design pattern where a derived class inherits from a base class template with itself as the template argument. This pattern enables static polymorphism, allowing the base class to access and manipulate the derived class's members.
+
+\begin{codeblock}[language=C++, numbers=none]
+template <typename Derived>
+class Shape {
+public:
+    double area() {
+        return static_cast<Derived*>(this)->area();
+    }
+};
+
+class Circle : public Shape<Circle> {
+public:
+    double area() {
+        // Compute area of a circle.
+    }
+};
+
+Circle c;
+c.area();
+\end{codeblock}
+
+CRTP allows the Shape class to know the interface of its derived class at compile time, enabling static (static) \textbf{compile-time polymorphism}, eliminating virtual function overhead for certain design scenarios.
+
+\subsubsection{Traits and Policy-Based Design}
+
+Traits classes (e.g., \plaintt{std::is\_integral<T>}) are used to encapsulate properties and behaviors of types. They are often used in policy-based design, where different behaviors are selected at compile time through template parameters.
+
+\begin{exampleblock}[Type Trait Check]
+\begin{codeblock}[language=C++, numbers=none]
+#include <type_traits>
+#include <iostream>
+
+template <typename T>
+void process_type(T value) {
+    if constexpr (std::is_integral_v<T>) {
+        std::cout << "Integral type\n";
+    } else if constexpr (std::is_floating_point_v<T>) {
+        std::cout << "Floating-point type\n";
+    } else {
+        std::cout << "Other type\n";
+    }
+}
+\end{codeblock}
+\end{exampleblock}
+
+By using \texttt{if constexpr} (introduced in C++17), the compiler evaluates the condition at compile time, creating specialized code paths without runtime overhead.
