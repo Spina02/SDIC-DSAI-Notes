@@ -131,8 +131,11 @@ eventually the corresponding code is inserted in the executable.
 Libraries result themselves from preprocessing and compiling their corresponding source codes. 
 
 \begin{codeblock}[language=bash]
-    g++ -c mylib.cpp
-    ar rcs libmylib.a mylib.o
+    g++ -c mylib.cpp  ##compilation
+    ar rcs libmylib.a mylib.o  ##creating the library files 
+
+    ## if downloaded the .a or .lib files 
+    g++ main.o libmylib.a -o main ## just linking
 \end{codeblock}
 
 \begin{definitionblock}
@@ -189,6 +192,10 @@ And then with terminal compile the source files:
 g++ -c src/chrislib.cpp -o build/chrislib.o   ## compilation
 ar rcs lib/libmy_lib.a build/my_lib.o   ## library files
 \end{codeblock}
+
+\begin{warningblock}
+    Remember to add \plaintt{lib} before the name of the library file.
+\end{warningblock}
 
 Now you have the executables needed to use the library. It is time to create the project directory.
 
@@ -306,22 +313,14 @@ As before, create the header\_files.hpp and source\_files.cpp (I will use the sa
 g++ -fPIC -shared -Iinclude src/chrislib.cpp -o lib/libchrislib.so  ## you can even create the executable .o but it is an intermediary step
 \end{codeblock}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{assets/dynamic_lib_dir.png}
-    \caption{Shared Library}
-\end{figure}
-
 \subsection*{Using A Shared Library}
 
 
 Go to the project directory, then
 \begin{codeblock}[language=bash]
-g++ -I../chrislib/include -L../chrislib/lib -lchrislib src/main.cpp -o build/my_program  
+g++ -I./include -L./lib -lchrislib src/main.cpp -o build/my_program  
 \end{codeblock}
-\begin{codeblock}[language=bash]
-export LD_LIBRARY_PATH=../chrislib/lib:$LD_LIBRARY_PATH
-\end{codeblock}
+
 \begin{codeblock}[language=bash]
 christianfaccio@Christians-MacBook-Air project_test % ./build/my_program  ## run the program
 Hello from chrislib!
@@ -332,6 +331,10 @@ Hello from chrislib!
     \includegraphics[width=\textwidth]{assets/dynamic_proj_dir.png}
     \caption{Shared Library}
 \end{figure}
+
+\begin{observationblock}
+    If you want to create a separate folder for the library, you can use the \texttt{-Wl,-rpath} flag to specify the runtime path for the shared library, or set the \texttt{LD\_LIBRARY\_PATH} environment variable to the library directory.
+\end{observationblock}
 
 \subsection*{Key Flags:}
 \begin{itemize}
