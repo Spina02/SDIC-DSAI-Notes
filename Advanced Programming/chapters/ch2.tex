@@ -1,3 +1,5 @@
+% !TEX root = ../main.tex
+
 \chapter{C++ Basic}
 
 \section{The Birth and Evolution of C++}
@@ -390,14 +392,7 @@ Floating-point numbers in C++ are represented using the format $\pm f \cdot 2^e$
 
 This representation enables efficient handling of very large or very small values but comes with certain limitations, such as rounding errors.
 
-\begin{exampleblock}
-    \begin{codeblock}[language=C++]
-double epsilon = 1.0;
-        
-while (1.0 + epsilon != 1.0) {
-    epsilon /= 2.0; // Finding machine epsilon.
-}
-    \end{codeblock}
+\begin{exampleblock}[Floating-Point Arithmetic]
     \begin{codeblock}[language=C++]
 double a = 0.1, b = 0.2, c = 0.3;
 
@@ -407,6 +402,13 @@ if (a + b == c) { // Unsafe comparison.
 
 if (std::abs((a + b) - c) < 1e-9) {
     // Use a tolerance for safe comparison.
+}
+    \end{codeblock}
+    \begin{codeblock}[language=C++]
+double epsilon = 1.0;
+        
+while (1.0 + epsilon != 1.0) {
+    epsilon /= 2.0; // Finding machine epsilon.
 }
     \end{codeblock}
 \end{exampleblock}
@@ -471,7 +473,7 @@ if (42)   // true
     \begin{codeblock}[language=C++]
 int* ptr = nullptr; // ptr points to memory address 0x00000000
 if (ptr == nullptr) {
-    std::cout << "Pointer is nill" << std::endl;
+    std::cout << "Pointer is null" << std::endl;
 }
     \end{codeblock}
 \end{exampleblock}
@@ -484,8 +486,8 @@ if (ptr == nullptr) {
     \item A \texttt{NaN} value is represented by an \textbf{exponent filled with 1s} and a \textbf{non-zero significand}.
     \item There are two types of \texttt{NaN}, \texttt{qNaN} and \texttt{sNaN}:
     \begin{itemize}
-        \item \textbf{Quiet NaN}: Used for undefined or unrepresentable results. It has a leading \texttt{1} in the significand.
-        \item \textbf{Signaling NaN}: Used to trigger exceptions in certain operations. It has a leading \texttt{0} in the significand.
+        \item \textbf{Quiet NaN}: It is used for undefined or unrepresentable results. It has a leading \texttt{1} in the significand.
+        \item \textbf{Signaling NaN}: It is used to trigger exceptions in certain operations. It has a leading \texttt{0} in the significand.
     \end{itemize}
 \end{itemize}
     
@@ -498,19 +500,24 @@ if (isnan(x)) {
     \end{codeblock}
 \end{exampleblock}
 
-% \subsubsection{Key Differences}
+\subsubsection{Key Differences}
 
-% \begin{tabular}{|l|l|l|}
-%     \hline
-%     \hfill \textbf{Feature} \hfill & \hfill \textbf{\plaintt{NULL}} \hfill & \hfill \textbf{\plaintt{NaN}} \hfill \\ \hline
-%     Purpose & Represents a null pointer & Represents an undefined floating-point value \\ \hline
-%     Data Type & Used with pointers & Used with floating-point numbers \\ \hline
-%     Representation & All-zero bits & Exponent filled with 1s and non-zero significand \\ \hline
-% \end{tabular}
+It is important to distinguish between \texttt{NULL} and \texttt{NaN}, as they serve different purposes and have distinct representations. The table below highlights the key differences between the two:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+    \hline
+    \hfill \textbf{Feature} \hfill & \hfill \textbf{\plaintt{NULL}} \hfill & \hfill \textbf{\plaintt{NaN}} \hfill \\ \hline
+    Purpose & Represents a null pointer & Represents an undefined floating-point value \\ \hline
+    Data Type & Used with pointers & Used with floating-point numbers \\ \hline
+    Representation & All-zero bits & Exponent filled with 1s and non-zero significand \\ \hline
+    Usage & Pointer comparison & Floating-point arithmetic \\ \hline
+\end{tabular}
+\caption{Key Differences Between \texttt{NULL} and \texttt{NaN}}
+\end{table}
 
 \subsection{Initialization and Aliases}
-
-\vspace{-0.5em}
 
 Initialization assigns an initial value to a variable at the time of declaration. C++ supports several initialization methods: direct, copy, and uniform initialization.
 
@@ -528,8 +535,6 @@ typedef float distance; // Alias for float.
 \end{codeblock}
 
 \subsection{The \plaintt{auto} Keyword and Type conversion}
-
-\vspace{-0.5em}
 
 The \texttt{auto} keyword allows the compiler to deduce the type of a variable based on its initialization value. This is useful for simplifying code and avoiding verbose type declarations.
 
@@ -553,32 +558,120 @@ C++ supports \textbf{implicit and explicit type conversions} to convert between 
 
 \begin{itemize}
     \item \textbf{Implicit conversion}:
-    \vspace{-0.5em}
     \begin{codeblock}[language=C++, numbers=none]
-    int x = 10;
-    double y = x; // int to double (implicit).
+int x = 10;
+double y = x; // int to double (implicit).
     \end{codeblock}
     \item \textbf{Explicit conversion}:
-    \vspace{-0.5em}
     \begin{codeblock}[language=C++, numbers=none]
-    double z = 3.14;
-    int w = static_cast<int>(z); // double to int (explicit).
+double z = 3.14;
+int w = static_cast<int>(z); // double to int (explicit).
     \end{codeblock}
 \end{itemize}
 
-\vspace{-0.8em}
+\subsection{Variables, Pointers, References and Arrays}
+
+\textbf{Variables} represent named memory locations for storing data, while \textbf{pointers} store memory addresses and enable direct manipulation of memory. Additionally, \textbf{references} provide an alias for an existing variable, ensuring efficient and safe access without the risks associated with pointer arithmetic. \textbf{Arrays}, on the other hand, are collections of elements stored contiguously in memory, offering a structured way to manage multiple related data items while maintaining type safety.
+
+\subsubsection{Variables}
+
+We have already seen what variables are and how they are initialized. More formally, variables are named memory locations that store data of a specific type. They must be declared before use and can be modified during program execution.
+
+\begin{codeblock}[language=C++]
+int x = 5;              // Declaration and initialization.
+x = 10;                 // Modification.
+
+int y;                  // Declaration.
+y = 20;                 // Initialization after declaration.
+
+const double a = 3.7;   // Constant variable.
+// a = 5;               // Error: cannot modify a constant.
+// double x = 3.14;     // Error: redeclaration of 'x'.
+\end{codeblock}
+
+\subsubsection{Pointers}
+
+Pointers store memory addresses, allowing for direct manipulation and efficient access to memory. They enable operations like pointer arithmetic, dynamic memory management, and low-level data handling, making them a powerful tool in C++. Pointers are declared using the \texttt{*} symbol and are typically initialized with the address of a variable using the \texttt{\&} operator.
+
+\begin{codeblock}[language=C++]
+int number = 42;
+int* pointer = &number; // Pointer to 'number'.
+
+// Dynamic allocation.
+int* dynamicVar = new int;
+*dynamicVar = 5;
+
+// Deallocation.
+delete dynamicVar;
+dynamicVar = nullptr;
+\end{codeblock}
+
+\begin{warningblock}[Common Pointer Pitfalls]
+
+    Accessing memory out-of-bounds may result in unpredictable behavior and even cause program crashes. Failing to deallocate dynamically allocated memory properly can lead to memory leaks, while dereferencing null or dangling pointers may trigger undefined behavior.
+
+    \begin{codeblock}[language=C++]
+    int* arr = new int[5];
+    // Incorrect loop: accesses out-of-bound index.
+    for (int i = 0; i <= 5; ++i) {
+        arr[i] = i;
+    }
+    std::cout << arr[10] << std::endl;  // Undefined behavior.
+    // delete[] arr;  // Missing deletion leads to a memory leak.
+\end{codeblock}
+
+    Always perform bounds checking, match every allocation with the appropriate deallocation, and validate pointers before use.
+
+\end{warningblock}
+
+\subsubsection{References}
+
+References in C++ serve as aliases for existing variables, allowing you to access them using an alternative name. They are declared with the \texttt{\&} symbol and must be initialized at the time of declaration. Unlike pointers, references cannot be made to refer to a different variable once set; this helps to ensure safer and more predictable data access.
+
+\begin{codeblock}[language=C++]
+int a = 10;
+int& ref = a; // 'ref' is an alias for 'a'.
+ref = 20;     // Modifies 'a'.
+
+int b = 10;
+ref = b;      // 'ref' still refers to 'a', which is now 10.
+ref = 5;      // Now, 'a' becomes 5 while 'b' remains 10.
+\end{codeblock}
+
+Arrays are collections of elements of the same type stored contiguously in memory. In modern C++, it is recommended to use container classes such as \texttt{std::array} for fixed-size arrays or \texttt{std::vector} for dynamic arrays. 
+
+\begin{codeblock}[language=C++]
+int numbers[5]; // Static array.
+numbers[0] = 1;
+
+int* dynamicArray = new int[5];
+for (int i = 0; i < 5; ++i) {
+    dynamicArray[i] = 2 * i;
+}
+delete[] dynamicArray;
+\end{codeblock}
 
 \section{Memory Management}
 
 In computer programming, memory is divided into two main regions: the \textbf{stack} and the \textbf{heap}. These regions serve different purposes and are managed differently.
 
-\vspace{-0.5em}
+\begin{exampleblock}[Working with Variables and Pointers]
+    \begin{codeblock}[language=C++]
+int stack_var = 10;          // Stack variable
+int* stack_ptr = &value;     // Pointer to stack variable
+
+int* heap_var = new int(25); // Pointer to heap-allocated variable
+*heap_var = 30;              // Modify heap variable through pointer
+
+// Cleanup
+delete heap_var;             // Deallocate heap memory
+heap_var = nullptr;          // Reset pointer.
+    \end{codeblock}
+\end{exampleblock}
 
 \subsection{Stack Memory}
 
-The \textbf{stack} is used for \textbf{static memory allocation}, where memory is allocated and deallocated in a last-in, first-out (LIFO) order.
-
-\vspace{-0.5em} 
+The \textbf{stack} is used for \textbf{static memory allocation}, where memory is allocated and deallocated in a last-in, first-out (LIFO) order. 
 
 \subsubsection{Key Characteristics of Stack Memory}
 \begin{itemize}
@@ -589,7 +682,6 @@ The \textbf{stack} is used for \textbf{static memory allocation}, where memory i
     \item \textbf{Lifetime}: Memory is automatically freed when the function or block that allocated it exits.
     \item \textbf{Fragmentation-Free}: The stack does not suffer from fragmentation because memory is always allocated and freed in a strict order.
 \end{itemize}
-
 
 \begin{exampleblock}[Stack Memory Example]
     \begin{codeblock}[language=C++]
@@ -626,7 +718,13 @@ void bar() {
 
 \subsection{Key Differences Between Stack and Heap}
 
+\vspace{-1em}
+
+\begin{table}[H]
+    \centering
+    \small
 \begin{tabular}{|l|l|l|}
+    % \small
     \hline
     \hfill \textbf{Feature} \hfill & \hfill \textbf{Stack Memory} \hfill & \hfill \textbf{Heap Memory} \hfill \\ \hline
     Purpose & Static memory allocation & Dynamic memory allocation \\ \hline
@@ -637,53 +735,33 @@ void bar() {
     Fragmentation & No fragmentation & Can suffer from fragmentation \\ \hline
     Usage & Local variables, function parameters & Dynamically allocated data \\ \hline
 \end{tabular}
+\end{table}
 
-% \subsubsection{When to Use Stack vs. Heap}
+\vspace{-0.5em}
 
-% \vspace{-0.5em}
+\subsubsection{When to Use Stack vs. Heap}
 
-% \begin{itemize}
-%     \item \textbf{Use the Stack}:
-%     \begin{itemize}
-%         \item For small, short-lived data (e.g., local variables, function parameters).
-%         \item When the size of the data is known at compile time.
-%         \item When you want fast and automatic memory management.
-%     \end{itemize}
-%     \item \textbf{Use the Heap}:
-%     \begin{itemize}
-%         \item For large or dynamically sized data (e.g., arrays, objects).
-%         \item When the lifetime of the data extends beyond the current scope.
-%         \item When you need flexibility in memory allocation and deallocation.
-%     \end{itemize}
-% \end{itemize}
+\vspace{-0.5em}
 
-% \vspace{-0.6em}
-
-\subsection{Variables and Pointers}
-
-\vspace{-0.3em}
-
-
-Variables represent named memory locations, while pointers store memory addresses, enabling direct access and manipulation.
-\textbf{Stack Variables} are declared locally within functions or blocks, are stored on the stack and are accessible directly.
-\textbf{Heap Variables} require pointers for access and explicit deallocation.
-
-\begin{exampleblock}[Working with Variables and Pointers]
-    \begin{codeblock}[language=C++]
-int value = 10;       // Stack variable
-int* ptr = &value;    // Pointer to stack variable
-
-int* heap_var = new int(25); // Pointer to heap-allocated variable
-*heap_var = 30;       // Modify heap variable through pointer
-
-// Cleanup
-delete heap_var;      // Deallocate heap memory
-heap_var = nullptr;   // Reset pointer.
-    \end{codeblock}
-\end{exampleblock}
+\begin{itemize}
+    \item \textbf{Use the Stack}:
+    \begin{itemize}
+        \item For small, short-lived data (e.g., local variables, function parameters).
+        \item When the size of the data is known at compile time.
+        \item When you want fast and automatic memory management.
+    \end{itemize}
+    \item \textbf{Use the Heap}:
+    \begin{itemize}
+        \item For large or dynamically sized data (e.g., arrays, objects).
+        \item When the lifetime of the data extends beyond the current scope.
+        \item When you need flexibility in memory allocation and deallocation.
+    \end{itemize}
+\end{itemize}
 
 \subsubsection{Lifetime and Scope}
 
+\textbf{Stack Variables} are declared locally within functions or blocks, are stored on the stack and are accessible directly.
+\textbf{Heap Variables} require pointers for access and explicit deallocation.
 The \textbf{lifetime} of a variable refers to the duration it exists in memory, while its \textbf{scope} defines where it is accessible in code.
 
 \begin{itemize}
@@ -700,17 +778,15 @@ The \textbf{lifetime} of a variable refers to the duration it exists in memory, 
     \end{itemize}
 \end{itemize}
 
-\begin{exampleblock}[Lifetime and Scope Example]
-    \begin{codeblock}[language=C++]
-void example() {                  //        Lifetime:
+\begin{codeblock}[language=C++]
+void foo() {                      //        Lifetime:
     int stack_var = 5;            // ends with the function.
     int* heap_var = new int(10);  // persists until delete.
 
     delete heap_var;      // Deallocate heap memory.
     heap_var = nullptr;   // Reset pointer.
 }
-    \end{codeblock}
-\end{exampleblock}
+\end{codeblock}
 
 \begin{tipsblock}[Best Practices for Memory Management]
     \begin{itemize}
@@ -721,38 +797,43 @@ void example() {                  //        Lifetime:
     \end{itemize}
 \end{tipsblock}
 
-\section{Condition Statements}
+\newpage
+
+\section{Condition Statements and Control Structures}
 
 \subsection{If-Else Statements}
 
 The \texttt{if-else} statement is used to execute code based on a condition. If the condition is true, the code inside the \texttt{if} block is executed; otherwise, the code inside the \texttt{else} block is executed.
 
 \begin{codeblock}[language=C++]
-int x = 15;
-if (x != 10) {
-    std::cout << "x is not equal to 10" << std::endl;
+if (x > 5) {
+    std::cout << "x is greater than 5" << std::endl;
+} else if (x > 3) {
+    std::cout << "x is greater than 3 but lower than 5" << std::endl;
 } else {
-    std::cout << "x is equal to 10" << std::endl;
+    std::cout << "x is not greater than 5" << std::endl;
 }
 \end{codeblock}
+
+\begin{tipsblock}[Chained Conditions]
+    When consecutive \plaintt{if} statements are used instead of \plaintt{else if}, each condition is evaluated on its own. Consequently, even if an earlier condition holds true, the subsequent conditions are still evaluated.
+\end{tipsblock}
 
 \subsection{Switch Statements}
 
 The \texttt{switch} statement executes different code blocks based on the value of an expression. When a matching case is found, its code block is executed.
 
 \begin{codeblock}[language=C++]
-int choice = 2;
-switch (choice) {
-    case 1:
-        // Code for first option
+switch (expression) {
+    case constant1:
+        // Code to execute if expression == constant1.
         break;
-    case 2:
-        // Code for second option
+    case constant2:
+        // Code to execute if expression == constant2.
         break;
-    // ...
+    // ... more cases ...
     default:
-        // Code for when no cases match
-        break;
+        // Code to execute if expression doesn't match any case.
 }
 \end{codeblock}
 
@@ -766,6 +847,10 @@ for (int i = 0; i < 5; i++) {
 }
 \end{codeblock}
 
+\begin{observationblock}[Counter]
+    \plaintt{i} is usually named the \textit{counter} and is used to track the loop's progress. It is incremented or decremented at the end of each iteration. A more general concept, called \textbf{iterator} will provide a generalization for custom objects (see \cref{sec:iterators}).
+\end{observationblock}
+
 \subsection{While Loop}
 
 The \texttt{while} loop is used to execute a block of code as long as a specified condition is true.
@@ -778,16 +863,22 @@ while (i < 5) {
 }
 \end{codeblock}
 
+\begin{tipsblock}[Do-While]
+    The \plaintt{do\{...\} while(...)} loop is similar to the \plaintt{while} loop, but it always \textbf{executes the block of code at least once} before checking the condition.
+\end{tipsblock}
+
 \section{Functions and operators}
 
 \subsection{Functions}
 
-Functions are blocks of code that perform a specific task. They are defined with a return type, name, parameters, and a body. Functions can be called from other parts of the program to execute the code inside them.
+Functions are blocks of code that perform a specific task and can be called from other parts of the program. They are defined with a return type, name, parameters, and a body.
 
 \begin{codeblock}[language=C++, numbers = none]
 int add(int a, int b) {
     return a + b;
 }
+
+int result = add(3, 4); // Calling the 'add' function
 \end{codeblock}
 
 If a function does not output a value, its return type is \texttt{void}. A function can also output a general \texttt{auto} type, which allows the compiler to deduce the return type based on the return statement.
@@ -796,36 +887,15 @@ Passing parameters by \textbf{value} creates a copy of the argument, while passi
 The function can also return pointers or references, enabling the caller to access or modify the original data.
 
 \begin{codeblock}[language=C++, numbers = none]
-void modify_by_copy(int x) { // New copy of 'x' inside the function.
-    x = 20; // Changes the copy 'x', not the original value.
-}
+// Changes the copy 'x', not the original value.
+void modify_by_copy(int x) { x = 20; }
 
-void modify_by_ptr(int* ptr) {
-    *ptr = 30; // Modifies the original value via the pointer.
-}
+// Modifies the original value via the pointer.
+void modify_by_ptr(int* ptr) { *ptr = 30; }
 
-void modify_by_ref(int& ref) {
-    ref = 40; // Modifies the original value through the reference.
-}
+// Modifies the original value through the reference.
+void modify_by_ref(int& ref) { ref = 40; }
 \end{codeblock}
-
-\begin{warningblock}[const correctness]
-    \plaintt{const} correctness is essential for writing safe and maintainable code. It prevents unintended modifications by marking parameters as read-only when they should not be altered.
-    
-    \begin{itemize}
-        \item \textbf{Avoids unintended changes}: Prevents accidental modifications, improving safety.
-        \item \textbf{Improves readability}: Clearly expresses the intent of function parameters.
-        \item \textbf{Enables optimizations}: Helps the compiler optimize code by ensuring immutability.
-    \end{itemize}
-
-    \begin{codeblock}[language=C++, numbers = none]
-void print(const std::string& message) {
-    std::cout << message << std::endl;
-}
-    \end{codeblock}
-\end{warningblock}
-
-
 
 \subsubsection{Function Overloading} \label{function-overloading}
 
@@ -844,19 +914,133 @@ int add(double a, double b) {
 \end{codeblock}
 \end{multicols}
 
+% \begin{warningblock}[const correctness]
+%     \plaintt{const} correctness is essential for writing safe and maintainable code. It prevents unintended modifications by marking parameters as read-only when they should not be altered.
+    
+%     \begin{itemize}
+%         \item \textbf{Avoids unintended changes}: Prevents accidental modifications, improving safety.
+%         \item \textbf{Improves readability}: Clearly expresses the intent of function parameters.
+%         \item \textbf{Enables optimizations}: Helps the compiler optimize code by ensuring immutability.
+%     \end{itemize}
+
+%     \begin{codeblock}[language=C++, numbers = none]
+% void print(const std::string& message) {
+%     std::cout << message << std::endl;
+% }
+%     \end{codeblock}
+% \end{warningblock}
+
+\subsection{Const Correctness}
+
+\begin{warningblock}[Const Correctness]
+    \plaintt{const} correctness is fundamental for writing safe, maintainable, and self-documenting C++ code. Marking variables and function parameters as \plaintt{const}:
+    \begin{itemize}
+        \item \textbf{Avoids unintended changes}: Prevents accidental modifications, improving safety.
+        \item \textbf{Improves readability}: Clearly expresses the intent of function parameters.
+        \item \textbf{Enables optimizations}: Helps the compiler optimize code by ensuring immutability.
+    \end{itemize}
+\end{warningblock}
+
+Consider the following examples that illustrate how \plaintt{const} is used to enforce immutability:
+
+\vspace{-0.5em}
+\begin{codeblock}[language=C++, numbers=none]
+void print_value(const int x) {
+    // x = 42; // Error: Cannot modify 'x'.
+}
+
+const int get_copy() {
+    const int x = 42;
+    return x;
+}
+
+int res = get_copy();
+res = 10; // Safe, it's a copy!
+
+const int age = 30;              // Immutable variable
+const int* ptr_to_const = &age;  // Pointer to a constant integer
+
+ptr_to_const = &res;  // Allowed: the pointer can change where it points
+*ptr_to_const = 42;   // Error: cannot modify the value pointed to
+\end{codeblock}
+
+In C++, you can declare a \textbf{constant pointer to a non-constant int}, meaning that while the pointer itself cannot be changed to point to a different address, the value stored at that address can be modified. One way to accomplish this is as follows:
+    
+\begin{codeblock}[language=C++, numbers=none]
+int* const ptr_to_int = &res;
+\end{codeblock}
+
+Here, ptr\_to\_int is a constant pointer (its address cannot be changed) that points to a non-constant int, allowing modifications to the pointed value.
+
+\begin{tipsblock}[Best Practices]
+\begin{itemize}
+    \item Use \plaintt{const} for function parameters that should not be altered, for example:
+    \vspace{-0.5em}
+    \begin{codeblock}[language=C++, numbers=none]
+void print(const std::string &message) {
+    std::cout << message << std::endl;
+}
+    \end{codeblock}
+    \vspace{-0.5em}
+    \item Declare variables as \plaintt{const} if their value is intended to remain constant after initialization.
+    \item Ensure that the placement of \plaintt{const} matches your intent (e.g., const ptrs vs ptr to const).
+    \item Incorrect or inconsistent use of \plaintt{const} may lead to compiler errors or unexpected behavior.
+\end{itemize}
+\end{tipsblock}
+
+\vspace{-0.5em}
+
 \subsection{Operators}
+
+Operators are symbols used to perform various operations on variables and values in C++. They provide the means to perform arithmetic, comparisons, and logical evaluations, among other functions. Below is an overview of the most commonly used operator categories:
+
+\vspace{0.5em}
+
+\begin{itemize}
+    \item \textbf{Arithmetic operators:} \texttt{+}, \texttt{-}, \texttt{*}, \texttt{/}, \texttt{\%}
+    \item \textbf{Arithmetic and assignment operators:} \texttt{+=}, \texttt{-=}, \texttt{*=}, \texttt{/=}, \texttt{\%=}
+    \item \textbf{Comparison operators:} \texttt{==}, \texttt{!=}, \texttt{<}, \texttt{>}, \texttt{<=}, \texttt{>=}, \texttt{<=>} (introduced in C++20)
+    \item \textbf{Logical operators:} \texttt{\&\&}, \texttt{||}, \texttt{!}
+\end{itemize}
+
+\vspace{0.5em}
+
+\begin{exampleblock}[Operator Usage]
+The following code demonstrates the use of various operators:
+\vspace{-0.5em}
+\begin{codeblock}[language=C++, numbers=none]
+int x = 5, y = 3;
+bool is_true = (x > y) && (x != 0); // Logical expression.
+int z = (x > y) ? 2 : 1;            // Ternary operator.
+
+x += 2; // x becomes 7.
+y *= 4; // y becomes 12.
+z /= 2; // z becomes 1.
+\end{codeblock}
+\end{exampleblock}
 
 \subsubsection{Increment and Decrement Operators}
 
-\begin{enumerate}
-    \item \textbf{Increment Operator (\texttt{++})}: Increases the value of a variable by 1.
-    \item \textbf{Decrement Operator (\texttt{--})}: Decreases the value of a variable by 1.
-\end{enumerate}
+The \textbf{increment} (\texttt{++}) and \textbf{decrement} (\texttt{--}) operators are used to increase or decrease the value of a variable by 1, respectively. They can be applied as either prefix or postfix operators, with different effects on the variable's value.
 
-\begin{codeblock}[language=C++]
+For increment operators:
+
+\begin{codeblock}[language=C++, numbers=none]
 int x = 5;
-x++; // x is now 6
-x--; // x is now 5
+
+int a = ++x; // x becomes 6, a is assigned 6.
+
+int b = x++; // b is assigned 6, then x becomes 7.
+\end{codeblock}
+
+Similarly, for decrement operators:
+
+\begin{codeblock}[language=C++, numbers=none]
+int x = 5;
+
+int c = --x; // x becomes 6, c is assigned 6.
+
+int d = x--; // d is assigned 6, then x becomes 5.
 \end{codeblock}
 
 \section{User-defined types}
@@ -865,6 +1049,7 @@ x--; // x is now 5
     \item \textbf{enum}: Defines a set of named constant values.
     \begin{codeblock}[language=C++]
 enum Color { RED, GREEN, BLUE };
+
 Color c = RED;
     \end{codeblock}
     \item \textbf{union}: Allows multiple data members to share the same memory location.
@@ -873,6 +1058,7 @@ union Data {
     int x;
     float y;
 };
+
 Data d;
 d.x = 10;
 d.y = 3.14; // Overwrites 'x'
@@ -883,6 +1069,7 @@ struct Point {
     int x;
     int y;
 };
+
 Point p = {10, 20};
     \end{codeblock}
     \item \textbf{class}: Similar to a struct but with additional features like access control (public, private, protected).
@@ -894,6 +1081,7 @@ public:
         return 3.14 * radius * radius;
     }
 };
+
 Circle c;
 c.radius = 5.0;
 double a = c.area();
