@@ -12,10 +12,10 @@ Standardization followed in the late 1980s, ensuring compatibility across platfo
 
 \begin{itemize}
     \item \textbf{Object-Oriented Programming (OOP)}: 
-    C++ introduced core OOP concepts like classes, inheritance, and polymorphism, enabling developers to design modular, reusable, and maintainable software.
+    C++ introduced core OOP concepts like \textit{classes}, \textit{inheritance}, and \textit{polymorphism}, enabling developers to design modular, reusable, and maintainable software.
     
     \item \textbf{Generic Programming}: 
-    The inclusion of templates brought the power of generic programming, allowing for flexible and reusable data structures and algorithms. Techniques like template metaprogramming extended this capability further.
+    The inclusion of \textit{templates} brought the power of generic programming, allowing for flexible and reusable data structures and algorithms. Techniques like \textit{template metaprogramming} extended this capability further.
 \end{itemize}
 
 \subsection{Modern Applications and Impact}
@@ -56,7 +56,9 @@ The build process for a C++ program involves several steps:
 \subsubsection{Preprocessor}
 
     The preprocessor is the first step in the build process. It processes directives that begin with \texttt{\#} and modifies the source code before it is compiled.
-    Common preprocessor directives include:
+    Common preprocessor directives are:
+
+    \vspace{0.5em}
     
     \begin{itemize}
         \item \texttt{\#include} for including header files;
@@ -106,9 +108,11 @@ int main() {
         \item \textbf{Output}: Produces object files containing machine code.
     \end{enumerate}
     
-    \begin{codeblock}[language=bash, numbers=none]
+The compiler is invoked from the command line using a command like:
+
+\begin{codeblock}[language=bash, numbers=none]
 g++ main.cpp -o main.o
-    \end{codeblock}
+\end{codeblock}
     
     Common compiler options include:
     \begin{itemize}
@@ -128,9 +132,11 @@ g++ main.cpp -o main.o
         \item \textbf{Output}: Produces an executable file.
         \item \textbf{Linker Errors/Warnings}: Identifies missing symbols or conflicts.
     \end{enumerate}
+
+    The linker is invoked from the command line with a command like:
     
-    \begin{codeblock}[language=bash]{Linking Object Files}
-    g++ main.o helper.o -o my_program
+    \begin{codeblock}[language=bash, numbers=none]
+g++ main.o helper.o -o my_program
     \end{codeblock}
     
     Linking can be static or dynamic:
@@ -153,6 +159,101 @@ g++ main.cpp -o main.o
         Dynamic linking at runtime enhances flexibility by including external libraries only when the program is executed. This approach reduces the initial binary size and allows for library updates without recompiling the application.
     \end{observationblock}
 
+\subsection{The Build toolchain in practice}
+
+\subsubsection{Preprocessor and Compiler}
+
+The build process starts with the \textbf{preprocessor} (\texttt{cpp}) and the \textbf{compiler} (\texttt{g++}, \texttt{clang++}):
+\begin{itemize}
+    \item \textbf{Preprocessor}: Handles directives like \texttt{\#include}, performs macro substitution, and prepares code.
+    \item \textbf{Compiler}: Translates preprocessed code into machine-readable object files.
+    \end{itemize}
+
+These steps are often combined when using a compiler command like \texttt{g++} or \texttt{clang++}.
+
+
+    For a project with three files (\plaintt{module.hpp}, \plaintt{module.cpp}, \plaintt{main.cpp}), the following commands illustrate preprocessing and compilation:
+    
+    \begin{codeblock}[language=bash, numbers=none]
+# Preprocessor step.
+g++ -E module.cpp -I/path/to/include/dir -o module_preprocessed.cpp
+g++ -E main.cpp -I/path/to/include/dir -o main_preprocessed.cpp
+
+# Compilation step.
+g++ -c module_preprocessed.cpp -o module.o
+g++ -c main_preprocessed.cpp -o main.o
+    \end{codeblock}
+
+    \begin{observationblock}
+        \begin{itemize}
+            \item \plaintt{-E}: Preprocess only.
+            \item \plaintt{-c}: Compile only (generate object file).
+            \item \plaintt{-I}: Include other directories (useful if the headers are not in the default directory).
+        \end{itemize}
+    \end{observationblock}
+
+
+\subsubsection{Linker}
+
+The \textbf{linker} (\texttt{ld}) combines object files into an executable program by resolving external references between them. It also links external libraries if required.
+
+\vspace{-0.3em}
+
+\begin{codeblock}[language=bash, numbers=none]
+g++ module.o main.o -o my_program
+\end{codeblock}
+
+
+\textbf{Linking Against Libraries}
+
+To link against external libraries, use the \texttt{-l} flag for library names (without the \texttt{lib} prefix or file extension) and the \texttt{-L} flag to specify the library directory:
+
+\vspace{-0.3em}
+
+\begin{codeblock}[language=bash, numbers=none]
+g++ module.o main.o -o my_program -lmy_lib -L/path/to/my/lib
+\end{codeblock}
+
+The \texttt{-lmy\_lib} flag links to the \texttt{libmy\_lib.so} (dynamic) or \texttt{libmy\_lib.a} (static) file in the specified directory.
+
+\subsubsection{Preprocessor, Compiler, Linker: Simplified Workflow}
+
+For small projects with few dependencies, a single command can handle preprocessing, compilation, and linking:
+
+\vspace{-0.3em}
+
+\begin{codeblock}[language=bash, numbers=none]
+g++ mod1.cpp mod2.cpp main.cpp -I/path/to/include/dir -o my_program
+\end{codeblock}
+
+\begin{warningblock}[Compiler Behavior]
+Different compilers (e.g., GCC, Clang) may produce varying behaviors, warnings, or errors. For an example of such differences, see this comparison on \href{https://godbolt.org/z/1M83E4sYE}{GodBolt}.
+\end{warningblock}
+
+\subsubsection{Loader}
+
+The \textbf{loader} is responsible for preparing the executable program for execution:
+\begin{itemize}
+    \item Allocates memory for code and data sections.
+    \item Resolves addresses for dynamically linked libraries.
+    \item Starts program execution.
+\end{itemize}
+
+\textbf{Running an Executable}
+
+\begin{codeblock}[language=bash, numbers=none]
+./my_program
+\end{codeblock}
+
+\textbf{Dynamic Libraries and \texttt{LD\_LIBRARY\_PATH}}
+
+When linking against external dynamic libraries, the loader uses the environment variable \texttt{LD\_LIBRARY\_PATH} to locate them. Ensure the required library paths are included:
+
+\begin{codeblock}[language=bash, numbers=none]
+export LD_LIBRARY_PATH+=:/path/to/my/lib
+./my_program
+\end{codeblock}
+
 \section{Structure of a Basic C++ Program}
 
 \subsection{Overview of Program Structure}
@@ -170,6 +271,8 @@ int main() { // Entry point of the program.
 \end{codeblock}
 \end{exampleblock}
 
+Let's break down the key components of this basic C++ program:
+
 \begin{itemize}
     \item \plaintt{\#include <iostream>}: Includes the Input/Output stream library.
     \item \plaintt{int main()}: The entry point function.
@@ -184,17 +287,28 @@ int main() { // Entry point of the program.
 
 After writing your C++ program, use the GNU C++ compiler (g++) to create an executable:
 
+\vspace{-0.5em}
+
 \begin{codeblock}[language=bash, numbers=none]
 g++ hello_world.cpp -o hello_world
 \end{codeblock}
 
+\vspace{-0.5em}
+
 Execute the compiled program from the terminal, optionally passing command-line arguments:
+
+\vspace{-0.5em}
 
 \begin{codeblock}[language=bash, numbers=none]
 ./hello_world [arg1] [arg2] ... [argN]
 \end{codeblock}
 
+\vspace{-0.5em}
+
 Verify the program's execution status by examining its exit code (0 typically indicates success):
+
+\vspace{-0.5em}
+
 \begin{codeblock}[language=bash, numbers=none]
 echo $?
 \end{codeblock}
@@ -227,8 +341,11 @@ It provides various built-in "\textbf{Fundamental Types}" to handle data of diff
         \plaintt{float} & 4 &  \\ \hline
         \plaintt{double} & 8 &  \\ \hline
     \end{tabular}
+    \vspace{-0.3em}
     \caption{Sizes of Fundamental Types in C++}
 \end{table}
+
+\vspace{-1em}
 
 \begin{exampleblock}[Strong Typing in C++]
     \begin{codeblock}[language=C++]
@@ -236,8 +353,8 @@ int x = 5;
 char ch = 'A';
 float f = 3.14;
 
-x = 1.6;        // Legal, but truncated to 1.
-f = "a string"; // Illegal.
+x = 1.6;             // Legal, but truncated to 1.
+f = "a string";      // Illegal.
 
 unsigned int y{3.0}; // Uniform initialization: illegal.
     \end{codeblock}
@@ -245,17 +362,21 @@ unsigned int y{3.0}; // Uniform initialization: illegal.
 
 C++ supports several \textbf{integer types} with varying sizes and value ranges. Common types include \texttt{int}, \texttt{short}, \texttt{long}, and \texttt{long long}.
 
-\begin{codeblock}[language=C++, numbers=none]
-int age = 30;
-short population = 32000;
-long long large_number = 123456789012345;
+\vspace{-0.5em}
+
+\begin{codeblock}[language=C++, numbers=none]    
+short age = 30;                             // 2 bytes
+int population = 75000;                     // 4 bytes 
+long long large_number = 123456789012345;   // 8 bytes
 \end{codeblock}
 
 \textbf{Floating-point types} represent real numbers. These include \texttt{float}, \texttt{double}, and \texttt{long double}. They are ideal for representing decimal values.
 
+\vspace{-0.5em}
+
 \begin{codeblock}[language=C++, numbers=none]
-float pi = 3.14;
-double gravity = 9.81;
+float pi = 3.14;        // 4 bytes
+double e = 2.71828;     // 8 bytes
 \end{codeblock}
 
 \subsubsection{Floating-Point Arithmetic}
@@ -264,7 +385,7 @@ Floating-point numbers in C++ are represented using the format $\pm f \cdot 2^e$
 \begin{itemize}
     \item $f$: the \textit{significand} or \textit{mantissa}, representing the precision of the number.
     \item $e$: the \textit{exponent}, determining the scale of the number.
-    \item $2$: the base, as floating-point numbers are typically stored in binary form.
+    \item $2$: the \textit{base}, as floating-point numbers are typically stored in binary form.
 \end{itemize}
 
 This representation enables efficient handling of very large or very small values but comes with certain limitations, such as rounding errors.
@@ -305,6 +426,8 @@ if (std::abs((a + b) - c) < 1e-9) {
 
 Characters in C++ are represented using the \texttt{char} type, while strings are sequences of characters represented by the \texttt{std::string} class.
 
+\vspace{-0.5em}
+
 \begin{codeblock}[language=C++, numbers=none]
 char letter = 'A'; // Single character.
 std::string name = "Alice"; // String of characters.
@@ -313,7 +436,9 @@ std::string greeting = "Hello, " + name + "!"; // Concatenation.
 
 \subsubsection{Boolean Types}
 
-C++ provides a built-in \plaintt{bool} type for logical values. A \texttt{bool} variable can hold one of two values, \texttt{true} or \texttt{false}, useful for conditional statements and logical operations. 
+C++ provides a built-in \texttt{bool} type for logical values. A \texttt{bool} variable can hold one of two values, \texttt{true} or \texttt{false}, useful for conditional statements and logical operations. 
+
+\vspace{-0.5em}
 
 \begin{codeblock}[language=C++, numbers=none]
 bool flag = true;
@@ -321,30 +446,32 @@ if (flag) {
     std::cout << "Flag is true" << std::endl;
 }
 \end{codeblock}
+Numbers are implicitly converted to \texttt{bool}: 0 is \texttt{false}; non-zero (including negatives) is \texttt{true}.
 
-Note that numbers can be implicitly converted to \texttt{bool}: 0 is \texttt{false}, while any other value is \texttt{true}.
+\vspace{-0.5em}
 
 \begin{codeblock}[language=C++, numbers=none]
 if (0)    // false
 if (42)   // true
 \end{codeblock}
 
-\subsection{\texttt{NULL}, \texttt{NaN}, and Key Differences}
+\subsection{\texttt{NULL}, \texttt{NaN}}
 
 \subsubsection{NULL}
 
 \texttt{NULL} is used to represent a null pointer or an invalid memory address. Its representation depends on the system and context:
 
 \begin{itemize}
-    \item In C/C++, \texttt{NULL} is typically defined as \texttt{0} or \texttt{(void*)0}.
+    \item In C/C++, \texttt{NULL} is typically defined as \texttt{0} or \texttt{((void*)0)}. Since C++11, the \texttt{nullptr} keyword is preferred for null pointers, as it provides better type safety and clarity.
     \item In memory, a null pointer is often represented by a sequence of \textbf{all-zero bits}. (e.g. 32-bit system: \texttt{0x00000000}; 64-bit system: \texttt{0x0000000000000000})
 \end{itemize}
 
+
 \begin{exampleblock}[Representation of NULL]
     \begin{codeblock}[language=C++]
-int* ptr = NULL; // ptr points to memory address 0x00000000
-if (ptr == NULL) {
-    printf("Pointer is NULL\n");
+int* ptr = nullptr; // ptr points to memory address 0x00000000
+if (ptr == nullptr) {
+    std::cout << "Pointer is nill" << std::endl;
 }
     \end{codeblock}
 \end{exampleblock}
@@ -354,7 +481,7 @@ if (ptr == NULL) {
 \texttt{NaN} (Not a Number) is a special value used in floating-point arithmetic to represent undefined or unrepresentable results. Its representation is defined by the \textbf{IEEE 754 floating-point standard}:
 
 \begin{itemize}
-    \item A \texttt{NaN} value is represented by an \textbf{exponent filled with 1s} (all bits set to 1) and a \textbf{non-zero significand}.
+    \item A \texttt{NaN} value is represented by an \textbf{exponent filled with 1s} and a \textbf{non-zero significand}.
     \item There are two types of \texttt{NaN}, \texttt{qNaN} and \texttt{sNaN}:
     \begin{itemize}
         \item \textbf{Quiet NaN}: Used for undefined or unrepresentable results. It has a leading \texttt{1} in the significand.
@@ -366,21 +493,20 @@ if (ptr == NULL) {
     \begin{codeblock}[language=C++]
 double x = 0.0 / 0.0; // Creates NaN
 if (isnan(x)) {
-    std::cout << "x is NaN\n";
+    std::cout << "x is NaN" << std::endl;
 }
     \end{codeblock}
 \end{exampleblock}
 
-\subsubsection{Key Differences}
+% \subsubsection{Key Differences}
 
-\begin{tabular}{|l|l|l|}
-    \hline
-    \textbf{Feature} & \textbf{\texttt{NULL}} & \textbf{\texttt{NaN}} \\ \hline
-    Purpose & Represents a null pointer & Represents an undefined floating-point value \\ \hline
-    Data Type & Used with pointers & Used with floating-point numbers \\ \hline
-    Representation & All-zero bits & Exponent filled with 1s and non-zero significand \\ \hline
-    Context & Memory addresses, pointers & Floating-point arithmetic \\ \hline
-\end{tabular}
+% \begin{tabular}{|l|l|l|}
+%     \hline
+%     \hfill \textbf{Feature} \hfill & \hfill \textbf{\plaintt{NULL}} \hfill & \hfill \textbf{\plaintt{NaN}} \hfill \\ \hline
+%     Purpose & Represents a null pointer & Represents an undefined floating-point value \\ \hline
+%     Data Type & Used with pointers & Used with floating-point numbers \\ \hline
+%     Representation & All-zero bits & Exponent filled with 1s and non-zero significand \\ \hline
+% \end{tabular}
 
 \subsection{Initialization and Aliases}
 
@@ -425,24 +551,26 @@ auto f{"string"};   // char[7].
 
 C++ supports \textbf{implicit and explicit type conversions} to convert between different data types. Implicit conversions are performed automatically by the compiler, while explicit conversions require manual intervention.
 
-\begin{exampleblock}[Type Conversion]
-    Implicit conversion:
-    \begin{codeblock}[language=C++]
-int x = 10;
-double y = x; // int to double (implicit).
+\begin{itemize}
+    \item \textbf{Implicit conversion}:
+    \vspace{-0.5em}
+    \begin{codeblock}[language=C++, numbers=none]
+    int x = 10;
+    double y = x; // int to double (implicit).
     \end{codeblock}
-    Explicit conversion:
-    \begin{codeblock}[language=C++]
-double z = 3.14;
-int w = static_cast<int>(z); // double to int (explicit).
+    \item \textbf{Explicit conversion}:
+    \vspace{-0.5em}
+    \begin{codeblock}[language=C++, numbers=none]
+    double z = 3.14;
+    int w = static_cast<int>(z); // double to int (explicit).
     \end{codeblock}
-\end{exampleblock}
+\end{itemize}
 
 \vspace{-0.8em}
 
 \section{Memory Management}
 
-In computer programming, memory is divided into two main regions: the \textbf{stack} and the \textbf{heap}. These regions serve different purposes and are managed differently. Below is a detailed explanation of their differences.
+In computer programming, memory is divided into two main regions: the \textbf{stack} and the \textbf{heap}. These regions serve different purposes and are managed differently.
 
 \vspace{-0.5em}
 
@@ -474,9 +602,7 @@ void foo() {
 
 \subsection{Heap Memory}
 
-\vspace{-0.5em}
-
-The \textbf{heap} is used for \textbf{dynamic allocation}, where memory can be allocated and deallocated in any order.
+The \textbf{heap} is used for \textbf{dynamic allocation}, where memory is allocated and deallocated in any order. This region is more flexible than the stack but requires careful management to avoid memory leaks and fragmentation.
 
 \subsubsection{Key Characteristics of Heap Memory}
 \begin{itemize}
@@ -491,7 +617,7 @@ The \textbf{heap} is used for \textbf{dynamic allocation}, where memory can be a
 \begin{exampleblock}[Heap Memory Example]
     \begin{codeblock}[language=C++]
 void bar() {
-    int* ptr = new int(20); // 'ptr' points to memory allocated on the heap
+    int* ptr = new int(20); // points to memory on the heap
     // Memory for 'ptr' must be explicitly freed
     delete ptr; // Free the memory to avoid a memory leak
 }
@@ -502,7 +628,7 @@ void bar() {
 
 \begin{tabular}{|l|l|l|}
     \hline
-    \textbf{Feature} & \textbf{Stack Memory} & \textbf{Heap Memory} \\ \hline
+    \hfill \textbf{Feature} \hfill & \hfill \textbf{Stack Memory} \hfill & \hfill \textbf{Heap Memory} \hfill \\ \hline
     Purpose & Static memory allocation & Dynamic memory allocation \\ \hline
     Management & Automatic (compiler-managed) & Manual (programmer-managed) \\ \hline
     Speed & Very fast & Slower \\ \hline
@@ -512,24 +638,31 @@ void bar() {
     Usage & Local variables, function parameters & Dynamically allocated data \\ \hline
 \end{tabular}
 
-\subsubsection{When to Use Stack vs. Heap}
+% \subsubsection{When to Use Stack vs. Heap}
 
-\begin{itemize}
-    \item \textbf{Use the Stack}:
-    \begin{itemize}
-        \item For small, short-lived data (e.g., local variables, function parameters).
-        \item When the size of the data is known at compile time.
-        \item When you want fast and automatic memory management.
-    \end{itemize}
-    \item \textbf{Use the Heap}:
-    \begin{itemize}
-        \item For large or dynamically sized data (e.g., arrays, objects).
-        \item When the lifetime of the data extends beyond the current scope.
-        \item When you need flexibility in memory allocation and deallocation.
-    \end{itemize}
-\end{itemize}
+% \vspace{-0.5em}
+
+% \begin{itemize}
+%     \item \textbf{Use the Stack}:
+%     \begin{itemize}
+%         \item For small, short-lived data (e.g., local variables, function parameters).
+%         \item When the size of the data is known at compile time.
+%         \item When you want fast and automatic memory management.
+%     \end{itemize}
+%     \item \textbf{Use the Heap}:
+%     \begin{itemize}
+%         \item For large or dynamically sized data (e.g., arrays, objects).
+%         \item When the lifetime of the data extends beyond the current scope.
+%         \item When you need flexibility in memory allocation and deallocation.
+%     \end{itemize}
+% \end{itemize}
+
+% \vspace{-0.6em}
 
 \subsection{Variables and Pointers}
+
+\vspace{-0.3em}
+
 
 Variables represent named memory locations, while pointers store memory addresses, enabling direct access and manipulation.
 \textbf{Stack Variables} are declared locally within functions or blocks, are stored on the stack and are accessible directly.
@@ -551,18 +684,20 @@ heap_var = nullptr;   // Reset pointer.
 
 \subsubsection{Lifetime and Scope}
 
-The lifetime of a variable refers to the duration it exists in memory, while its scope defines where it is accessible in code.
+The \textbf{lifetime} of a variable refers to the duration it exists in memory, while its \textbf{scope} defines where it is accessible in code.
 
-\textbf{Stack Variables}
 \begin{itemize}
-    \item Limited to the scope of their defining function or block.
-    \item Automatically deallocated when the scope ends.
-\end{itemize}
+    \item \textbf{Stack Variables:}
+    \begin{itemize}
+        \item Limited to the scope of their defining function or block.
+        \item Automatically deallocated when the scope ends.
+    \end{itemize}
 
-\textbf{Heap Variables}
-\begin{itemize}
-    \item Persist beyond their defining scope until explicitly deallocated.
-    \item Risk memory leaks if not deallocated properly.
+    \item \textbf{Heap Variables:}
+    \begin{itemize}
+        \item Persist beyond their defining scope until explicitly deallocated.
+        \item Risk memory leaks if not deallocated properly.
+    \end{itemize}
 \end{itemize}
 
 \begin{exampleblock}[Lifetime and Scope Example]
@@ -571,8 +706,8 @@ void example() {                  //        Lifetime:
     int stack_var = 5;            // ends with the function.
     int* heap_var = new int(10);  // persists until delete.
 
-    delete heap_var;              // Deallocate heap memory.
-    heap_var = nullptr;           // Reset pointer.
+    delete heap_var;      // Deallocate heap memory.
+    heap_var = nullptr;   // Reset pointer.
 }
     \end{codeblock}
 \end{exampleblock}
@@ -582,7 +717,7 @@ void example() {                  //        Lifetime:
         \item Use stack memory for small, short-lived variables.
         \item Use heap memory for large or long-lived data.
         \item Always match \plaintt{new} with \plaintt{delete} and \plaintt{new[]} with \plaintt{delete[]}.
-        \item Prefer modern alternatives like \plaintt{std::unique\_ptr} or \plaintt{std::shared\_ptr} to manage heap memory safely.
+        \item Prefer modern alternatives like \plaintt{std::unique\_ptr} or \plaintt{std::shared\_ptr} to manage heap memory safely (see \hyperref[sec:smart_pointers]{Smart Pointers}).
     \end{itemize}
 \end{tipsblock}
 
@@ -607,7 +742,7 @@ The \texttt{switch} statement executes different code blocks based on the value 
 
 \begin{codeblock}[language=C++]
 int choice = 2;
-swit77ch (choice) {
+switch (choice) {
     case 1:
         // Code for first option
         break;
@@ -623,7 +758,7 @@ swit77ch (choice) {
 
 \subsection{For loop}
 
-The \texttt{for} loop is used to execute a block of code a specified number of times. It consists of three parts: initialization, condition, and increment/decrement.
+The \texttt{for} loop is used to execute a block of code a specified number of times. It consists of three parts: \textit{initialization}, \textit{condition}, and \textit{post-iteration operation} (tipically increment/decrement).
 
 \begin{codeblock}[language=C++]
 for (int i = 0; i < 5; i++) {
@@ -655,18 +790,22 @@ int add(int a, int b) {
 }
 \end{codeblock}
 
-If a function does not output a value, its return type is \texttt{void}.    
-A function can also output a general \texttt{auto} type, which allows the compiler to deduce the return type based on the return statement.
+If a function does not output a value, its return type is \texttt{void}. A function can also output a general \texttt{auto} type, which allows the compiler to deduce the return type based on the return statement.
 
 Passing parameters by \textbf{value} creates a copy of the argument, while passing by \textbf{reference} allows the function to modify the original argument.
 The function can also return pointers or references, enabling the caller to access or modify the original data.
 
 \begin{codeblock}[language=C++, numbers = none]
-void increment(int& x) {
-    x++;
+void modify_by_copy(int x) { // New copy of 'x' inside the function.
+    x = 20; // Changes the copy 'x', not the original value.
 }
-auto add(int a, int b) {
-    return a + b;
+
+void modify_by_ptr(int* ptr) {
+    *ptr = 30; // Modifies the original value via the pointer.
+}
+
+void modify_by_ref(int& ref) {
+    ref = 40; // Modifies the original value through the reference.
 }
 \end{codeblock}
 
@@ -689,8 +828,12 @@ void print(const std::string& message) {
 
 
 \subsubsection{Function Overloading} \label{function-overloading}
+
 Function overloading is a feature in C++ that allows you to define multiple functions with the same name but different parameters. The compiler selects the appropriate function based on the number or types of arguments during the function call.
 
+\vspace{-0.5em}
+
+\begin{multicols}{2}
 \begin{codeblock}[language=C++]
 int add(int a, int b) {
     return a + b;
@@ -699,6 +842,7 @@ int add(double a, double b) {
     return a + b;
 }
 \end{codeblock}
+\end{multicols}
 
 \subsection{Operators}
 
@@ -826,94 +970,3 @@ int main() {
 }
 \end{codeblock}
 \end{exampleblock}
-
-
-\section{The Build toolchain in practice}
-
-\subsection{Preprocessor and Compiler}
-
-The build process starts with the \textbf{preprocessor} (\texttt{cpp}) and the \textbf{compiler} (\texttt{g++}, \texttt{clang++}):
-\begin{itemize}
-    \item \textbf{Preprocessor}: Handles directives like \texttt{\#include}, performs macro substitution, and prepares code.
-    \item \textbf{Compiler}: Translates preprocessed code into machine-readable object files.
-    \end{itemize}
-
-These steps are often combined when using a compiler command like \texttt{g++} or \texttt{clang++}.
-
-
-    For a project with three files (\plaintt{module.hpp}, \plaintt{module.cpp}, \plaintt{main.cpp}), the following commands illustrate preprocessing and compilation:
-    
-    \begin{codeblock}[language=bash, numbers=none]
-# Preprocessor step.
-g++ -E module.cpp -I/path/to/include/dir -o module_preprocessed.cpp
-g++ -E main.cpp -I/path/to/include/dir -o main_preprocessed.cpp
-
-# Compilation step.
-g++ -c module_preprocessed.cpp -o module.o
-g++ -c main_preprocessed.cpp -o main.o
-    \end{codeblock}
-
-    \begin{observationblock}
-        \begin{itemize}
-            \item \plaintt{-E}: Preprocess only.
-            \item \plaintt{-c}: Compile only (generate object file).
-            \item \plaintt{-I}: Include other directories (useful if the headers are not in the default directory).
-        \end{itemize}
-    \end{observationblock}
-
-
-\subsection{Linker}
-
-The \textbf{linker} (\texttt{ld}) combines object files into an executable program by resolving external references between them. It also links external libraries if required.
-
-
-    \begin{codeblock}[language=bash, numbers=none]
-g++ module.o main.o -o my_program
-    \end{codeblock}
-
-
-\textbf{Linking Against Libraries}
-
-To link against external libraries, use the \texttt{-l} flag for library names (without the \texttt{lib} prefix or file extension) and the \texttt{-L} flag to specify the library directory:
-
-\begin{codeblock}[language=bash, numbers=none]
-g++ module.o main.o -o my_program -lmy_lib -L/path/to/my/lib
-\end{codeblock}
-
-The \texttt{-lmy\_lib} flag links to the \texttt{libmy\_lib.so} (dynamic) or \texttt{libmy\_lib.a} (static) file in the specified directory.
-
-\subsection{Preprocessor, Compiler, Linker: Simplified Workflow}
-
-For small projects with few dependencies, a single command can handle preprocessing, compilation, and linking:
-
-\begin{codeblock}[language=bash, numbers=none]
-g++ mod1.cpp mod2.cpp main.cpp -I/path/to/include/dir -o my_program
-\end{codeblock}
-
-\begin{warningblock}[Compiler Behavior]
-Different compilers (e.g., GCC, Clang) may produce varying behaviors, warnings, or errors. For an example of such differences, see this comparison on \href{https://godbolt.org/z/1M83E4sYE}{GodBolt}.
-\end{warningblock}
-
-\subsection{Loader}
-
-The \textbf{loader} is responsible for preparing the executable program for execution:
-\begin{itemize}
-    \item Allocates memory for code and data sections.
-    \item Resolves addresses for dynamically linked libraries.
-    \item Starts program execution.
-\end{itemize}
-
-\textbf{Running an Executable}
-
-\begin{codeblock}[language=bash, numbers=none]
-./my_program
-\end{codeblock}
-
-\textbf{Dynamic Libraries and \texttt{LD\_LIBRARY\_PATH}}
-
-When linking against external dynamic libraries, the loader uses the environment variable \texttt{LD\_LIBRARY\_PATH} to locate them. Ensure the required library paths are included:
-
-\begin{codeblock}[language=bash, numbers=none]
-export LD_LIBRARY_PATH+=:/path/to/my/lib
-./my_program
-\end{codeblock}

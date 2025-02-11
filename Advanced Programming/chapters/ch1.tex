@@ -129,8 +129,11 @@ To become familiar with the shell, let’s start with some fundamental commands:
 Commands can be written in a script file, which is a text file containing instructions for the shell to execute. 
 The first line of the script, known as the \textbf{shebang}, specifies the interpreter to use.
 
+Below are examples of shebang lines for Bash and Python scripts:
+
 \begin{codeblock}[language=bash, numbers=none]
-#!/bin/bash
+#!/bin/Bash
+
 #!/usr/bin/env python
 \end{codeblock}
 
@@ -265,30 +268,44 @@ Commands can be combined using operators to manipulate input and output streams:
         tr & \begin{minipage}{0.58\textwidth}Translates characters in \plaintt{\scriptsize{SET1}} to corresponding characters in \plaintt{\scriptsize{SET2}}. If \plaintt{\scriptsize{SET2}} is omitted, deletes characters in \plaintt{\scriptsize{SET1}}.\\
         \textbf{Options:}
         \begin{itemize}
-            \item \plaintt{-d}: Delete characters in \plaintt{\scriptsize{SET1}}.
-            \item \plaintt{-s}: Squeeze repeated characters.
+            \item \plaintt{\scriptsize{-d}}: Delete characters in \plaintt{\scriptsize{SET1}}.
+            \vspace{-0.5em}
+            \item \plaintt{\scriptsize{-s}}: Squeeze repeated characters.
         \end{itemize} 
         \end{minipage} & tr [options] SET1 [SET2] \\
         \midrule
         sed & \begin{minipage}{0.58\textwidth}Stream editor for filtering and transforming text.\\
-        \textbf{Common uses:}
+        \textbf{Common used commands:}
         \begin{itemize}
-            \item Substitution: \plaintt{\scriptsize{'s/pattern/replacement/flags'}}
-            \item Deletion: \plaintt{\scriptsize{'Nd'}} deletes the N-th line.
+            \item Deletion: \plaintt{\scriptsize{'<N>d'}} deletes the N-th line.
+            \vspace{-0.5em}
+            \item Substitution: \plaintt{\scriptsize{'s/pattern/replacement/flags'}}\newline
+            \textbf{Flags:}
+            \begin{itemize}[label=*]
+                \item \plaintt{\scriptsize{g}}: Global replacement.
+                \vspace{-0.5em}
+                \item \plaintt{\scriptsize{n}}: Replace n-th occurrence.
+                \vspace{-0.5em}
+                \item \plaintt{\scriptsize{i}}: Case-insensitive.
+            \end{itemize}
+            
         \end{itemize}
-        \textbf{Flags:}
+        \textbf{Options:}
         \begin{itemize}
-            \item \plaintt{\scriptsize{g}}: Global replacement.
-            \item \plaintt{\scriptsize{n}}: Replace n-th occurrence.
-        \end{itemize} 
+            \item \plaintt{\scriptsize{-i}}: Edit files in place.
+            \vspace{-0.5em}
+            \item \plaintt{\scriptsize{-e}}: Allows multiple commands.
+        \end{itemize}
         \end{minipage} & sed [options] 'command' file \\
         \midrule
         cut & \begin{minipage}{0.58\textwidth}Removes sections from each line.\\
         \textbf{Extraction methods:}
         \begin{itemize}
             \item \plaintt{\scriptsize{-b}} \textit{list}: Select bytes.
+            \vspace{-0.5em}
             \item \plaintt{\scriptsize{-c}} \textit{list}: Select characters.
-            \item \plaintt{\scriptsize{-f}} \textit{list}: Select fields; delimiter specified with \plaintt{-d}.
+            \vspace{-0.5em}
+            \item \plaintt{\scriptsize{-f}} \textit{list}: Select fields; delimiter specified with \plaintt{\scriptsize{-d}}.
         \end{itemize} 
         \end{minipage} & cut [options] file \\
         \midrule
@@ -296,7 +313,9 @@ Commands can be combined using operators to manipulate input and output streams:
         \textbf{Expressions:}
         \begin{itemize}
             \item \plaintt{\scriptsize{-name pattern}}: Matches filenames.
+            \vspace{-0.5em}
             \item \plaintt{\scriptsize{-type [f|d]}}: Finds files (\plaintt{\scriptsize{f}}) or directories (\plaintt{\scriptsize{d}}).
+            \vspace{-0.5em}
             \item \plaintt{\scriptsize{-exec command \{\} \textbackslash;}}: Executes command on each match.
         \end{itemize} 
         \end{minipage} & find [path...] [expression] \\
@@ -305,6 +324,7 @@ Commands can be combined using operators to manipulate input and output streams:
         \textbf{Options:}
         \begin{itemize}
             \item \plaintt{\scriptsize{-i}}: Ignore case.
+            \vspace{-0.5em}
             \item \plaintt{\scriptsize{-r}}: Use regular expressions.
         \end{itemize} 
         \end{minipage} & locate [options] pattern \\
@@ -319,27 +339,27 @@ Commands can be combined using operators to manipulate input and output streams:
     
     \begin{itemize}
         \item \plaintt{tr}:
-        \begin{itemize}
+        \begin{itemize}[label=*]
             \item \plaintt{\scriptsize{echo "hello" | tr 'a-z' 'A-Z'}}: Converts lowercase letters to uppercase.
             \item \plaintt{\scriptsize{echo "hello123" | tr -d '0-9'}}: Removes digits from the input.
         \end{itemize}
         \item \plaintt{sed}:
-        \begin{itemize}
+        \begin{itemize}[label=*]
             \item \plaintt{\scriptsize{echo 'UNIX is great' | sed 's/UNIX/Linux/'}}: Replaces 'UNIX' with 'Linux'.
-            \item \plaintt{\scriptsize{echo -e "1\\n2\\n3" | sed '2d'}}: Deletes the second line.
+            \item \plaintt{\scriptsize{echo -e "1\textbackslash{}n2\textbackslash{}n3" | sed '2d'}}: Deletes the second line.
         \end{itemize}
         \item \plaintt{cut}:
-        \begin{itemize}
+        \begin{itemize}[label=*]
             \item \plaintt{\scriptsize{cut -d ',' -f 1 file.csv}}: Extracts the first field from a CSV file.
             \item \plaintt{\scriptsize{cut -c 1-5 file.txt}}: Extracts the first five characters of each line.
         \end{itemize}
         \item \plaintt{find}:
-        \begin{itemize}
+        \begin{itemize}[label=*]
             \item \plaintt{\scriptsize{find ~ -type f -name "*.txt"}}: Finds all text files in the user's home directory.
             \item \plaintt{\scriptsize{find . -type d -name "lib*"}}: Finds all directories in the current directory whose names start with "lib".
         \end{itemize}
         \item \plaintt{locate}:
-        \begin{itemize}
+        \begin{itemize}[label=*]
             \item \plaintt{\scriptsize{locate -i foo}}: Finds all files or directories whose name contains 'foo', ignoring case.
             \item \plaintt{\scriptsize{locate -r '.*\textbackslash{}.txt'}}: Finds all files ending with '.txt' using a regular expression.
         \end{itemize}
@@ -415,6 +435,8 @@ which helps teams manage changes to the source code over time. It is \textbf{dis
     \label{fig:git_cs}
 \end{figure}
 
+\vspace{-1em}
+
 Basic Git commands:
 \begin{itemize}
     \item \texttt{git init}: Initialize a new Git repository.
@@ -430,7 +452,7 @@ Basic Git commands:
     \item \texttt{git log}: Show the commit history.
 \end{itemize}
 
-
+\vspace{0.5em}
 
 To collaborate, just remember to pull the changes made by your colleagues before pushing your own changes. If you are working on the same files, the best practice is to create a new \textbf{branch},
 such that you can merge the changes only when you are sure that everything works as expected.
@@ -440,20 +462,30 @@ When you switch branches, Git moves the pointer to the latest commit of the bran
 When you merge branches, Git combines the changes of the two branches and moves the pointer to the latest commit of the merged branches. If it encounters some conflics, it will ask you to solve them.
 Rebasing allow you to move the commits of a branch on top of another branch, so that the history is linear.
 
-Best practices:
+\begin{tipsblock}[Best practices]
 \begin{itemize}
     \item Commit often, with meaningful messages.
     \item Use branches to isolate changes.
     \item Pull before pushing.
     \item Write tests for your code.
-    \item Use a \texttt{.gitignore} file to exclude files from version control.
+    \item Use a \plaintt{.gitignore} file to exclude files from version control.
 \end{itemize}
+\end{tipsblock}
 
 \subsection{SSH Authentication}
 
 To avoid typing your username and password every time you push or pull from a repository, you can use SSH keys for authentication.
 
-\begin{tipsblock}[SSH Keys]
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ssh.png}
+    \caption{SSH}
+    \label{fig:ssh}
+\end{figure}
+
+The SSH protocol provides a secure way to access remote servers. To set up SSH keys, follow these steps:
+
+% \begin{tipsblock}[SSH Keys]
     \begin{enumerate}
         \item Generate a new SSH key: \plaintt{ssh-keygen -t rsa -b 4096 -C "your\@email"}.
         \item Add the SSH key to the SSH agent: \newline \plaintt{eval "\$(ssh-agent -s)"; ssh-add \textasciitilde/.ssh/id\_rsa}.
@@ -462,13 +494,8 @@ To avoid typing your username and password every time you push or pull from a re
         \item Change the remote URL to the SSH URL: \plaintt{git remote set-url origin}
         \item Test the connection: \plaintt{git pull}.
     \end{enumerate}
-\end{tipsblock}
+% \end{tipsblock}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/ssh.png}
-    \caption{SSH}
-    \label{fig:ssh}
-\end{figure}
+
 
     
