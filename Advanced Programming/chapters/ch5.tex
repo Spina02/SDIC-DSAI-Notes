@@ -18,7 +18,7 @@ Containers are objects that store data. The STL provides several container class
 \begin{itemize}
     \item \textbf{Sequence Containers}: These containers maintain ordered collections of elements. The main sequence containers are \texttt{std::vector}, \texttt{std::list}, and \texttt{std::deque}.
     \item \textbf{Associative Containers}: These containers store elements in sorted order and support fast searching. The main associative containers are \texttt{std::set}, \texttt{std::multiset}, \texttt{std::map}, and \texttt{std::multimap}.
-    \item \textbf{Container Adaptors}: These provide restricted access to elements by adapting existing containers. The primary container adaptors are 	exttt{std::stack}, 	exttt{std::queue}, and 	exttt{std::priority\_queue}.
+    \item \textbf{Container Adaptors}: These provide restricted access to elements by adapting existing containers. The primary container adaptors are \texttt{std::stack}, \texttt{std::queue}, and \texttt{std::priority\_queue}.
     \item \textbf{Special Containers}: These containers provide specialized functionality. Examples include \texttt{std::byte}, \texttt{std::pair}, \texttt{std::tuple}, \texttt{std::variant}, \texttt{std::optional} and \texttt{std::any}.
 \end{itemize}
 
@@ -700,6 +700,36 @@ foo(10);  // Valid: '10' is an rvalue
 int x = 5;
 foo(x);   // Error: 'x' is an lvalue
 \end{codeblock}
+
+\begin{observationblock}[Rvalue references]
+    Rvalues are temporary objects that do not have a stable memory address. However, C++11 introduced 
+    \textbf{rvalue references (T\&\&)}, which allow binding to them. The key idea 
+    is that while an rvalue usually does not have a persistent memory location, the compiler 
+    ensures that the temporary object remains valid as long as the rvalue reference exist. 
+
+    \textbf{How does it work?}
+
+    When an rvalue is bound to an rvalue reference (T\&\&), the compiler extends the lifetime of the temporary object for the duration of 
+    the reference. This allows you to work with the temporary safely. 
+
+    \begin{codeblock}[language=C++]
+        #include <iostream> 
+
+        void func(int&& x) {
+            std::cout << "rvalue reference: " << x << std::endl;
+        }
+
+        int main() {
+            func(42);
+        }
+    \end{codeblock}
+
+    Here, 
+    \begin{itemize}
+        \item 42 is a temporary (rvalue)
+        \item \plaintt(func(int\&\& x)) binds the rvalue to x, extending its lifetime
+    \end{itemize}
+\end{observationblock}
 
 \subsection*{Lvalues vs. Rvalues in Function Overloading}
 Functions can be overloaded based on lvalue and rvalue references:
