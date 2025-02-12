@@ -51,15 +51,17 @@ recipe is executed.
 Considering a very simple case where we only have three files (math.hpp, math.cpp and main.cpp), we can write:
 
 \begin{codeblock}[language=bash]
-main.o: main.cpp math.hpp   ## for compilation
+main.o: main.cpp math.hpp   ## for compilation of main.cpp
     g++ std=c++17 -Wall main.cpp -c
-math.o: math.cpp math.hpp   ## for compilation
+math.o: math.cpp math.hpp   ## for compilation of math.cpp
     g++ -std=c++17 -Wall math.cpp -c
 main: main.o math.o   ## for linking
     g++ main.o math.o -o main
 clean:   ## for cleaning object files
     rm -rf main *.o
 \end{codeblock}
+
+Take for example the first line of code, \texttt{main.o: main.cpp math.hpp}. This line tells make that the target \texttt{main.o} depends on the files \texttt{main.cpp} and \texttt{math.hpp}. If either of these files has been modified more recently than \texttt{main.o}, make will execute the recipe associated with this target. The recipe is the set of shell commands that follow the target definition.
 
 A Makefile only redo the operations that contains files that have changed, and one can also call a single recipe instead of the entire file.
 
@@ -80,9 +82,9 @@ main: main.o math.o   ## for linking
 clean:   ## for cleaning object files
     rm -rf main *.o
 
-
-###### since the first two commands are the same we can summarize the command
-
+\end{codeblock}
+since the first two commands are the same we can summarize them:
+\begin{codeblock}[language=bash]
 CXX=g++
 CPPFLAGS=-I.   ## for the preprocessor of either C++ or C
 CXXFLAGS=-std=c++17 -Wall -Wpedantic -Werror   ## specific for c++ compiler
@@ -97,14 +99,11 @@ main: $(OBJS)   ## for linking
     ## $^ expands to the list of all prerequisites (dependencies) of the current target
 clean:   ## for cleaning object files
     rm -rf *.o
-
-distcean:   ## convention to remove files generated during build process
-    rm -rf main
 \end{codeblock} 
 
-Now we can introduce the dependencies:
+Now we can introduce the variables \texttt{DEPS}, \texttt{SRCS} and \texttt{OBJS} to make the Makefile more general:
 \begin{codeblock}[language=bash]
-    CXX=g++
+CXX=g++
 CPPFLAGS=-I.   ## for the preprocessor of either C++ or C
 CXXFLAGS=-std=c++17 -Wall -Wpedantic -Werror   ## specific for c++ compiler
 
@@ -122,24 +121,22 @@ main: main.o math.o   ## for linking
     ## $^ expands to the list of all prerequisites (dependencies) of the current target
 clean:   ## for cleaning object files
     rm -rf *.o
-
-distcean:   ## convention to remove files generated during build process
-    rm -rf main
 \end{codeblock}
 
 To use this \texttt{Makefile}, simply type:
 
-\begin{codeblock}[language=bash][language=bash]
+\begin{codeblock}[language=bash]
 make
 \end{codeblock}
 
 To clean up:
 
-\begin{codeblock}[language=bash][language=bash]
+\begin{codeblock}[language=bash]
 make clean
 \end{codeblock}
 
 Example with dynamic library:
+\begin{exampleblock}[Library Makefile]
 \begin{codeblock}[language=bash]
     ### Library Makefile
     CXX=g++
@@ -168,6 +165,8 @@ Example with dynamic library:
     clean:
     	rm -f *.o $(LIB_NAME_SHARED)
 \end{codeblock}
+\end{exampleblock}
+\begin{exampleblock}[Project Makefile]
 \begin{codeblock}[language=bash]
     ### Project Makefile
     CXX=g++
@@ -191,6 +190,7 @@ Example with dynamic library:
     clean:
     	rm -f *.o main
 \end{codeblock}
+\end{exampleblock}
 Then run in the terminal:
 \begin{codeblock}[language=bash]
     ### In the library directory:
@@ -199,7 +199,8 @@ Then run in the terminal:
     ### In the project directory:
     make
 
-    ### Important thing is to insert the ex1.cpp in the project directory or update the directory in the Makefile
+    ### Now you can run the executable:
+    ./main
 \end{codeblock}
 
 
@@ -222,12 +223,18 @@ It works the following way:
 Contains the configuration and structure of your project. It is a script that CMake uses to generate the build system files.
 It has the following structure:
 
-\begin{codeblock}[language=C++]
-cmake_minimum_required(VERSION 3.10) 
-project(MyProject)  
-
-add_executable(my_project_main.cpp) 
+\begin{codeblock}[language=bash]
+cmake_minimum_required(VERSION 3.12) 
+project(MyProject VERSION 1.0
+    DESCRIPTION "My Project"
+    LANGUAGES CXX)
 \end{codeblock}
+
+\begin{warningblock}
+    Use a CMake version more recent than your compiler (e.g., CMake 3.12 for C++17).
+
+    Also, command names are \textbf{case insensitive}.
+\end{warningblock}
 
 \subsubsection{Minimum Version}
 
@@ -243,7 +250,7 @@ cmake_minimum_required(VERSION 3.12...3.15)
 
 \subsubsection{Setting a project}
 Every top-level CMake file will have this line:
-\begin{codeblock}[language=C++]
+\begin{codeblock}[language=bash]
 project(MyProject VERSION 1.0
     DESCRIPTION "My Project"
     LANGUAGES CXX)
@@ -255,7 +262,7 @@ and \texttt{PROJECT\_VERSION}. The \texttt{LANGUAGES} keyword sets the languages
 
 \subsubsection{Making an executable}
 
-\begin{codeblock}[language=C++]
+\begin{codeblock}[language=bash]
 add_executable(my_project_main my_project_main.cpp)
 \end{codeblock}
 
@@ -265,7 +272,7 @@ The headers will be ignored for most purposes; they are there only to be showed 
 
 \subsubsection{Making a library}
 
-\begin{codeblock}[language=C++]
+\begin{codeblock}[language=bash]
 add_library(my_library STATIC my_library.cpp)
 \end{codeblock}
 
@@ -280,14 +287,14 @@ CMake is all about targets and properties. An executable is a target, a library 
 application is built as a collection of targets depending on each other.
 
 
-\begin{codeblock}[language=C++]
+\begin{codeblock}[language=bash]
 target_include_directories(my_library PUBLIC include)
 \end{codeblock}
 
 This sets the include directories for the target. The \texttt{PUBLIC} keyword means that the include directories will be propagated to any target that links to \texttt{my\_library}.
 We can then chain targets:
 
-\begin{codeblock}[language=C++]
+\begin{codeblock}[language=bash]
 add_library(my_library STATIC my_library.cpp)
 target_link_libraries(my_project PUBLIC my_library)
 \end{codeblock}
@@ -297,11 +304,90 @@ This will link \texttt{my\_project} to \texttt{my\_library}. The \texttt{PUBLIC}
 Targets can have include directories, linked libraries (or linked targets), compile options, compile definitions, 
 compile features and more.
 
+\subsubsection*{Basic Example}
+\begin{exampleblock}
+\begin{codeblock}[language=bash]
+cmake_minimum_required(VERSION 3.10)
+project(Libraries_Tests)
+
+# First create the static or shared library, in this case the project contains the library
+add_library(chrislib_static STATIC src/chrislib.cpp)
+add_library(chrislib_shared SHARED src/chrislib.cpp)
+
+# Then create the executable of the main file
+add_executable(main_static src/main.cpp)
+add_executable(main_shared src/main.cpp)
+
+# Set the properties of the libraries, in this case the include directories
+target_include_directories(chrislib_static PUBLIC include)
+target_include_directories(chrislib_shared PUBLIC include)
+
+# Link the libraries to the executables
+target_link_libraries(main_static chrislib_static)  
+target_link_libraries(main_shared chrislib_shared)
+
+# (Optional) Create custom commands to run the executables 
+add_custom_target(run_static
+    COMMAND main_static
+    DEPENDS main_static
+    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+)
+
+add_custom_target(run_shared
+    COMMAND main_shared
+    DEPENDS main_shared
+    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+)
+
+# Clean
+add_custom_target(clean_all
+    COMMAND rm -f ../build/* ../lib/*
+)
+\end{codeblock}
+\end{exampleblock}
+
+\subsubsection*{Control Flow}
+
+\begin{codeblock}[language=bash]
+if (MY_VAR)
+    message(STATUS "MY_VAR is set")
+else()
+    message(STATUS "MY_VAR is not set")
+endif()
+\end{codeblock}
+
+Many operators can be used in the if statement, like \texttt{AND}, \texttt{OR}, \texttt{NOT}, \texttt{EQUAL}, \texttt{LESS}, \texttt{GREATER}, \texttt{MATCHES} and \texttt{IN\_LIST}.
+You can also use \texttt{foreach}, \texttt{while} and \texttt{function}. 
+
+With \textbf{branch selection} (using \texttt{if} and \texttt{\#ifdef} statements), you can switch among different implementations or versions of any third-party library. 
+This is useful when you want to use different implementations of a library depending on the platform or the compiler. 
+As an example, 
+\begin{codeblock}[language=bash]
+#ifdef USE_BOOST
+    #include <boost/algorithm/string.hpp>
+#else
+    #include <algorithm>
+#endif
+\end{codeblock}
+
+But how to choose the correct branch? You can use the \texttt{option} command:
+
+\begin{codeblock}[language=bash]
+option(USE_BOOST "Use Boost library" ON)
+\end{codeblock}
+
+This will create a cache variable that can be set from the command line. If you want to set it from the command line, you can use the \texttt{-D} flag:
+
+\begin{codeblock}[language=bash]
+cmake /path/to/src/ -DUSE_BOOST=OFF
+\end{codeblock}
+
+
 \subsubsection{Variables}
 
 \texttt{Local variables} are used to store values that are used only in the current scope:
 
-\begin{codeblock}[language=C++]
+\begin{codeblock}[language=bash]
 set(MY_VAR "some_file") 
 \end{codeblock}
 
@@ -311,7 +397,7 @@ no longer be defined. You can set a variable in the scope immediately above your
 
 One can also set a list of values:
 
-\begin{codeblock}[language=C++]
+\begin{codeblock}[language=bash]
 set(MY_LIST "value1" "value2" "value3")
 \end{codeblock}
 
@@ -320,7 +406,7 @@ which internally becomes a string with semicolons. You can access the values wit
 If you want to set a variable from the command line, CMake offers a variable cache.
 \texttt{Cache variables} are used to interact with the command line:
 
-\begin{codeblock}ì[language=C++]
+\begin{codeblock}[language=bash]
 set(MY_CACHE_VAR "VALUE" CACHE STRING "Description")
 
 option(MY_OPTION "Set from command line" ON)
@@ -350,8 +436,72 @@ But it is not recommended to use environment variables in CMake.
 
 The other way to set properties is to use the \texttt{set\_property} command:
 
-\begin{codeblock}[language=C++]
+\begin{codeblock}[language=bash]
 set_property(TARGET my_library PROPERTY CXX_STANDARD 17)
 \end{codeblock}
 
 This is like a variable, but it is attached to a target. The \texttt{PROPERTY} keyword is optional. The \texttt{CXX\_STANDARD} is a property that sets the C++ standard for the target.
+
+\begin{observationblock}
+    We personally suggest to go deeper in the CMake arguments and properties, since listing every possible 
+    command here would be too long. The above examples are the most common ones but contain all the basic
+    information to start using CMake.
+\end{observationblock}
+
+Just for the sake of completeness, below is a more complete example of a \texttt{CMakeLists.txt} file which uses GTest and compiles multiple source files:
+It compiles the main engine and the tests, linking them with Google Test and creating a custom target to run the executable.
+
+\begin{exampleblock}
+\begin{codeblock}[language=bash]
+cmake_minimum_required(VERSION 3.10)
+# Project name
+project(ChessEngine)
+# Set C++ standard
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Include directories
+include_directories(${PROJECT_SOURCE_DIR}/include)
+
+# Source files
+set(SOURCES
+    src/*.cpp
+)
+
+# Add executable for main engine
+add_executable(ChessEngine src/main.cpp ${SOURCES})
+
+# Google Test setup
+enable_testing()
+find_package(GTest REQUIRED)
+
+# Add test sources
+set(TEST_SOURCES
+    test/test.cpp
+)
+
+# Create test executable
+add_executable(ChessEngineTests ${TEST_SOURCES} ${SOURCES})
+
+# Link test executable with Google Test and required libraries
+target_link_libraries(ChessEngineTests GTest::GTest GTest::Main pthread)
+
+# Add test to CTest framework
+add_test(NAME ChessEngineTests COMMAND ChessEngineTests)
+
+# Running executable
+add_custom_target(play
+    COMMAND ChessEngine
+    DEPENDS ChessEngine
+    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+)
+
+# (Optional)Cleaning
+add_custom_target(clean-all
+    COMMAND ${CMAKE_BUILD_TOOL} clean
+    COMMAND rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile
+    COMMAND rm ../build/*
+    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+)
+\end{codeblock}
+\end{exampleblock}
