@@ -18,7 +18,7 @@ OOP is based on several key principles:
 
 \begin{itemize}
     \item \textbf{Encapsulation}: bundles data (attributes) and the functions (methods) that operate on the data into a single unit called an \textit{object}. This promotes data hiding and reduces code complexity.
-    \item \textbf{Inheritance}: allows you to create new classes (derived or child classes) based on existing classes (base or parent classes). It enables code reuse and the creation of class hierarchies.
+    \item \textbf{Inheritance}: allows you to create new classes (\textit{derived} or \textit{child} classes) based on existing classes (\textit{base} or \textit{parent} classes). It enables code reuse and the creation of class hierarchies.
     \item \textbf{Polymorphism}: enables objects from different derived classes to be handled through a common base class. This facilitates code reuse and provides a way to handle objects abstractly.
 \end{itemize}
 
@@ -93,8 +93,8 @@ delete my_car_ptr;              // Releasing allocated memory.
 A class consists of two main components:
 
 \begin{itemize}
-    \item \textbf{Member Variables}: Store the state of an object. They are also known as attributes or fields.
-    \item \textbf{Member Functions}: Define the behavior of an object. They are also known as methods.
+    \item \textbf{Member Variables}: Store the state of an object. They are also known as \textit{attributes} or \textit{fields}.
+    \item \textbf{Member Functions}: Define the behavior of an object. They are also known as \textit{methods}.
 \end{itemize}
 
 \vspace{1em}
@@ -108,15 +108,15 @@ Static members are shared by all instances of a class. They are declared with th
 \begin{codeblock}[language=C++]
 class Circle {
 public:
-    static const double PI = 3.14159265359;   // Static member.
-    double radius;                            // Non-static member.
+    static const double PI = 3.14159265359;   // Static member
+    double radius;                            // Non-static member
 
-    double calculate_area() {
+    double calculate_area() {                 // Non-static method
         return PI * radius * radius;
     }
     
-    static void print_shape_name() {
-        std::cout << "This is a circle." << std::endl;
+    static void print_shape_name() {          // Static method
+        std::cout << "This is a circle" << std::endl;
     }
 };
 \end{codeblock}
@@ -124,15 +124,15 @@ Static members can be accessed using the class name directly, while non-static m
 
 \begin{codeblock}[language=C++, firstnumber=14]
 Circle circle;
-circle.radius = 5.0;
-const double area = circle.calculate_area();  // non-static member.
-const double pi_value = Circle::PI;           // static member.
-Circle::print_shape_name();
+circle.radius = 5.0;                          // Non-static member
+const double area = circle.calculate_area();  // non-static method
+const double pi_value = Circle::PI;           // static member
+Circle::print_shape_name();                   // static method
 \end{codeblock}
 
 \subsubsection{Const Members}
 
-The keyword \texttt{const} can be applied to member variables and member functions to indicate immutability. In the example below, the constructor initializes a constant member, and the member function \texttt{print\_value} is declared as \texttt{const} to signal that it does not modify the object.
+The keyword \texttt{const} (see \cref{const-correctness}) can be applied to member variables and functions to indicate immutability. In the example below, the constructor initializes a constant member, and the member function \texttt{print\_value} is declared as \texttt{const} to signal that it does not modify the object.
 
 \begin{codeblock}[language=C++]
 class MyClass {
@@ -321,7 +321,7 @@ public:
     }
 
     void display_info() const {
-        std::cout << "Title:" << title << ", Author:" << author << "\n";
+        std::cout << "Book:" << title << ", by " << author << std::endl;
     }
 
     std::string title;
@@ -370,9 +370,7 @@ public:
     }
 
     ~FileHandler() {
-        if (file.is_open()) {
-            file.close();
-        }
+        if (file.is_open()) { file.close(); }
     }
 
     std::string filename;
@@ -400,23 +398,21 @@ public:
 
 \subsubsection{Compiler-Generated Special Member Functions}
 
-\vspace{-1em}
-
+The compiler automatically generates special member functions when not explicitly defined:
+233
 \renewcommand{\arraystretch}{1.35}
 \setlength{\tabcolsep}{2.8pt}
-
 \begin{table}[H]
     \centering
     \captionsetup{justification=centering, margin=0.1cm, labelfont=bf, font=small}
-    \caption{The compiler automatically generates special member functions when not explicitly defined. \cite{howardhinnant}}
     \label{tab:special_members}
     \vspace{-0.4em}
     \small
     \begin{tabular}{|>{\centering\columncolor{gray!20}\arraybackslash}m{2.9cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|}
-    \hline
-    \rowcolor{gray!30} \textbf{user declares} & \textbf{default constructor} & \textbf{destructor} & \textbf{copy constructor} & \textbf{copy assignment} & \textbf{move constructor} & \textbf{move assignment} \\
-    \hline
-    Nothing & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted \\
+        \hline
+        \rowcolor{gray!30} \textbf{user declares} & \textbf{default constructor} & \textbf{destructor} & \textbf{copy constructor} & \textbf{copy assignment} & \textbf{move constructor} & \textbf{move assignment} \\
+        \hline
+        Nothing & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted \\
         \hline
         Any constructor & \cellcolor{yellow!20}not declared & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted \\
         \hline
@@ -432,9 +428,10 @@ public:
         \hline
         move assignment & \cellcolor{blue!15}defaulted & \cellcolor{blue!15}defaulted & \cellcolor{red!20}deleted & \cellcolor{red!20}deleted & \cellcolor{yellow!20}not declared & \cellcolor{green!20}user declared \\
         \hline
-        \end{tabular}
-        \vspace{-0.5em}
-    \end{table}
+    \end{tabular}
+    \vspace{-0.5em}
+    \caption{ Compiler-Generated Special Member Functions in C++ \cite{howardhinnant}.}
+\end{table}
 
 \newpage
 \subsection{The \plaintt{inline} Directive}
@@ -554,7 +551,7 @@ Member functions can also be declared in the class but defined separately in a s
 // my_class.hpp
 class MyClass {
 public:
-    int add(int a, int b); // Function declaration.
+    int add(int a, int b); // Function declaration
 };
 \end{codeblock}
 
@@ -562,7 +559,7 @@ public:
 // my_class.cpp
 #include "my_class.hpp"
 
-int MyClass::add(int a, int b) {
+int MyClass::add(int a, int b) { // Function definition
     return a + b;
 }
 \end{codeblock}
@@ -846,7 +843,7 @@ private:
 Complex a{2.0, 3.0};
 Complex b{1.0, 2.0};
 Complex c = a + b; // Using the overloaded '+' operator.
-c.print();
+c.print(); // Output: 3 + 5i
 \end{codeblock}
 \end{exampleblock}
 
@@ -875,8 +872,8 @@ private:
 };
 
 Vector v1{2, 3}, v2{1, 1};
-Vector result = v1 + v2; // Works because + is a member function.
-result.print();
+Vector result = v1 + v2; // Works because + is a member function
+result.print(); // Output: (3, 4)
 \end{codeblock}
 
 \subsubsection{Overloading as a Non-Member Function}
@@ -889,21 +886,21 @@ class MyClass {
 public:
     MyClass(int v) : value(v) {}
 
-    // Declaring the '<<' operator as a friend function.
+    // Declaring the '<<' operator as a friend function
     friend std::ostream& operator<<(std::ostream& os, const MyClass& obj);
 
 private:
     int value;
 };
 
-// Overloading the '<<' operator as a non-member function.
+// Overloading the '<<' operator as a non-member function
 std::ostream& operator<<(std::ostream& os, const MyClass& obj) {
     os << obj.value;
     return os;
 }
 
 MyClass obj{42};
-std::cout << obj << std::endl; // Calls the overloaded operator.
+std::cout << obj << std::endl; // Calls the overloaded operator
 \end{codeblock}
 
 \begin{tipsblock}[Operator Overloading Guidelines]
@@ -1047,7 +1044,7 @@ public:
 };
 \end{codeblock}
 
-In this example \texttt{Wheel} objects wheels can exist independently of the \texttt{Car}:
+In this example \texttt{Wheel} objects can exist independently of the \texttt{Car}:
 
 \begin{codeblock}[language=C++]
     Wheel front_left, front_right, rear_left, rear_right;
@@ -1059,7 +1056,7 @@ In this example \texttt{Wheel} objects wheels can exist independently of the \te
 
 Aggregation is useful for modeling objects that are composed of other objects but can exist independently.
 
-\subsection{Pointer vs. Reference for Aggregation}
+\subsubsection{Pointer vs. Reference for Aggregation}
 
 Choosing between pointers and references when aggregating polymorphic objects depends on the intended behavior.
 
@@ -1092,7 +1089,7 @@ Composition is a stronger \textbf{"\textit{part-of}" relationship} where the con
 
 \vspace{-0.5em}
 
-\begin{codeblock}[language=C++, numbers=none]
+\begin{codeblock}[language=C++]
 class Room {
 public:
     void clean() { /* ... */ }
@@ -1117,7 +1114,7 @@ public:
 
 When the containing object is destroyed, all composed objects are automatically destroyed as well.
 
-\begin{codeblock}
+\begin{codeblock}[language = C++, numbers=none]
 Apartment my_apartment;
 my_apartment.clean(); // Cleans all rooms.    
 \end{codeblock}
@@ -1155,6 +1152,29 @@ private:
 
 \texttt{DiagonalView} provides a restricted view of a Matrix, allowing access only to diagonal elements. It prevents modifications to off-diagonal elements by returning \texttt{0.0} for those cases.
 
+\subsection{Class Relationships Summary}
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{|l|l|l|}
+    \hline
+    \hfill \textbf{Type} \hfill & \hfill \textbf{Definition} \hfill & \hfill \textbf{Example} \hfill \\
+    \hline
+    \textbf{Association} & A relationship where one object uses another but does not own it. & A Person uses a Car, but the Car is independent. (e.g., a rental car or a friend's car) \\
+    \hline
+    \textbf{Aggregation} & A relationship where an object contains another, but the contained object can exist independently. & A Person has a Car, but does not own it. (e.g., a company fleet where cars belong to the company, not the employee) \\
+    \hline
+    \textbf{Composition} & A relationship where an object owns another, and the owned object cannot exist independently. & A Person owns a Car, and it cannot exist without the owner. (e.g., a personal car that belongs to one person and disappears when they do) \\
+    \hline
+    \textbf{Proxy} & A relationship where one object acts as a placeholder or intermediary for another object to control access to it. & A virtual proxy for an image file that loads only when needed, or a network proxy that forwards requests. \\
+    \hline
+    \end{tabular}
+    \caption{Comparison of Association, Aggregation, Composition, and Proxy}
+    \label{tab:association_aggregation_composition_proxy}
+    \end{table}
+    
+
 \newpage
 
 \section{Inheritance and Polymorphism}
@@ -1163,11 +1183,11 @@ private:
 
 Inheritance is a fundamental concept in object-oriented programming that allows a new class (the derived or subclass) to inherit properties and behaviors from an existing class (the base or superclass). It establishes an \textbf{"\textit{is-a}" relationship}, enabling code reuse and extension.
 
-For example, a\texttt{Shape} class can serve as a base for\texttt{Circle},\texttt{Rectangle}, and\texttt{Triangle} classes, all of which share common characteristics while extending functionality.
+For example, a \texttt{Shape} class can serve as a base for \texttt{Circle}, \texttt{Rectangle}, and \texttt{Triangle} classes, all of which share common characteristics while extending functionality.
 
 \subsubsection{Inheritance in C++}
 
-In C++, inheritance is specified using using the \texttt{class} or \texttt{struct} keyword followed by a colon \texttt{:} and an access specifier (\texttt{public},\texttt{protected}, or\texttt{private}) and the name of the base class.
+In C++, inheritance is specified using using the \texttt{class} or \texttt{struct} keyword followed by a colon \texttt{:} and an access specifier (\texttt{public}, \texttt{protected}, or \texttt{private}) and the name of the base class.
 
 \begin{exampleblock}[Inheritance]
 
@@ -1313,7 +1333,7 @@ D d(4, 12.0); // Initializes d.x = 12.0, d.my_i = 4
 
 \subsubsection{Inheriting Constructors}
 
-Constructors are not inherited by default, but they can be explicitly made available in a derived class using\texttt{using}.
+Constructors are not inherited by default, but they can be explicitly made available in a derived class using \texttt{using}.
 
 \begin{codeblock}[language=C++]
 class B {
@@ -1330,7 +1350,7 @@ private:
 D d(12.0);
 \end{codeblock}
 
-In the example above, when you create an instance like D d(12.0), the using declaration makes \texttt{B}'s constructor available in \texttt{D}. The constructor \texttt{B::B(double)} is called with \texttt{12.0}, setting \texttt{d.x} accordingly, while \texttt{d.my\_i} is automatically initialized to its default value of \texttt{10}.
+In the example above, when you create an instance like \texttt{D d(12.0)}, the using declaration makes \texttt{B}'s constructor available in \texttt{D}. The constructor \texttt{B::B(double)} is called with \texttt{12.0}, setting \texttt{d.x} accordingly, while \texttt{d.my\_i} is automatically initialized to its default value of \texttt{10}.
 
 \subsubsection{Destruction of a Derived Class}
 
@@ -1434,13 +1454,13 @@ public:
 
 class Derived : public Base {
 public:
-    void display() override { // 'override' is recommended for clarity.
+    void display() override { // 'override' is recommended for clarity
         std::cout << "Derived class." << std::endl;
     }
 };
 
 Base *ptr = new Derived();
-ptr->display(); // Calls Derived::display() dynamically.
+ptr->display(); // Calls Derived::display() dynamically
 \end{codeblock}
 
 \vspace{-0.7em}
@@ -1462,7 +1482,7 @@ The \texttt{virtual} keyword indicates that a method can be overridden by derive
 \begin{codeblock}[language=C++]
 class Polygon {
 public:
-    virtual double area() { return 0.0; } // Base implementation.
+    virtual double area() { return 0.0; } // Base implementation
 };
 
 class Square : public Polygon {
@@ -1473,11 +1493,11 @@ private:
 };
 
 void f(const Polygon &p) {
-    const double a = p.area(); // Calls the correct area() dynamically.
+    const double a = p.area(); // Calls the correct area() dynamically
 }
 
 Square s;
-f(s); // Upcasting: 'Square' is treated as 'Polygon'.
+f(s); // Upcasting: 'Square' is treated as 'Polygon'
 \end{codeblock}
 
 \vspace{-0.5em}
@@ -1488,9 +1508,9 @@ f(s); // Upcasting: 'Square' is treated as 'Polygon'.
 \end{warningblock}
 
 \begin{codeblock}[language=C++, numbers=none]
-void f(Polygon p) { // Passed by value (bad practice).
-    const double a = p.area(); // Calls Polygon::area(),
-                               // not Square::area().
+void f(Polygon p) { // Passed by value (bad practice)
+    const double a = p.area(); // Calls Polygon::area()
+                               // not Square::area()
 }
 
 Square s;
@@ -1623,33 +1643,35 @@ Shape s; // Illegal! Cannot instantiate an abstract class.
 
 \subsubsection{Implementing an Abstract Class}
 
-When deriving from an abstract class, all pure virtual functions must be implemented in the derived class. The derived class becomes concrete (instantiable) only when all pure virtual functions are implemented. Otherwise, it remains abstract.
+When deriving from an abstract class, you must implement all pure virtual functions to make the derived class concrete. If any remain unimplemented, the derived class stays abstract.
 
 \begin{codeblock}[language=C++]
 class Triangle : public Shape {
 public:
+    Triangle(double b, double h) : base{b}, height{h} {}
     double area() override { return 0.5 * base * height; }
 private:
-    double base;
-    double height;
+    double base, height;
 };
 
 class Square : public Shape {
 public:
+    Square(double s) : side{s} {}
     double area() override { return side * side; }
 private:
     double side;
 };
 
-Triangle t{1.5, 3.0};   // Legal
-Square s{0.5};          // Legal
+//in main
+Triangle t{1.5, 3.0}; // Legal.
+Square s{0.5}; // Legal.
 \end{codeblock}
 
 \subsection{The \plaintt{final} and \plaintt{override} Specifiers}
 
 C++ provides two important specifiers to improve the clarity and correctness of inheritance hierarchies: \texttt{final} and \texttt{override}.
 
-\vspace{1em}
+\subsubsection{Final}
 
 The \texttt{final} specifier prevents further overriding of a virtual method or inheritance of a class, ensuring that the implementation remains unchanged in derived classes. When applied to a class, it forbids any further derivation, and when used with a virtual function, it ensures that no subclass can override that function.
 
@@ -1671,6 +1693,8 @@ class C : public B // Error: B is final.
 };
 \end{codeblock}
 
+\subsubsection{Override}
+
 The \texttt{override} specifier ensures that the method in the derived class correctly overrides the base class method. By explicitly stating this intent, any signature mismatches will trigger a compile-time error, thereby enhancing code safety and clarity.
 
 \begin{codeblock}[language=C++]
@@ -1688,7 +1712,7 @@ class B : public A {
 
 \begin{tipsblock}[Compiler Tip]
 Although \plaintt{override} is not mandatory, it is strongly recommended to catch potential errors during compilation; moreover it improves code safety and clarity.
-
+\vspace{0.5em}
 The compiler option \plaintt{-Wsuggest-override} can be used to generate warnings when the \plaintt{override} specifier is missing.
 \end{tipsblock}
 
@@ -1696,7 +1720,7 @@ The compiler option \plaintt{-Wsuggest-override} can be used to generate warning
 
 In polymorphic class hierarchies, it is often necessary to determine an object's actual type at runtime or safely convert between base and derived class pointers. C++ provides mechanisms such as \textbf{Run-Time Type Information (RTTI)} and \texttt{dynamic\_cast} to achieve this.
 
-\subsubsection{Run-Time Type Identification (RTTI) and \texttt{typeid}}
+\subsubsection{Run-Time Type Information (RTTI) and \texttt{typeid}}
 
 RTTI allows the program to determine the actual type of an object at runtime, which is particularly useful in polymorphic hierarchies.
 The \texttt{typeid} operator returns a type descriptor that can be inspected or compared.
@@ -1733,7 +1757,8 @@ The \texttt{dynamic\_cast} operator ensures safe downcasting in polymorphic hier
 double compute_area(const Shape& p) {
     auto ptr = dynamic_cast<const Square*>(&p);
     if (ptr != nullptr) {
-        return ptr->get_side() * ptr->get_side(); // Safe only if p is a Square.
+        // Safe inly if p is a Square
+        return ptr->get_side() * ptr->get_side();
     } else {
         return p.area();
     }
@@ -1767,6 +1792,12 @@ private:
     Shape* poly_ptr = nullptr; // Composition (owns object)
 };
 \end{codeblock}
+
+In the example above, aggregation relies on external lifetime management, while composition gives full ownership to the class. When working with polymorphic objects, consider whether sharing an object (aggregation) or encapsulating its lifecycle (composition) better fits your design goals.
+
+\vspace{0.5em}
+
+Ask yourself: should the class simply use an object provided by the caller, or is it preferable to control its creation and destruction to ensure consistency and avoid dangling pointers?
 
 \subsection{Best Practices in Polymorphic Hierarchies}
 
