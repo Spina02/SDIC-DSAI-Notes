@@ -50,15 +50,24 @@ class MyClass:
     @staticmethod
     def static_method():
         print("This is a static method")
+    @staticmethod   
+    def sum(a, b):
+        return a + b
     \end{codeblock}
+    They do not receive any implicit first argument (neither \texttt{self} nor \texttt{cls}) and are used for utility
+    functions that logically belong to the class but don't require access to class or instance-specific data. They are like regular functions 
+    bound to the class namespace.
     \item \textbf{Class methods} are defined using the \texttt{@classmethod} decorator.
     \begin{codeblock}[language=Python]
 class MyClass:
     @classmethod
     def class_method(cls):
-        print("This is a class method")
+        print(f"This is a class method of {cls.\_\_name\_\_}")
+
     \end{codeblock}
-    The \texttt{cls} parameter is the class itself.
+    The \texttt{cls} parameter is the class itself. They receive the class (\texttt{cls}) as the first argument 
+    instead of the instance. They are useful for factory methods or methods that need to modify
+    or access class-level data. 
 \end{itemize}
 
 \subsection*{Magic Methods}
@@ -80,6 +89,13 @@ class MyClass:
         \item The \texttt{self} in Python is equivalent to the \texttt{this} pointer in C++.
         \item All class members (including the data members) are public and all the methods are virtual in Python.
     \end{itemize}
+
+    \textbf{Difference between \plaintt{self} and \plaintt{cls}}:
+
+    \plaintt{self} represents the instance of the class, is automatically passed to instance methods 
+    and is used to access instance-specific attributes and methods. \plaintt{cls}, instead, 
+    represents the class itself, is automatically passed to class methods (decorated with @classmethod) 
+    and is used to access class-level attributes and methods or for creating alternative constructors. 
 \end{observationblock}
 
 
@@ -183,12 +199,17 @@ class Dog(Animal):
         return f"{self.name} says Woof!"
 \end{codeblock}
 
+\begin{observationblock}
+    \plaintt{super()} is used to call methods from a parent class in a subclass. It allows you to 
+    extend or modify the behavior of inherited methods without explicitly naming the parent class. 
+\end{observationblock}
+
 \subsection*{Getters}
 
 Since attributes can change, one can use the \texttt{@property} decorator to define a getter method. This method is called when the attribute is accessed.
 
 \begin{codeblock}[language=Python]
-class Circle:
+    class Circle:
     def __init__(self, radius):
         self.radius = radius
 
@@ -199,6 +220,13 @@ class Circle:
     @property
     def area(self):
         return 3.14159 * self.radius ** 2
+
+# Example usage:
+circle = Circle(3)  # Create a Circle instance with a radius of 3
+
+print("Radius:", circle.radius)      # Output: Radius: 3
+print("Diameter:", circle.diameter)  # Output: Diameter: 6
+print("Area:", circle.area)          # Output: Area: 28.27431
 \end{codeblock}
 
 \subsection*{Setters}
@@ -206,7 +234,7 @@ class Circle:
 Similarly, one can use the \texttt{@<attribute>.setter} decorator to define a setter method. This method is called when the attribute is assigned a new value.
 
 \begin{codeblock}[language=Python]
-class Circle:
+    class Circle:
     def __init__(self, radius):
         self.radius = radius
 
@@ -217,6 +245,17 @@ class Circle:
     @diameter.setter
     def diameter(self, diameter):
         self.radius = diameter / 2
+
+# Example usage:
+circle = Circle(3)
+print("Initial radius:", circle.radius)      # Output: 3
+print("Initial diameter:", circle.diameter)    # Output: 6
+
+# Update the diameter using the setter
+circle.diameter = 10
+print("Updated radius:", circle.radius)        # Output: 5.0 (since 10 / 2)
+print("Updated diameter:", circle.diameter)      # Output: 10
+
 \end{codeblock}
 
 This way we can ensure that the radius is always half the diameter.
@@ -226,7 +265,7 @@ This way we can ensure that the radius is always half the diameter.
 Finally, one can use the \texttt{@<attribute>.deleter} decorator to define a deleter method. This method is called when the attribute is deleted.
 
 \begin{codeblock}[language=Python]
-class Circle:
+    class Circle:
     def __init__(self, radius):
         self.radius = radius
 
@@ -241,6 +280,26 @@ class Circle:
     @diameter.deleter
     def diameter(self):
         del self.radius
+
+# Example usage:
+circle = Circle(4)
+print("Initial radius:", circle.radius)      # Output: 4
+print("Initial diameter:", circle.diameter)    # Output: 8
+
+# Update the diameter using the setter:
+circle.diameter = 10
+print("Updated radius:", circle.radius)        # Output: 5.0
+print("Updated diameter:", circle.diameter)      # Output: 10
+
+# Delete the diameter (which deletes the radius attribute)
+del circle.diameter
+
+# Attempting to access circle.radius now raises an AttributeError:
+try:
+    print("Radius after deletion:", circle.radius)
+except AttributeError:
+    print("Attribute 'radius' has been deleted.")
+
 \end{codeblock}
 
 
