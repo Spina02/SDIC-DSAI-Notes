@@ -56,14 +56,16 @@ After setup, include extern/pybind11/include in your project, or employ pybind11
 All pybind11 code is written in C++. The following lines must always be included in your code:
 
 \begin{codeblock}[language=C++]
-#include <pybind11/pybind11.h>
+#include <pybind11/pybind11.h> 
+#include <pybind11/stl.h> //for STL containers
+
 namespace py = pybind11;
 \end{codeblock}
 
-The first line includes the pybind11 library, while the second line creates an alias for the pybind11 namespace. This alias is used to simplify the code and make it more readable.
+The first line includes the pybind11 library, the second line is used for STL containers and the third one creates an alias for the pybind11 namespace. This alias is used to simplify the code and make it more readable.
 In practice, implementation and binding code will generally be located in separate files.
 
-The \texttt{PYBIND11\_MODULE} macro is used to create a Python module. The first argument is the module name, while the second argument is the module's scope. The module name is the name of the Python module that will be created, while the scope is the C++ namespace that contains the functions to be exposed and is the main interface for creating bindings.
+To bind C++ code (either basic commands like functions or more advanced ones like classes), the \texttt{PYBIND11\_MODULE} macro is used. The first argument is the module name, while the second argument is the module's scope. The module name is the name of the Python module that will be created, while the scope is the C++ namespace that contains the functions to be exposed and is the main interface for creating bindings.
 Example:
 
 \begin{codeblock}[language=C++]
@@ -330,3 +332,258 @@ print(dog.speak()) #output: I am a dog
 \end{codeblock}
 
 
+
+
+
+\subsection{Complete Example}
+
+In the following example we are going to implement a regression model 
+in C++ and expose it to Python using pybind11. The model is a simple linear regression model that predicts the output based on the input. 
+
+We first start by illustrating the organization of the project:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/tree_bindings.png}
+    \caption{Project organization}
+    \label{fig:pybind11_project}
+\end{figure}
+here, the \texttt{src} folder contains the source files, the \texttt{include} folder contains the header files and the \texttt{build} folder is used for CMake.
+
+We first start implementing the headers of the data-generation process (to create the dataset) and for the model fitting.
+
+\begin{exampleblock}[Data-generation process]
+    \begin{codeblock}[language=C++]
+#ifndef DATAGEN_HPP
+#define DATAGEN_HPP
+
+#include <iostream>
+#include <vector>
+#include <set>
+#include <random>
+#include <map>
+
+template <typename T>
+std::map<T, T> generateData(const std::set<T> &x, const int n) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::normal_distribution<> d(0, 1);
+
+    std::map<T, T> data;
+    for (int i = 0; i < n; i++) {
+        T x_val = *std::next(x.begin(), i % x.size());
+        T y_val = x_val + d(gen);
+        data[x_val] = y_val;
+    }
+    return data;
+}
+
+#endif // DATAGEN_HPP
+    \end{codeblock}
+\end{exampleblock}
+
+
+\begin{exampleblock}[Model fitting]
+    \begin{codeblock}[language=C++]
+#ifndef REGRESSION_HPP
+#define REGRESSION_HPP
+
+#include <iostream>
+#include <map>
+
+class Regression {
+public:
+    Regression() = default;
+    ~Regression() = default;
+
+    template <typename T>
+    void fit(const std::map<T, T> &data) {
+        T x_mean = 0;
+        T y_mean = 0;
+        for (const auto &pair : data) {
+            x_mean += pair.first;
+            y_mean += pair.second;
+        }
+        x_mean /= data.size();
+        y_mean /= data.size();
+
+        T numerator = 0;
+        T denominator = 0;
+        for (const auto &pair : data) {
+            numerator += (pair.first - x_mean) * (pair.second - y_mean);
+            denominator += (pair.first - x_mean) * (pair.first - x_mean);
+        }
+        slope = numerator / denominator;
+        intercept = y_mean - slope * x_mean;
+    }
+
+    template <typename T>
+    T predict(const T &x) {
+        return slope * x + intercept;
+    }
+
+    template <typename T>
+    void print() {
+        std::cout << "y = " << slope << "x + " << intercept << std::endl;
+    }
+
+private:
+    double slope;
+    double intercept;
+};
+
+#endif // REGRESSION_HPP
+    \end{codeblock}
+\end{exampleblock}
+
+They have been implemented header-only and with templates to allow for different types of data.
+
+\begin{observationblock}
+    The following step should be to test if the written code performs as expected. We wrote the \plaintt{main.cpp} file to test the code.
+    \begin{codeblock}[language=C++]
+#include "../include/datagen.hpp"
+#include "../include/regression.hpp"
+
+#include <iostream>
+
+int main() {
+    // Generate data
+    std::set<double> x = {1.5, 2.3, 3.1, 4.0, 5.5, 6.9, 7.1, 8.6, 9.2, 10.0};
+    std::map<double, double> data = generateData(x, 100);
+
+    // Fit the model
+    Regression regression;
+    regression.fit(data);
+
+    // Print the model
+    regression.print<int>();
+
+    return 0;
+        }
+    \end{codeblock}
+\end{observationblock}
+
+The next step is to expose the C++ code to Python using pybind11. We start by creating a \texttt{bindings.cpp} file in the \texttt{src} folder.
+
+\begin{exampleblock}[bindings.cpp]
+\begin{codeblock}[language=C++]
+#include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
+#include "../include/datagen.hpp"   // Contains generateData function (without PYBIND11_MODULE)
+#include "../include/regression.hpp" // Contains Regression class (without PYBIND11_MODULE)
+
+namespace py = pybind11;
+
+// Define a module that exposes both functionalities.
+PYBIND11_MODULE(BindingTestModule, m) {
+    m.doc() = "Combined data generation and regression module";
+
+    // Bind datagen function.
+    m.def("generateData", &generateData<int>, "Generate data for a given set of x values and n points");
+
+    // Bind the Regression class.
+    py::class_<Regression>(m, "Regression")
+        .def(py::init<>())
+        .def("fit", &Regression::fit<double>)
+        .def("predict", &Regression::predict<double>)
+        .def("print", &Regression::print<double>);
+    }
+
+\end{codeblock}
+\end{exampleblock}
+
+The module has been named \textbf{BindingTestModule} and contains the \texttt{generateData} function and the \texttt{Regression} class. The \texttt{fit}, \texttt{predict}, and \texttt{print} methods have been bound to the Python module.
+
+It is time now to compile the code. We create a \texttt{CMakeLists.txt} file in the main directory.
+
+\begin{exampleblock}[CMakeLists.txt]
+\begin{codeblock}[language=C++]
+cmake_minimum_required(VERSION 3.10)
+project(BindingTest)
+
+set(CMAKE_CXX_STANDARD 17)
+set(PYBIND11_FINDPYTHON ON)
+find_package(pybind11 REQUIRED)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# Create an executable for C++ tests if needed.
+add_executable(BindingTestExe src/main.cpp)
+target_include_directories(BindingTestExe PRIVATE include)
+
+# Create one Python module target from bindings.cpp.
+pybind11_add_module(BindingTestModule src/bindings.cpp)
+target_link_libraries(BindingTestModule PRIVATE pybind11::pybind11)
+\end{codeblock}
+\end{exampleblock}
+
+Now run the following commands in your terminal to compile the code:
+
+\begin{codeblock}[language=bash]
+mkdir build
+cd build
+cmake ..
+make
+\end{codeblock}
+
+The compilation will create a shared library file named \texttt{BindingTestModule.cpython-312-darwin.so} in the \texttt{build} folder that can be imported into Python. 
+The Python code to test the C++ code is as follows:
+
+\begin{exampleblock}[regression.py]
+\begin{codeblock}[language=python]
+import sys 
+sys.path.append('build')  # Add the build directory to the path
+import BindingTestModule  # type: ignore # our combined module
+import matplotlib.pyplot as plt
+import numpy as np
+
+# --- Generate sample data ---
+# Create a set of x values. (Python sets will convert to C++ std::set.)
+x_values = {1, 2, 3, 4, 5}
+n_points = 50
+
+# Call the data generation function from our module.
+# This should return a dictionary mapping x values to y values.
+data = BindingTestModule.generateData(x_values, n_points)
+
+# Convert the dictionary to sorted lists for plotting.
+x_data = sorted(data.keys())
+y_data = [data[x] for x in x_data]
+
+# --- Fit the regression model ---
+# Create an instance of the Regression class from our module.
+reg = BindingTestModule.Regression()
+reg.fit(data)  # Fit using the generated data
+
+# --- Prepare the regression line ---
+# Create a smooth range of x values for plotting the regression line.
+x_line = np.linspace(min(x_data) - 1, max(x_data) + 1, 100)
+# Get predicted y values using the regression model.
+y_line = [reg.predict(x) for x in x_line]
+
+# --- Plotting the results ---
+plt.figure(figsize=(8, 6))
+plt.scatter(x_data, y_data, color='blue', label='Data Points')
+plt.plot(x_line, y_line, color='red', label='Regression Line')
+plt.xlabel('x')
+plt.ylabel('y')
+plt.title('Data and Regression Line')
+plt.legend()
+plt.grid(True)
+plt.show()
+\end{codeblock}
+\end{exampleblock}
+
+The Python code generates sample data, fits a regression model to the data, and plots the data points and the regression line. The data generation and regression fitting are performed using the C++ code exposed to Python.
+The following image is generated:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/regression.png}
+    \caption{Regression plot}
+    \label{fig:regression}
+\end{figure}
+
+
+
+
+    
