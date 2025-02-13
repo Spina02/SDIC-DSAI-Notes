@@ -37,10 +37,10 @@ For a free, non-template function, the typical declaration syntax is:
 
 \begin{codeblock}[language=C++, numbers=none]
 return_type function_name(...);
-
+// or
 auto function_name(...) -> return_type;
-
-auto function_name(...); // The compiler deduces the return type.
+// or
+auto function_name(...); // The compiler deduces the return type
 \end{codeblock}
 
 \vspace{-0.5em}
@@ -93,14 +93,14 @@ std::ostream &operator<<(std::ostream &os, const MyClass &obj) {
     return os;
 }
 
-std::cout << x << " concatenated with " << y; // Enables chaining.
+std::cout << x << " concatenated with " << y; // Enables chaining
 \end{codeblock}
 
 \vspace{-0.5em}
 
 Returning a reference is often used in operator overloading (e.g., \texttt{<<}) to enable chaining and in methods that modify an object and return it for further operations.
 
-\begin{warningblock}
+\begin{warningblock}[Returning References]
     Be cautious when returning references, as the object being referred to must outlive the reference.  Returning a reference to a local variable, for example, leads to undefined behavior.
 \end{warningblock}
 
@@ -115,7 +115,7 @@ std::vector<double> cross_prod(const std::vector<double> &a,
                                const std::vector<double> &b,
                                const unsigned int ndim = 2); // Default
 // Usage:
-a = cross_prod(c, d); // 'ndim' defaults to 2.
+a = cross_prod(c, d); // 'ndim' defaults to 2
 \end{codeblock}
 
 \begin{observationblock}[Default Parameters and Function Overloading]
@@ -124,11 +124,11 @@ a = cross_prod(c, d); // 'ndim' defaults to 2.
 
 \subsection{Function Pointers}
 
-\vspace{-0.5em}
+\vspace{-0.2em}
 
 Function pointers allow passing functions as arguments and selecting functions dynamically at runtime, offering a level of indirection that enhances code modularity. They are particularly useful when the specific function to be executed is not known at compile time.
 
-\vspace{-0.5em}
+\vspace{-0.2em}
 
 \begin{codeblock}[language=C++, numbers=none]
 double integrand(double x);
@@ -139,11 +139,11 @@ double integrate(double a, double b, const f_ptr fun);
 double I = integrate(0, 3.14, integrand); // Passing function as pointer
 \end{codeblock}
 
-\vspace{-0.5em}
+\vspace{-0.2em}
 
 The name of the function is interpreted as a pointer to that function. However, you may precede it by \texttt{\&}: \texttt{f\_ptr f = \&integrand}.
 
-Function pointers are useful, but \plaintt{std::function} offers greater flexibility and type safety as it can encapsulate any callable object (including function pointers, lambdas, and function objects) with a compatible signature.
+Function pointers are useful, but \plaintt{std::function} offers greater flexibility and type safety as it can encapsulate any callable object (including function pointers, lambdas, and function objects) with a compatible signature (see \cref{function-wrappers}).
 
 \subsubsection{Dynamic Function Selection}
 
@@ -155,13 +155,13 @@ int subtract(int a, int b) { return a - b; }
 
 int (*operation)(int, int);
 
-if (user_input == "add") { // User input determines operation.
+if (user_input == "add") { // User input determines operation
     operation = add;
 } else {
     operation = subtract;
 }
 
-const int result = operation(10, 5); // Calls selected function.
+const int result = operation(10, 5); // Calls selected function
 \end{codeblock}
 
 \subsubsection{Member Function Pointers}
@@ -215,7 +215,7 @@ public:
 // in main
 Calculator calc;
 Calculator::Add add(calc);
-add(5, 3); // Calls add.operator()(5, 3), result stored in calc.result.
+add(5, 3); // Calls add.operator()(5, 3), result stored in calc.result
 \end{codeblock}
 
 The \texttt{Add} functor stores the result in the \texttt{Calculator} object's \texttt{result} member. This behavior is not possible with regular functions without using global variables or other less desirable approaches. Functors are particularly useful with standard library algorithms like \texttt{std::transform} and \texttt{std::for\_each}, where they can be used to apply a stateful operation to a range of elements.
@@ -231,7 +231,7 @@ std::vector<int> out;
 std::transform(
     in.begin(), in.end(),     // Source
     std::back_inserter(out),  // Destination
-    std::negate<int>()        // Negates each element
+    std::negate<int>()        // Functor: negates each element
 );
 \end{codeblock}
 
@@ -243,24 +243,21 @@ Using predefined functors reduces the need to write custom function objects for 
     \centering
     \renewcommand{\arraystretch}{1.1}
     \begin{tabular}{l|l}
-    \hline
-    \hfill \textbf{Functor} \hfill & \hfill \textbf{Description} \hfill \\
-    \hline
-    \plaintt{plus<T>, minus<T>} & Addition/Subtraction (Binary) \\
-    \plaintt{multiplies<T>, divides<T>} & Multiplication/Division (Binary) \\
-    \plaintt{modulus<T>} & Modulus (Unary) \\
-    \plaintt{negate<T>} & Negative (Unary) \\
-    \plaintt{equal\_to<T>, not\_equal\_to<T>} & (Non-)Equality Comparison (Binary) \\
-    \plaintt{greater}, \plaintt{less}, \plaintt{greater\_equal}, \plaintt{less\_equal} & Comparison (Binary) \\
-    \plaintt{logical\_and<T>, logical\_or<T>, logical\_not<T>} & Logical AND/OR/NOT (Binary) \\
-    \hline
+        \hline
+        \hfill \textbf{Functor} \hfill & \hfill \textbf{Description} \hfill \\
+        \hline
+        \plaintt{plus<T>, minus<T>} & Addition/Subtraction (Binary) \\
+        \plaintt{multiplies<T>, divides<T>} & Multiplication/Division (Binary) \\
+        \plaintt{modulus<T>} & Modulus (Unary) \\
+        \plaintt{negate<T>} & Negative (Unary) \\
+        \plaintt{equal\_to<T>, not\_equal\_to<T>} & (Non-)Equality Comparison (Binary) \\
+        \plaintt{greater}, \plaintt{less}, \plaintt{greater\_equal}, \plaintt{less\_equal} & Comparison (Binary) \\
+        \plaintt{logical\_and<T>, logical\_or<T>, logical\_not<T>} & Logical AND/OR/NOT (Binary) \\
+        \hline
     \end{tabular}
-    \vspace{-0.5em}
     \caption{Some predefined functors in the STL. \cite{cplusplus}}
     \label{tab:functors}
-    \end{table}
-    
-    \vspace{-1em}
+\end{table}
 
 \subsection{Lambda Functions}
 
@@ -269,9 +266,9 @@ C++ supports a streamlined syntax for defining anonymous functions known as \tex
 \vspace{-0.5em}
 
 \begin{codeblock}[language=C++]
-auto f = [](double x) { return 3 * x; }; // Lambda function.
+auto f = [](double x) { return 3 * x; }; // Lambda function
 
-auto y = f(9.0); // y = 27.0.
+auto y = f(9.0); // y = 27.0
 \end{codeblock}
 
 \vspace{-0.5em}
@@ -322,7 +319,7 @@ private:
 
 Here, \texttt{compute()} uses the lambda \texttt{prod} that changes the member \texttt{x}. To be more explicit, you can write \texttt{this->x *= a;}
 
-\subsection{Function Wrappers (\texttt{std::function})}
+\subsection{Function Wrappers (\texttt{std::function})} \label{function-wrappers}
 A \textbf{function wrapper} is a polymorphic wrapper that can store \textit{any} callable object, including free functions, function pointers, functors, and lambdas. The standard C++ library provides this capability through \texttt{std::function} (declared in \texttt{<functional>}). By using \texttt{std::function}, you can treat different callable objects as first-class citizens with a uniform interface.
 
 \begin{codeblock}[language=C++]
@@ -414,7 +411,7 @@ int main() {
     // Wrap a lambda
     tasks.push_back([](int x, int y){ return x * y; });
 
-    for (auto &t : tasks) {
+    for (auto &t : tasks) { // Iterator over the vector
         std::cout << t(3, 4) << std::endl;
     }
     return 0;
@@ -429,7 +426,7 @@ $$
 $$
 
 \subsubsection{\texttt{std::bind} and Function Adapters}
-The C++ standard library provides \texttt{std::bind} (also in \texttt{<functional>}) to create \textit{adapted} or \textit{partially applied} functions. It allows you to fix (bind) certain parameters of a function, producing a new callable that can be invoked with fewer parameters.
+The C++ standard library provides \texttt{std::bind} (also in \texttt{<functional>}) to create \textit{adapted} or \textit{partially applied} functions. It allows you to fix (bind) certain parameters of a function, producing a new callable that can be invoked with fewer parameters. \texttt{std::placeholders} are used to mark the positions of arguments that will be provided later when the bound function is called.
 
 \begin{codeblock}[language=C++]
 #include <functional>
@@ -441,8 +438,7 @@ int add(int a, int b) {
 
 int main() {
     // Create a new function that binds 'a' to 5
-    std::function<int(int)> add5 =
-        std::bind(add, 5, std::placeholders::_1);
+    std::function<int(int)> add5 = std::bind(add, 5, std::placeholders::_1);
 
     std::cout << add5(3) << std::endl; // Prints 8
     return 0;
@@ -457,13 +453,13 @@ Although \plaintt{std::bind} is powerful, modern C++ often prefers \textbf{lambd
 %------------------------------------------------------
 \section{Generic Programming and Templates}
 
-Generic programming is a \textbf{paradigm} that aims to write code that is independent of any particular data type, making it reusable, type-safe, and efficient. C++ achieves generic programming primarily through \emph{templates}, which allow you to write code that is instantiated for different data types as needed.
+Generic programming is a \textbf{paradigm} that aims to write code that is independent of any particular data type, making it reusable, type-safe, and efficient. C++ achieves generic programming primarily through \emph{templates}, which allow you to write code that is instantiated for different data types.
 
 \subsection{Overview of Generic Programming}
-\subsubsection{Concept and Motivation.}
+\subsubsection{Concept and Motivation}
 Generic programming focuses on designing algorithms and data structures in a way that they can operate on a broad range of types. Rather than writing multiple versions of the same functionality for each type, you write a \emph{single} version of an algorithm (e.g., \texttt{sort}) and let the compiler automatically generate the correct variant for an \textit{int} array, a \textit{double} array, a \textit{std::string} array, and so on.
 
-\subsubsection{Key Benefits.}
+\subsubsection{Key Benefits}
 \begin{itemize}
     \item \textbf{Reusability:} Write the code once and reuse it for multiple types.
     \item \textbf{Type Safety:} Many errors that involve type mismatches are caught at compile time.
@@ -471,7 +467,7 @@ Generic programming focuses on designing algorithms and data structures in a way
     \item \textbf{Expressiveness:} Templates reduce boilerplate and improve readability, as the type details are factored out.
 \end{itemize}
 
-\subsubsection{Examples and Use Cases.}
+\subsubsection{Examples and Use Cases}
 \begin{itemize}
     \item \textbf{STL (Standard Template Library):} Provides generic containers (\texttt{std::vector}, \texttt{std::list}, \dots) and algorithms (\texttt{std::sort}, \texttt{std::accumulate}, \dots).
     \item \textbf{Function Templates:} Write one function that works for any type supporting the required operations (e.g., \texttt{operator+}).
@@ -498,7 +494,7 @@ template <typename T>
 bool less_than(T x1, T x2) { return (x1 < x2); }
 \end{codeblock}
 
-When calling \texttt{less\_than(3.0, 2.5)}, the compiler generates \texttt{less\_than<double>(double, double)} automatically. You can also specify the template argument explicitly: \texttt{less\_than<int>(10, 5)}.
+When calling \plaintt{less\_than(3, 5)}, the compiler generates \plaintt{less\_than<int>(int, int)} automatically. You can also specify the template argument explicitly:\newline\plaintt{less\_than<char>('a', 'z')}.
 
 \end{exampleblock}
 
@@ -570,10 +566,7 @@ This function sums numeric values or concatenates strings if \texttt{operator+} 
 \end{itemize}
 
 \subsubsection{Constant values as template parameters}
-
-You can give defaults to the rightmost parameters (this applies also).
-
-A template parameter may also be an integral value.
+Defaults can only be provided for the rightmost parameters. Moreover, template parameters can also represent integral constants.
 
 \begin{codeblock}[language=C++]
 template <int N, int M = 3>
@@ -655,7 +648,7 @@ private:
     T data[N];
 };
 
-// Partial specialization for arrays of size 1.
+// Partial specialization for arrays of size 1
 template <typename T>
 class Array<T, 1> {
 private:
@@ -931,7 +924,7 @@ public:
     static constexpr int value = 1;
 };
 
-constexpr int n = Fibonacci<10>::value; // Calc. at compile-time.
+constexpr int n = Fibonacci<10>::value; // Calc. at compile-time
 \end{codeblock}
 \end{exampleblock}
 
