@@ -1,0 +1,94 @@
+\chapter{Introduction}
+
+Different fields as Epidemics spreading, Cancer growth, and many others, can be modeled using Stochastic Differential Equations (SDEs).
+
+An example is SIR model for epidemics spreading, formulized during a huge cholera infection in early 19th century. The model is based on three compartments: Susceptible, Infected, and Recovered individuals. This is modeled using a system of SDEs.
+
+Often stochastic models represents well the problem, but real data are noisy and chaotic. For instance often we have to deal with data varying spatially and temporally, and we have to deal with the problem of parameter estimation.
+
+Example: Oscillating chemical system
+
+$$
+A + Y \xrightarrow{k_1} X + P, \quad X \xrightarrow{k_2} 2P
+$$
+$$
+A + X \xrightarrow{k_3} 2Z, \quad X + Z \xrightarrow{k_4} 2A
+$$
+
+Other examples are preys and predators models, 
+
+\dots
+
+Renewable energies introduces a high volatility and unpredictability in energy production
+
+If the demand of energy exceedes the production, we need to activate standard plans, to reduce consumption by switching off devices (e.g. water boilers remotely controlled), or to activate additional production plants. All these scenarios are complex systems.
+
+\begin{definitionblock}[Complex System]
+A \textbf{complex system} is a system composed of interconnected parts that as a whole exhibit one or more properties (behavior among the possible properties) not obvious from the properties of the individual parts.
+\end{definitionblock}
+
+Emergent behavior is a property of complex systems, and it is not predictable from the behavior of the individual parts.
+
+
+
+\begin{definitionblock}[Adaptivity and self-organization]
+    \begin{itemize}
+        \item \textbf{Adaption} meand achieving a fit between the system and its environment.
+        \item \textbf{Self-organization} is the process where a system changes its structure spontaneously, in order to adapt to the environment.
+    \end{itemize}
+\end{definitionblock} 
+
+An instance of self-organization is the formation of a flock of birds, where each bird follows simple rules, but the flock as a whole exhibits a complex behavior.
+
+\begin{observationblock}[Noise and Nonlinearities]
+Noise and nonlinearities can (sometimes) favor the emergence of "order".
+\end{observationblock}
+
+\section{Modelling complex systems}
+
+\subsubsection{Math for quantitatve models}
+
+We will be interersted in the temporal behavior of the system, and we will use some key ingredients for the maths:
+
+\begin{itemize}
+    \item \textbf{Entities} can be modelled as \textit{discrete} objects or \textit{continuous} quantities.
+    \item \textbf{...} ...
+    \item \textbf{Time} can be \textit{discrete} or \textit{continuous}.
+\end{itemize}
+
+\dots
+
+\subsubsection{Data-Based vs Model-Based Approaches}
+
+Will data approaches make the kind of modelling obsolete?
+
+
+
+Hybrid approacehs are possible: 
+
+\begin{enumerate}
+    \item Math models can be joined/hcybrized with machine learning models.
+    \item Deep Network to learn modules aor whole math models
+
+        An exampleis \textit{Physics-informed neural networks}: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations
+
+    \item ...
+\end{enumerate}
+
+\begin{definitionblock}[Dynamical System]
+A \textbf{dynamical system} is a system whose state evolves over time according to a rule that depends on the current state.
+\end{definitionblock}
+
+[definition of differential equations]
+
+\begin{definitionblock}[Differential Equation]
+    A \textbf{differential equation} is an equation that relates one or more unknown functions and their derivatives.
+\end{definitionblock}
+
+In practice, differential equations are mathemathical instruments that describves the world around us. A note differential equation (maybe the first ever invented) is the Newton law:
+
+$$
+F = ma \quad \Rightarrow \quad m \frac{d^2x}{dt^2} = F(x(t))
+$$
+
+\cleardoublepage
