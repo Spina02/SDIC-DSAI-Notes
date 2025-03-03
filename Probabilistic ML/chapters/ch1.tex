@@ -1,0 +1,75 @@
+
+\chapter{Introduction}
+
+\section{Machine Learning}
+
+Machine learning is a field of computer science about \textbf{learning models}.
+
+\subsubsection{Models}
+
+\begin{definitionblock}[Model]
+    \begin{itemize}
+        \item A \textbf{\textit{Model}} is a hypothesis that certain features of a system of interest are well replicated in another, simpler syetem.
+        
+        \item \textbf{\textit{Mathematical Model}} is a model where the simpler system consists of a set of mathematical relations between objects (equations, inequalities, etc).
+        
+        \item A \textbf{\textit{Stochastic Model}} is a mathematical model where the objects are probability distributions.
+    \end{itemize}
+\end{definitionblock}
+
+All modelling usually starts by defining a family of models indexed by some parameters, which are tweaked to reflect how well the feature of interest are replicated.
+
+Machine learning deals with algorithms for automatic selecrion of a model from observations of the system.
+
+\subsubsection{Machine Learning}
+
+\begin{definitionblock}[Machine learning]
+\textit{\textbf{Machine learning} explores the study and construction of algorithms that can learn from and make predictions on data. \hfill \~ Wikipedia}
+\end{definitionblock}
+
+There are three main types of machine learning:
+
+
+\subsubsection{Generative and Discriminative Learning}
+
+\begin{itemize}
+    \item \textbf{Generative Learning} im at describing the full probability distribution of inputs $x$ or input/output pairs $(x, y)$.
+    $$
+    p(x,y) = p(x)p(y|x)
+    $$
+
+    \item \textbf{Discriminative Learning} aims at describing the conditional probability of output given the input, or a statistics/function of such probability
+    $$
+    p(y|x) \quad or \quad y = f(x)
+    $$
+\end{itemize}
+
+[to fix:]
+\begin{itemize}
+    \item \textbf{Supervised Learning}: The algorithm learns from labeled data by mapping inputs to outputs.
+    \item \textbf{Unsupervised Learning}: The algorithm identifies patterns or structures in unlabeled data.
+    \item \textbf{Data Generatiion}: The algorithm generates new data points.
+\end{itemize}
+
+\subsubsection{Inference and Estimation}
+
+Two central concepts for probabilistic machine learning are:
+
+\begin{itemize}
+    \item \textbf{Inference}: Compute marginals and contitionals probability distributions applying the laws of probability. 
+    \item \textbf{Estimation}: Given data and a family of models, find the best parameters/models that explains the data.
+\end{itemize}
+
+In the Bayesian world: estimation \approx \ inference.
+
+\subsubsection{Probability}
+
+\textbf{Probability} is a mathematical theory that deals with \textbf{uncertainty}
+
+When a certain problems has to face practical difficulties due to it's complexity, we can use probability to model the \textbf{\textit{aleatorical uncertainty}}, which is the uncertainty due to the randomness of the system. 
+
+More often, we have a limited knowledge of the system, and we can use probability to model the \textbf{\textit{epistemic uncertainty}}, which is the uncertainty due to the lack of knowledge.
+
+\begin{tipsblock}[Everything is a probability distribution]
+    In machine learning \textbf{everything is a probability distribution}, even if not explicitly stated.
+\end{tipsblock}
