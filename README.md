@@ -1,72 +1,69 @@
-#### These are the PDFs of our notes:
-
-- [Advanced Cloud Computing](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf>) [WIP]
-- [Advanced Programming](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Programming/main.pdf>) [WIP]
-- [Introduction to Machine Learning](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Introduction%20to%20ML/main.pdf>) [WIP]
-- [Algorithms](<https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Algorithms/main.pdf>) [WIP]
-
-
-<!--
+#### These are the links to the PDFs of our notes:
 <table>
   <thead>
     <tr>
-      <th colspan="2">1° year</th>
+      <th colspan="4" style="text-align: center;">1° year</th>
     </tr>
     <tr>
       <th>1° semester</th>
+      <th>Status</th>
       <th>2° semester</th>
+      <th>Status</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf">Advanced Cloud Computing</a></td>
-      <td>High Performance Computing</td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf">Cloud Computing (+ Advanced)</a></td>
+      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/High%20Performance%20Computing/main.pdf">High Performance Computing</a></td>
+      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
-  </tbody>
     <tr>
-      <td>Cloud Computing</td>
-      <td>...</td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Algorithms/main.pdf">Algorithms</a></td>
+      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Deep%20Learning/main.pdf">Deep Learning</a></td>
+      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
-  <tbody>
     <tr>
-      <td>Algorithms</td>
-      <td></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Introduction%20to%20ML/main.pdf">Introduction to Machine Learning</a></td>
+      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Probabilistic%20Machine%20Learning/main.pdf">Probabilistic Machine Learning</a></td>
+      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
-  <tbody>
     <tr>
-      <td>Introduction to Machine Learning<\td>
-      <td><\td>
-    <\tr>
-  </tbody>
-    <tr>
-      <td>Statistics</td>
-      <td></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Programming/main.pdf">Advanced Programming</a></td>
+      <td><strong><span style="color: lime;">[DONE]</span></strong></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Stochastic%20Modeling%20and%20Simulation/main.pdf">Stochastic Modeling and Simulation</a></td>
+      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
-  <tbody>
     <tr>
       <td>Global and Multi-Objective Optimisation</td>
-      <td></td>
-    </tr>
-    <tr>
-      <th colspan = 2></th>
-    </tr>
-  </tbody>
-  <thead>
-    <tr>
-      <th colspan="2">2° year</th>
-    </tr>
-    <tr>
-      <th>1° semester</th>
-      <th>2° semester</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>...</td>
-      <td>...</td>
+      <td><strong><span style="color: red;">[TODO]</span></strong></td>
+      <td>Introduction to Galaxies and Astrophysics</td>
+      <td><strong><span style="color: red;">[TODO]</span></strong></td>
     </tr>
   </tbody>
 </table>
--->
 
 
+<!-- <table>
+  <thead>
+    <tr>
+      <th colspan="4" style="text-align: center;">2° year</th>
+    </tr>
+    <tr>
+      <th>1° semester</th>
+      <th>Status</th>
+      <th>2° semester</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>...</td>
+      <td></td>
+      <td>...</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table> -->
