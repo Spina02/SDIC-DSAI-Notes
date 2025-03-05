@@ -73,3 +73,105 @@ More often, we have a limited knowledge of the system, and we can use probabilit
 \begin{tipsblock}[Everything is a probability distribution]
     In machine learning \textbf{everything is a probability distribution}, even if not explicitly stated.
 \end{tipsblock}
+
+\section{Probability basics}
+
+\subsection{Random Variables}
+
+\textbf{\textit{Random Variables}} are functions mapping outcomes of an experiment to real numbers. They serve as abstract representations of the outcomes in randomized experiments. Note that what we observe are the \textit{realizations} (values resulting from an observed outcome) of these random variables.
+
+\begin{exampleblock}[Random Variable]
+Consider the following example:
+$$
+\{Head, Tail\}, \quad \quad
+\{0, 1\}, \quad \quad
+\left\{\tfrac{1}{2}, \tfrac{1}{2}\right\}.
+$$
+Only the second is the random variable itself; the third is its probability distribution, while the first is the sample space of potential outcomes.
+\end{exampleblock}
+
+We consider a \textbf{\textit{Sample Space}} $\Omega$, which is the set of all possible outcomes of a random experiment. A random variable $X$ is a function:
+$$
+X: \Omega \rightarrow E, \qquad \text{where } E \subseteq \mathbb{R} \quad (\text{or } E \subseteq \mathbb{N})
+$$
+with the probability measure 
+$$
+P(X \in S) = P(\{\omega \in \Omega \mid X(\omega) \in S\}), \quad S \subseteq E.
+$$
+
+A model for our random outcome is the probability distribution of $X$. In particular, if the sample space is finite or countable the \textbf{probability mass function (pmf)} is given by:
+$$
+p(x) := P(X=x).
+$$
+If the sample space is infinite, we use the \textbf{probability density function (pdf)} where
+$$
+P(a \leq X \leq b) = \int_a^b p(x)dx \quad \text{and} \quad \int_{\mathbb{R}} p(x)dx=1.
+$$
+
+\subsection{Notable Probability Distributions}
+
+Below are some of the most common probability distributions.
+
+\subsubsection*{Discrete Distributions}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.5} % increase row spacing
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l l l l }
+\toprule
+Distribution & pmf & Mean & Variance \\
+\midrule
+Binomial $\text{Bin}(n,p)$ & $\displaystyle \binom{n}{x} p^x (1-p)^{n-x}$ & $np$ & $np(1-p)$ \\
+Bernoulli $\text{Bern}(p)$ & $\displaystyle p \quad (x=1), \quad 1-p \quad (x=0)$ & $p$ & $p(1-p)$ \\
+Discrete Uniform $\mathcal{U}(a,b)$ & $\displaystyle \frac{1}{b-a+1}$ & $\displaystyle \frac{a+b}{2}$ & $\displaystyle \frac{(b-a+1)^2-1}{12}$ \\
+Geometric $\text{Geom}(p)$ & $\displaystyle (1-p)^{x-1}p$ & $\displaystyle \frac{1}{p}$ & $\displaystyle \frac{1-p}{p^2}$ \\
+Poisson $\text{Pois}(\lambda)$ & $\displaystyle \frac{\lambda^x e^{-\lambda}}{x!}$ & $\lambda$ & $\lambda$ \\
+\bottomrule
+\end{tabular*}
+\end{center}
+
+\subsubsection*{Continuous Distributions}
+\begin{center}
+\small
+\renewcommand{\arraystretch}{2.5} % increase row spacing
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}} l l l l }
+\toprule
+Distribution & pdf & Mean & Variance \\
+\midrule
+Continuous Uniform $\mathcal{U}(a,b)$ & 
+$\displaystyle
+\begin{cases}
+\frac{1}{b-a} & x \in [a,b]\\[0.5em]
+0 & \text{otherwise}
+\end{cases}$ 
+& $\displaystyle \frac{a+b}{2}$ & $\displaystyle \frac{(b-a)^2}{12}$\\[1.5ex]
+Exponential $\text{Exp}(\lambda)$ & $\displaystyle \lambda e^{-\lambda x}$ & $\displaystyle \frac{1}{\lambda}$ & $\displaystyle \frac{1}{\lambda^2}$\\[1.5ex]
+Gaussian $\mathcal{N}(\mu,\sigma^2)$ & 
+$\displaystyle \frac{1}{\sigma\sqrt{2\pi}} \exp\!\Biggl(-\frac{1}{2}\Bigl(\frac{x-\mu}{\sigma}\Bigr)^2\Biggr)$ 
+& $\mu$ & $\sigma^2$\\[1.5ex]
+Beta $\text{Beta}(\alpha,\beta)$ & 
+$\displaystyle \frac{x^{\alpha-1}(1-x)^{\beta-1}}{B(\alpha,\beta)}$ 
+& $\displaystyle \frac{\alpha}{\alpha+\beta}$ & $\displaystyle \frac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}$\\[1.5ex]
+Gamma $\text{Gamma}(\alpha,\beta)$ & 
+$\displaystyle \frac{\beta^\alpha}{\Gamma(\alpha)} x^{\alpha-1}e^{-\beta x}$ 
+& $\displaystyle \frac{\alpha}{\beta}$ & $\displaystyle \frac{\alpha}{\beta^2}$\\[1.5ex]
+Dirichlet $Dir(\alpha)$ & 
+$\displaystyle \frac{1}{B(\alpha)} \prod_{i=1}^{K}x_i^{\alpha_i-1}$ 
+& $\tilde{\alpha}_i$ & $\displaystyle \frac{\tilde{\alpha}_i (1-\tilde{\alpha}_i)}{\alpha_0+1}$ \\[1.5ex]
+Student's t $St(\nu)$ & 
+$\displaystyle \frac{\Gamma\Bigl(\frac{\nu+1}{2}\Bigr)}{\sqrt{\nu\pi}\;\Gamma\Bigl(\frac{\nu}{2}\Bigr)}\Bigl(1+\frac{x^2}{\nu}\Bigr)^{-\frac{\nu+1}{2}}$ 
+& $0$ & 
+$\displaystyle \begin{cases}
+\frac{\nu}{\nu-2} & \nu>2 \\[0.5em]
+\infty & 1<\nu\leq2 
+\end{cases}$\\
+\bottomrule
+\end{tabular*}
+\end{center}
+  
+\subsubsection*{Notes:}
+\begin{itemize}
+    \item For discrete distributions, $n\in\{0,1,2,\dots\}$, $p\in[0,1]$, and $x$ runs over the support.
+    \item For continuous distributions, parameters such as $\lambda$, $\mu$, $\sigma$, $\alpha$, and $\beta$ belong to $\mathbb{R}$ (with appropriate restrictions) and $x\in\mathbb{R}$.
+    \item In the Dirichlet distribution, $\tilde{\alpha}_i=\frac{\alpha_i}{\sum_{h=1}^K\alpha_h}$ and $\alpha_0=\sum_{i=1}^K \alpha_i$.
+    \item For Student's t-distribution, $\nu>1$.
+\end{itemize}
