@@ -1,0 +1,144 @@
+\newpage
+\chapter{Data Generation Distribution}
+
+We want our model to be able to generate an output given a certain input.
+
+\begin{itemize}
+    \item input space:
+    $$X \subseteq \mathbb{R}^n$$
+    \item output space:
+    $$Y = \mathbb{R}, \text{or } \{0,1\}, \text{or } \{0,1,\ldots,K\}$$
+\end{itemize}
+
+We want to model the distribution of the data, i.e. the joint distribution of input and output:
+
+$$
+p(x,y) \in Dist(X\times Y) \quad p(x,y) = p(x) p(y|x)
+$$
+
+$p(x) = \int p(x,y) dy$
+
+$p(y|x) = \dfrac{p(x,y)}{p(x)}$
+
+$D \sim p^N(x,y)$
+
+$D = \{(x_i, y_i) | i = 1, \dots, N\} \text{ such that } (x_i, y_i) \sim p(x,y)$
+
+We assume the probability of $y$ given $x$ to be actually a probability depending on a function of $x$:
+$$p(y|x) = p(y|f(x)), \text{ for some } f(x)$$
+
+\textbf{Hypothesis class}: $\mathcal{H} = \{h:X\rightarrow Y\}$
+
+We want to pick an hypothesis $h$ that is close to the true function $f$.
+
+$h = h_\theta \text{ with } \theta \in \Theta \subset \mathbb{R}^k$
+
+$f(x) = STAT(p(y|x))$
+
+regression
+
+$f(x) = E_p [\bar y | x]$
+
+\section{Risk and Empirical Risk}
+
+$h \in \mathcal{H} \quad x,y \sim p(x,y)$
+
+\textbf{\textit{loss function}} $l(x,y,h) \in \mathbb{R_{\ge 0}}$, 
+
+\begin{itemize}
+    \item 0-1 loss: $l(x,y,h) = \mathbb{I}(h(x) \neq y)$, eith $y \in \{0, 1\}$.
+    \item squared loss: $l(x,y,h) = (h(x) - y)^2$, with $y \in \mathbb{R}$.
+\end{itemize}
+
+We have a probabilistic process, so we have some inputs that are more likely than others. If a model makes a mistake on a more likely input, it should be penalized more.
+
+\begin{definitionblock}[Risk]
+The \textbf{\textit{risk}} (or \textbf{\textit{generalization error}}) is defined as:
+$$
+R(h) = E_{x,y \sim p(x,y)}[l(x,y,h)]
+$$ 
+\end{definitionblock}
+
+\textbf{Risk minimization principle:}
+
+The goal is to find the hypothesis $h$ that minimizes the risk.
+$$
+\text{find } h^* \in \mathcal{H} \text{ such that } h^* = \mathrm{arg\,min}_{h \in \mathcal{H}} R(h)
+$$
+
+\begin{definitionblock}[Empirical Risk]
+The \textbf{\textit{empirical risk}} (or \textbf{\textit{training error}}) is defined as:
+$$
+\hat R = \dfrac 1N \sum_{i=1}^N l(x_i, y_i, h)
+$$
+\end{definitionblock}
+
+
+\textbf{Empirical risk minimization principle:}
+
+The goal is to find the hypothesis $h$ that minimizes the empirical risk.
+$$
+\text{find } h^*_D = \mathrm{arg\,min}_{h \in \mathcal{H}} \hat R(h)
+$$
+
+\subsection{Bias Variance Trade-off}
+
+In this section, we want to analyze the generalization error and decom-
+pose it according to the sources of error that we are going to commit.
+
+In what follows, we will use the squared loss (hence we will focus on
+regression problems). Considering $h \in \mathcal H$, an explicit expression of the generalization error committed when choosing hypothesis $h$ is:
+$$
+R(h) = E_p[l(x,y,h)] = \int \int (h(x) - y)^2 p(x,y) dx dy
+$$
+
+\newtheorem{theorem}{Theorem}
+\begin{theorem}
+    The minimizer of the generalization error $R$ is:
+    $$
+    \boxed{ g(x) = E[y|x] = \int y p(y|x) dy }
+    $$
+    so that $g = \mathrm{arg\,min}_h R(h),\ if\ g \in \mathcal H$
+\end{theorem}
+
+We can rewrite the risk as:
+$$
+R(h) = \underbrace{\int (h(x) - g(x))^2 p(x) dx}_{=\ 0 \quad iff \quad h(x) = g(x)} + \overbrace{\iint (g(x) - y)^2 p(x,y) dx dy}^{\text{independent of }h \text{: intrinsic noise}}
+$$
+
+
+
+$$
+\begin{array}{rl}
+E_D[R(h^*_D)]
+& = \underbrace{\int ( E_D[h^*_D(x) - g(x)])^2 p(x) dx}_{bias^2} \\
+& + \underbrace{\int E_D[(h^*_D(x) - E_D[h^*_D(x)])^2 p(x) dx]}_{variance} \\
+& + \underbrace{\iint (g(x) - y)^2 p(x,y) dx dy}_{noise}
+\end{array}
+$$
+
+\section{ERM and Maximum Likelihood}
+
+Given a dataset $D = \{(x_i, y_i)\}_{i=1, \dots, m}$ s.t. $D \sim p^m, p = p(x,y)$
+
+We factorize the data generating distributions as: $p(x,y) = p(x) p(y|x)$ and we make an hypothesis on $p(y|x)$, trying to express this conditional probability in a parametric form:
+$$p(y|x) = p(y|x, \theta)$$
+
+[check recording for missing part]
+
+We consider the log Likelihood:
+$$
+L(\theta; D) = \sum_{i = 1}^m \log p(y_i | x_i, \theta)
+$$
+
+Then we apply the maximum likelihood principle:
+
+$$
+\begin{array}{rcl}
+    \argmin{\theta} - L(\theta; D) &
+    = & \argmin{\theta} - \dfrac 1m \displaystyle\sum_{i=1}^m \log p(y_i | x_i, \theta) \\
+    & = & \argmin{\theta}\ E_{p(x,y)}[-\log p(y | x, \theta)]
+\end{array}
+$$
+
+since the avarage is an empirical approximation of the expectation.
