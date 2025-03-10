@@ -289,3 +289,246 @@ A single node can have multiple cores, each with multiple hardware threads. This
     \item The fourth level of parallelism is between CPUs of a single node.
     \item A node can also have accelerators, like GPUs or FPGAs which introduce another level of parallelism.
 \end{enumerate}
+
+\newpage
+
+\section{The Software Stack}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/software_stack.png}
+    \caption{The Software Stack: in red the \textit{cluster middleware}} \label{fig:software_stack}
+\end{figure}
+
+\subsubsection{The Cluster middleware}
+
+The cluster middleware (the one in the red box in \cref{fig:software_stack}) is the software layer that sits between the hardware and the applications. 
+
+The cluster middleware includes administration software responsible for managing user accounts and network services such as NTP and NFS, ensuring system consistency and time synchronization. Additionally, it encompasses resource management and scheduling tools (LRMS) that efficiently distribute processes, balance system load, and schedule jobs for multiple tasks, thereby optimizing overall cluster performance.
+
+\subsubsection{Resource Management Problem}
+
+The Resource Management Problem in HPC environments centers around the efficient allocation of computing resources among competing users and applications. We have a pool of users and a pool of resources, but this alone is insufficient for effective operation. Three key software components bridge this gap: resource controllers that monitor and manage the available computational assets, scheduling systems that make intelligent decisions about which applications to execute based on resource availability and prioritization policies, and execution engines that handle the actual deployment and running of applications on the allocated hardware. This layered approach ensures optimal utilization of expensive HPC infrastructure while providing fair access to multiple users with diverse computational needs. The complexity of this management increases with system scale, particularly as modern supercomputers accommodate thousands of simultaneous users competing for limited computational resources.
+
+\subsubsection{Resources}
+
+HPC systems manage a variety of computational resources, including CPUs, memory, storage, network bandwidth, and specialized accelerators like GPUs and FPGAs. In modern supercomputing environments, resources are often virtualized and dynamically allocated based on workload demands. This approach enables flexible resource management but introduces additional complexity in tracking, optimizing, and maintaining the system. Resource management systems must balance competing priorities such as maximizing throughput, ensuring fairness among users, accommodating urgent jobs, and maintaining energy efficiency. As illustrated in Figure \ref{fig:resources}, these resources form an interconnected ecosystem where efficient allocation directly impacts overall system performance and user satisfaction.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/resources.png}
+    \caption{Resources in a HPC cluster}
+    \label{fig:resources}
+\end{figure}
+
+\begin{definitionblock}[Scheduling]
+    Scheduling is the method by which work specified by some means is assigned to resources that complete the work
+\end{definitionblock}
+
+Some definitions of scheduling:
+
+\begin{itemize}
+    \item \textbf{Batch Scheduler}: software responsible for scheduling the users' jobs on the cluster.
+    \item \textbf{Resource Manager}: software that enable the jobs to connect the nodes and run
+    \item \textbf{Node}: computer used for its computational power
+    \item \textbf{Login/Master node}: it's through this node that the users will submit/launch/manage jobs
+\end{itemize}
+
+\subsubsection{Batch Scheduler}
+
+The \textbf{batch scheduler} is a critical component of the HPC software stack, responsible for managing the allocation of computational resources to user applications. It serves as the primary interface between users and the underlying hardware, ensuring that jobs are executed efficiently and fairly. The batch scheduler receives job submissions from users, evaluates resource availability, and makes intelligent decisions about job placement and execution. By optimizing resource utilization and minimizing job wait times, the batch scheduler plays a central role in maximizing the overall performance of the HPC system.
+
+\vspace{0.5em}
+
+The batch scheduler faces the challenging task of balancing multiple competing objectives:
+
+\begin{itemize}
+    \item \textbf{User Satisfaction:} Allocating resources for applications according to their specific requirements and users' rights, while ensuring minimal response time and high reliability.
+    
+    \item \textbf{Administrative Efficiency:} Meeting administrative goals by maintaining high resource utilization, operational efficiency, and effective energy management.
+\end{itemize}
+
+This balancing act requires sophisticated algorithms and policies that can adapt to changing workloads and priorities within the HPC environment.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/batch_scheduler.png}
+    \caption{Batch Scheduler Architecture}
+    \label{fig:batch_scheduler}
+\end{figure}
+
+Modern HPC schedulers typically implement a layered architecture:
+
+\begin{itemize}
+    \item \textbf{Resource Management Layer:} Handles the low-level aspects of job execution, including launching processes, cleaning up after completion, and continuous monitoring of resource usage.
+    
+    \item \textbf{Job Management Layer:} Manages both batch and interactive jobs with features such as:
+    \begin{itemize}
+        \item \textbf{Backfilling:} Filling idle resources with smaller jobs that won't delay scheduled larger jobs
+        \item \textbf{Advanced scheduling:} Optimizing job placement based on multiple constraints
+        \item \textbf{Job control:} Supporting suspend/resume operations and preemption when needed
+        \item \textbf{Workflow management:} Handling job dependencies and automatic resubmission
+        \item \textbf{Resource reservation:} Enabling advance booking of computational resources
+    \end{itemize}
+    
+    \item \textbf{Workload Management Layer:} Implements comprehensive scheduling policies including:
+    \begin{itemize}
+        \item Fair-sharing mechanisms to allocate resources equitably among users and groups
+        \item Quality of Service (QoS) provisions for prioritizing critical applications
+        \item Service Level Agreement (SLA) enforcement to meet contracted performance metrics
+        \item Energy-saving strategies to optimize power consumption
+    \end{itemize}
+\end{itemize}
+
+In many large-scale HPC environments, this workload management functionality may be provided by dedicated software that interfaces with the underlying resource manager, creating a flexible and powerful scheduling ecosystem that can adapt to the specific needs of the organization.
+
+\subsection{Local Resource Manager}
+
+A Local Resource Manager System (LRMS) provides the critical interface between the computing resources and the users' workloads. These systems are responsible for allocating resources, launching jobs, tracking their execution, and managing the overall utilization of the HPC cluster.
+
+\subsubsection{Main LRMS packages}
+
+Several LRMS solutions have emerged to address the complex scheduling and resource management needs of HPC environments. Each offers different features, advantages, and licensing models:
+
+\begin{itemize}
+    \item \textbf{IBM Platform LSF (Load Sharing Facility)}
+    \begin{itemize}
+        \item Commercial solution with enterprise-level support
+        \item Offers advanced workload management capabilities for heterogeneous environments
+        \item Provides comprehensive policy management, reporting, and analytics
+        \item Notable for its fault tolerance and high availability features
+    \end{itemize}
+    
+    \item \textbf{Univa Grid Engine (UGE)}
+    \begin{itemize}
+        \item Commercial solution that evolved from Sun Grid Engine (SGE)
+        \item Specializes in managing complex workloads across distributed computing resources
+        \item Features advanced job scheduling algorithms and resource allocation policies
+        \item Supports containerization and cloud integration
+    \end{itemize}
+    
+    \item \textbf{PBS Professional (PBSPRO)}
+    \begin{itemize}
+        \item Originally commercial, now available in both open-source and commercial versions
+        \item Commercial support provided through Altair Engineering
+        \item Offers sophisticated scheduling capabilities for heterogeneous computing resources
+        \item Previously available on ORFEO but has been replaced
+    \end{itemize}
+    
+    \item \textbf{SLURM (Simple Linux Utility for Resource Management)}
+    \begin{itemize}
+        \item Open-source solution with commercial support options
+        \item Currently deployed on ORFEO for student access
+        \item Highly scalable and fault-tolerant architecture
+        \item Used by many of the world's top supercomputers
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{SLURM in Depth}
+
+SLURM's development began in 2002 at Lawrence Livermore National Laboratory, where it was originally designed as a resource manager for Linux clusters. The name initially stood for \textit{Simple Linux Utility for Resource Management}. The system evolved significantly over time, with advanced scheduling plugins being added in 2008 to enhance its capabilities. Today, SLURM consists of approximately 550,000 lines of C code and maintains an active global user community and development ecosystem that continues to improve and extend its functionality.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/slurm_architecture.png}
+    \caption{Simplified SLURM Architecture}
+    \label{fig:slurm_architecture}
+\end{figure}
+
+\textbf{Key Entities in SLURM:}
+\begin{itemize}
+    \item \textbf{Jobs:} Resource allocation requests that define the computational resources required
+    \begin{itemize}
+        \item Specified through command-line tools or script directives
+        \item Include parameters such as required nodes, cores, memory, and time limits
+    \end{itemize}
+    
+    \item \textbf{Job Steps:} Sets of (typically parallel) tasks within a job allocation
+    \begin{itemize}
+        \item Usually correspond to MPI applications or multi-threaded programs
+        \item Utilize resources from the parent job's allocation
+        \item Multiple steps can execute sequentially or concurrently within a job
+        \item Offer lower overhead than full job submissions
+    \end{itemize}
+    
+    \item \textbf{Partitions:} Job queues with specific limits and access controls
+    \begin{itemize}
+        \item Configure access policies and resource limits for different user groups
+        \item Enable prioritization of workloads based on organizational needs
+        \item Allow for specialized hardware to be allocated to appropriate jobs
+    \end{itemize}
+    
+    \item \textbf{QoS (Quality of Service):} Defines limits, policies, and priorities
+    \begin{itemize}
+        \item Controls maximum resource allocation per user or group
+        \item Enforces priorities between competing workloads
+        \item Implements site-specific policies for resource allocation
+        \item Provides mechanisms for preemption and resource guarantees
+    \end{itemize}
+\end{itemize}
+
+\textbf{Architecture Components:}
+\begin{itemize}
+    \item \textbf{slurmctld} - Central controller daemon managing the overall state of the cluster
+    \item \textbf{slurmd} - Node-level daemon running on each compute node
+    \item \textbf{slurmdbd} - Optional database daemon for accounting records
+    \item \textbf{User commands} - Tools like \texttt{sbatch}, \texttt{srun}, \texttt{squeue}, and \texttt{scancel} for job submission and management
+\end{itemize}
+
+SLURM's modular design allows for customization through plugins, making it adaptable to various hardware configurations and scheduling policies. Its scalability has been demonstrated on systems with over 100,000 compute nodes, making it suitable for the largest supercomputing installations in the world.
+
+\subsection{Scientific Software}
+
+\dots
+
+\subsection{Complilers}
+
+High level languages need to be compiled to a stream of machine instructions that can be executed by the CPU. The \textbf{compiler} is the software that does this job. 
+
+In HPC environments, the choice of compiler can significantly impact application performance. Several options are available:
+
+\textbf{Free Compilers: GNU Suite}
+\begin{itemize}
+    \item Always available on virtually all Linux/Unix platforms
+    \item Includes GCC (C/C++) and GFortran (Fortran) compilers
+    \item Multiple versions with varying feature support
+    \item Fundamental and reliable, but may lack performance optimizations for specific architectures
+    \item Open source with strong community support
+\end{itemize}
+
+\textbf{Commercial Compilers: Intel Suite}
+\begin{itemize}
+    \item Provides a comprehensive software stack including:
+    \begin{itemize}
+        \item Highly optimized C, C++, and Fortran compilers
+        \item Performance libraries (MKL, IPP, TBB)
+        \item Profiling and benchmarking tools
+        \item MPI implementations
+    \end{itemize}
+    \item Specifically optimized for Intel architectures
+    \item Often delivers superior performance for floating-point computations
+    \item Excellent vectorization capabilities
+\end{itemize}
+
+\textbf{NVIDIA HPC SDK (formerly PGI)}
+\begin{itemize}
+    \item Strong compiler suite with good performance characteristics
+    \item Features valuable HPC extensions:
+    \begin{itemize}
+        \item OpenACC directives for GPU programming
+        \item CUDA Fortran for direct GPU programming from Fortran
+        \item Advanced optimization capabilities
+    \end{itemize}
+    \item Community edition available for free
+    \item Particularly well-suited for heterogeneous CPU/GPU computing
+\end{itemize}
+
+The choice of compiler depends on various factors including the target architecture, specific performance requirements, and available budget. Many HPC centers provide multiple compiler options, allowing users to select the most appropriate tool for their particular application requirements.
+
+\begin{observationblock}[ORFEO Compiler]
+    On ORFEO there is an openMPI installation, which includes the GNU compilers.
+\end{observationblock}
+
+\subsection{Libraries}
+
+\dots
