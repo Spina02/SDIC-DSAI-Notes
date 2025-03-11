@@ -1,3 +1,165 @@
+\chapter{Introduction}
 
-\chapter{First Chapter}
+\section{What is Deep Learning?}
+
+\begin{definitionblock}[Deep Learning]
+    \textit{"\textbf{Deep Learning} is constructing networks of parametrized functional modules and training them from examples using gradient-based optimization." \newline
+    \phantom{ } \hfill \textasciitilde{} Yann LeCun}
+\end{definitionblock}
+
+In other words, Deep Learning is a collection of tools to build complex modular differentiable functions. These tools are devoid of meaning, it is pointless to discuss what DL can or cannot do. What gives meaning to it is how it is trained and how the data is fed to it.
+
+\vspace{0.5em}
+
+Deep learning models usually have an architecture that is composed of multiple layers of functions. These functions are called \textbf{modules} or \textbf{layers}. Each layer is a function that takes an input and produces an output. The output of one layer is the input of the next layer. The output of the last layer is the output of the model.
+
+% \subsubsection{Basic Model Components}
+
+% \textbf{Linear layers} are the most basic building blocks of Deep Learning. They are defined as:
+
+% $$
+% \text{Linear Layer:} \quad f(x) = W_{n,d}x_d + b_n
+% $$
+
+% where $W_{n,d}$ is a matrix of \textbf{weights}, $b_n$ is a \textbf{bias vector}, and $x_d$ is the \textbf{input vector}. The output of a linear layer is a linear combination of the input features.
+
+% While linear layers provide a foundation for deep learning models, they are limited in their expressive power. Multiple linear layers composed together still result in a linear function. To model complex, non-linear relationships, we introduce \textbf{activation functions} after linear transformations.
+
+% The Rectified Linear Unit (ReLU) is one of the most commonly used activation functions, defined as:
+
+% $$
+% \text{ReLU}(x) = \max(0, x)
+% $$
+
+% ReLU has several advantages:
+% \begin{itemize}
+%     \item \textbf{Computational efficiency}: Simple to compute, just replacing negative values with zero
+%     \item \textbf{Sparse activation}: Neurons with negative pre-activation values become inactive, leading to sparse representations
+%     \item \textbf{Reduced vanishing gradient problem}: Unlike sigmoid or tanh functions, ReLU doesn't saturate in the positive domain
+% \end{itemize}
+
+% Other popular activation functions include Leaky ReLU, ELU (Exponential Linear Unit), GELU (Gaussian Error Linear Unit), and Swish, each designed to address specific limitations of the original ReLU function.
+
+\subsubsection{Practical Applications of Deep Learning}
+
+Deep Learning has revolutionized numerous fields by achieving unprecedented performance on complex tasks. In \textbf{computer vision}, convolutional neural networks can recognize objects, detect faces, segment images, and even generate realistic images. \textbf{Protein structure prediction} has seen remarkable advances with models like AlphaFold, which can accurately predict 3D protein structures from amino acid sequences, fundamentally changing molecular biology and drug discovery. \textbf{Speech recognition and synthesis} systems powered by deep learning can transcribe spoken language with near-human accuracy and generate natural-sounding speech, enabling voice assistants and accessibility tools. Other applications include natural language processing (powering chatbots and translation systems), recommendation systems, anomaly detection in cybersecurity, weather forecasting, and autonomous driving. The versatility of deep learning comes from its ability to learn meaningful representations directly from data, reducing the need for manual feature engineering while achieving superior performance across diverse domains.
+
+\section{Family of linear functions}
+
+Let's consider a simple modell 
+
+$$
+y = \Phi_0 + \Phi_1 x
+$$
+
+This model is a linear function of $x$ with parameters $\Phi_0$ and $\Phi_1$. The model can be represented as a line in the $x-y$ plane. The parameters $\Phi_0$ and $\Phi_1$ determine the slope and the intercept of the line.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            axis lines = left,
+            xlabel = $x$,
+            ylabel = $y$,
+            xmin = 0, xmax = 10,
+            ymin = 0, ymax = 10,
+        ]
+        % Linear function
+        \addplot [
+            domain=0:10, 
+            samples=100, 
+            color=blue,
+            thick,
+        ]
+        {0.5*x + 1};
+        
+        % Scatter points with more deviation
+        \addplot[only marks, mark=*, red] coordinates {
+            (1, 1.8) (2, 2.7) (3, 2.4) (4, 1.9) 
+            (5, 4.2) (6, 3.2) (7, 6.1) (8, 4.8) (9, 3.6)
+        };
+        
+        % Error segments (vertical lines from points to regression line)
+        \draw[dashed, gray] (axis cs:1,1.8) -- (axis cs:1,1.5);
+        \draw[dashed, gray] (axis cs:2,2.7) -- (axis cs:2,2.0);
+        \draw[dashed, gray] (axis cs:3,2.4) -- (axis cs:3,2.5);
+        \draw[dashed, gray] (axis cs:4,1.9) -- (axis cs:4,3.0);
+        \draw[dashed, gray] (axis cs:5,4.2) -- (axis cs:5,3.5);
+        \draw[dashed, gray] (axis cs:6,3.2) -- (axis cs:6,4.0);
+        \draw[dashed, gray] (axis cs:7,6.1) -- (axis cs:7,4.5);
+        \draw[dashed, gray] (axis cs:8,4.8) -- (axis cs:8,5.0);
+        \draw[dashed, gray] (axis cs:9,3.6) -- (axis cs:9,5.5);
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Linear model with scatter points and error segments}
+\end{figure}
+
+\subsubsection{Loss Function}
+
+The loss function for this model is the mean squared error (MSE) between the predicted values and the actual values:
+
+$$
+L = \dfrac 1N \sum_{i=1}^{N} (\underbrace{\Phi_0 + \Phi_1 x_i}_{= \ P_i} - y_i)^2
+$$
+
+where $N$ is the number of data points, $x_i$ is the $i$-th input, $y_i$ is the $i$-th target, and $P_i$ is the predicted value for the $i$-th data point.
+
+\subsubsection{Optimization}
+
+The goal of optimization is to find the values of $\Phi_0$ and $\Phi_1$ that minimize the loss function. This is done by computing the gradient of the loss function with respect to the parameters and updating the parameters in the opposite direction of the gradient. The update rule for the parameters is given by:
+
+Let's calculate the gradient of the losso function:
+
+$$
+\nabla_{\{\Phi\}} L = \left[ \dfrac{\partial L}{\partial \Phi_0}, \dfrac{\partial L}{\partial \Phi_1} \right]
+$$
+
+Then we can update the parameters as follows:
+
+$$
+\begin{cases}
+\Phi_0 \leftarrow \Phi_0 - \lambda \dfrac{\partial L}{\partial \Phi_0}\\
+\Phi_1 \leftarrow \Phi_1 - \lambda \dfrac{\partial L}{\partial \Phi_1}
+\end{cases}
+\quad \Rightarrow \quad
+\Phi^{new} = \Phi^{old} - \lambda \nabla_{\{\Phi\}} L
+$$
+
+where $\lambda$ is the \textbf{learning rate}, a hyperparameter that controls the size of the parameter updates.
+
+This is only a step in the optimization process. The optimization algorithm iteratively updates the parameters until the loss converges to a minimum.
+But when shell we stop?
+
+$$
+|L^{new} - L^{old}| < \epsilon
+$$
+
+where $\epsilon$ is a small positive number that determines the convergence threshold.
+
+\newpage
+
+\subsubsection{Exercises}
+
+Let's talk further about the loss function:
+
+$$
+L = \dfrac 1N \sum_{i=1}^{N} (\underbrace{\Phi_0 + \Phi_1 x_i}_{= \ P_i} - y_i)^2
+$$
+
+The aim is to minimize the loss function. In this case the loss is a paraboloid function of $\Phi_0$ and $\Phi_1$, so it has a single minimum. 
+
+\textbf{Questions}
+
+\begin{itemize}
+    \item Calculate the gradient of the Loss function
+    \item Find the minimum of the loss function
+    \item Show that the gradient of L is orthogonal to the level lines
+    \item Estimate the computational complexity of the exact solution of the linear regression problem in the general case (take into account the number of data samples and the number of dimensions/features used)
+    
+    $$
+    \Phi = (X^\top X)^{-1} X^\top y
+    $$
+\end{itemize}
+
 
