@@ -27,7 +27,7 @@
     <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Introduction%20to%20ML/main.pdf">Introduction to Machine Learning</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Probabilistic%20Machine%20Learning/main.pdf">Probabilistic Machine Learning</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Probabilistic%20ML/main.pdf">Probabilistic Machine Learning</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
     <tr>
