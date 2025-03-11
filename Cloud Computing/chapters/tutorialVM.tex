@@ -1,0 +1,213 @@
+
+\chapter{Tutorial: Virtual Machines}
+
+This tutorial is made with VirtualBox in mind, but the general concepts should be applicable to other virtualization software as well.
+
+Important things to keep in mind:
+\begin{itemize}
+    \item This tutorial is made with MacOS 
+    \item The VMs are running Ubuntu 20.04
+    \item Only the Master node is connected to the internet (NAT)
+    \item Working nodes are connected to the master node via an Internal Network
+\end{itemize}
+
+\section{Master Node}
+
+\subsection{Master Node as a Gateway}
+
+\begin{itemize}
+    \item \textbf{Enable IP forwarding on the Master Node}
+    \\Run the following command:
+    \begin{codeblock}[language=bash]
+echo 1 | sudo tee /proc/sys/net/ipv4/ip\_forward
+    \end{codeblock}
+    To make this change permanent, edit the file \texttt{/etc/sysctl.conf} and uncomment the line \texttt{net.ipv4.ip\_forward=1}.
+
+    Apply the changes with the following command:
+    \begin{codeblock}[language=bash]
+sudo sysctl -p
+    \end{codeblock}
+    
+    \item \textbf{Enable NAT on the Master Node}
+    Assuming your master node has two interfaces:
+    \begin{itemize}
+        \item \texttt{enp0s8} connected to the internet (NAT)
+        \item \texttt{enp0s9} connected to the internal network
+    \end{itemize}
+    
+
+    Run the following command:
+    \begin{codeblock}[language=bash]
+sudo iptables -t nat -A POSTROUTING -o enp0s8 -j MASQUERADE
+sudo iptables -A FORWARD -i eth1 -o eth0 -j ACCEPT
+sudo iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+    \end{codeblock}
+    Replace \texttt{enp0s8} with the name of the interface connected to the internet.
+    
+    To persist the rules:
+    \begin{codeblock}[language=bash]
+sudo apt-get install iptables-persistent # For Debian/Ubuntu 
+sudo netfilter-persistent save
+sudo netfilter-persistent reload
+    \end{codeblock}
+    \item \textbf{Configure the Woring Node to Use the Master Node as a Gateway}
+    On the working node, set the master node as the default gateway:
+    \begin{codeblock}[language=bash]
+sudo ip route add default via <MASTER\_NODE\_IP>
+    \end{codeblock}
+    Replace \texttt{<MASTER\_NODE\_IP>} with the IP address of the master node.
+    \item \textbf{Set up DNS on the Working Node}
+    Edit the file \texttt{/etc/resolv.conf} and add the following line:
+    \begin{codeblock}[language=bash]
+sudo vim /etc/resolv.conf
+echo "nameserver <DNS\_SERVER\_IP>" | sudo tee /etc/resolv.conf
+    \end{codeblock}
+    Replace \texttt{<DNS\_SERVER\_IP>} with the IP address of the DNS server (ex. 8.8.8.8 for Google's DNS).
+
+    \item \textbf{Test the Connection}
+    Run the following command on the working node:
+    \begin{codeblock}[language=bash]
+ping google.com
+ping 8.8.8.8
+    \end{codeblock}
+    If the connection is successful, the working node is now connected to the internet via the master node.
+\end{itemize}
+
+\begin{warningblock}
+    It could happen that after restarting the woring node cannot more connect to the internet. At this point, first check if you can ping the Master Node:
+    \begin{codeblock}[language=bash]
+ping <MASTER\_NODE\_IP>
+    \end{codeblock}
+    If the connection is successful, check the default route pointing to the Master Node:
+    \begin{codeblock}[language=bash]
+ip route show
+    \end{codeblock}
+    If the default route is not set, add it again:
+    \begin{codeblock}[language=bash]
+sudo ip route add default via <MASTER\_NODE\_IP>
+    \end{codeblock}
+    Now it should work.
+\end{warningblock}
+
+\subsection{DNS Configuration}
+
+The master node may not have a working nameserver. Check your current DNS settings:
+\begin{codeblock}[language=bash]
+cat /etc/resolv.conf
+\end{codeblock}
+
+If it is empty or does not contain a valid nameserver, add one:
+\begin{codeblock}[language=bash]
+echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+\end{codeblock}
+
+For a permanent solution, edit the file \texttt{/etc/netplan/01-netcfg.yaml} and add the following lines:
+\begin{codeblock}[language=bash]
+network:
+    version: 2
+    ethernets:
+        enp0s3:
+            dhcp4: true
+            nameservers:
+                addresses: [8.8.8.8, 8.8.4.4]
+\end{codeblock}
+
+\begin{warningblock}
+There could appear a warning saying that the Netplan configuration file has permissions that are too open, making it accessible to unauthorized users. 
+
+Run the following command to fix the permissions:
+\begin{codeblock}[language=bash]
+sudo chmod 600 /etc/netplan/01-netcfg.yaml
+\end{codeblock}
+
+Apply the changes with the following command:
+\begin{codeblock}[language=bash]
+sudo netplan apply
+\end{codeblock}
+\end{warningblock}
+
+Apply the changes with the following command:
+\begin{codeblock}[language=bash]
+sudo netplan apply
+\end{codeblock}
+
+Restart the network service:
+\begin{codeblock}[language=bash]
+sudo systemctl restart systemd-networkd
+\end{codeblock}
+
+Now the master node should have a working nameserver, allowing it to resolve domain names. Try pinging a domain name to test the connection:
+\begin{codeblock}[language=bash]
+ping google.com
+\end{codeblock}
+
+\section{DHCP Server Configuration}
+
+Here we will set up a DHCP server to assign IPs dynamically to the working nodes and configure a DNS server for name resolution.
+
+\begin{enumerate}
+    \item Install and Configure a DHCP Server on the Master Node 
+    \begin{codeblock}[language=bash]
+sudo apt-get install isc-dhcp-server
+    \end{codeblock}
+    Edit the file \texttt{/etc/dhcp/dhcpd.conf} and add the following lines:
+    \begin{codeblock}[language=bash]
+subnet 192.168.0.0 netmask 255.255.255.0 {
+    range 192.168.0.100 192.168.0.200;
+    option routers 192.168..1; # Master Node as the gateway 
+    option domain-name-servers 192.168.0.1, 8.8.8.8;
+    option domain-name "internal.local";
+    default-lease-time 600;
+    max-lease-time 7200;
+
+}
+    \end{codeblock}
+    Save and exit.
+
+    Set the internal network interface as the DHCP server interface by editing the file \texttt{/etc/default/isc-dhcp-server}:
+    \begin{codeblock}[language=bash]
+INTERFACESv4="enp0s9"
+    \end{codeblock}
+    Replace \texttt{enp0s9} with the name of the internal network interface.
+
+    Restart the DHCP server:
+    \begin{codeblock}[language=bash]
+sudo systemctl restart isc-dhcp-server
+sudo systemctl enable isc-dhcp-server
+    \end{codeblock}
+
+    \item Configure DNS on the Master Node 
+    
+    Install the DNS server:
+    \begin{codeblock}[language=bash]
+sudo apt install dnsmasq
+    \end{codeblock}
+
+    Edit the file \texttt{/etc/dnsmasq.conf} and add the following lines:
+    \begin{codeblock}[language=bash]
+interface=enp0s9
+dhcp-range=192.168.0.100,192.168.0.200,12h
+server=8.8.8.8
+domain=internal.local
+    \end{codeblock}
+    Replace \texttt{enp0s9} with the name of the internal network interface.
+
+    Restart the DNS server:
+    \begin{codeblock}[language=bash]
+sudo systemctl restart dnsmasq
+sudo systemctl enable dnsmasq
+    \end{codeblock}
+
+    \item Configure the Working Nodes to Use the DHCP Server
+    
+    Edit the file \texttt{/etc/netplan/01-netcfg.yaml} and add the following lines:
+    \begin{codeblock}[language=bash]
+network:
+    version: 2
+    ethernets:
+        enp0s8:
+            dhcp4: true
+    \end{codeblock}
+    Apply the changes with the following command:
+    \begin{codeblock}[language=bash]
+\end{enumerate}

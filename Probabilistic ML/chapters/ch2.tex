@@ -145,3 +145,140 @@ $$
 $$
 
 since the avarage is an empirical approximation of the expectation.
+
+\begin{observationblock}[Empirical Risk]
+$$
+-\frac{1}{m}\sum_{i=1}^{m}\log p(y_i|x_i, \theta) \text{is known as \textbf{empirical risk}}
+$$
+\end{observationblock}
+
+
+
+\section{KL divergence}
+
+Consider a probability distribution $p(x)$, then $-\log p(x)$ is a measure of \textbf{self-information}. Indeed, if $p(x) = 1$ then $-\log p(x) = 0$ (no self-information), describing substantially out (lack of) surprise in observing the event. If instead $p(x) = 0$ then $-\log p(x) = \infty$. In general, the more rare the event is, i.e. the lower is $p(x)$, the more self-information it carries, i.e. the larger is $-\log p(x)$.
+
+\begin{definitionblock}[Entropy]
+    In an information-theoretic sense, the \textbf{entropy} is a measure of the inforamtion that is carries by a random phenomenon, expressed as the expected amount of self-information that is conveyed by a realization of the random phenomenon.
+    
+    It is formally defined as:
+    $$
+    H(p) = E_p[-\log p(x)] = -\int p(x) \log p(x) dx
+    $$
+    for the continuous case, and:
+    $$
+    H(p) = E_p[-\log p(x)] = -\sum p(x) \log p(x)
+    $$
+    for the discrete case.
+\end{definitionblock}
+
+For the discrete case, the maximum entropy is achieved for te uniform distrivution and is equal to $\log n$, where $n$ is the number of possible outcomes. In the continuous case, for a fixed variance, the distribution that maximizes the entropy is the Gaussian. The entropy is always 0 if we have a deterministic distribution.
+
+\begin{definitionblock}[Kullback-Leibler divergence]
+    The \textbf{Kullback-Leibler divergence} (or \textbf{relative entropy}) between two probability distributions $p(x)$ and $q(x)$ is a measure of how one distribution diverges from a second, expected probability distribution.
+    
+    It is formally defined as:
+    $$
+    D_{KL}(p||q) = E_p\left[\log \dfrac{p(x)}{q(x)}\right] = \int p(x) \log \dfrac{p(x)}{q(x)} dx
+    $$
+    for the continuous case, and:
+    $$
+    D_{KL}(p||q) = E_p\left[\log \dfrac{p(x)}{q(x)}\right] = \sum p(x) \log \dfrac{p(x)}{q(x)}
+    $$
+    for the discrete case.
+\end{definitionblock}
+
+Intuitively, we are taking a sort of expected difference between $p$ and $q$, expressed in terms of a log odds ratio. It tells us how different two distributions are: the larger \textit{KL} the more different are $p$ and $q$.
+
+Properties of \textit{KL}:
+\begin{itemize}
+    \item $KL[q||p]$ is a convex function of $q$ and $p$ and $KL[q||p] \ge 0$
+    \item KL is non-symmetric, i.e. $KL[q||p] \neq KL[p||q]$
+    \item $KL[q||p] = -H[q] - \mathbb{E}_q[\log p]$, where the first term is the entropy and the second term is known as cross-entropy between $p$ and $q$.
+\end{itemize}
+
+
+Suppose moreover, that $p$ is fixed but unknown, $q = q_0$ can vary: what we usually do is trying to find the best $q_{\theta}$ that approximates $p$.
+
+The \textbf{mutual information} between $x$ and $y$ is defined as:
+$$
+I(x,y) = KL[p(x,y)||p(x)p(y)] = \int \int p(x,y) \log \dfrac{p(x,y)}{p(x)p(y)} dx dy
+$$
+
+$KL[p(x,y)||p(x)p(y)] = 0$ iff $x$ and $y$ are independent.
+
+Moreover, the more dependent they are, the more different is $p(x,y)$ from the product of the marginals, the more information $x$ carries about $y$ and viceversa.
+
+In other words, the higher the mutual information is, the more knowing $y$ will tell us about $x$, the less residual uncertainty on $x$ we will have.
+\newpage
+Consider a dataset: $\underline{x} : x_1,\dots,x_N$:
+\begin{definitionblock}[Empirical distribution]
+    The \textbf{empirical distribution} of a dataset $\underline{x}$ is defined as:
+    $$
+    \hat p(\underline{x}) = \dfrac 1N \sum_{i=1}^N \delta(x - x_i)
+    $$
+    where $\delta(x)$ is the Dirac delta function.
+\end{definitionblock}
+
+It is an approximation of the input data generating function$p(x)$. Practically, the more observations we have, the more the empirical distribution will look like $p(x)$.
+
+Given a distribution $q$, we can compute:
+$$
+KL[p_{emp}||q] = \mathbb{E}_{p_{emp}}\left[\log \dfrac{p_{emp}(x)}{q(x)}\right] = \dfrac 1N \sum_{i=1}^N \log \dfrac{p(x_i)}{q(x_i)}
+$$
+
+If $q = q_0$, this is $-\frac{1}{N}L(\Theta)$ plus a constant. Hence maximizing $L(\Theta)$ is essentially equivalent to minimizing the \textit{KL} between $p_{emp}$ and $q_0$. This means that we can always rephrase maximum likelihood in terms of cross-entropy.
+
+
+\section{PAC Learning}
+Our goal is to measure how much we can learn as a function of the model complexity. This results in the \textbf{PAC} (Probably Approximately Correct) \textbf{learning} framework, which encodes the notion of model complexity and gives also bounds on the error that we commit. 
+Here we consider it in the context of (binary) classification, i.e. $y \in {0,1}$, using the 0-1 loss. 
+
+\begin{definitionblock}[PAC Learning]
+    A realizable hypothesis set $\mathcal{H}$ is \textbf{\textit{PAC learnable}} iff $\forall \epsilon, \delta \in (0,1), \forall p(x,y), \exists m_{\epsilon, \delta} \in \mathcal{N} s.t. \forall m \geq m_{\epsilon, \delta}, \exists D ~ p^m, |D| = m$ then $p_D(R(h^*_D) \leq \epsilon) \geq 1 - \delta$
+\end{definitionblock}
+
+This means that, fixing two parameters $\epsilon, \delta \in (0,1)$, governing our precision, and a data generating distribution $p(x,y)$, we can find a number of samples $m_{\epsilon, \delta}$ such that, with probability at least $1 - \delta$, the empirical risk of the best hypothesis $h^*_D$ is less than $\epsilon$. Note that the probability here is over the dataset D, meaning that our learning will succeed for a fraction $1 - \delta$ of sampled datasets. 
+
+In a more general setting, 
+\begin{definitionblock}
+Given an hypothesis set $\mathcal{H}$ (not necessarily realizable) and an algorithm A, 
+$\mathcal{H} is \text{\textbf{agnostic PAC-learnable}} iff \forall \epsilon, \delta \in (0,1), 
+\forall p(x,y), \exists m_{\epsilon, \delta} \in \mathcal{N} ~ p^m, 
+|D|  = m \geq m_{\epsilon, \delta} \Rightarrow p_D(R(h^*_D) \leq R(h^*) + \epsilon) \geq 1 - \delta$, 
+being $h^A_D$ the result of applying A to $\mathcal{H}$ and D.
+\end{definitionblock}
+
+This means that, fixing two parameters $\epsilon, \delta \in (0,1)$, governing our precision, and a data generating distribution $p(x,y)$, we can find a number of samples $m_{\epsilon, \delta}$ such that, with probability at least $1 - \delta$, the empirical risk of the best hypothesis $h^*_D$ is less than the risk of the best hypothesis $h^*$ plus $\epsilon$.
+
+\subsection*{Finite hypothesis sets}
+
+An hypothesis set is said to be \textbf{finite} is $\mathcal{H}$ is s.t. $|\mathcal{H}| < \infty$.
+
+Using combinatorial arguments, we can prove that finite hypothesis sets are agnostic PAC-learnable with:
+$$
+m_{\epsilon, \delta} \leq \lceil \frac{2\log (\frac{2\mathcal{H}}{\delta})}{\epsilon^2} \rceil
+$$
+hence with polynomial dependency on $\epsilon$ and $\delta$. In this framework, $\log(|\mathcal{H}|)$ is a measure of the complexity of the set $\mathcal{H}$.
+\begin{warningblock}
+    If $\mathcal{H}$ is described by $d$ parameters of type double when represented in a computer (64 bits), it holds that $|\mathcal{H}| \leq 2^{d\dot 64}$, so we have a finite set of hypothesis, hence we can provide a bound on every implementable set of hypothesis functions.
+
+    In this case,
+    $$
+    m_{\epsilon, \delta} \leq \frac{128d + 2\lg(\frac{2}{\delta})}{\epsilon^2}
+    $$
+    i.e. we have linear dependency on the number of parameters.
+\end{warningblock}
+
+TO FINISH PAC LEARNING EXAMPLE...
+
+
+
+
+\section{VC Dimension (Vapnik-Chervonenkis)}
+
+
+
+
+
+
