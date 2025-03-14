@@ -1,0 +1,484 @@
+\newpage
+\chapter{Lecture 14/03/2024}
+
+$$
+m \dot v = - \gamma v + F_s(t)
+$$
+
+if $m \ll 1$ then $\dfrac m \gamma \approx 0$
+
+
+
+$$
+\dot x = f(x) + \omega \xi(t)
+$$
+
+$$
+\dfrac {dx}{dt} = f(x) + g(x) \xi(t)
+$$
+
+SI model:
+
+$$
+\begin{cases}
+    \dot S = - \beta S I + \theta I\\
+    \dot I = \beta S I - \theta I
+\end{cases}
+$$
+
+where $\beta$ is the infection rate and $\theta$ is the recovery rate.
+
+$$
+\dfrac {dI}{dt} = \beta(1-I)I - \theta I
+$$
+
+\beta is a stochastic variable, we can write it as:
+
+$$
+\beta \rightarrow \beta + \omega \xi(t)
+$$
+
+where $\omega$ is the amplitude of the noise and $\xi(t)$ is a white noise.
+
+We can write the equation as:
+
+$$
+\dfrac {dI}{dt} = (\beta + \omega \xi(t))(1-I)I - \theta I
+$$
+
+\subsubsection{Properties of $\xi(t)$}
+
+The noise process $\xi(t)$ is characterized by the following properties:
+\begin{enumerate}
+    \item \textbf{White Noise:} 
+    
+    $\xi(t)$ is a white noise process, meaning its values at different time instants are uncorrelated.
+
+    \item \textbf{Gaussian Noise:}
+    
+    $\xi(t)$ follows a Gaussian distribution, so all its finite-dimensional distributions are Gaussian.
+
+    \item \textbf{Zero Mean:}
+    
+    The expected value of the process is zero:
+    $$\langle \xi(t) \rangle = 0.$$
+
+    \item \textbf{Temporal Uncorrelation:}
+    
+    For any two distinct time instants $t \neq q$, the noise is uncorrelated:
+    $$\langle \xi(t)\xi(q) \rangle = 0.$$
+
+    \item \textbf{Delta-Correlated:}
+    
+    The autocorrelation function is given by the Dirac delta function:
+    $$\langle \xi(t)\xi(q) \rangle = \delta(t-q).$$
+
+    \item \textbf{Infinite Instantaneous Variance:}
+    
+    The variance at any fixed time is formally divergent:
+    $$\langle \xi^2(t) \rangle \gg 1,$$
+    reflecting the idealized nature of white noise.
+
+\end{enumerate}
+
+\dots
+
+$$
+f(x) = 0
+$$
+$$
+g(x) = \omega \neq 0
+$$
+$$
+\dot x = \omega \xi(t)
+$$
+$$
+x(t) = x(0) + \omega \int_0^t \xi(s) ds
+$$
+$$
+<x(t)> = x(0) + \omega \int_0^t \underbrace{<\xi(s)>}_{=\ 0} ds = x(0)
+$$
+$$
+x(t)x(q) = \omega^2 \int_0^t \xi(s) ds \int_0^q \xi(\theta) d\theta = 
+\omega^2 \int_0^t \int_0^q \xi(s) \xi(\theta) ds d\theta
+$$
+
+$$
+<x(t)x(q)> = \omega^2 \int_0^t \int_0^q \underbrace{<\xi(s)\xi(\theta)>}_{=\ \delta(s-\theta)} ds d\theta = \omega^2 \int_0^t \int_0^q \delta(s-\theta) d\theta ds
+$$
+
+We have $ <x(t)x(q)> = \omega^2 \min(t,q) $.
+
+\vspace{0.5em}
+
+If $q \ge t$:
+
+$$
+<x(t)x(q)> = \omega^2 \int_0^t \int_0^t \delta(\theta - s) d\theta = \omega^2 \int_0^t ds = \omega^2 t
+$$
+
+Else if $0 < q < t$:
+
+$$
+<x(t)x(q)> = \omega^2 \int_0^q \left\{
+    \int_0^q \delta(\theta - s) d\theta
+\right\} ds
+=
+\omega^2 \int_0^q ds = \omega^2 q
+$$
+
+\vspace{4em}
+\dots
+\vspace{4em}
+
+$$
+\begin{array}{rl}
+    \langle(x(t) - x(q))^2\rangle \ \ = & \langle x^2(t)\rangle + \langle x^2(q)\rangle - 2\langle x(t)x(q)\rangle 
+    \quad = \quad 
+    \omega^2 (t + q - 2 \min(t,q)) \\[0.5em]
+    = &
+    \begin{cases}
+        0 & \text{if } t = q\\
+        \omega^2 (t - q) & \text{if } t > q\\
+        \omega^2 (q - t) & \text{if } t < q
+    \end{cases} 
+    \quad = \quad 
+    \omega^2 |t - q|
+\end{array}
+$$
+
+\vspace{4em}
+\dots
+\vspace{4em}
+
+$$
+\left \langle \left( 
+\dfrac {x(t+h) - x(t)}{h} 
+\right) ^2 \right \rangle
+= \dfrac {\omega^2}{h}
+$$
+
+This is an incremental ratio, so, if we take the limit as $h \to 0^+$ we get:
+
+$$
+\lim_{h \to 0^+} \left \langle \left( 
+\dfrac {x(t+h) - x(t)}{h} 
+\right) ^2 \right \rangle
+= + \infty
+$$
+
+
+
+
+
+
+
+
+\newpage
+
+\subsubsection{Wiener Process}
+
+The \textbf{Wiener Process} (also known as Brownian motion) is a continuous-time stochastic process widely used in physics and finance to model random behavior. It is named after Norbert Wiener, who introduced it in the 1920s. The process is defined by the stochastic differential equation
+
+$$
+\begin{cases}
+    \dfrac{dw}{dt} = \xi(t),\\[1mm]
+    w(0) = 0,
+\end{cases}
+$$
+
+where $\xi(t)$ represents a white Gaussian noise.
+
+\vspace{0.5em}
+
+\textbf{Properties of the Wiener Process:}
+
+The Wiener process is a Gaussian process with the following key properties:
+\begin{enumerate}
+    \item \textbf{Zero Mean:}
+    
+    The expected value of the process is zero:
+
+    $$\langle w(t) \rangle = 0.$$
+
+    \item \textbf{Gaussian Distribution:}
+    
+    For any fixed time $t$, $w(t)$ is normally distributed.
+
+    \vspace{0.5em}
+
+    \item \textbf{Autocorrelation:}
+    
+    The autocorrelation function is given by
+
+    $$\langle w(t)w(q) \rangle = \min(t,q).$$
+
+    \item \textbf{Independent Increments:}
+    
+    The increments of the process are independent. In particular,
+
+    $$\langle w(q)-w(t) \rangle = 0,$$
+
+    and these increments are also Gaussian.
+
+    \vspace{0.5em}
+
+    \item \textbf{Increment Variance:}
+    
+    The variance of the increment over the interval $[t,q]$ is proportional to the time difference:
+
+    $$\langle (w(q)-w(t))^2 \rangle = |q-t|.$$
+
+    \item \textbf{Increment Distribution:}
+    
+    More precisely, for $q>t$, the increment is distributed as
+
+    $$w(q)-w(t) \sim \mathcal{N}\Bigl(0,\,|q-t|\Bigr),$$
+
+    and in particular,
+
+    $$w(t)-w(0) \sim \dfrac{1}{\sqrt{2\pi t}} \exp\Bigl(-\dfrac{w^2}{2t}\Bigr).$$
+\end{enumerate}
+
+\newpage
+
+\subsubsection{Increment Analysis and the Derivative of the Wiener Process}
+
+Consider a small time increment defined as
+
+$$
+q = t + dt, \quad \quad dt > 0.
+$$
+
+The increment of the Wiener process over this interval is given by
+
+$$
+dw = w(t+dt) - w(t).
+$$
+
+Since the process is Gaussian, the increment satisfies
+
+$$
+dw \sim G(\mu = 0, \sigma = dt),
+$$
+
+which implies that the finite difference quotient behaves as
+
+$$
+\frac{dw}{dt} \sim G\left(\mu = 0, \sigma = \frac{1}{dt}\right).
+$$
+
+This relation highlights that, in the limit as $dt\to 0$, the notion of a derivative for the Wiener process becomes problematic due to the divergence in the standard deviation.
+
+Furthermore, for a finite interval $h$, we consider the probability
+
+$$
+\Pr\Biggl( \left|\frac{w(t+h)-w(t)}{h} \right| > M \Biggr)
+\quad \Rightarrow \quad
+\Pr\Bigl( |w(t+h)-w(t)| > hM \Bigr).
+$$
+
+This formulation reinforces the scaling behavior of the process's increments and underscores the fact that the Wiener process has almost surely nowhere differentiable paths.
+
+\newpage
+
+\subsubsection{Euler-Maruyama Method}
+
+In stochastic differential equations, the dynamics of a system are often described by equations of the form
+
+$$
+\boxed{dp = F\, dt},
+$$
+
+where $dp$ represents the infinitesimal change in momentum and $F$ is the force.
+
+Similarly, the evolution of a state variable $x$ is given by
+
+$$
+dx = f(x,t)\,dt + g(x,t)\,dw,
+$$
+
+with $f(x,t)$ denoting the drift term, $g(x,t)$ the diffusion coefficient, and $dw$ the stochastic increment.
+
+The stochastic increment is defined as
+
+$$
+dw = G(t)\sqrt{dt},
+$$
+so that the update of $x$ over a small time interval $dt$ can be written as
+
+$$
+x(t+dt) = x(t) + f(x,t)\,dt + g(x,t)G(t)\sqrt{dt}.
+$$
+
+When discretizing time, let $t_j$ denote the $j$-th time step, and define
+
+$$
+G_j = G(t_j) \sim \mathcal{N}(0,1).
+$$
+
+An increment over a discrete time-step is then approximated by
+
+$$
+dx \simeq x_{j+1} - x_j.
+$$
+
+Thus, the discretized form of the stochastic differential equation becomes
+
+$$
+\begin{cases}
+    x_{j+1} = x_j + f(x_j,t_j)h + g(x_j,t_j)G_j\sqrt{h},\\[1mm]
+    x_0 = x(0),
+\end{cases}
+$$
+
+where $h$ is the time-step size.
+
+This numerical scheme is known as the \textit{\textbf{Euler-Maruyama method}}.
+
+\newpage
+
+$$
+\dot x = x(1-x)
+$$
+
+$$
+dx = x(1-x)dt
+$$
+
+$$
+\dfrac {dx}{x(1-x)} = dt
+$$
+
+$$
+\dfrac {dx}{x} + \dfrac {dx}{1-x} = dt
+$$
+
+$$
+d(\ln|x| - \ln|1-x|) = dt
+\quad \Rightarrow \quad
+\ln \dfrac x{1-x} = \ln \dfrac {x_0}{1-x_0}
+$$
+
+\dots
+
+$$
+dx = a(x) dt + b(x) dw
+$$
+
+$$
+y = \Psi(x)
+$$
+
+$$
+dy = \Psi(x + dx) - \Psi(x)
+$$
+
+$$
+dy = \Psi(x + a(x)dt + b(x)dw) - \Psi(x) = 
+$$
+
+\dots
+
+$$
+dy = \Psi'(x)[a(x)dt + b(x)dw] + \dfrac 12 \Psi''(x)
+\left[
+    b^2(x)dt^2 +
+    \underbrace{\cancel{a^2(x)dt^2}}_{O(dt^2)} +
+    \underbrace{\cancel{2a(x)b(x)dt dw}}_{O(dt^{2/3})}
+\right]
+$$
+
+$$
+dy = \Psi'(x)a(x)dt + \Psi'(x)b(x)dw + \Psi''(x) \dfrac {b^2(x)}2 (dw)^2
+$$
+
+$$
+(dw)^2 = (dt + \Omega(t))
+$$
+$$
+dw \sim \mathcal{N}(0,dt)
+$$
+
+$$
+dy = \left[
+    \dfrac{\partial \Psi}{\partial x} a(x) + \dfrac{b^2(x)}2 \Psi''(x)
+\right]
++ \Psi'(x) b(x) dw + \cancel{O(dt^{2/3})}
+$$
+
+\dots
+
+\newpage
+
+Malthus model
+
+$$
+\dot x = bx - mx = (b-m)x = rx
+$$
+
+$$
+\begin{cases}
+b \rightarrow b + \text{fluctuations}(t)\\
+m \rightarrow m + \text{fluctuations}(t)
+\end{cases}
+$$
+
+$$
+\dfrac {dx}{dt} = (r + \omega \xi(t))x
+$$
+
+$$
+dx = rxdt + \omega x dw
+$$
+
+$$
+y = \Psi(x) = \ln x
+$$
+
+$$
+\begin{cases}
+a(x) = rx\\
+b(x) = \omega x
+\end{cases}
+$$
+
+$$
+\Psi'(x) = \dfrac 1x
+$$
+
+$$
+\Psi''(x) = -\dfrac 1{x^2}
+$$
+
+$$
+dy = 
+\left[
+    \dfrac 1{\cancel x} r\cancel x + \dfrac 12 \omega^2\cancel{x^2}  
+    \left( 
+        - \dfrac 1{\cancel{x^2}} 
+    \right)
+\right]
+dt + \dfrac 1{\cancel x} \omega \cancel x dw
+\quad = \quad
+\boxed{
+    \left(
+        r - \dfrac {\omega^2}2
+    \right)
+    dt + \omega dw
+}
+$$
+
+$$
+y(t) = \underbrace{y(0)}_{=\ e^{x_0}} + \left(
+    r - \dfrac {\omega^2}2
+\right) t + \omega^2 w(t)
+$$
+
+\dots
+
+$$
+\boxed{x(t) = e^{y(t)}}
+\quad \Rightarrow \quad
+x(t) \to 0
+$$
