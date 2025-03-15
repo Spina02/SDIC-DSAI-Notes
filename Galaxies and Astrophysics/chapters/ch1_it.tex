@@ -1,4 +1,4 @@
-\chapter{Introduzione}
+\chapter{Geometrie Non Euclidee}
 
 La teoria che studieremo è una \textit{teoria geometrica}:
 
@@ -8,70 +8,172 @@ La teoria che studieremo è una \textit{teoria geometrica}:
     \item Una retta può essere prolungata indefinitamente in entrambe le direzioni.
     \item Dato un punto $O$ ed un raggio $R$, esiste esattamente un cerchio con centro in $O$ e raggio $R$.
     \item Tutti gli angoli retti sono congruenti.
-    \item Data una retta $R$ ed un punto $P$ non appartenente a $R$, esiste esattamente una retta passante per $P$ che è parallela a $R$.
+    \item Data una retta r ed un punto P fuori da essa, per
+    il punto P passa una ed una sola retta parallela ad r (possiamo dare al termine parallelo il significato di \textit{che incontra r solo all'infinito}, in un punto improprio).
 \end{enumerate}
 
-Il quinto postulato è più complesso degli altri; nel corso del tempo, i matematici hanno provato più volte a dimostrare il quinto postulato basandosi sui restanti quattro. In seguito fu scoperto che il quinto è indipendente dagli altri.
+Il quinto postulato è più complesso degli altri; i tentativi di dimostrare tale postulato a partire dagli altri postulati, considerati più evidenti, non hanno permesso di arrivare a questo, ma hanno portato, nell'800, alla nascita delle geometrie non-Euclidee (Gauss, Bolyai, Lobachevski, Klein).
 
-\textbf{Conseguenze:}
+\begin{center}
+\begin{tikzpicture}[scale=1.0]
+    % Draw a dashed line at the top
+    \draw[dashed] (-3,1) -- (3,1);
+    % Create point P at the center of the dashed line
+    \fill (0,1) circle (1pt) node[above] {$P$};
+    % Draw the line r at the bottom
+    \draw (-3,0) -- (3,0);
+    % Place the label r at the left end of the line
+    \node at (-2.9,0) [left, above] {$r$};
+\end{tikzpicture}
+\end{center}
+
+Il quinto postulato si è rivelato indipendente dagli altri enunciati di Euclide, poiché è stato possibile formulare geometrie piane (in 2 dimensioni) in cui valgono tutti gli altri postulati, mentre il concetto di parallelismo assume un significato diverso:
+
 \begin{enumerate}
-    \item Non esiste alcuna retta parallela a $R$ passante per $P$ \\
-    \quad $\rightarrow$ Geometrie ellittiche piane $[S^2]$
-    \item Esistono due o più rette parallele a $R$ passanti per $P$ \\
-    \quad $\rightarrow$ Geometrie iperboliche piane $[H^2]$
+    \item Non esiste alcuna retta parallela a $R$ passante per $P$ \,\quad $\rightarrow$ \textbf{Geometrie ellittiche piane} $[S^2]$
+    \item Esistono due o più rette parallele a $R$ passanti per $P$ \quad $\rightarrow$ \textbf{Geometrie iperboliche piane} $[H^2]$
 \end{enumerate}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/geometries.png}
+    \includegraphics[width=0.6\textwidth]{assets/geometries.png}
     \caption{Geometrie ellittiche e iperboliche}
 \end{figure}
 
-\subsubsection{Geometria Ellittica}
+\section{Geometria Ellittica}
 
-La geometria ellittica piana è una forma di geometria non euclidea che rifiuta il quinto postulato di Euclide, il quale in geometria euclidea garantisce l'esistenza di una sola retta parallela passante per un dato punto. In geometria ellittica, non esistono rette parallele; invece, ogni coppia di rette si interseca eventualmente.
+La \textbf{geometria ellittica piana} è una forma di geometria non euclidea che rifiuta il quinto postulato di Euclide, il quale in geometria euclidea garantisce l'esistenza di una sola retta parallela passante per un dato punto. In geometria ellittica, non esistono rette parallele; invece, ogni coppia di rette si interseca eventualmente.
 
-Un classico esempio è la geometria sferica, in cui le “rette” sono rappresentate da grandi cerchi su una sfera.
+Un classico esempio è la geometria sferica, in cui possiamo definire come "\bfit{punto}" la coppia di punti diametralmente opposti $(P, P')$, e come "\bfit{retta}" un cerchio massimo passante per $P$ e $P'$. Si può dimostrare che per due punti $(P, P')$ e $(Q, Q')$ passa esattamente una retta $r$. Inoltre, per un punto $(T, T')$ esterno ad $r$ non passa alcuna retta parallela ad $r$, poiché tutte le rette passanti per $(T, T')$ intersecano $r$ in almeno un punto.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{assets/spherical_geometry.png}
-    \caption{Geometria sferica}
-\end{figure}
+Con la geometria analitica, Descartes ha mostrato che, identificando i punti con coppie di numeri reali e definendo la distanza tra due punti $(x_1, y_1)$ e $(x_2, y_2)$ come $d = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2}$, tutti i postulati di Euclide si riducono a teoremi sui numeri reali.
 
-In questo contesto, i triangoli, noti come triangoli sferici, mostrano una proprietà intrigante: la somma dei loro angoli interni supera i 180° (un fenomeno noto come eccesso sferico), con l'eccesso proporzionale all'area del triangolo.
+Definito sulla sfera un triangolo con i lati formati da archi di cerchi massimi, la somma degli angoli $\alpha + \beta + \gamma$ è sempre $> \pi$. L'area $S$ di tale triangolo, se la sfera ha raggio $R$, si può esprimere come $S = R^2(\alpha + \beta + \gamma - \pi)$. Quando $S \to 0$ (mantenendo $R$ fisso), si osserva che $(\alpha + \beta + \gamma) \to \pi$. Questo significa che se il triangolo sferico è molto più piccolo del raggio $R$, la sua differenza da un triangolo piano tende a scomparire, avvicinandosi alla geometria euclidea.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/spherical_triangle.png}
-    \caption{Triangolo sferico}
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.85\textwidth]{assets/spherical_geometry.png}
+        \caption{Geometria sferica}
+    \end{minipage} \hspace{1cm}
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.82\textwidth]{assets/spherical_triangle.png}
+        \caption{Triangolo sferico}
+    \end{minipage}
 \end{figure}
 
-\subsubsection{Geometria Iperbolica}
+\vspace{-1em}
 
-La geometria iperbolica piana è una forma di geometria non euclidea che rifiuta il quinto postulato di Euclide, il quale in geometria euclidea garantisce l'esistenza di una sola retta parallela passante per un dato punto. In geometria iperbolica, esistono molteplici rette parallele, e la somma degli angoli in un triangolo è sempre inferiore a 180°.
+In questo contesto, i triangoli, noti come triangoli sferici, mostrano una proprietà intrigante: la somma dei loro angoli interni supera i 180° ($\alpha + \beta + \gamma > \pi$), un fenomeno noto come eccesso sferico, con l'eccesso proporzionale all'area del triangolo.
+\vspace{0.2em}
+$$
+S = R^2(\alpha + \beta + \gamma - \pi) \quad \text{dove per} \quad R \to \infty \quad \text{si ha} \quad \dfrac S{R^2} \to 0 \quad \text{e} \quad \alpha + \beta + \gamma \to \pi
+$$
+Per costruire un modello della geometria ellittica piana siamo ricorsi all'uso di una sfera (superficie bidimensionale, indicata con $S^2$) immersa (\textit{embedded}) in uno spazio euclideo tridimensionale $E^3$. 
+
+Notiamo che per rappresentare il 5° postulato abbiamo dovuto ricorrere ad una superficie \textit{curva}, cioè la sfera. Questa curvatura deve essere inoltre costante in tutto il piano perché gli altri postulati descrivono lo spazio come omogeneo, e se la curvatura variasse questa proprietà verrebbe meno.
+
+Questo ci porta a comprendere che le diverse geometrie non euclidee possono essere caratterizzate matematicamente attraverso diverse definizioni di distanza. La curvatura dello spazio diventa quindi un elemento fondamentale per distinguere tra i vari tipi di geometrie:
+\begin{itemize}
+    \item Curvatura zero → geometria euclidea
+    \item Curvatura positiva costante → geometria ellittica
+    \item Curvatura negativa costante → geometria iperbolica
+\end{itemize}
 
 % \begin{figure}[H]
 %     \centering
-%     \includegraphics[width=0.5\textwidth]{assets/hyperbolic_geometry.png}
-%     \caption{Geometria iperbolica}
+%     \includegraphics[width=0.4\textwidth]{assets/spherical_triangle.png}
+%     \caption{Triangolo sferico}
 % \end{figure}
 
-In questo contesto, i triangoli, noti come triangoli iperbolici, mostrano una proprietà intrigante: la somma dei loro angoli interni è inferiore a 180°, con il difetto proporzionale all'area del triangolo.
+\section{Geometria Iperbolica}
+
+La geometria iperbolica piana è una geometria non euclidea in cui il quinto postulato di Euclide non vale, ammettendo più parallele a una retta data. I triangoli iperbolici hanno somma degli angoli inferiore a 180°, con “difetto” proporzionale all’area. Il piano iperbolico non può essere immerso interamente in uno spazio euclideo 3D, ma esistono modelli come il \emph{cerchio di Klein} (1870), in cui i punti sono all’interno di una circonferenza unitaria e le rette ne sono le corde. Da un punto $P$ passano due parallele a una retta data, e ne esistono infinite che non la intersecano.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/hyperbolic_triangle.png}
-    \caption{Triangolo iperbolico}
+    \includegraphics[width=0.75\textwidth]{assets/hyperbolic_geometry.png}
+    \caption{Geometria iperbolica}
 \end{figure}
 
-\subsubsection{Curva piana}
+La distanza tra due punti $A$ e $B$ è
+$$
+d(A,B) = \frac12 \log \!\Bigl(\frac{RA\cdot SB}{RB\cdot SA}\Bigr),
+$$
+che diverge se uno dei punti tende al bordo. Una rappresentazione parziale di $H^2$ in 3D è la \emph{pseudosfera}, una superficie a curvatura negativa costante, in contrasto con la sfera a curvatura positiva.
 
-\textbf{Ascissa curvilinea}
+\section{Curva piana}
 
-\dots
+Si può parametrizzare una curva piana nel modo seguente: $\bar x(t) = (x_1(t), x_2(t))$, dove $t$ è un parametro, non necessariamente il tempo; il vettore tangente (velocità) è $\tfrac {d\bar x}{dt}$. Possiamo definire l'ascissa curvilinea $s(t)$:
+$$
+O \equiv \bar x(t = 0) \quad P \equiv \bar x(t) \quad ds = |d\bar x| = |\tfrac {d\bar x}{dt}| dt \quad \to \quad s(t) = \int_0^t |d\bar x| = \int_0^t |\tfrac {d\bar x}{dt}| dt
+$$
 
-\newpage
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/curve.png}
+    \caption{Ascissa curvilinea}
+\end{figure}
+
+Trasformando $t \to s$ si può notare che $\dfrac{d\bar x}{ds} = \dot {\bar x}(s)$ ha modulo 1: è il versore tangente $\hat t(s)$.
+
+Poichè $|\dot \bar x(s)| = |\hat t(s)| = 1$, abbiamo $\hat t \dot {\hat t} = 1$ e, derivando, segue che $2 \hat t \cdot \dot {\hat t} = 0$, ovvero $\hat t \perp \dot {\hat t}$.
+
+\textbf{Nota}: $\dot {\hat t}$ non è un versore!
+
+Chiamati $\kappa(s) = |\dot {\hat t}(s)|$ e $\hat n(s) = \dfrac {\dot {\hat t}(s)}{|\dot {\hat t}(s)}$, segue che $\dot {\hat t}(s) = \kappa(s) \hat n(s)$.
+
+$$
+\Delta \hat t = \hat t(s + \Delta s) - \hat t(s) 
+\quad \quad
+|\Delta \hat t| = 2 |\hat t| \sin \dfrac {\Delta \theta}2 \sim \Delta \theta
+\quad \quad
+\Delta s \simeq \Delta \theta
+\quad \quad
+\left| \dfrac {\Delta \hat t}{\Delta s} \right| \simeq \dfrac {\Delta \theta}{\rho \Delta \theta} = \dfrac 1\rho
+$$
+
+Quindi
+
+$$
+\dfrac {d\hat t}{ds} = \kappa\hat n = \dfrac 1\rho \hat n \quad \quad
+\begin{cases}
+    \kappa : \text{curvatura} \\
+    \rho : \text{raggio di curvatura}
+\end{cases}
+$$
+
+Misurando $\theta$ rispetto ad una distanza fissata (ad esempio la'asse $x$):
+
+$$
+\Delta s = \rho \Delta \theta = \dfrac {\Delta \theta}{k} \quad \to \quad \kappa = |\dfrac {d\theta}{ds}|
+$$
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{assets/flesso.png}
+        \caption{Curva con flesso}
+    \end{minipage}%
+    \hspace{10pt}
+    \begin{minipage}{0.65\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{assets/segno_flesso.png}
+        \caption{Segno del flesso}
+    \end{minipage}
+\end{figure}
+
+Abbiamo definito $\kappa$ come $> 0$. Così facendo, però, in un flesso ho una discontinuità in $\hat n$. Per evitare questo, definita una $s$ sulla curva, resta definito anche $\hat t$ e posso definire $\hat n$ come rotazione di $\hat t$ di 90° in senso positivo (coerente con $O, x_1, x_2$). Poiché $\hat t \perp \dot{\hat t}$ abbiamo ancora $\dot{\hat t} = \kappa\hat n$, ma ora possiamo avere anche $\kappa < 0$. A seconda del segno la curva sta a sinistra o a destra di $\hat t$; nel flesso $\hat n$ non cambia ma $\kappa$ cambia segno e ora risulta:
+$$
+\kappa = \dfrac {d\theta}{ds}
+$$
+
+(e non in valore assoluto).
+
+\section{Superfici}
 
 L'altra volta abbiamo visto come poter usare le coordinate curvilinee per descrivere tre geometrie.
 Abbiamo visto poi come 
