@@ -1,0 +1,269 @@
+\newpage
+\chapter{Lecture 17/03/2025}
+
+In this lecture we analyze a stochastic version of the Malthusian law. In the deterministic case, the Malthusian growth is given by
+$$
+\dot{x} = r\, x,
+$$
+which has the solution $x(t)=x(0)e^{rt}$. Here, we introduce a multiplicative noise term to account for random fluctuations, leading to the stochastic differential equation
+$$
+\dot{x} = \Bigl(r + \omega\, \xi(t)\Bigr)x,
+$$
+where $\xi(t)$ is a white noise process. By definition of white noise, we have
+$$
+\langle \xi(t) \rangle = 0 \quad \text{and} \quad \langle \xi(t)\xi(t') \rangle = \delta(t-t').
+$$
+
+Since the noise has zero mean, the average growth rate remains $r$, so that
+$$
+\langle r + \omega\, \xi(t) \rangle = r,
+$$
+which implies
+$$
+\langle x(t) \rangle = x(0)e^{rt}.
+$$
+
+However, a paradox arises when comparing the average behavior with the typical (or almost sure) behavior of the system:
+$$
+\begin{cases}
+x(t) \to 0 \quad \text{(typical behavior)}, \\
+\langle x(t) \rangle = \infty \quad \text{(ensemble average)}.
+\end{cases}
+$$
+This paradox is a consequence of the strong fluctuations induced by the multiplicative noise, which make the mean value unrepresentative of a typical realization.
+
+To further analyze the dynamics, we perform a logarithmic transformation by setting
+$$
+y(t)=\ln x(t).
+$$
+Using Itô's calculus, the transformed variable satisfies
+$$
+y(t)= y_0 + \left(r - \frac{\omega^2}{2}\right)t + \omega W(t),
+$$
+where $W(t)$ is the Wiener process and $y_0=\ln x(0)$. As $W(t)$ is normally distributed with mean $0$ and variance $t$, it follows that
+$$
+y(t) \sim \mathcal{N}\Bigl(y_0+\Bigl(r-\frac{\omega^2}{2}\Bigr)t,\, \omega^2 t\Bigr).
+$$
+
+Since $x(t)=e^{y(t)}$, the variable $x(t)$ is log-normally distributed. For a log-normal random variable, the mean is given by
+$$
+\mu_{\log_N} = e^{\mu_G + \frac{\text{Var}_G}{2}},
+$$
+where $\mu_G$ and $\text{Var}_G$ are the mean and variance of the corresponding Gaussian variable $y(t)$.
+
+A useful side note is that if we define a new variable $u$ with the density
+$$
+\rho(u) = a\, e^{-au}\, H(u),
+$$
+(where $H(u)$ is the Heaviside function) then its expected value is
+$$
+\langle u \rangle = \frac{1}{a}.
+$$
+This relation, although coming from a different context, similarly illustrates how averages may differ significantly from the most probable (median) value.
+
+In fact, the median of a log-normally distributed variable is simply the exponential of the median of the underlying Gaussian distribution. Therefore, we have
+
+$$
+\begin{cases}
+\text{Median}[x] = e^{\mu_{Gauss}}, \\
+\text{Median}[x(t)] = e^{y_0 + \left(r - \frac{\omega^2}{2}\right)t}.
+\end{cases}
+$$
+
+Notably, if $r - \frac{\omega^2}{2}$ is negative, the median of $x(t)$ decays to zero, even though the mean diverges. This discrepancy between the typical outcome and the ensemble average is a key feature of systems driven by multiplicative noise.
+
+\section{Linear Logistic Perturbed Model}
+
+We begin with the deterministic version of the logistic model in its linearized form:
+$$
+\dot{x} = (b - m)x = rx, \quad \quad r > 0,
+$$
+which implies that in the absence of density-dependent regulation, the solution grows exponentially and diverges as $x \to \infty$. 
+
+To incorporate environmental fluctuations, we introduce a stochastic perturbation into the model. The perturbed model is written as
+$$
+\dot{x} = \bigl(r - \alpha x + \omega\,\xi(t)\bigr)x,
+$$
+or equivalently, in differential form,
+$$
+dx = (r_0 - \alpha x)x\,dt + \omega\,x\,\xi(t),
+$$
+where $r_0$ represents the intrinsic growth rate, $\alpha>0$ is the density-dependent regulation coefficient, $\omega$ quantifies the intensity of the noise, and $\xi(t)$ denotes a white noise process.
+
+To simplify the analysis, it is useful to perform a logarithmic transformation by defining
+$$
+y = \ln(x) \quad \Longleftrightarrow \quad x = e^y.
+$$
+Applying Itô's formula to $y=\ln(x)$ (with the usual correction term due to the stochastic calculus), we obtain
+$$
+dy = \left(r_0 - \frac{\omega^2}{2} - \alpha e^y\right)dt + \omega\,dW,
+$$
+where $dW$ is the Wiener process corresponding to $\xi(t)$.
+
+This transformed stochastic differential equation can be formally integrated to yield
+$$
+y(t) = y_0 + \left(r_0 - \frac{\omega^2}{2}\right)t + \omega\,W(t) - \alpha\int_0^t e^{y(s)}ds.
+$$
+Notice that the first three terms, 
+$$
+y_0 + \left(r_0 - \frac{\omega^2}{2}\right)t + \omega\,W(t),
+$$
+represent the contribution of the intrinsic growth and the noise, while the integral term
+$$
+\alpha\int_0^t e^{y(s)}ds
+$$
+captures the effect of density-dependent regulation. 
+
+If the noise intensity is sufficiently strong, specifically when
+$$
+\frac{\omega^2}{2} > r_0,
+$$
+then the combined effect of the noise and the regulation term drives $y(t)$ to $-\infty$ as $t\to\infty$. Consequently,
+$$
+x(t)=e^{y(t)} \to 0^+,
+$$
+which indicates that the population eventually goes extinct.
+
+Let $\rho(x,t)$ denote the probability density function (PDF) of $x(t)$. As time progresses, the dynamics force the distribution to concentrate at $x=0$, and one can show that
+$$
+\lim_{t\to\infty} \rho(x,t) = \delta(x),
+$$
+where $\delta(x)$ is the Dirac delta distribution. This result confirms that extinction is the almost sure outcome under strong stochastic perturbations.
+
+It is also instructive to discuss the notion of an equilibrium in this stochastic context. For a deterministic system described by
+$$
+\frac{dx}{dt} = f(x),
+$$
+an equilibrium point $x_e$ satisfies $f(x_e)=0$, so that if $x(0)=x_e$, then $x(t)=x_e$ for all $t$. In contrast, for a stochastic differential equation of the form
+$$
+dx = f(x)\,dt + g(x)\,dW,
+$$
+a stochastic equilibrium (or steady state) $x_{ES}$ is defined by the conditions
+$$
+f(x_{ES})=0 \quad \text{and} \quad g(x_{ES})=0.
+$$
+When these conditions hold, small deviations from equilibrium can be analyzed by setting
+$$
+x = x_{ES} + U,
+$$
+which leads to a linearized equation for the perturbation $U$:
+$$
+dU = a\,U\,dt + b\,U\,dW.
+$$
+
+In our logistic perturbed model, extinction ($x=0$) acts as a stochastic equilibrium point. Linearizing the dynamics around $x=0$, we find
+$$
+dU = r_0\,U\,dt + \omega\,U\,dW,
+$$
+which describes the evolution of small perturbations near the extinct state.
+
+\vspace{1em}
+
+In summary, the introduction of multiplicative noise in the logistic model not only modifies the dynamics but, under strong noise conditions, leads to extinction—even when the deterministic model predicts unbounded growth. The interplay between the intrinsic growth rate, the density-dependent term, and the noise intensity determines the long-term fate of the system.
+
+\newpage
+
+\section{Ito's Formula (Physical) Demonstration}
+
+We start by considering a stochastic differential equation (SDE) for a variable $x$:
+$$
+dx = \underbrace{a(x)\,dt}_{O(dt)} \;+\; \underbrace{b(x)\,dW}_{O(\sqrt{dt})}.
+$$
+Our goal is to derive the differential of a function $\Psi(x)$ using Ito's formula. Recall that if $\Psi(x)$ is twice differentiable, then
+$$
+d\Psi = \Psi'(x)\,dx + \frac{1}{2}\Psi''(x)\,(dx)^2 + \dots.
+$$
+
+Because $dx$ contains a term of order $\sqrt{dt}$, the term $(dx)^2$ is of order $dt$. In particular, the properties of the Wiener process imply that
+$$
+\boxed{\langle (dW)^2 \rangle = dt}.
+$$
+
+To analyze the fluctuations in $(dW)^2$, we decompose it as follows:
+$$
+(dW)^2 = dt + \bigl[(dW)^2 - dt\bigr] = dt + d\Omega,
+$$
+where we define the random variable
+$$
+y \equiv (dW)^2 - dt,
+$$
+which satisfies $\langle y \rangle = 0$. Its variance is computed by
+$$
+\text{Var}(y) = \langle y^2 \rangle = \left\langle \Bigl[(dW)^2 - dt\Bigr]^2 \right\rangle.
+$$
+
+Expanding the square, we have
+$$
+\langle (dW)^4 - 2dt\,(dW)^2 + (dt)^2 \rangle.
+$$
+Using the moment properties of the Wiener process:
+\[
+\langle (dW)^2 \rangle = dt \quad \text{and} \quad \langle (dW)^4 \rangle = 3(dt)^2,
+\]
+we obtain
+$$
+3(dt)^2 - 2dt\,(dt) + (dt)^2 = 3(dt)^2 - 2(dt)^2 + (dt)^2 = 2(dt)^2.
+$$
+
+Returning to the expansion for $d\Psi$, and substituting $dx = a(x)\,dt + b(x)\,dW$, we identify:
+\begin{itemize}
+    \item The term $\Psi'(x)\,dx$ contributes a drift component and a stochastic component of order $O(\sqrt{dt})$.
+    \item The term $\frac{1}{2}\Psi''(x)(dx)^2$ contributes an extra drift term of order $O(dt)$ due to the quadratic variation of $dW$.
+\end{itemize}
+
+Thus, the full expression for the differential of $\Psi(x)$ is given by
+$$
+d\Psi = \left[\Psi'(x)a(x) + \frac{1}{2}\Psi''(x)b^2(x)\right]dt + \Psi'(x)b(x)dW.
+$$
+
+This result is the celebrated Ito's formula. It shows that, unlike in ordinary calculus, the second derivative term multiplied by $\frac{1}{2}b^2(x)$ appears as a correction due to the non-negligible quadratic variation of the Wiener process. This additional term is what distinguishes stochastic calculus from its deterministic counterpart.
+
+\section{Probability Density Function and Markov Processes}
+
+Consider a stochastic process governed by the stochastic differential equation
+$$
+dx = a(x)\,dt + b(x)\,dW.
+$$
+Let $\rho(x,t)$ denote the probability density function (PDF) of $x(t)$, so that the probability of finding $x(t)$ in the interval $[\hat{x},\,\hat{x}+d\hat{x}]$ is given by
+$$
+\Pr\Bigl[x(t) \in [\hat{x},\,\hat{x}+d\hat{x}]\Bigr] = \rho(\hat{x}, t)\,d\hat{x}.
+$$
+In this way, the state of the system $x(t)$ is fully characterized by its PDF, $\rho(x,t)$.
+
+More generally, if we consider
+$$
+x \in \mathbb{R}, \quad t \in \mathbb{R},
+$$
+the stochastic process $x(t)$ has the state space (SSP) $\mathbb{R}$ and evolves in continuous time. The probability that the process takes a value in a small interval at time $t$ depends on its past history,
+$$
+\Pr\Bigl[x(t) \in [\hat{x},\,\hat{x}+d\hat{x}]\Bigr] = \kappa\Bigl[\{x(\theta) \}_{0 \le \theta \le t}\Bigr],
+$$
+where $\kappa$ represents the functional dependence on the trajectory $\{x(\theta)\}$ for $0\le\theta\le t$.
+
+\subsubsection{Markov Process}
+
+A process is said to possess the \textbf{Markov property} if its future evolution depends solely on its present state rather than the entire past history. For the SDE above, the increment over an infinitesimal time interval $dt$ can be written as
+$$
+x(t+dt) = x(t) + a(x)\,dt + b(x)G_t\sqrt{dt},
+$$
+where $G_t$ is a Gaussian random variable with mean $0$ and variance $1$. Note that the update depends only on the current state $x(t)$, which exemplifies the Markov property.
+
+To further illustrate this idea, consider a simple discrete deterministic process:
+$$
+x_{t+1} = a\, x_t, \quad t \in \mathbb{N}_0.
+$$
+Its solution is given by
+$$
+x_t = a^t x_0.
+$$
+Now, if we add a stochastic term to account for random fluctuations, we obtain
+$$
+x_{t+1} = a\, x_t + \omega\, \nu_t,
+$$
+where $\nu_t$ is a random variable representing noise. In this context, the distribution of $x_t$ at time $t$, denoted by $\rho(x,t)$, evolves according to the stochastic dynamics. Often, this distribution can be expressed as
+$$
+\rho(x,t) = L(x_t),
+$$
+where $L(x_t)$ denotes the law governing the evolution of the process.
+
+This example highlights that in a Markov process the next state is determined exclusively by the most recent state rather than by the full history of the process.
