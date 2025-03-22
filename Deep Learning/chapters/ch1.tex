@@ -9,8 +9,6 @@
 
 In other words, Deep Learning is a collection of tools to build complex modular differentiable functions. These tools are devoid of meaning, it is pointless to discuss what DL can or cannot do. What gives meaning to it is how it is trained and how the data is fed to it.
 
-\vspace{0.5em}
-
 Deep learning models usually have an architecture that is composed of multiple layers of functions. These functions are called \textbf{modules} or \textbf{layers}. Each layer is a function that takes an input and produces an output. The output of one layer is the input of the next layer. The output of the last layer is the output of the model.
 
 % \subsubsection{Basic Model Components}
@@ -98,7 +96,6 @@ This model is a linear function of $x$ with parameters $\Phi_0$ and $\Phi_1$. Th
 \subsubsection{Loss Function}
 
 The loss function for this model is the mean squared error (MSE) between the predicted values and the actual values:
-
 $$
 L = \dfrac 1N \sum_{i=1}^{N} (\underbrace{\Phi_0 + \Phi_1 x_i}_{= \ P_i} - y_i)^2
 $$
@@ -151,7 +148,7 @@ The aim is to minimize the loss function. In this case the loss is a paraboloid 
 
 \textbf{Questions}
 
-\begin{itemize}
+\begin{enumerate}
     \item Calculate the gradient of the Loss function
     \item Find the minimum of the loss function
     \item Show that the gradient of L is orthogonal to the level lines
@@ -160,6 +157,26 @@ The aim is to minimize the loss function. In this case the loss is a paraboloid 
     $$
     \Phi = (X^\top X)^{-1} X^\top y
     $$
-\end{itemize}
+\end{enumerate}
 
+\textbf{Solutions}
 
+\begin{enumerate}
+    \item Calculate the gradient of the Loss function
+    \item Find the minimum of the loss function
+    \item Show that the gradient of L is orthogonal to the level lines
+    \item Estimate the computational complexity of the exact solution of the linear regression problem in the general case (take into account the number of data samples and the number of dimensions/features used)
+    $$
+    \Phi = (X^\top X)^{-1} X^\top y
+    $$
+
+    Let's consider a $X_{N\times D}$ matrix and let's computate the complexity of the single operations:
+
+    \begin{itemize}
+        \item $(x^\top X)$ is a $D \times D$ matrix, so the complexity is $O(ND^2)$
+        \item $(x^\top X)^{-1}$ requires $O(D^3)$ operations
+        \item $(x^\top y)$ is a $D \times 1$ matrix, so the complexity is $O(ND)$
+    \end{itemize}
+
+    The total complexity is $O(ND^2 + D^3 + \cancel{ND}) = O(ND^2 + D^3)$
+\end{enumerate}
