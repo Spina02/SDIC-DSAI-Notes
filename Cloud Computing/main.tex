@@ -1,0 +1,54 @@
+\documentclass[a4paper,12pt]{report}
+
+%%%%%%%%%%%%
+% packages %
+%%%%%%%%%%%%
+
+\usepackage{../template/pkgs}
+\usepackage{../template/styles}
+\usepackage{../template/frames}
+\usepackage{../template/macros}
+
+\usetikzlibrary{positioning, arrows}
+
+%%%%%%%%%%%%%%
+% Title Page %
+%%%%%%%%%%%%%%
+
+\institute{UniTs - University of Trieste}
+\faculty{Scientific and Data Intensive Computing}
+\department{mathematics informatics and geosciences}
+\title{Cloud\\Computing}
+\author{Christian Faccio}
+\lecturer{Prof. Taffoni Giuliano}
+\date{\today}
+\githublink{christianfaccio}
+\email{christianfaccio@outlook.it}
+\license{\CCBYNCSA}
+
+%%%%%%%%%%%%
+% document %
+%%%%%%%%%%%%
+
+\addbibresource{./references.bib}
+
+\begin{document}
+
+% Pagina di copertina
+\maketitle
+
+% Abstract
+\include{chapters/abstract}
+
+% Indice
+\toc
+
+% Chapters
+\includechapters
+% Bibliography
+\printbibliography
+
+\end{document}
+
+
+
