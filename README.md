@@ -13,9 +13,15 @@
   </thead>
   <tbody>
     <tr>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf">Cloud Computing (+ Advanced)</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf">Advanced Cloud Computing</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/High%20Performance%20Computing/main.pdf">High Performance Computing</a></td>
+      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
+    </tr>
+    <tr>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Cloud%20Computing/main.pdf">Cloud Computing</a></td>
+      <td><strong><span style="color: orange;">[DONE]</span></strong></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Reinforcement%20Learning/main.pdf">Reinforcement Learning</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
     <tr>
