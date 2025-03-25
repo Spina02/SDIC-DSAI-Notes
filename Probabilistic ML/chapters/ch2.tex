@@ -270,15 +270,230 @@ hence with polynomial dependency on $\epsilon$ and $\delta$. In this framework, 
     i.e. we have linear dependency on the number of parameters.
 \end{warningblock}
 
-TO FINISH PAC LEARNING EXAMPLE...
+\begin{exampleblock}[Pac learning example]
+    We consider an example introduced by Kearns and Vazirani in the book "An Introduction to Computational Learning Theory". \cite{kearns1994introduction}.
 
+    The goal is to learn a target axis-aligned rectangle R lying in $\mathbb{R}^2$ and $z \in {-1,1}$ distributed according to a distribution $p(\textbf{x}, z)$. The hypothesis set $\mathcal{H}$ is the set of all axis-aligned rectangles lying in $\mathbb{R}^2$. We assume there is a true rectangle of this king such that all positive points are inside it, and all negative points are outside. 
+    \begin{figure}[H]
+        \centering 
+        \includegraphics[width=0.4\textwidth]{assets/fig8.png}
+    \end{figure}
+
+
+We consider out hypothesis \textit{h} to be the axis-aligned rectangle \textit{R'} with the smallest area that includes all the positive examples and none of the negative ones.
+
+What is the minimum number $m_{\epsilon, \delta}$ of training examples so that, wiht probability at least $1-\delta$, \textit{h} has an error at most $\epsilon$ with respect to the true rectangle and the distribution $p(\textbf{x}, z)$?
+
+\textbf{Solution}
+
+We have to find an $m_{\epsilon, \delta}$ such that $\forall m > m_{\epsilon, \delta} P(error(h_m) > \epsilon) \leq \delta$. First of all, let's notice that the error $error(h_m)$ is equal to the area of the target rectangle R minus the area of the internal rectangle $R' = h_m$ that we found. 
+
+Then, given an arbitrary error bound $\epsilon$, we build within $R$ 4 rectangles having each one an area of $\epsilon/4$, on the sides of $R$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/fig9.png}
+    \caption{The 4 rectangles of area $\epsilon/4$}
+    \label{fig:fig9}
+\end{figure}
+
+Let's consider the $m$ observations drawn from $p(\textbf{x}, y)$. If each of the four rectangles defined above contains at least one point, we have $error(h_m) \leq \epsilon$, because the area difference between $R$ and $R'$ would be fully covered by the 4 rectangles. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/fig10.png}
+    \caption{Configuration showing event}
+    \label{fig:fig10}
+\end{figure}
+
+If we call this event $B$, we have: 
+\[ 
+    B \to error(h_m) \leq \epsilon 
+\]
+
+equivalently, by modus tollens:
+\[ 
+    error(h_m) > \epsilon \to \neg B
+\]
+
+This implies: 
+\[ 
+    P(\neg B) \geq P(error(h_m) > \epsilon)
+\]
+
+$P(\neg B)$ is the probability that at least one of the 4 rectangles doesn't contain any of the $m$ points. This probability is $(1-\epsilon/4)^m$ for a single rectangle, hence we have $P(\neg B) \leq 4(1-\epsilon/4)^m$. Thys the following chain of inequalities holds:
+\[
+    4(1-\epsilon/4)^m \geq P(\neg B) \geq P(error(h_m) > \epsilon)
+\] 
+
+Now, let $m_{\epsilon, \delta}$ be such that:
+\[
+    \delta \geq 4(1-\epsilon/4)^m_{\epsilon, \delta} \geq P(\neg B) \geq P(error(h_m) > \epsilon)
+\]
+
+Finding $m_{\epsilon, \delta}$ that satisfy this inequality would prove that $\forall m > m_{\epsilon, \delta}P(error(h_m) > \epsilon) \leq \delta$. We then require:
+\[
+    4(1-\epsilon/4)^m_{\epsilon, \delta} \leq \delta
+\]
+
+and we use the inequality $(1-k) \leq e^{-k}$ to obtain:
+\[
+    m_{\epsilon, \delta} \geq (4/\epsilon) \cdot \ln(4/\delta)
+\]
+
+In summary, provided a sample of at least $(4/\epsilon) \cdot \ln(4/\delta)$ examples in order to choose an hypothesis rectangle $R'$, we can assert that with probability at least $1- delta, R'$ will misclassify a new point (drawn according to the same distribution from which the sample was chosen) with probability at most $\epsilon$. 
+
+This proves that our hypothesis set $\mathcal{H}$ is PAC-learnable.
+
+
+
+\end{exampleblock}
 
 
 
 \section{VC Dimension (Vapnik-Chervonenkis)}
 
+Consider a class of hypotheses functions $\mathcal{H} = {h : X \to {0,1}}$ and a subset $C = {c_1,\dots, c_m} \subseteq X$ of input points. 
+
+Define $\mathcal{H}_c = {(h(c_1),\dots, h(c_m))|h \in \mathcal{H}}$, the set of all tuples of Booleans obtained by applying all possible hypothesis functions $h \in \mathcal{H}$ to all points in C. We say that $\mathcal{H}$ \textbf{shatters} the set C iff |$\mathcal{H}_C| = 2^m$. 
+
+Practically, this means that for any label assignment to points in C, we have a function in our hypothesis set which is able to match such an assignment. Namely, we can exactly describe every possible dataset with inputs in C. 
+
+\begin{definitionblock}[VC Dimension]
+    The \textbf{VC dimension of $\mathcal{H}$} is defined as:
+    $$
+    VC(\mathcal{H}) = \max \{m \in \mathbb{N} | \mathcal{H} \text{ shatters some } C \subseteq X, |C| = m\}
+    $$
+\end{definitionblock}
+
+\textbf{Remark}: In calculating the VC dimension, it is enough that we find one set of m points that can be shattered, it is not necessary that we are able to shatter any m points. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/fig11.png}
+    \caption{Proof that VCdim($\mathcal{H}_l \geq 3$)}
+    \label{fig:fig11}
+\end{figure}
+
+\subsection{VC dimension and PAC learning}
+
+In what follows, we will explore the reasons why VC dimension in crucial for PAC learnability. 
 
 
+\begin{theorem}
+    $If \mathcal{H} shatters C, |C| \geq 2m, then we cannot learn \mathcal{H} with m samples$
+\end{theorem}
 
+Hence, there will be an assignment of \textit{m} samples to classes in which we are going to commit a large error. 
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.2\textwidth]{assets/fig12.png}
+    \caption{Visual interpretation of the theorem: it is impossible to train a model of type $\mathcal{H}_a+$ with only a point A with known classification, because the points different from A could have any classification.}
+    \label{fig:fig12}
+\end{figure}
 
+If the $VCdim(\mathcal{H}) = \infty$, then $\mathcal{H}$ is not (agnostic) PAC learnable, indeed: 
+\begin{theorem}
+    $\mathcal{H} is (agnostic) PAC learnable iff VCdim(\mathcal{H}) < \infty$
+\end{theorem}
+
+In this case: $\exists c_1,c_2$ s.t.
+$$
+c_1 \frac{VCdim(\mathcal{H}) + \log (\frac{1}{\delta})}{\epsilon^2} \leq m_{\epsilon, \delta} \leq c_2 \frac{VCdim(\mathcal{H}) + \log(\frac{1}{\delta})}{\epsilon^2}
+$$
+
+Hence VC dimension gives us control on what we can or cannot learn. 
+
+\subsection{Rademacher Complexity}
+
+Consider the data generating distribution $p(x, y)$, a dataset $D ~ p^m$ and an hypothesis class $\mathcal{H} = {h : X \to {-1,1}}$.
+
+\begin{definitionblock}[Rademacher Distribution]
+    A distribution $\sigma = (\sigma_1, \dots, \sigma_m) s.t. \sigma_i \in {-1,1} \forall i and p(\sigma_i = 1) = 0.5$ is called \textbf{Rademacher Distribution}
+\end{definitionblock}
+
+\begin{definitionblock}[Rademacher Complexity]
+    The \textbf{Rademacher Complexity} of $\mathcal{H}$ is defined as:
+    $$
+    R_m(\mathcal{H}) = \mathbb{E}_{\sigma} \left[ \sup_{h \in \mathcal{H}} \dfrac{1}{m} \sum_{i=1}^m \sigma_i h(x_i) \right]
+    $$
+\end{definitionblock}
+
+\textbf{Remark}: this is a property both of the function \textit{h} and of the dataset \textit{D}.
+
+\begin{observationblock}
+$\sum_{i=1}^{m}\sigma_i h(x_i) = \sigma \cdot h(\underline{x})$ is the scalar product of the Rademacher distribution \sigma with the function \textit{h} evaluated on our dataset, so that $\frac{1}{m}\sigma \cdot h(\underline{x}) \in [-1,1]$, essentially is a measure of correlation of \textit{h} with random noise $\sigma$.
+\end{observationblock}
+
+Hence, for a specific choice of noise $\sigma$, we are going to look at the dataset and choose the best \textit{h} that correlates with this noise; then we take the expectation w.r.t. $\sigma$. 
+
+\begin{definitionblock}[Rademacher Complexity]
+    Taking into account the data generating mechanism \textit{p}, the \textbf{data-independent Rademacher complexity} is defined as:
+    $$
+    \mathcal{R}_m(\mathcal{H}) = \mathbb{E}_{D~p^m}[\hat{\mathcal{R}_D}(\mathcal{H})]
+    $$
+\end{definitionblock}
+
+Fix $\mathcal{H} and p(x,y)$, then $\forall \sigma > 0$ with probability at least $1-\delta, \forall D ~ p^m, |D| = m, \forall h \in \mathcal{H}$ we have:
+$$
+\begin{array}{rl}
+    R(h) \leq \hat(R_D)(h) + \underbrace{\mathcal{R}_m(\mathcal{H}) + \sqrt{\frac{\log (\frac{1}{\delta})}{2m}}}_{\epsilon_1}\\
+    R(h) \leq \hat(R_D)(h) + \hat{\mathcal{R}_D}(\mathcal{H}) + 3\sqrt{\frac{\log (\frac{2}{\delta})}{sm}}_{\epsilon_2}
+\end{array}
+$$
+
+\textbf{Remark}: computing the Rademacher complexity can be challenging, as it requires the solution of an optimization problem of any possible value of the Rademacher distribution. 
+
+\subsection{Rademacher complexity and VC dimension}
+
+\begin{definitionblock}[Growth Function]
+    The \textbf{growth function} $\prod_{\mathcal{H}}$ is defined as:
+    $$
+    \prod_{\mathcal{H}} : \mathbb{N} \to \mathbb{N}, \prod_{\mathcal{H}}(m) = \max_{x_1,\dots,x_m \in X} |{\mathcal{H}_D}|, |D| = m
+    $$
+    with $\mathcal{H}_D = {h(x_1),\dots,h(x_m)|h \in \mathcal{H}, D = {x_1,\dots,x_m}}$
+\end{definitionblock}
+
+Hence the growth function describes how the complexity of what we can explain with out hypothesis set $\mathcal{H}$ increases with the cardinality of the data points that we have.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/fig13.png}
+    \caption{Plot of the growth functions of $\mathcal{H}_a$(blue), $\mathcal{H}_{a+}$(green), $\mathcal{H}_l$(red) for $1 \leq m \leq 3$}
+    \label{fig:fig13}
+\end{figure}
+
+We can moreover define the $VCdim(\mathcal{H})$ in terms of the growth function:
+$$
+VCdim(\mathcal{H}) = \max \{m \in \mathbb{N} | \prod_{\mathcal{H}}(m) = 2^m\}
+$$
+
+Intuitively, this comes from the fact that if a set C is shattered by $\mathcal{H}$, then $\mathcal{H}_D = 2^m$.
+
+\begin{theorem}[Sauer Lemma]
+    $$
+    \prod_{\mathcal{H}}(m) \leq \sum_{i=0}^{d} \binom{m}{i} \leq \left(\dfrac{em}{d}\right)^d \leq O(m^d)
+    $$
+    with $d = VCdim(\mathcal{H})$
+\end{theorem}
+
+Moreover it also holds that:
+$$
+\mathcal{R}_m(\mathcal{H}) \leq \sqrt{\dfrac{2\log(\frac{2}{\delta})}{m}} + \sqrt{\dfrac{2\log(\frac{2}{\delta})}{m}} \leq O(\sqrt{\dfrac{d}{m}})
+$$
+
+We can say that $\mathcal{R}_m(\mathcal{H})$ and $VCdim(\mathcal{H})$ are essentially equivalent, in the sense that when the VC dimension is $\infty$ then the upper bound on the Redemarcher complexity is independent of \textit{m} and greater than 1 (if you substitute it into the PAC bound using Redemacher complexity, you get an error which remains always large, no matter how large is \textit{m}). Otherwise, when the VC dimension is $< \infty$, the bound tends to go to 0 as \textit{m} grows to infinity. 
+
+Summarizing, we have ways to measure the complexity of our hypotheses
+space: if this complexity is finite (in the sense of VC dimensionality), then
+what we have as a result is that we can constrain the error and provide
+bounds that tell us that this error is going towards 0, as we increase the
+data points (i.e. we will eventually learn). Instead if the VC dimension is
+infinite, no matter how many data points we have, we are not going to be
+able to learn, because the complexity of our model is too high, hence it
+can always overfit the data.
+
+Hence, in order to be able to actually learn, we need to put some
+constraints in our hypothesis set, and this formalizes our inductive
+bias.
