@@ -749,14 +749,431 @@ net.load_state_dict(torch.load('checkpoints/linear.pth'))
 
 \subsection{Training Example: Optimizing a Linear Layer}
 
+To train a network we need to come up with a score for how close we are to the goal. This scalar number is called the \textbf{objective} or the \textbf{loss}. 
+
+As an example, suppose we would like this network to always output \texttt{[1, 1]} regardless of input. Then a reasonable loss would be the mean suqared distance to \texttt{[1, 1]}, computed like this:
+\begin{codeblock}[language=python]
+y_batch = net(x_batch)
+loss = ((y_batch - torch.tensor([[1.0, 1.0]])) ** 2).sum(1).mean()
+print(f'loss is {loss}')
+\end{codeblock}
+
+We can use autograd get gradients to see how small changes in every parameter would impact the loss. 
+
+\begin{codeblock}[language=python]
+loss.backward()
+print(net.weight.grad)
+print(net.bias.grad)
+# tensor([[ 0.0000,  0.0000, -0.0000],
+#        [ 0.0000,  0.0000, -0.0000]])
+# tensor([0.0000, 0.0000])
+# Note that the gradients are all zero, because the output is already at the target value.
+# If we change the target to [0, 0], then the gradients are non-zero.
+loss = ((y_batch - torch.tensor([[0.0, 0.0]])) ** 2).sum(1).mean()
+loss.backward()
+print(net.weight.grad)
+# tensor([[ 0.0000,  0.0000, -0.0000],
+#        [ 0.0000,  0.0000, -0.0000]])
+print(net.bias.grad)
+# tensor([-0.0000, -0.0000])
+\end{codeblock}
+
+\textbf{Simple gradient descent can be done directly}. To improve our layer, we can use simple gradient descent with a learning rate of 0.01. That is, we can adjust each parameter by subtracting 0.01 times the gradient. If we do this repeatedly, we should get closer to our objective. 
+
+Any time we directly update the network parameters, we need to temporarily disable the autograd machinery using \texttt{with torch.no\_grad()}.
+
+\begin{codeblock}[language=python]
+net = torch.nn.Linear(3, 2)
+log = []
+for _ in range(10000):
+    y_batch = net(x_batch)
+    loss = ((y_batch - torch.tensor([[1.0, 1.0]])) ** 2).sum(1).mean()
+    log.append(loss.item())
+    net.zero_grad()
+    loss.backward()
+    with torch.no_grad():
+        for p in net.parameters():
+            p[...] -= 0.01 * p.grad
+print(f'weight is {net.weight}\n')
+print(f'bias is {net.bias}\n')
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+plt.ylabel('loss')
+plt.xlabel('iteration')
+plt.plot(log)
+plt.show()
+
+#weight is Parameter containing:
+#tensor([[7.5908e-06, 7.5909e-06, 7.5911e-06],
+#        [1.4001e-05, 1.4001e-05, 1.4001e-05]], requires_grad=True)
+#
+#bias is Parameter containing:
+#tensor([1.0000, 1.0000], requires_grad=True)
+\end{codeblock}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/fig9.png}
+    \caption{Loss over iterations}
+\end{figure}
+
+\subsection{Using \texttt{torch.nn.Sequential} to compose networks}
+
+Unlike \texttt{Linear}, most networks are made by composing many smaller networks. The simplest way to do this is chain networks together end-to-end, connecting each outpu to the next input. For example, we can simply compose \texttt{Linear} layers. 
+
+\textbf{Defining Multilayer Perceptron}. Of course, to get something more interesting than another linear function, we need to do something nonlinear between the linear steps. If we add a nonlinearity between each step (for example, if we clamp negative numbers to zero - an operation called \textbf{ReLU}), then we can get a \textbf{Multilayer Perceptron}, which is known to be a universal function approximator, i.e., a family of piecewise-linear functions that can approximate any function. 
+
+Here is how we can express the network as a nested set of Sequentials:
+
+\begin{codeblock}[language=python]
+from collections import OrderedDict
+from torch.nn import Linear, ReLU, Sequential
+
+mlp = torch.nn.Sequential(OrderedDict([
+('layer1', Sequential(Linear(2, 20), ReLU())),
+('layer2', Sequential(Linear(20, 20), ReLU())),
+('layer3', Sequential(Linear(20, 2)))
+]))
+
+print(mlp)
+
+#Sequential(
+#  (layer1): Sequential(
+#    (0): Linear(in_features=2, out_features=20, bias=True)
+#    (1): ReLU()
+#  )
+#  (layer2): Sequential(
+#    (0): Linear(in_features=20, out_features=20, bias=True)
+#    (1): ReLU()
+#  )
+#  (layer3): Sequential(
+#    (0): Linear(in_features=20, out_features=2, bias=True)
+#  )
+#)
+\end{codeblock}
+
+In the above, we have nested two levels of Sequentials. In the outermost level, we have defined and named three layers. 
+
+Then each layer is itself a Sequential that executes a parametrized \texttt{Linear} operation followed by a \texttt{ReLU} nonlinear clamping operation. We have not bothered to name each of the innermost steps, so the Sequential just automatically numbers them. 
+
+\textbf{Every submodule has a fully qualified name}. We can het a full recursive list of submodules by listing \texttt{net.named\_modules()}. 
+
+\begin{codeblock}[language=python]
+for n, c in mlp.named_modules():
+print(f'{n or "The whole network"} is a {type(c).__name__}')
+
+#The whole network is a Sequential
+#layer1 is a Sequential
+#layer1.0 is a Linear
+#layer1.1 is a ReLU
+#layer2 is a Sequential
+#layer2.0 is a Linear
+#layer2.1 is a ReLU
+#layer3 is a Sequential
+#layer3.0 is a Linear
+
+\end{codeblock}
+
+\textbf{A module's parameters include all its child module parameters}. We can see this by listing all the parameters by name. 
+
+\begin{codeblock}[language=python]
+for name, param in mlp.named_parameters():
+print(f'{name} has shape {tuple(param.shape)}')
+
+#layer1.0.weight has shape (20, 2)
+#layer1.0.bias has shape (20,)
+#layer2.0.weight has shape (20, 20)
+#layer2.0.bias has shape (20,)
+#layer3.0.weight has shape (2, 20)
+#layer3.0.bias has shape (2,)
+\end{codeblock}
+
+There are now six parameters: a weight and a bias for each of the three \texttt{Linear} layers. 
+
+\textbf{Training a Classifier}. This slightly more complicated network can now represent a more general class of functions. As an example, we can use this architecture to learn to compute a classifier function. 
+
+Suppose we want to classify points on a plane as either above a sine-wave (class 1) or below a sine-wave (class 0). Here is the ordinary training loop to train our MLP to do it, using the Adam optimizer:
+
+\begin{codeblock}[language=python]
+from torch.nn.functional import cross_entropy
+
+def classify_target(x, y):
+    return (y > (x * 3).sin()).long()
+
+mlp.cuda()
+optimizer = Adam(mlp.parameters(), lr=0.01)
+for iteration in range(1024):
+    in_batch = torch.randn(10000, 2, device='cuda')
+    target_batch = classify_target(in_batch[:,0], in_batch[:,1])
+    out_batch = mlp(in_batch)
+    loss = cross_entropy(out_batch, target_batch)
+    if iteration > 0:
+        mlp.zero_grad()
+        loss.backward()
+        optimizer.step()
+    if iteration == 2 ** iteration.bit_length() - 1:
+        pred_batch = out_batch.max(1)[1]
+        accuracy = (pred_batch == target_batch).float().sum() / len(in_batch)
+        print(f'Iteration {iteration} accuracy: {accuracy}')
+        visualize_net(mlp, classify_target)
+\end{codeblock}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/fig10.png}
+    \caption{Classifier accuracy}
+\end{figure}
+
+\subsection{Defining \texttt{forward} to create custom networks}
+
+Sometimes you will want to hook up network components in a more complicated way than just a sequential operation of predefined components. 
+
+For example, \href{https://arxiv.org/abs/1512.03385}{ResNet} is built on the observation that learning can work much better if, instead of learning an arbitrary linear operation, we learn perturbations of the identity. I.e., have a layer learn to compute a small residual instead of the whole total answer. 
+
+To apply the residual trick in our little three-layer network, we cannot just use an overall \texttt{Sequential}: instead we will define the operation by writing our own \texttt{forward} function. It looks like this:
+
+\begin{codeblock}[language=python]
+class MyNetwork(torch.nn.Module):
+def __init__(self):
+    super().__init__()
+    self.layer1 = Sequential(Linear(2, 20), ReLU())
+    self.residual_layer2 = Sequential(Linear(20, 20), ReLU())
+    self.layer3 = Linear(20, 2)
+    
+def forward(self, x):
+    x = self.layer1(x)
+    x = x + self.residual_layer2(x)
+    x = self.layer3(x)
+    return x
+
+res_mlp = MyNetwork()
+print(res_mlp)
+
+# Exercise left to you: try training res_mlp just like we trained mlp above.
+
+
+#MyNetwork(
+#  (layer1): Sequential(
+#    (0): Linear(in_features=2, out_features=20, bias=True)
+#    (1): ReLU()
+#  )
+#  (residual_layer2): Sequential(
+#    (0): Linear(in_features=20, out_features=20, bias=True)
+#    (1): ReLU()
+#  )
+#  (layer3): Linear(in_features=20, out_features=2, bias=True)
+#)
+ \end{codeblock}
+ 
+ Training the network above can be done exactly the same way as training our previous \texttt{Sequential} mlp. Try copying+pasting the training code and adapting it to this new network. 
+
+ \subsection{Other \texttt{Module} tricks}
+
+ \begin{itemize}
+    \item \texttt{torch.nn.Parameter} wraps trainable parameters. In the \texttt{\_\_init\_\_()} method, you can define more tensors as parameters to be optimized, by wrapping parameter tensors with a \texttt{torch.nn.Parameter} before setting the attribute. See the \href{https://github.com/pytorch/pytorch/blob/main/torch/nn/modules/linear.py#L74-L78}{pytorch Linear source code} to see an example. 
+    \item \texttt{module.training} allows special behavior during training. Some modules behave differently at training time than at inference time. For example a \href{https://jmlr.org/papers/volume15/srivastava14a/srivastava14a.pdf}{Dropout} layer will drop half the channels and amplify the other half randomly during training, but at inference, for better performance, it will include all the channels. To support this sort of trick, there is a \texttt{module.train()} method to put a module (recursively) into training mode and a \texttt{module.eval()} to put it into inference mode. The \texttt{module.training} boolean tells which mode is current. 
+    \item \textbf{buffers} can be learned without the optimizer. Not every attribute of a module needs to be trainable by the optimizer. Some attributes can be learned in a different way, for example by observing and averaging statistics observed during training time. The most famous example of this is the \href{https://arxiv.org/abs/1502.03167}{Batchnorm} layer, which observes mean and variance during training, and accumulates statistics to enforces zero mean and unit variance.
+    \item \textbf{Predefined model architecture} are available; for example \texttt{torchvision.models.resnet18(num\_classes=100)} will create a ResNet-18 classifier model, configured to do a 100-way classification of images. 
+ \end{itemize}
 
 
 
+ \section{Datasets and Dataloaders in PyTorch}
 
+ \begin{codeblock}[language=python]
+# To save time, start this download first, before reading through the examples.
+import torch, torchvision, os
+if not os.path.isfile('datasets/miniplaces/train/yard/00001000.jpg'):
+    torchvision.datasets.utils.download_and_extract_archive(
+        'http://dissect.csail.mit.edu/datasets/miniplaces.zip',
+        'datasets', md5='bfabeb497c7eca01c74cd8441a9ac108')
+\end{codeblock}
 
+Data sets can be thought of as big arrays of data. If the data set is small enough (e.g. MNIST, which has 60,000 28x28 grayscale images), a dataset can be literally represented as an array - or more precisely, as a single PyTorch tensor. With one number per pixel, MNIST takes about 200MB of RAM, which fits comfortably into a modern computer.
 
+But larger-scale datasets like ImageNet of Places365 have more than a million higher-resolution full-color images. In these cases, an ordinary python array or PyTorch tensor would require more than a TB of RAM, which is impractical on most computers. 
 
+Instead, we need to load the data from dist (or SSD). Unfortunately, the latency of loading from disk is very slow compared to RAM, so we need to do the loading cleverly if we want to load the data quickly. 
 
+To solve the problem, PyTorch provides two classes:
+\begin{itemize}
+    \item \texttt{torch.utils.data.Dataset} - This very simple base class represents an array where the actual data may be slow to fetch, typically because the data is in disk files that require some loading, decoding, or other preprocessing. PyTorch provides a variety of different \texttt{Dataset} subclasses. As an example, there is a handy one called \texttt{ImageFolder} that treats a directory tree of image files as an array of classified images. 
+    \item \texttt{torch.utils.data.DataLoader} - This fancy class wraps a \texttt{Dataset} as a stream of data batches. Behind the scenes it uses a few techniques to feed the data faster. You do not need to subclass \texttt{DataLoader} - its purpose is to make a \texttt{Dataset} speedy. 
+\end{itemize}
 
+\subsection{Looking at an image dataset using ImageFolder}
 
+The most common \texttt{Dataset} used in computer vision is \texttt{ImageFolder}, which loads a set of image files from a directory tree. It treats every subdirectory of images as a classification category. To demonstrate it, we will use it to load images from the miniplaces dataset loaded above. 
 
+\textbf{Directory layout}. Notice that \texttt{datasets/miniplaces/val} contains a set of 100 directories with names like \texttt{golf\_course}. Each of these directories contain 100 images, each stored as a jpeg file: 10000 images in total. 
+
+\begin{codeblock}[language=python]
+ls datasets/miniplaces/val/golf_course
+\end{codeblock}
+
+\textbf{Constructing an ImageFolder}. Making an ImageFolder at the root directory of the dataset creates an object that behaves like an array: it has a length and each entry contains a tuple with an image and a number. The image is stored as a \texttt{PIL} object, which is a standard in python object for images and the number denotes the classification class - with one class for each folder, numbered in alphabetical order. 
+
+\begin{codeblock}[language=python]
+val_set = torchvision.datasets.ImageFolder('datasets/miniplaces/val')
+print('Length is', len(val_set))
+item = val_set[5100]
+print('5100th item is a pair', item)
+
+# Display the PIL image and the class name directly.
+display(item[0])
+print('Class name is', val_set.classes[item[1]])
+\end{codeblock}
+
+\textbf{Transforming the PIL image into a PyTorch tensor}. A PIL image is not convenient for training: we would prefer our dataset to return PyTorch tensors. So we can tell \texttt{ImageFolder} to do this by specifying the \texttt{transform} function on construction. PyTorch comes with a standard transform function \texttt{torchvision.transforms.ToTensor()} which converts an image to a PyTorch tensor. 
+
+Now when indexing into the dataset, we will get a PyTorch tensor instead of a PIL image. 
+
+\begin{codeblock}[language=python]
+val_set =  torchvision.datasets.ImageFolder(
+    'datasets/miniplaces/val',
+    transform=torchvision.transforms.ToTensor())
+print(val_set[1000])
+
+# There is an inverse transform that can be used to convert it back to a PIL image,
+# handy if we want to see it.
+as_image = torchvision.transforms.ToPILImage()
+display(as_image(val_set[1000][0]))
+\end{codeblock}
+
+\subsection{Fast Dataset Access using DataLoader}
+
+When we use a dataset, we will usually run through the whole dataset in batches. We could do this ourselves, as in line 6-8 below, by just fetching the images one at a time and grouping them. 
+
+But a faster way to iterate the dataset is to wrap our \texttt{val\_set} object in a \texttt{torch.utils.data.DataLoader} object, as shown on line 14-18 below. The \texttt{val\_loader} we get can magically pull data out of the Dataset much faster than doing it in the simple way; the \texttt{DataLoader} class does this by using several threads to load and prefetch the data. 
+
+The speedup will depend on the system and the number of threads you use (the number of threads to use is specified using \texttt{num\_workers}). In practice using \texttt{DataLoader} will typically be 5-20 times faster than direct \texttt{Dataset} access. 
+
+\begin{codeblock}[language=python]
+import time
+
+print('Going over the data set as an array.')
+start = time.time()
+summed_image_dataset = 0
+batch_size = 100
+for i in range(0, len(val_set), batch_size):
+    image_batch = torch.stack([val_set[i+j][0] for j in range(batch_size)])
+    summed_image_dataset += image_batch.sum(0)
+end = time.time()
+print(f'Took {end - start} seconds')
+
+print('Going over the same dataset using a dataloader.')
+start = time.time()
+val_loader = torch.utils.data.DataLoader(
+    val_set, batch_size=batch_size, num_workers=10)
+summed_image_loader = 0
+for image_batch, label_batch in val_loader:
+    summed_image_loader += image_batch.sum(0)
+end = time.time()
+print(f'Took {end - start} seconds')
+
+print('Numerical difference is exactly', (summed_image_loader - summed_image_dataset).norm().item())
+\end{codeblock}
+
+\subsection{Using a DataLoader for Training}
+
+We can put everything together by using the data from a data loader to train a classifier. 
+
+The following is a simplistic example of training an image classifier. It uses the Adam optimizer and the ResNet-18 neural network architecture, and trains for a couple minutes, just passing once over the training set. 
+
+\begin{codeblock}[language=python]
+from tqdm import tqdm
+
+# Create a Dataset of miniplaces training images.
+train_set = torchvision.datasets.ImageFolder(
+    'datasets/miniplaces/train',
+    torchvision.transforms.ToTensor())
+
+# Wrap the Dataset in a high-speed DataLoader with batch_size 100.
+train_loader = torch.utils.data.DataLoader(
+    train_set, batch_size=100, num_workers=10,
+    shuffle=True,
+    pin_memory=True)
+
+# Create an untrained neural network using the ResNet 18 architecture.
+model = torchvision.models.resnet18(num_classes=100).cuda()
+
+# Set up the model for training using the Adam optimizer.
+model.train()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+
+# To train, optimize an objective on batches of training data.
+# Here we look at every training image once.
+for batch in tqdm(train_loader):
+    images, labels = [d.cuda() for d in batch]
+    optimizer.zero_grad()
+    scores = model(images.cuda())
+    loss = torch.nn.functional.cross_entropy(scores, labels)
+    loss.backward()
+    optimizer.step()
+\end{codeblock}
+
+\subsection{Checking Accuracy with a Held-Out Dataset}
+
+To check if network has learned anything useful, we can check whether the model can make good predictions on unseen images. The easy way to do this is to create a second \texttt{ImageFolder} dataset (and \texttt{DataLoader}) with a second set of images that was \textbf{not} used for training. 
+
+While the achieved accuracy after a couple minutes of training is not perfect, it is already much better than random. 
+
+\begin{codeblock}[language=python]
+# Create a validation dataset and data loader.
+val_set = torchvision.datasets.ImageFolder(
+    'datasets/miniplaces/val',
+    torchvision.transforms.ToTensor())
+val_loader = torch.utils.data.DataLoader(
+    val_set, batch_size=100, num_workers=10,
+    pin_memory=True)
+
+# This function runs over the validation images and counts accurate predictions.
+def accuracy():
+    model.eval()
+    correct = 0
+    for iter, batch in enumerate(val_loader):
+        images, labels = [d.cuda() for d in batch]
+        with torch.no_grad():
+            scores = model(images.cuda())
+        correct += (scores.max(1)[1] == labels).float().sum()
+    return correct.item() / len(val_set)
+
+print(f'Accuracy on unseen images {accuracy() * 100}% (random guesses would be 1%)')
+\end{codeblock}
+
+\subsection{Improving Training using Data Augmentation}
+
+One of the main ways to stretch a dataset to make it more effective for training is to randomly adjust the images. For example if we randomly adjust the crop, color, or orientation of the image while loading, using the same image file  multiple times will produce different training examples for the network. This is an easy way to increase the amount of training diversity in the dataset without requiring more actual images. 
+
+To do data augmentation in a PyTorch \texttt{Dataset}, you can specify more operations on \texttt{transform=} besides \texttt{ToTensor()}. 
+
+In particular, there is a \texttt{Compose} transform that makes it easy to chain a series of data transformations; and \texttt{torchvision.transforms} includes a number of useful image transforms such as random resized crops and image flips. 
+
+Here is an example:
+
+\begin{codeblock}[language=python]
+# Create a Dataset of miniplaces training images.
+train_set = torchvision.datasets.ImageFolder(
+    'datasets/miniplaces/train',
+    torchvision.transforms.Compose([
+        torchvision.transforms.RandomCrop(112),
+        torchvision.transforms.RandomHorizontalFlip(),
+        torchvision.transforms.ToTensor(),
+    ]))
+train_loader = torch.utils.data.DataLoader(
+    train_set, batch_size=100, num_workers=10,
+    shuffle=True,
+    pin_memory=True)
+
+# Now let's train for one more epoch, and test the accuracy
+model.train()
+for batch in tqdm(train_loader):
+    images, labels = [d.cuda() for d in batch]
+    optimizer.zero_grad()
+    scores = model(images.cuda())
+    loss = torch.nn.functional.cross_entropy(scores, labels)
+    loss.backward()
+    optimizer.step()
+print(f'Accuracy on unseen images {accuracy() * 100}% (random guesses would be 1%)')
+\end{codeblock}
