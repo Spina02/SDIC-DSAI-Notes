@@ -549,14 +549,14 @@ Se
 $
 \begin{cases}
     \bar v = a\bar x_u + b\bar x_v \\ 
-    \bar \omega = c\bar x_u + d\bar x_v
+    \bar w = c\bar x_u + d\bar x_v
 \end{cases}
 \text{, con } a,b,c,d \in \mathbb{R}
 $
 , sono due vettori tangenti alla superficie $M$, allora:
 
 $$
-\bar v \cdot \bar \omega = (a\bar x_u + b\bar x_v) \cdot (c\bar x_u + d\bar x_v) = acE + (ad + bc)F + bdG
+\bar v \cdot \bar w = (a\bar x_u + b\bar x_v) \cdot (c\bar x_u + d\bar x_v) = acE + (ad + bc)F + bdG
 $$
 
 che si può riscrivere nella forma matriciale:
@@ -747,8 +747,8 @@ L'area dell'areola è data da
 \vspace{0.4em}
 $$
 \Delta A = |\bar x_1|\,\Delta u^1 \cdot |\bar x_2|\,\Delta u^2\,\sin\theta 
-=\; |\bar x_1 \times \bar x_2|\,\Delta u^1\,\Delta u^2
-=\; \sqrt{g}\,\Delta u^1\,\Delta u^2,
+=\; \underbrace{|\bar x_1 \times \bar x_2|\,\Delta u^1\,\Delta u^2
+=\; \sqrt{g}\,\Delta u^1\,\Delta u^2}_{\text{identità di Lagrange}}
 $$
 dove $\theta$ è l'angolo tra $\bar x_1$ e $\bar x_2$ e $g = \det(g_{ij})$.
 
@@ -789,7 +789,7 @@ Osserviamo che, in due dimensioni, la misura di un insieme coincide con l'area; 
     Consideriamo un esmepio più complesso, il toro:
 
     $$
-    \bar x (u, v) = [R + r \cos u] \cos v, [R + r \cos v] \sin u, r \sin v,
+    \bar x (u, v) = [R + r \cos u] \cos v, [R + r \cos u] \sin n, r \sin u,
     $$
     
     \begin{minipage}[H]{0.5\textwidth}
@@ -797,7 +797,7 @@ Osserviamo che, in due dimensioni, la misura di un insieme coincide con l'area; 
         \begin{cases}
             0 < v < 2\pi \\
             0 < u < 2\pi \\
-            0 < r < r
+            0 < r < R
         \end{cases}
         $$
     \end{minipage}%
@@ -807,11 +807,27 @@ Osserviamo che, in due dimensioni, la misura di un insieme coincide con l'area; 
             \includegraphics[width=0.6\textwidth]{assets/toro.png}
         \end{figure}
     \end{minipage}
-    
-    Otteniamo:
+
+    Calcoliamo la prima forma fondamentale:
 
     $$
-    A = \iint_{\Omega} \sqrt{g} du dv = \boxed{4 \pi^2 R r}
+    \begin{cases}
+        E = R^2 + r^2 \cos^2 u \\
+        F = 0 \\
+        G = r^2
+    \end{cases}
+    \quad \Rightarrow \quad
+    \sqrt{g} = \sqrt{EG-F^2} = r(R + r\cos u)
+    $$
+
+    Calcoliamo l'area:
+
+    $$
+    \begin{array}{rl}
+    \displaystyle A &= \displaystyle \int_0^{2\pi} \left[ \int_0^{2\pi} r(R + r\cos u) du \right] dv \;=\; 2\pi r \left[ \int_0^{2\pi} R\; du + \int_0^{2\pi} r\cos u\; du \right] = \\[1em]
+    \displaystyle &= \displaystyle 2\pi r \left[ 2\pi R +r \int_0^{2\pi} \cos u\; du \right] \; 
+    \quad \;=\; \quad \boxed{4 \pi^2 R r}
+    \end{array}
     $$
 
 \end{exampleblock}

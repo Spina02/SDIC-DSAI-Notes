@@ -1,2 +1,107 @@
+\newpage
 
+\chapter{Lecture 25/03/2025}
+
+\lstdefinelanguage{assembly}{
+  morekeywords={mov, cmp, jge, add, sub, jmp},
+  sensitive=true,
+  comment=[l]{;},
+}
+
+\lstdefinelanguage{c}{
+  morekeywords={if, else, return, for, while},
+  sensitive=true,
+}
+
+\textbf{Coherency problem}
+
+We saw that:
+
+\textbf{Symmetric Multiprocessing (SMP)}\newline
+In SMP systems, multiple processors share a common physical memory, enabling concurrent access to shared data and resources.
+
+\textbf{Distributed NUMA}
+Each CPU has its own local memory, but can also access the memory of other CPUs albeit with increased latency due to the non-uniform memory access characteristics.
+
+---
+
+When a CPUs wants to modify a value in memory, they firstly need to copy that value in a register, perform the operation and then write it back in memory.
+
+If we are in a shared memory environment, and two or more CPUs are trying to modify the same value, we have a problem: the value in memory is not updated until the CPU writes it back. This can lead to a situation where the CPUs are working on an outdated value.
+
+---
+
+The cpu is able to perform multiple operations at the same time. This is possible because the CPU has a pipeline divided in stages. Each stage is responsible for a specific operation. The CPU can start a new operation in a new stage before the previous operation is completed.
+
+If many independent logical units exist to perform each step, they could operate subsequently on different instructioms:
+
+If the stage delays are not uniform, the throughput is limited by the latency:
+$$F + (D + E) - (F + D) = E \sim 220ps$$
+which means we have a throughput of $\sim 4.5GHz$.just becouse of logic units separation.
+
+Therefore, introducing the instruction pipelining, we can increase the throughput of our system by a large factor:
+
+*missing something here*
+
+Modern computers have multiple pipelines, each one dedicated to a specific type of instruction (int op, float op, memory, ...).
+
+---
+
+Modern CPUs have "\bfit{vector registers}", which are registers that can store multiple values at the same time. This allows the CPU to perform the same operation on multiple values at the same time, increasing the throughput of the system.
+
+\chapter{branches}
+
+Whenever either
+\begin{enumerate}
+\item the sequence of operations that must be executed
+\item the sequence of data to be processed depends on some condition, i.e. on the outcome of a test performed onsome data or result
+\end{enumerate}
+we have a \textbf{conditional execution}.
+
+Modern architecture offer 2 distinct low-level instructions to implement a conditional execution upon a test:
+\begin{itemize}
+\item modifying the control flow → data-dependent execution
+\item modifying the data flow → data-dependent data-flow
+\end{itemize}
+
+At machine level, the way to alter the execution flow is through a \textbf{jump instruction}, that causes the control to be passed to a different code section.
+The jump instruction can be \bfit{conditional}, when its execution depends on the outcome of some operation (a test), or \bfit{unconditional} if it is not.
+
+\begin{exampleblock}[Example]
+Let's consider a simple snippet of code in C and its corresponding assembly code:
+\begin{minipage}{0.27\linewidth}
+    \begin{codeblock}[language=c]
+if (a < b) {
+    c = a + b;
+} else {
+    c = a - b;
+}
+    \end{codeblock}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.73\linewidth}
+    \begin{codeblock}[language=assembly]
+  mov  eax, DWORD PTR [rbp-8]  ; moves a to eax
+  cmp  eax, DWORD PTR [rbp-4]  ; compares a and b
+  jge  .L2                     ; jumps to L2 if a >= b
+  
+  mov  edx, DWORD PTR [rbp-8]  ; moves a to edx
+  mov  eax, DWORD PTR [rbp-4]  ; moves b to eax
+  add  eax, edx                ; adds a and b
+  mov  DWORD PTR [rbp-12], eax ; moves res to c
+  jmp  .L3                     ; jumps to .L3
+.L2:
+  mov  eax, DWORD PTR [rbp-8]  ; moves a to eax
+  sub  eax, DWORD PTR [rbp-4]  ; sub. b from a
+  mov  DWORD PTR [rbp-12], eax ; moves res to c
+.L3:
+  ; (rest of the code, if any)
+    \end{codeblock}
+\end{minipage}
+\underline{\textbf{Note}}: The true branch is the closest to the test condition, while the false branch is reached upon a jump.
+\end{exampleblock}
+
+\begin{tipsblock}[Branch prediction]
+    When coding, if possible pay attention to what is most likely to be true, to preserve the code locality: \emph{It is possible to suggest to compiler which branch will most probably be true}
+\end{tipsblock}
 

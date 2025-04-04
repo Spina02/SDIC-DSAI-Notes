@@ -1,72 +1,86 @@
 \newpage
 
-\chapter{Lezione 3: 11/03/2025}
+\chapter{Tensori}
+
+Avremo a che fare con grandezze \emph{tensoriali}, grandezze e cui proprietà sono legate al modo di trasformarsi cambiando sistema di riferimento.
 
 \section{Tensori Controvarianti e Covarianti}
 
 \subsubsection{Tensori Controvarianti}
 
-$$
-u^i = (i = 1, \dots, n) \quad \Rightarrow \quad u'^j = (j = 1, ..., n)
-$$
 
-Regola di trasformazione:
-
+Passando da un sistema generico di dimensione $n$ ad un altro 
+$
+u^i = (i = 1, \dots, n) \ \rightarrow \ u'^j = (j = 1, ..., n)
+$
+abbiamo visto che vale la regola di trasformazione:
+\vspace{0.5em}
 $$
 du'^j = \sum_{i=1}^{n} \dfrac {\partial u'^j}{\partial u^i} du^i
 $$
-
-Otteniamo il \textbf{tensore controvariante}:
-
+Ogni grandezza $V^j$ che si trasforma con la regola:
+\vspace{0.5em}
 $$
 \boxed{
-V^{j} = \sum_{i=1}^{n} \dfrac {\partial u'^j}{\partial u^i} V^{i} 
-}
+    V'^{j} = \sum_{i=1}^{n} \dfrac {\partial u'^j}{\partial u^i} V^{i} 
+    \quad \xrightarrow{\text{notazione di Einstein}}\quad 
+    V'^{j} = \dfrac {\partial u'^j}{\partial u^i} V^{i} 
+    }
 $$
+è un \textbf{tensore controvariante}, quindi anche $du^i$ (o $u^i$) è un tensore controvariante. Un vettore è un tensore di \bfit{ordine} o (\bfit{rango}) 1. Una grandezza scalare, invece, il cui valore non muta in un dato punto anche se cambia il sistema di coordinate, è un tensore di ordine 0.
 
 \subsubsection{Tensori Covarianti}
 
-Consideriamo ora un campo scalare $\Phi$:
+Consideriamo ora un campo scalare $\Phi(u^i) = \Phi(u'^j)$. 
+Ad esempio un campo che definisce la temperatura in un punto dello spazio, per la quale, indipendentemente dal sistema di riferimento $u^i$ o $u'^j$, il valore della temperatura è sempre lo stesso.
 
+La relazione che sussiste tra il gradiente di $\Phi$ in un sistema di riferimento e quello in un altro è:
+\vspace{0.5em}
 $$
 % \begin{array}{rcl}
 \partial \Phi_{'j} = \dfrac{\partial \Phi} {\partial u'^j} 
-= \sum_i \dfrac{\partial \Phi} {\partial u'} \dfrac{\partial u'} {\partial u'^j}
-= \sum_i \dfrac{\partial u'} {\partial u'^j} \dfrac{\partial \Phi} {\partial u'} 
-= \sum_i \dfrac{\partial u'} {\partial u'^j} \partial \Phi_{'i} = W
+= \sum_i \dfrac{\partial \Phi} {\partial u^i} \dfrac{\partial u^i} {\partial u'^j}
+= \sum_i \dfrac{\partial u^i} {\partial u'^j} \dfrac{\partial \Phi} {\partial u'} 
+= \sum_i \dfrac{\partial u^i} {\partial u'^j} \partial \Phi_{'i} = W
 % \end{array}
 $$
 
-Otteniamo il \textbf{tensore covariante}:
-
+Ogni grandezza $W_{'j}$ che si trasforma con la regola:
+\vspace{0.5em}
 $$
 \boxed{
-W_{ij} = \sum_i \dfrac{\partial u'} {\partial u'^j} W_j
-}
+    W_{'j} = \sum_i \dfrac{\partial u^i} {\partial u'^j} W_j
+    \quad \xrightarrow{\text{notazione di Einstein}}\quad 
+    W_{'j} = \dfrac{\partial u^i} {\partial u'^j} W_j 
+    }
 $$
 
+è un \textbf{tensore covariante}.
+
+Abbiamo visto la grandezza $ds^2 = g_{ij} du^i du^j$, che indica la lunghezza, al quadrato, di un segmento infinitesimo, e quindi non dipende dal sistema di riferimento usato (è uno scalare). In due sistemi diversi sarà quindi:
 $$
 ds^2 = g_{ij} du^i du^j = g_{ij} \dfrac {\partial u^i}{\partial u'^l} du'^l \dfrac {\partial u^j}{\partial u'^k} du'^k = g'_{lk} du'^l du'^k 
 $$
-
+poichè
 $$
 g'_{lk} = \dfrac {\partial u^i}{\partial u'^l} \dfrac {\partial u^j}{\partial u'^k} g_{ij} \quad \rightarrow \quad \text{"covariante"}
 $$
-
+abbiamo quindi:
 $$
 g'^{lk} = \dfrac {\partial u'^l}{\partial u^i} \dfrac {\partial u'^k}{\partial u^j} g^{ij} \quad \rightarrow \quad \text{"controvariante"}
 $$
+Cioè $g_{ij}$ è un tensore covariante di rango 2, mentre $g^{ij}$ è un tensore controvariante di rango 2.
 
-Se un tensore ha sia indici covarianti che controvarianti, allora si dice \textbf{misto}. In tal caso è necessario applicare una trasformazione controvariante per gli indici controvarianti e una covariante per gli indici covarianti:
-
+Se un tensore ha sia indici covarianti che controvarianti, come abbiamo visto in $g_{ij}g^{jk} = \delta_i^k$ allora si dice \textbf{misto}. In tal caso è necessario applicare una trasformazione controvariante per gli indici controvarianti e una covariante per gli indici covarianti:
+\vspace{0.5em}
 $$
 V'^k_l = \dfrac {\partial u'^k}{\partial u^j} \dfrac {\partial u^i}{\partial u'^l} V^j_i
 $$
 
 \begin{observationblock}[Tensori e indici]
     Un tensore ha \textbf{rango} $n$ se ha $n$ indici, sia covarianti che controvarianti.
-
-    Nota: \textit{Non tutti gli ogetti che hanno indici sono tensori}
+    
+    \underline{\textbf{Nota}}: \textit{Non tutti gli ogetti che hanno indici sono tensori}
 \end{observationblock}
 
 \newpage

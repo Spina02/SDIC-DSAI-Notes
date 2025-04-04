@@ -51,18 +51,22 @@ We can convert the data from Cartesian to Polar coordinates as follows:
     \includegraphics[width=0.7\textwidth]{assets/non-lin.png}
 \end{figure}
 
+\newtheorem{theorem}{Theorem}[chapter]
 
 \section{Universal Approximation Theorem}
 
-Let $\sigma$ be any continuous discriminatory function.
+\rule{\textwidth}{0.5pt}
+\begin{theorem}
 
-$$
+    Let $\sigma$ be any continuous discriminatory function.
+    
+    $$
 \displaystyle
 \text{Then finite sums of the form}
 \quad
 G(x) = \sum_{j=1}^{N} \alpha_j \sigma(y_i^\top x + \theta_j)
 \quad
-\text{are dense in} C(I_n).
+\text{are dense in } C(I_n).
 $$ 
 
 In other words, given any $f \in C(I_n)$ and $\varepsilon > 0$, there is a sum, $G(x)$, of the above form, for wich:
@@ -70,8 +74,10 @@ In other words, given any $f \in C(I_n)$ and $\varepsilon > 0$, there is a sum, 
 $$
 |G(x) - f(x)| < \varepsilon \quad \quad \forall x \in I_n
 $$
+\rule{\textwidth}{0.5pt}
+\end{theorem}
 
----
+\subsubsection{Bounds of the Universal Approximation Theorem}
 
 Any function $f(x)$ on $\mathbb{R}^d$ with some smoothness conditions can be approximated by a single hidden layer sigmoidal neural network $f_n(x)$ with $n$ hidden units such that:
 
@@ -167,3 +173,233 @@ B_i(x) =
     majority & \text{if the class of $x$ in the block $ A$}
 \end{cases}
 $$
+
+\subsubsection{Limitations of Fixed Basis Functions}
+
+High dimensionality introduces several challenges. One intuitive explanation comes from examining the probability density function in high-dimensional spaces.
+
+Consider the marginal density of the radial coordinate:
+$$
+p(r) = \int_{d\Omega} d\Omega \int p(x)\, dx,
+$$
+where $d\Omega$ denotes the differential solid angle.
+
+By switching to polar coordinates, we have:
+$$
+p(x) \to p(r, \Omega),
+$$
+so that the radial density becomes:
+$$
+p(r) = \dfrac{S_D \, r^{D-1}}{(2\pi \sigma^2)^{D/2}} e^{-r^2/(2\sigma^2)},
+$$
+with $S_D$ representing the surface area of the unit sphere in $D$ dimensions.
+
+A key insight is that the probability mass concentrates around a specific radius. In fact, the mode of the radial density occurs approximately at:
+$$
+r^* \approx \sigma \sqrt{D}.
+$$
+Moreover, for a small deviation $\varepsilon$ from $r^*$, the density decays as:
+$$
+p(r^* + \varepsilon) = p(r^*) \exp \left( -\dfrac{3 \varepsilon^2}{2\sigma^2} \right).
+$$
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/curse_dim.png}
+    \caption{Curse of dimensionality.}
+    \label{fig:curse_dim}
+\end{figure}
+
+
+\subsubsection{Mainfolds hypothesis}
+
+Most "naturally occuring" datasets lie on a low-dimensional mainfold
+
+
+\chapter{Deep Networks}
+\section{Composition of shallow networks}
+
+The composition of shallow networks is a way to increase the number of linear regions. The idea is to stack multiple shallow networks to create a deep network.
+
+Let's consider firstly a simple example with two shallow networks:
+
+\begin{center}
+    \begin{tikzpicture}[x=2cm, y=1.5cm, every node/.style={circle, draw, minimum size=1cm}]
+        % Input layer (3 neurons)
+        \node[] (X) at (0,-2) {$X$};
+        
+        % Hidden layer (3 neurons)
+        \foreach \j in {1,...,3} {
+            \node[] (H\j) at (1.5,-\j) {$h_{\j}$};
+        }
+        
+        % Output layer (1 neuron)
+        \node[] (Y) at (3,-2) {$y$};
+
+        % Hidden layer (3 neurons)
+        \foreach \j in {1,...,3} {
+            \node[] (H'\j) at (4.5,-\j) {$h'_{\j}$};
+        }
+        
+        % Output layer (1 neuron)
+        \node[] (Y') at (6,-2) {$y'$};
+
+        % Connect input layer to hidden layer
+        \foreach \j in {1,...,3} {
+            \draw[->] (X) -- (H\j);
+        }
+        
+        % Connect hidden layer to output layer
+        \foreach \j in {1,...,3} {
+            \draw[->] (H\j) -- (Y);
+        }
+
+        % Connect hidden layer to output layer
+        \foreach \j in {1,...,3} {
+            \draw[->] (Y) -- (H'\j);
+        }
+
+        \foreach \j in {1,...,3} {
+            \draw[->] (H'\j) -- (Y');
+        }
+    \end{tikzpicture}
+\end{center}
+
+In this case we can distinguish how the two network behaves:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/composition.png}
+    \caption{Composition of shallow networks.}
+    \label{fig:composition}
+\end{figure}
+
+We can reinterpret the composition of shallow networks as 2-layer a deep network:
+
+\begin{center}
+    \begin{tikzpicture}[x=2cm, y=1.5cm, every node/.style={circle, draw, minimum size=1cm}]
+        % Input layer (3 neurons)
+        \node[] (X) at (0,-2) {$X$};
+        
+        % Hidden layer (3 neurons)
+        \foreach \j in {1,...,3} {
+            \node[] (H\j) at (1.5,-\j) {$h_{\j}$};
+        }
+        
+        % Hidden layer (3 neurons)
+        \foreach \j in {1,...,3} {
+            \node[] (H'\j) at (3.5,-\j) {$h'_{\j}$};
+        }
+
+            % Output layer (1 neuron)
+        \node[] (Y') at (5,-2) {$y'$};
+            
+        % Connect input layer to hidden layer
+        \foreach \j in {1,...,3} {
+            \draw[->] (X) -- (H\j);
+        }
+
+        % Connect hidden layer to output layer
+        \foreach \i in {1,...,3} {
+            \foreach \j in {1,...,3} {
+                \draw[->] (H\i) -- (H'\j);
+            }
+        }
+
+        \foreach \j in {1,...,3} {
+            \draw[->] (H'\j) -- (Y');
+        }
+    \end{tikzpicture}
+\end{center}
+
+\section{Generic MLP}
+
+The generic Multi-Layer Perceptron (MLP) is a deep network with multiple hidden layers.
+
+\begin{center}
+    \usetikzlibrary{calc}
+    \begin{tikzpicture}[x=2cm, y=1.5cm, every node/.style={circle, draw, minimum size=1cm}]
+        % Input layer (3 neurons + bias)
+        \foreach \i in {0,...,3} {
+            \ifnum\i=0
+                \node[orange] (X\i) at (0,-\i) {$\beta_0$};
+            \else
+                \node[] (X\i) at (0,-\i) {$X_{\i}$};
+            \fi
+        }
+        
+        % Hidden layer (4 neurons + bias)
+        \foreach \j in {0,...,4} {
+            \ifnum\j=0
+                \node[orange] (H\j) at (1.5,0.5 -\j) {$\beta_1$};
+            \else
+                \node[] (H\j) at (1.5,0.5 -\j) {$h_{\j}$};
+            \fi
+        }
+        
+        % Hidden layer (2 neurons + bias)
+        \foreach \j in {0,...,2} {
+            \ifnum\j=0
+                \node[orange] (H'\j) at (3,-0.5 -\j) {$\beta_2$};
+            \else
+                \node[] (H'\j) at (3,-0.5 -\j) {$h'_{\j}$};
+            \fi
+        }
+
+        % Hidden layer (3 neurons + bias)
+        \foreach \k in {0,...,3} {
+            \ifnum\k=0
+                \node[orange] (H''\k) at (4.5,-\k) {$\beta_3$};
+            \else
+                \node[] (H''\k) at (4.5,-\k) {$h''_{\k}$};
+            \fi
+        }
+
+        % Output layer (2 neuron)
+        \foreach \l in {1,...,2} {
+            \node[] (Y'\l) at (6,-0.5 -\l) {$y_{\l}$};
+        }
+
+        % Connect input layer to hidden layer
+        \foreach \i in {0,...,3} {
+            \foreach \j in {1,...,4} {
+                \ifnum\i=0
+                    \draw[->, orange] (X\i) -- (H\j);
+                \else
+                    \draw[->] (X\i) -- (H\j);
+                \fi
+            }
+        }
+
+        % Connect hidden layer to output layer
+        \foreach \i in {0,...,4} {
+            \foreach \j in {1,...,2} {
+                \ifnum\i=0
+                    \draw[->, orange] (H\i) -- (H'\j);
+                \else
+                    \draw[->] (H\i) -- (H'\j);
+                \fi
+            }
+        }
+
+        \foreach \i in {0,...,2} {
+            \foreach \j in {1,...,3} {
+                \ifnum\i=0
+                    \draw[->, orange] (H'\i) -- (H''\j);
+                \else
+                    \draw[->] (H'\i) -- (H''\j);
+                \fi
+            }
+        }
+
+        \foreach \j in {0,...,3} {
+            \foreach \l in {1,...,2} {
+                \ifnum\j=0
+                    \draw[->, orange] (H''\j) -- (Y'\l);
+                \else
+                    \draw[->] (H''\j) -- (Y'\l);
+                \fi
+            }
+        }
+    \end{tikzpicture}
+\end{center}
