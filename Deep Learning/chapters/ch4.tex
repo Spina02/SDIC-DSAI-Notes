@@ -1,0 +1,210 @@
+\newpage
+\chapter{Loss Functions}
+
+\subsubsection{Mean Squared Error (MSE)}
+
+Mean Squared Error is the most common loss function used for regression problems. MSE is the sum of squared distances between our target variable and predicted values.
+
+$$
+L = \dfrac 1N \sum_i^N \left(
+    y_i - f(c^i; \{\phi\})
+\right)^2
+$$
+
+Maximum Likelihood Estimation (MLE) is equivalent to minimizing the MSE loss function.
+
+---
+
+Recipe for loss construction:
+
+\begin{enumerate}
+    \item Choose a suitable probability distribution $\Pr(y|\theta)$ that is defined over the domain of the predictions $y$ and has distribution parameters $\theta$
+    \item Set the mahchine learning model $f[x, \phi]$ to predict one or more of these parameters so $\theta = f[x, \phi]$ and $\Pr(y|\theta) = \Pr(y|f[x, \phi])$.
+    \item To train the model, find the network parameters $\hat \phi$ that minimize the negative log-likelihood over the training dataset pairs:
+    
+    $$
+    \hat \phi = \arg\min_{\phi} [L[\phi]] = \arg\min_{\phi} \left[
+        - \sum_{i=1}^N \log \bigg[
+            \Pr(y_i | f[x_i, \phi])
+        \bigg]
+    \right]
+    $$
+
+    This is equivalent to maximise the probability of the observed data under the model:
+
+    $$
+    \Pr(\{x_i, y_i\}) = \prod_{i = 1}^N \Pr(y_i | f[x_i; \{\phi\}])
+    $$
+\end{enumerate}
+
+...
+
+\subsubsection{Binary classification Problem}
+
+$$
+\begin{cases}
+    \lambda = \Pr(y = 1 | x) \\
+    1 - \lambda = \Pr(y = 0 | x)
+\end{cases}
+\quad\Leftrightarrow\quad
+\Pr(y|x) = \lambda^y (1 - \lambda)^{1 - y}
+$$
+
+$$
+\min_{\lambda} - \sum_i^N y^i \log \lambda + (1 - y^i) \log (1 - \lambda)
+$$
+
+suppose that you want to classify a $\mathbb{R}^d$ dimentional data
+
+$$
+\begin{array}{c}
+    x^{(1)}, y^{(1)} \\
+    x^{(2)}, y^{(2)} \\
+    \vdots \\
+    x^{(N)}, y^{(N)}
+\end{array}
+$$
+
+where $x^{(i)} \in \mathbb{R}^d$ and $y^{(i)} \in \{0, 1\}$
+
+In this case we cannot use a ReLu activation function in the output layer, because the output of the ReLu function is not bounded between 0 and 1. We need to use a \bfit{sigmoid activation} function in the output layer.
+
+This is for a binary classification problem.
+
+\subsubsection{Multi-class classification Problem}
+
+For a multi-class classification problem we want to have multiple choices for the output layer. 
+
+Let's consider $k$ parameters for the output layer. The values returned by the output layer are not probabilities, but scores, usually called \bfit{logits}.
+
+In this case we need to use a \bfit{softmax activation} function in the output layer.
+
+$$
+\begin{array}{l c r}
+    z_o & \rightarrow & e^{z_o}  / \sum_i^k e^i\\
+    z_1 & \rightarrow & e^{z_1}  / \sum_i^k e^i\\
+     & \vdots & \\
+    z_k & \rightarrow & e^{z_k} / \sum_i^k e^i
+\end{array}
+$$
+
+The softmax function is a generalization of the sigmoid function and is used in the output layer of a neural network when we are dealing with a multi-class classification problem.
+
+\subsubsection{Information Theoretical Perspective on Loss Functions}
+
+We can calculate the empirical probability distribution as follows:
+
+$$
+\Pr_{emp}(\{x\}) = \sum_{i=1}^N \delta (x - x_i)
+$$
+
+where $\delta$ is the \bfit{Dirac delta} function.
+
+\dots
+
+We can calculate the "distance" between two probability distributions using the \bfit{Kullback-Leibler divergence}:
+
+$$
+KL[q][p] = \int_{-\infty}^{\infty} q(z) \log [q(z)] dz - \int_{-\infty}^{\infty} q(z) \log [p(z)] dz
+$$
+
+This is not symmetric $KL[q][p] \neq KL[p][q]$ but it is always positive $KL[q][p] \geq 0$.
+
+$$
+\min KL(q|p(\theta)) \qquad\Leftrightarrow\qquad MLE
+$$
+
+$$
+KL(q|p(\theta)) = - \int \dfrac 1N \sum_{i=1}^N \delta(x - x_i) \log p(x; \theta) dx + \cancel{\underbrace{\int \dfrac 1N \sum_{i = 1}^N \delta(x - x_i) \log \dfrac 1N \sum_{i = 1}^N \delta(x - x_i) dx}_{\text{not dependent on \theta}}}
+$$
+
+So we can minimize the KL divergence by minimizing the negative log-likelihood.
+
+---
+
+We said that the KL divergence is not symmetric:
+
+$$
+\min KL(p|q) = \min \sum_{i=1}^N p_i \log \dfrac {p_i}{q_i}
+$$
+
+We will always have a distance between de empirical distribution and the model distribution:
+
+$$ KL(p|q) > 0 \quad = \text{"wrong code"}$$
+
+This is becouse We have limited knowledge of the source, and this reflects in a non optimal compression of the data. The KL divergence is the difference between the optimal compression and the compression we are able to achieve.
+
+\section{Training}
+
+\subsection{Stochastic Gradient Descent}
+
+The \bfit{Stochastic Gradient Descent} (SGD) is a method to minimize a function by iteratively moving in the direction of the negative gradient of the function at each point.
+
+...
+
+% \begin{enumerate}
+%     \renewcommand{\labelenumi}{Step \arabic{enumi}:}
+    
+% \end{enumerate}
+
+\subsubsection{Gabor model}
+
+The Gabor model is a linear model that uses a set of Gabor filters to extract features from an image. The Gabor filters are a set of sinusoidal functions that are modulated by a Gaussian function.
+
+$$
+f[x, \phi] = \sin\left[\phi_0 + \sum_{i=1}^N \phi_i x_i\right] e^{- \sum_{i=1}^N \phi_i^2 x_i^2}
+$$
+
+Gradient descent gets to the global minimum if we start in the right "valley", otherwise it will get stuck in a local minimum or near a saddle point.
+
+The idea is to add noise to the gradient to escape from the local minimum:
+
+\begin{itemize}
+    \item Compute the gradient based on only a subset of the points: a \bfit{mini-batch}.
+    \item Work through datsset sampling without replacement.
+    \item One pass through the data is called an \bfit{epoch}.
+\end{itemize}
+
+In this way we calculate the gradient of the loss function for a mini-batch, which will likely be different from the gradient of the whole dataset. The hope is that the noise in the gradient will help us escape from the local minimum.
+
+\subsubsection{Property of SGD}
+
+\begin{itemize}
+    \item Can escape from local minima
+    \item Adds noise, but still sensible updates as based on part of data
+    \item Uses all data equally
+    \item Less computationally expensive
+    \item Seems to find better solutions
+\end{itemize}
+\vspace{1em}
+\begin{itemize}
+    \item Doesn't convere in traditional sense
+    \item Learning rate schedule: learning rate decreases over time
+\end{itemize}
+
+\subsubsection{Momentum}
+
+
+
+
+
+
+% \neuralnetwork[nodes={2,4,5,2},indices={a,b,c,d},useindices=1,colormode=color]
+
+% % % Black and white version
+% \neuralnetwork[colormode=bw]
+
+% % Basic usage with defaults
+% \neuralnetwork[colormode=color]
+
+% % Fully customized
+% \neuralnetwork[nodes={6,6,6,6,6},indices={i,j,k},symbols={a,b,c},yshift=0.5,colormode=bw,showdots=true]
+
+% \section{Test 1: No extra row}
+% No extra row, because indices list length != # of layers
+% \neuralnetwork[nodes={3,4,4,3},symbols={x,h,y},colormode=color]
+
+% \bigskip
+
+% \section{Test 2: With extra row}
+% \neuralnetwork[nodes={3,3,3},useindices=1,colormode=bw]

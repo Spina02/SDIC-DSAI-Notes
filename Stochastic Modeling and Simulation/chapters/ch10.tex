@@ -1,0 +1,257 @@
+\chapter{Lecture: 04/04/2025}
+
+\dots
+
+$$
+\dfrac{\partial P}{\partial t} (x,t) = \int_{S \in s} P(s,t) \Omega(s, x) ds - P(x,t) \int_{a \in s} \Omega(x, a) da
+$$ 
+
+\dots
+
+$$
+\dfrac{\partial P}{\partial t} (x,t) = \underbrace{r P(x+1, t)}_{backward} + \underbrace{r P(x-1, t)}_{forward} - 2 r P(x,t)
+$$
+
+\dots
+
+More in general we can write
+
+$$
+\Omega(s, a) = \sum_{j \in \mathbb Z} K_{s,a} \delta(s-a-j)
+$$
+$$
+\Rightarrow \quad
+\dfrac{\partial P}{\partial t} (x,t) = \sum_{j \in \mathbb Z} \int P(s,t) K_{s,x} \delta(s-x-j) ds - P(x,t) \sum_{j \in \mathbb Z} \int K_{x,a} \delta(x-a-j) da
+$$
+
+$$
+\dfrac{\partial P (x,t)}{\partial t} = \left(
+    \sum_{j \in \mathbb Z} K_{x,x+j} K_{x+j,x} P(x+j,t)
+    \right)
+    - P(x,t) \left( \sum_{j \in \mathbb Z} K_{x,x-j} \right)
+$$
+
+\dots
+
+$$
+\begin{cases}
+    S' = - \beta \dfrac IN S\\
+    I' = \beta \dfrac IN S - \gamma I
+\end{cases}
+$$
+
+This system represents the dynamics of a population of individuals that can be in one of two states: susceptible (S) or infected (I). The parameter $\beta$ represents the rate at which susceptible individuals become infected, while $\gamma$ represents the rate at which infected individuals recover.
+
+We have $(R = N - S - I)$ and:
+
+$$I(t) \ge 0; \quad S(t) \ge 0; \quad R(t) \ge 0$$ 
+
+$$(t, t + dt) X(t) = (S(t), I(t)) \in \mathbb{R}^2$$
+
+The "removal" of individuals accounts for the recovery of infected individuals, its probability is given by:
+
+$$
+\Pr \left[
+    \big(S(t+dt), I(t + dt)\big) = \big(S(t), I(t) - 1\big)\ \bigg|\ \big(s(t), I(t)\big)
+\right] = \gamma dt
+$$
+
+\dots
+
+$$
+\underbrace{\binom SI}_t \to \underbrace{\binom S{I-1} = \binom SI + \binom{0}{-1}}_{t + dt}
+$$
+
+The contagion process instead is given by:
+
+$$
+\underbrace{\binom{S}{I}}_t \to \underbrace{\binom{S}{I} + \binom{-1}{1}}_{t + dt}
+$$
+
+\dots
+
+We can think of $\sigma$ and $\alpha$ as the states of the system at time $t$ and $t + dt$, respectively: 
+
+$$\displaystyle \sigma = \binom {S_\sigma}{I_\sigma},\qquad \alpha = \binom{S_\alpha}{I_\alpha}$$
+
+\dots
+
+$$
+\Omega(\sigma, \alpha) = \gamma I_{\sigma} \delta 
+\left(
+    \sigma - \alpha - \binom 0{-1}
+\right) + \beta \dfrac{I_{\sigma}}N S_\sigma \Omega 
+\left(
+    \sigma - \alpha - \binom {-1}{1}
+\right)
+$$
+
+\dots
+
+$$
+\dfrac{\partial P(S, I, t)}{\partial t} = \beta \dfrac{(I-1)}{N} (S + 1) P(S + 1, I - 1, t) + \gamma (I + 1) P(S, I + 1, t) - \left( \gamma I + \beta \dfrac{I}{N} S \right) P(S, I, t)
+$$
+
+Your starting point is an integer position; whatever jump you take, x + dt must be another integer position.
+In fact, the probability sitribution is non-zero only for integer positions.
+
+\section{Discrete time, Discrete state space}
+
+State $s$ is discrete
+
+Time $t \subseteq \mathbb N \cup \{0\}$
+
+$$
+P \{
+    x(t+1) = \alpha \big| x(t) = \sigma
+\} = \theta_{\sigma \alpha} \in [0,1]
+$$
+
+$$
+P\{
+    x(t) = \omega
+\} = P_\omega(t)
+$$
+
+The probability of beiing in a state $\alpha$ at time $t + 1$ is given by the probability of being in state $\sigma$ at time $t$ multiplied by the transition probability from $\sigma$ to $\alpha$:
+
+$$
+\boxed{P_\alpha(t+1) = \sum_{\sigma \in S} \Pr_\sigma(t) \theta_{\sigma \alpha} }$$
+$$
+P_\alpha(t+1) = P_\alpha (t) \theta_{\alpha \alpha} + \sum_{\sigma \in S  \backslash \{\alpha\}} P_\sigma(t) \theta_{\sigma \alpha}
+$$
+
+$$
+\theta_{\alpha, \alpha} = 1 - \sum_{\beta \in S \backslash \{\alpha\}}
+$$
+
+$$
+P_\alpha(t+1) = P_\alpha(t) \left[
+    1 - \sum_{\beta \in S \backslash \{\alpha\}} \theta_{\alpha, \beta}
+\right] + \sum_{\sigma \in S \backslash \{\alpha\}} P_\sigma(t) \theta_{\sigma, \alpha}
+$$
+
+$$
+P_\alpha(t+1) = P_\alpha(t) + \sum_{\sigma} P_\sigma(t) \theta_{\sigma, \alpha} - P_\alpha(t) \sum_{\beta \in S \backslash \{\alpha\}} \theta_{\alpha, \beta}
+$$
+$$
+P_\alpha(t+1) - P_\alpha(t) = \sum_{\sigma} P_\sigma(t) \theta_{\sigma, \alpha} - P_\alpha(t) \sum_{\beta \in S \backslash \{\alpha\}} \theta_{\alpha, \beta}
+$$
+
+$$
+\dfrac{P_\alpha(t+1) - P_\alpha(t)}U = \sum_{\sigma} P_\sigma(t) \dfrac {\theta_{\sigma, \alpha}}{U} - P_\alpha(t) \sum_\beta \dfrac {\theta_{\alpha, \beta}}{U}
+$$
+
+\dots
+
+\section{SIS model}
+
+A SIS model is a simple model of disease spread in a population. In this model, individuals can be in one of two states: susceptible (S) or infected (I). The dynamics of the system are governed by two parameters: the infection rate $\beta$ and the recovery rate $\gamma$. The model assumes that individuals can move between these two states, with susceptible individuals becoming infected at a rate proportional to the number of infected individuals they come into contact with, and infected individuals recovering at a constant rate.
+
+Moreover, $\mu$ is the natural death rate of the population, which is assumed to be the same as the birth rate. This means that the population size remains constant over time, and the total number of individuals in the population is given by $N = S + I$.
+
+$$
+\begin{cases}
+    S' = \mu - \mu S - \beta I S \\
+    I' = \beta I S - (\mu + \gamma) I
+\end{cases},
+\qquad
+\begin{cases}
+    \mu \to \mu + \omega_\mu \xi_\mu \\
+    \beta \to \beta + \omega_\beta \xi_\beta \\
+\end{cases},
+\qquad
+\xi (t) = \binom {\xi_\mu}{\xi_\beta}
+.
+$$
+
+This is actually a stochastic model of disease spread, where the parameters $\mu$, $\beta$, are subject to random fluctuations. 
+
+\dots
+
+[a lot of stuff missing]
+
+\dots
+
+Case whit indipendent noise and ...
+
+$$
+x_j = x(jh)
+$$
+$$
+x_{j+1} = x_j + \alpha (x_j) h + \beta (x_j) \left[
+    \begin{smallmatrix}
+        G_j \\
+        G_{j+1}
+    \end{smallmatrix}
+\right] \sqrt{h}
+$$
+
+\dots
+
+\section{ma che cazzo ne so}
+
+Suppose we are in a region of $R^N$ and all the points follows the following law:
+$$
+\dot x_i = f(x_i)
+$$
+$$
+n(x, 0) = \tilde O (x)
+$$
+$$
+\inf n(x,t)dx = N
+$$
+$$
+\int n(x,0) dx = \int \tilde O (x) dx = N 
+$$
+$$
+c = [a,b]
+$$
+$$
+N_c(t) = \int_a^b n(x,t)dx
+$$
+$$
+P[x(t) \in [a,b]] \simeq \dfrac {N_c(t)}n
+$$
+
+\dots
+
+\section{ma che cazzo ne so pt.2}
+
+Let's consider an interval $[t, t + dt]$ and some particles that follows the law:
+
+$$
+\dot x = f(x) \equiv v(x)
+$$
+
+Then, the number of particles that enter and exit the interval $[x, x + dx]$ at time $t$ is given by:
+
+$$
+\left[
+\begin{array}{ll}
+    Enter: & n(x,t) v(x) dt \\
+    Exit: & n(x + dt,t) v(x + dt) dt \\
+\end{array}
+\right.
+$$
+
+\dots
+
+[missing a lot of stuff]
+
+\dots
+
+the product $n \cdot v$ is called \bfit{current} density and is denoted by $J(x,t)$:
+
+$$
+\begin{cases}
+    \dfrac{\partial n}{\partial t} + \dfrac{\partial}{\partial x} J(x,t) = 0 \\
+    J(x,t) = n(x,t) v(x)
+\end{cases},
+\qquad
+\dfrac{\partial n}{\partial t} + \text{div} J(x,t) = 0
+$$
+
+\dots
+
+... probabiulity current ...

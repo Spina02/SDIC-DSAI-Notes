@@ -1,0 +1,297 @@
+\chapter{Lecture 28/03/2025}
+
+\subsubsection{Proprietà di un tensore di curvatura}
+
+Si può dimostrare che $R^i_{klm}$ è l'unico ensore che può essere costruita dal tensore metrico e dalle sue derivate prime e seconde, e che è lineare nelle derivate seconde (e anche quadratico nelle derivate prime). Del tensore metrico si può scrivere la forma totalmente covariante $R_{jklm} = g_{ji}R^i_{klm}$.
+
+\dots
+
+$$
+R^i_{klm;j} + R^i_{kmj;l} + R^i_{kjl;m} = 0
+$$
+
+Questa è detta \bfit{identità di Bianchi}. Ricordiamo che, anche se l'abbiamo ricavata nel sistema localmente euclideo, essendo una relazione tensoriale, essa vale in tutti i sistemi di riferimento.
+
+Possiamo anche abbassare l'indice controvariante con il tensore metrico e otteniamo:
+\vspace{0.3em}
+$$
+R_{ijkl;m} + R_{ijml;k} + R_{ijlk;m} = 0
+$$
+
+Il tensore di Riemann presenta delle proprietà, vediamole nella versione completamente covariante $R_{jklm} = g_{ji}R^i_{klm}$:
+
+\begin{itemize}
+    \item \textbf{Simmetria}:
+    $$
+    R_{jklm} = R_{lmjk}
+    $$
+    \item \textbf{Antisimmetria}:
+    $$
+    R_{jklm} = -R_{kjlm} = -R_{jkml} = R_{kjml}
+    $$
+    \item \textbf{Ciclicità}:
+    $$
+    R_{jklm} + R_{klmj} + R_{lmjk} = 0
+    $$
+\end{itemize}
+
+Dal tensore di Riemann, per contrazione, si può ricavare un tensore di rango 2, il tensore di Ricci, definito come:
+$$ R_{km} = R^i_{kim} $$
+Il tensore di Ricci è simmetrico:
+\vspace{0.3em}
+$$
+R_{mk} = R^i_{mik} = g^{ir}R_{rmik} = g^{ir}R_{ikrm} = R^r_{krm} = R_{km}
+$$
+
+Esso è l'unico tensore simmetrico di rango 2 che si può ottenere da $R^i_{klm}$. Dal tensore di Ricci si ricava lo \bfit{scalare di Ricci} o \bfit{scalare di curvatura}:
+$$
+R = g^{km}R_{km}
+$$
+
+Esso è il solo scalare che si può ottenere da $R^i_{klm}$.
+
+Le proprietà sopra evidenziate del tensore di Riemann fanno si che, in $N$ dimensioni, il numero delle sue componenti indipendenti sia:
+$$\mathcal N = \dfrac{N^2(N^2-1)}{12}$$
+
+In particolare:
+
+$$
+R_{11} = R^l_{1l1} = g^{11}R_{1111} + g^{11}R_{1121} + g^{21}R_{2111} + g^{22}R_{2121} = g^{22}R_{1212}
+$$
+
+$$
+R_{12} = R_{21} = ... = -g^{21}R_{1212}
+$$
+
+$$
+R_{22} = ... = g^{11}R_{1212}
+$$
+
+Dunque:
+
+$$
+\begin{array}{rcl}
+R &=& g^{11}g^{22} R_{1212} - 2 g^{12}g^{21}R_{2121} + g^{22}g^{11}R_{1212}\\[0.3em]
+&=&
+2 R_{1221}\left(
+g^{11}g^{22} - g^{12}g^{21}
+\right)\\[0.3em]
+&=&
+2 R_{1221} \det g^{ij}
+\end{array}
+$$
+
+\begin{itemize}
+\item Per $N = 1, \mathcal N = 0$ ed $R_{1111} \equiv 0$ sempre: una curva ha sempre curvatura (intrinseca) nulla, non ho informazioni su come la curva è "embedded" in uno spazio a 2 o più dimensioni.
+
+\item Per $N = 2, \mathcal N = 1$. C'è un'unica componente indipendente, ad esempio $R_{1212}$.
+
+\item Per $N = 3, \mathcal N = 6$.  tante quante sono le componenti del tensore di Ricci (simmetrico). Quindi per $N = 3$ basta conoscere $R_{km}$ per descrivere la curvatura dello spazio.
+
+\item Per $N = 4, \mathcal N = 20$, mentre $R_{km}$ ha 10 componenti soltanto. È necessario ricorrere al tensore $R^i_{klm}$ completo (a parte situazioni di particolare simmetria, e vedremo che così sarà nel caso dell'universo isotropo ed omogeneo).
+\end{itemize}
+
+Dall'identità di Bianchi, nella forma covariante, sfruttando le proprietà di antisimmetria del tensore di Riemann, si ha:
+
+$$
+R_{iklm;j} - R_{kimj;l} - R_{iklj;m} = 0
+$$
+$$
+g^{km}R^l_{klm;j} - g^{il} R^m_{imj;l} - g^{km}R^l_{klj;m} = 0
+$$
+cioè:
+$$
+g^{km}R_{km;j} - g^{il} R_{ij;l} - g^{km}R_{kj;m} = 0
+$$
+da cui:
+$$
+R_{;j} - R^l_{j;l} - R^m_{j;m} = R_{;j} -  2 R^l_{j;l} = 0
+$$
+dalla quale si ha:
+$$
+R^l_{j;l} = \dfrac{1}{2} R_{;j} = \dfrac{1}{2} \dfrac{\partial R}{\partial u^j}
+$$
+
+dove l'ultimo passaggio è dovuto al fatto che $R$ è uno scalare, non dipende quindi dal sistema di riferimento usato, e la sua derivata covariante coincide con la semplice derivata parziale. La quantità $R^l_{j;l}$ rappresenta la divergenza (covariante) del tensore di Ricci. Consideriamo ora il tensore misto:
+
+$$
+R^l_j - \dfrac 12 \delta^l_j R
+$$
+
+La sua divergenza sarà (per la regola della derivazione di un prodotto ed essendo $\delta^l_{j;l} = 0 4$):
+
+% Rlj;l - 1
+% 2 \deltal
+% j
+% ∂R
+% ∂ul = Rlj;l - 1
+% 2
+% ∂R
+% ∂uj = 0
+% per quanto visto poco sopra. Il tensore il questione ha quindi divergenza (covariante) nulla. Se passiamo alle
+% componenti covarianti otteniamo
+
+\dots
+
+$$
+g_{il}R^l_j - \dfrac 1 2 g_{il}\delta^l_j R = R_{ij} - \dfrac 1 2 g_{ij} R \equiv Gij
+$$
+
+dove $G_{ij}$ è detto \bfit{tensore di Einstein}. Questo tensore ha importantissime proprietà: è simmetrico, ha divergenza nulla e, derivando dal tensore di Riemann, contiene termini lineari nelle derivate seconde della metrica e quadratici nelle sue derivate prime.
+
+% 2.6 Il Theorema Egregium
+% In 2 dimensioni il Theorema Egregium di Gauss afferma che la curvatura di Gauss K si può ricavare a partire
+% dal tensor metrico; in particolare, si ha che K = R1212/g.
+% Diamo qui una giustificazione del Theorema Egregium. Abbiamo visto che, localmente, in un intorno del punto
+% P , un elemento di superficie si può scrivere nella forma
+% z = f (x, y) = x2
+% 2ρ1
+% + y2
+% 2ρ2
+% che, messo nella forma x(u, v), si può esprimere come (x \equiv u, y \equiv v):
+% x(u, v) =
+% (
+% u, v, u2
+% 2ρ1
+% + v2
+% 2ρ2
+% )
+% ; xu =
+% (
+% 1, 0, u
+% ρ1
+% )
+% xv =
+% (
+% 0, 1, v
+% ρ2
+% )
+% 4\deltal
+% j;l = ∂\deltal
+% j
+% ∂ul + \Gammal
+% lk \deltak
+% j - \Gammam
+% jl \deltal
+% m = \Gammal
+% lj - \Gammal
+% jl = 0
+% 30
+
+\chapter{Relatività Generale}
+
+\dots
+
+L'equazione delle geodetiche è sempre:
+
+$$
+\dfrac{d^2x^\alpha}{ds^2} + \Gamma^\alpha_{\beta \gamma} \dfrac{dx^\beta}{ds} \dfrac{dx^\gamma}{ds} = 0
+$$ 
+
+se la metrica è data da $\eta_{\alpha \beta}$, allora i $\Gamma^\alpha_{\beta \gamma}$ osno nulli e resta $d^2x^\alpha/ds^2 = 0$, cioè $x^\alpha = a^\alpha \cdot s + b^\alpha$, ovvero:
+
+$$
+\begin{cases}
+    ct = a^0 \cdot s + b^0\\
+    \bar x = \bar a \cdot s + \bar b
+\end{cases}
+$$
+
+e la traiettoria è una retta percorsa di moto rettilineo uniforme.
+
+\subsubsection{Tensore energia-impulso}
+
+Vogliamo ora descrivere le proprietà gravitazionali di un fluido
+
+Consideriamo un fluido in cui l'unica forza presente è quella gravitazionale. Chiamiamo tale fluido "polvere" (dust).
+
+Le due quantità che ci interessano sono densità e velocità.
+
+Il tensore più sempliche che possiamo pensare che descriva tali quantità è il \bfit{tensore energia-impulso}:
+
+$$
+T^{\alpha \beta} = \rho_0 c^2 u^\alpha u^\beta
+$$
+
+Nel dettaglio abbiamo:
+
+$$
+T^{00} = \rho_0 c^2 \gamma^2 = \gamma^2 \rho_0 c^2 = \rho c^2 \qquad \text{posto } \rho = \gamma^2 \rho_0
+$$
+
+Per interpretare questo risultato ricordiamo che la massa è $m = \gamma m_0$ (con $m_0$ massa a riposo) e che un elemento di volume in moto appare contratto di un fattore $1 / \gamma$, per cui la densità cresce di un ulteriore fattore $\gamma$.
+
+Perciò, se la densità propria è $\rho_0$, un osservatre rispetto al quale il fluido ha velocità $\bar v$ misurerà una densità $\gamma^2 \rho_0$.
+
+$T^{00}$ misura quindi la densità di massa-energia (qui l'unico contributo all'energia viene dal moto della materia).
+
+Le componenti di $T^{\alpha \beta}$ sono:
+
+$$
+T^{\alpha \beta} =
+\rho c^2 \cdot
+\begin{array}{cccc}
+    1 & v_x/c & v_y/c & v_z/c\\
+    v_x/c & v_x^2/c^2 & v_x v_y/c^2 & v_x v_z/c^2\\
+    v_y/c & v_x v_y/c^2 & v_y^2/c^2 & v_y v_z/c^2\\
+    v_z/c & v_x v_z/c^2 & v_y v_z/c^2 & v_z^2/c^2
+\end{array}
+$$
+
+Vediamo come le equazioni del moto possono essere ricavate in modo sintetico come $\partial_\beta T^{\alpha \beta} = 0$
+
+\begin{itemize}
+    \item Per $\alpha = 0$ si ha $\partial_\beta T^{0 \beta} = 0 \quad \Leftrightarrow \quad \frac {\partial T^{0\beta}}{\partial x^\beta} = 0$, che scritta per esteso:
+    
+    $$
+    \dfrac 1c \dfrac {\partial(\rho c^2)}{\partial x} + \dfrac{\partial(\rho c v_x)}{\partial x} + \dfrac{\partial(\rho c v_y)}{\partial y} + \dfrac{\partial(\rho c v_z)}{\partial z} = 0
+    $$
+    che si può semplificare in:
+    $$
+    \dfrac {\partial \rho}{\partial t} + \nabla \cdot (\rho \bar v) = 0
+    $$
+    (dove $\bar v$ è la velocità totale) cioè l'equazione di continuità per un fluido, che esprime la conservazione della massa-energia.
+
+    \item Per $\alpha = 1, 2, 3$ si ha:
+
+    $$
+    \begin{cases}
+        \dfrac 1c \dfrac{\partial(\rho c v_x)}{\partial t} + \dfrac{\partial(\rho c v_x v_x)}{\partial x} + \dfrac{\partial(\rho c v_x v_y)}{\partial y} + \dfrac{\partial(\rho c v_x v_z)}{\partial z} = 0 \quad (\alpha = 1)
+        \\[0.5em]
+        \dfrac 1c \dfrac{\partial(\rho c v_y)}{\partial t} + \dfrac{\partial(\rho c v_y v_x)}{\partial x} + \dfrac{\partial(\rho c v_y v_y)}{\partial y} + \dfrac{\partial(\rho c v_y v_z)}{\partial z} = 0 \quad (\alpha = 2)
+        \\[0.5em]
+        \dfrac 1c \dfrac{\partial(\rho c v_z)}{\partial t} + \dfrac{\partial(\rho c v_z v_x)}{\partial x} + \dfrac{\partial(\rho c v_z v_y)}{\partial y} + \dfrac{\partial(\rho c v_z v_z)}{\partial z} = 0 \quad (\alpha = 3)
+    \end{cases}
+    $$  
+\end{itemize}
+
+moltipichiamo le tre equazioni per i versori $\bar i, \bar j, \bar k$ e sommiamo membro a membro:
+
+$$
+\dfrac \partial {\partial t}(\rho \bar v) + \dfrac \partial {\partial x}(\rho v_x \bar v) + \dfrac \partial {\partial y}(\rho v_y \bar v) + \dfrac \partial {\partial z}(\rho v_z \bar v) = 0
+$$
+
+che, sviluppando e usando poi l'equazione di continuità, si riduce a:
+
+$$
+\rho \dfrac {\partial \bar v}{\partial t} + \bar v \left[
+    \dfrac {\partial \rho}{\partial t} + \nabla \cdot (\rho \bar v)
+\right] + 
+\rho v_x \dfrac {\partial \bar v}{\partial x} +
+\rho v_y \dfrac {\partial \bar v}{\partial y} +
+\rho v_z \dfrac {\partial \bar v}{\partial z} = 0
+$$
+
+cioè:
+
+$$
+\underbrace{\rho \left[
+    \dfrac {\partial \bar v}{\partial t} + (\bar v \cdot \nabla) \bar v
+\right] = 0}_{(I)}
+\qquad \Leftrightarrow \qquad 
+\underbrace{\rho \dfrac {d \bar v}{d t} = 0}_{(II)}
+$$
+
+Questa relazione, tipica della fluidodinamica, rappresenta l'equazione del moto per un fluido senza pressione, viscosità e forze esterne.
+
+...
