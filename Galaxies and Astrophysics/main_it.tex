@@ -31,6 +31,18 @@
 % Override paragraph spacing
 \AtBeginDocument{
   \setlength{\parskip}{0.4em}
+
+  \crefformat{chapter}{#2Capitolo~#1#3}  % "Capitolo X" cliccabile
+  \crefname{chapter}{Capitolo}{Capitoli} % Cambia nome cref per capitoli
+
+  \crefformat{section}{#2Sezione~#1#3}
+  \crefname{section}{Sezione}{Sezioni}
+
+  \crefformat{figure}{#2Figura~#1#3}
+  \crefname{figure}{Figura}{Figure}
+
+  \crefformat{table}{#2Tabella~#1#3}
+  \crefname{table}{Tabella}{Tabelle}
 }
 
 \addbibresource{./references.bib}
@@ -55,6 +67,9 @@
 \include{chapters/ch6_it}
 \include{chapters/ch7_it}
 \include{chapters/ch8_it}
+\include{chapters/ch9_it}
+\include{chapters/ch10_it}
+\include{chapters/ch11_it}
 
 % Bibliography
 \printbibliography

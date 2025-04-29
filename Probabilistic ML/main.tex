@@ -1,4 +1,4 @@
-\documentclass[a4paper,12pt]{report}
+\documentclass[a4paper,11pt]{report}
 
 %%%%%%%%%%%%
 % packages %
@@ -28,6 +28,10 @@
 % document %
 %%%%%%%%%%%%
 
+\AtBeginDocument{
+    \setlength{\parskip}{0.4em}
+}
+
 \addbibresource{./references.bib}
 
 \begin{document}
@@ -43,6 +47,8 @@
 
 % Chapters
 \includechapters
+
+\include{chapters/ch4}
 
 % Bibliography
 \printbibliography
