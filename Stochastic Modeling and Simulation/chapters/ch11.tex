@@ -1,0 +1,630 @@
+\chapter{Lecture 11/04/2025}
+
+\dots
+
+Ito:
+
+$$
+dx = a(x) dt + b(x) dW 
+\quad \Rightarrow \quad
+x(t + dt) = x(t) + a(x(t)) dt + b(x(t)) dW
+$$
+
+Stratonovich:
+$$
+dx = a(x) dt + b(x) \circ dW
+\quad \Rightarrow \quad
+x(t + dt) = x(t) + a(x(t)) dt + b\left(x\left(t + \tfrac {dt}2\right)\right) dW
+$$
+
+$$
+x \left(t + \tfrac {dt}2 \right) = x(t) + a(x(t)) dt +  b\left(x(t)\right) \hat{dW}
+\quad \text{where } \hat{dW} = W\left(t + \tfrac {dt}2\right) - W(t)
+$$
+
+$$
+b\left(x\left(t + \tfrac {dt}2\right)\right) dW = b(x(t)) dW + b'(x(t))\left(a(x) dt + b \left( t + \tfrac {dt}2 \right) \hat {dW} \right) dW + b'(x(t)) b\left(x\left(t + \tfrac {dt}2\right)\right) \hat{dW} dW
+$$
+
+$$
+\left\langle
+\left(
+    W\left(t + \tfrac {dt}2\right) - W(t)
+\right)
+\left(
+    W(t + dt) - W(t)
+\right)
+\right\rangle
+=
+$$
+$$
+=
+\left\langle
+\left(
+    W\left(t + \tfrac {dt}2\right)  W(t + dt)
+\right)
+- W \left(t + \tfrac {dt}2\right) W(t)
+- W(t) W(t + dt) + W^2(t) 
+\right\rangle
+$$
+
+$$
+=
+t + \tfrac{dt}2 - t - t + t = \tfrac{dt}2
+\quad \Rightarrow \quad
+b(x(t + dt)) dW = \left(\tfrac {dt}2\right) b' (x(t)) b\left(x\left(t + \tfrac {dt}2\right)\right) =
+$$
+
+$$
+= \tfrac {dt}2 b'(x(t)) \left[
+    b(x(t)) + O(\sqrt{dt})
+\right]
+= 
+dt \dfrac{b'(x(t)) b(x(t))}2
+$$
+
+$$
+dx = a(x) dt + b \left( x \left(t + \tfrac {dt}2\right) \right) dW
+=
+a(x)dt + b(x) dW + \dfrac{b'(x)b(x)}2 dt
+$$
+
+$$
+dx = a(x)dt + b(x) \circ dW \quad \Rightarrow \quad 
+\left[a(x) + \dfrac{b'(x)b(x)}2 \right] dt + b(x) dW = dx
+$$
+
+So the Stratonovich formula is equivalent to the Ito where instead of $a(x)$ we have: $a(x) + \dfrac{b'(x)b(x)}2$
+
+
+\dots
+
+$$
+I = \sum_i f(x(t_i + \tfrac \Delta2 ))(W(t_i + \Delta) - W(t_i)) \quad \Rightarrow \quad
+I = \sum_i \dfrac{f(x(t_i)) + f(x(t_i + \Delta))}2 (W(t_i + \Delta) - W(t_i))
+$$
+
+$$
+b(x(t+dt)) dW = \left[ b(x(t)) b'(x(t)) [a(x) dt + b(x) dW] 
+\right] dW
+\quad \Rightarrow \quad
+b(x) dW + \dfrac 12 b'(x) b(x) dt
+$$
+
+so
+
+$$
+x(t + dt) = x(t) + a(x(t)) + dW \dfrac{b(x) + b(x)}2 + \dfrac{b'(x) b(x)}2 dt
+=
+\left\{
+    a(x) + \dfrac{b'(x) b(x)}2
+\right\} dt 
++ b(x) dW
+$$
+
+% \documentclass{article}
+% \usepackage{amsmath}
+% \usepackage{amssymb}
+% \usepackage{amsfonts} % Required for \mathbb
+
+% % Optional: For better typesetting of math
+% \usepackage{mathtools} 
+
+% % Define commands for expectation and differentials if needed
+% \newcommand{\E}[1]{\mathbb{E}\left[#1\right]} 
+% \newcommand{\dd}{\mathrm{d}} % Upright d for differentials
+
+% \begin{document}
+
+% \chapter{Lecture 11/04/2025: Ito vs. Stratonovich Calculus}
+
+% \section{Introduction to Ito and Stratonovich SDEs}
+
+% We consider a one-dimensional stochastic differential equation (SDE) describing the evolution of a process $x(t)$ influenced by both a deterministic drift and random noise. The noise is driven by a standard Wiener process (or Brownian motion), denoted by $W(t)$. There are two common interpretations, or calculi, for such equations: Ito and Stratonovich.
+
+% \subsection{Ito Interpretation}
+
+% The Ito SDE is written as:
+% \begin{equation}
+%     dx = a(x(t)) dt + b(x(t)) dW_t 
+% \end{equation}
+% Here, $a(x)$ is the drift coefficient and $b(x)$ is the diffusion coefficient. $dW_t$ represents the infinitesimal increment of the Wiener process $W(t)$.
+
+% A key feature of the Ito interpretation is that the diffusion coefficient $b(x(t))$ is evaluated at the \emph{beginning} of the infinitesimal time interval $[t, t+dt]$. This leads to a simple forward Euler-Maruyama discretization scheme:
+% \begin{equation} \label{eq:ito_discrete}
+%     x(t + dt) \approx x(t) + a(x(t)) dt + b(x(t)) \Delta W_t
+% \end{equation}
+% where $\Delta W_t = W(t+dt) - W(t)$ is a random variable drawn from a normal distribution with mean 0 and variance $dt$, i.e., $\Delta W_t \sim \mathcal{N}(0, dt)$.
+
+% The Ito calculus is mathematically convenient, particularly because Ito integrals have the martingale property, meaning their expected future change is zero, conditional on the past.
+
+% \subsection{Stratonovich Interpretation}
+
+% The Stratonovich SDE is written using a different notation for the stochastic integral:
+% \begin{equation}
+%     dx = a(x(t)) dt + b(x(t)) \circ dW_t
+% \end{equation}
+% The circle ($\circ$) indicates the Stratonovich interpretation.
+
+% The main difference lies in how the stochastic integral $\int b(x(t)) \circ dW_t$ is defined. It effectively evaluates the diffusion coefficient $b(x)$ at the \emph{midpoint} of the time interval $[t, t+dt]$. This leads to a discretization scheme like:
+% \begin{equation} \label{eq:strato_discrete}
+%     x(t + dt) \approx x(t) + a(x(t)) dt + b\left(x\left(t + \tfrac {dt}2\right)\right) \Delta W_t
+% \end{equation}
+% where $x(t + \tfrac{dt}{2})$ is the value of the process at the midpoint of the interval. Note that $x(t + \tfrac{dt}{2})$ itself depends on the noise within the first half of the interval.
+
+% The Stratonovich calculus often arises more naturally when deriving SDEs from physical principles or as limits of ordinary differential equations driven by coloured noise. It also obeys the standard rules of calculus (like the chain rule) without extra correction terms, unlike Ito calculus.
+
+% \section{Relating Stratonovich to Ito Calculus}
+
+% Since the two interpretations differ, it's crucial to have a way to convert between them. We can derive this relationship by analysing the Stratonovich discretization \eqref{eq:strato_discrete}.
+
+% The challenge is the term $b(x(t + \tfrac{dt}{2}))$. We need to express this in terms of quantities known at time $t$. We can approximate $x(t + \tfrac{dt}{2})$ using a step from $t$. A simple (though heuristic for this derivation) way to estimate the midpoint value is using the evolution over half the interval, driven by noise over that half-interval:
+% \begin{equation} \label{eq:midpoint_approx}
+%     % Note: The original notes had a potentially non-standard approximation. 
+%     % A more standard Euler step for x(t+dt/2) would be:
+%     % x(t + dt/2) \approx x(t) + a(x(t)) (dt/2) + b(x(t)) \Delta W_{t, t+dt/2}
+%     % The notes seem to use:
+%     x \left(t + \tfrac {dt}2 \right) \approx x(t) + a(x(t)) dt +  b\left(x(t)\right) \Delta \hat{W}_t 
+%     \quad \text{where } \Delta \hat{W}_t = W\left(t + \tfrac {dt}2\right) - W(t)
+% \end{equation}
+% % Let's proceed with the approximation given in the notes, while being aware it might be a simplification.
+% % Or, perhaps more likely, the 'a(x) dt' term in the midpoint approximation was a typo and should have been a(x) dt/2. 
+% % Let's assume the goal is Taylor expansion, where x(t+dt/2) - x(t) is needed.
+% % x(t+dt/2) - x(t) \approx a(x(t)) dt/2 + b(x(t)) \Delta \hat{W}_t
+
+% Now, we use a Taylor expansion for $b(x(t + \tfrac{dt}{2}))$ around $x(t)$:
+% \begin{equation}
+%     b\left(x\left(t + \tfrac {dt}2\right)\right) \approx b(x(t)) + b'(x(t)) \left( x\left(t + \tfrac {dt}2\right) - x(t) \right)
+% \end{equation}
+% Substituting the change $x(t + \tfrac{dt}{2}) - x(t)$ using a first-order approximation (like an Euler step over $dt/2$):
+% \begin{equation}
+%     x\left(t + \tfrac {dt}2\right) - x(t) \approx a(x(t)) \frac{dt}{2} + b(x(t)) \Delta \hat{W}_t 
+% \end{equation}
+% % Using the approximation from the notes (eq \ref{eq:midpoint_approx}) instead:
+% % x(t + dt/2) - x(t) \approx a(x(t)) dt + b(x(t)) \Delta \hat{W}_t 
+% % This dt term still seems suspect, let's use the dt/2 version which is more standard.
+
+% So, the Stratonovich diffusion term becomes:
+% \begin{align}
+%     b\left(x\left(t + \tfrac {dt}2\right)\right) \Delta W_t &\approx \left[ b(x(t)) + b'(x(t)) \left( a(x(t)) \frac{dt}{2} + b(x(t)) \Delta \hat{W}_t \right) \right] \Delta W_t \\
+%     &= b(x(t)) \Delta W_t + b'(x(t)) a(x(t)) \frac{dt}{2} \Delta W_t + b'(x(t)) b(x(t)) \Delta \hat{W}_t \Delta W_t \label{eq:taylor_expanded}
+% \end{align}
+% Now we analyse the terms in the limit $dt \to 0$:
+% \begin{itemize}
+%     \item $b(x(t)) \Delta W_t$ is the standard Ito term, of order $\sqrt{dt}$.
+%     \item $b'(x(t)) a(x(t)) \frac{dt}{2} \Delta W_t$ is of order $dt \times \sqrt{dt} = dt^{3/2}$. This term is negligible compared to terms of order $dt$.
+%     \item $b'(x(t)) b(x(t)) \Delta \hat{W}_t \Delta W_t$ involves the product of two Wiener increments. This term is crucial.
+% \end{itemize}
+
+% We need to evaluate the behaviour of $\Delta \hat{W}_t \Delta W_t$. In stochastic calculus, terms like $(dW)^2$ do not vanish but contribute a deterministic amount $dt$. This is related to the non-zero quadratic variation of the Wiener process. Heuristically, we replace the product $\Delta \hat{W}_t \Delta W_t$ by its expectation in the limit $dt \to 0$.
+
+% Let's calculate the expectation (covariance) of these increments:
+% \begin{align}
+%     \E{\Delta \hat{W}_t \Delta W_t} &= \E{ \left( W\left(t + \tfrac {dt}2\right) - W(t) \right) \left( W(t + dt) - W(t) \right) } \\
+%     &= \E{ W\left(t + \tfrac {dt}2\right)W(t + dt) - W\left(t + \tfrac {dt}2\right)W(t) - W(t)W(t + dt) + W(t)^2 }
+% \end{align}
+% Using the property $\E{W(s)W(u)} = \min(s, u)$ (assuming $W(0)=0$ and we measure time from 0, or simply that these are increments relative to $W(t)$ whose expectation is $t$):
+% \begin{align}
+%  \E{\Delta \hat{W}_t \Delta W_t} &= \min\left(t + \tfrac{dt}{2}, t+dt\right) - \min\left(t + \tfrac{dt}{2}, t\right) - \min(t, t+dt) + \min(t,t) \\
+%  &= \left(t + \tfrac{dt}{2}\right) - t - t + t \\
+%  &= \tfrac{dt}{2}
+% \end{align}
+% So, the product $\Delta \hat{W}_t \Delta W_t$ behaves like $dt/2$ on average. We replace the stochastic term $\Delta \hat{W}_t \Delta W_t$ in equation \eqref{eq:taylor_expanded} with its expectation $dt/2$. This is a key step reflecting Ito's Lemma.
+
+% Substituting this back into the expansion \eqref{eq:taylor_expanded}, keeping only terms up to order $dt$:
+% \begin{align}
+%     b\left(x\left(t + \tfrac {dt}2\right)\right) \Delta W_t &\approx b(x(t)) \Delta W_t + \underbrace{b'(x(t)) a(x(t)) \frac{dt}{2} \Delta W_t}_{\text{Order } dt^{3/2} \to 0} + b'(x(t)) b(x(t)) \left( \tfrac{dt}{2} \right) \\
+%     &\approx b(x(t)) \Delta W_t + \frac{1}{2} b'(x(t)) b(x(t)) dt
+% \end{align}
+% % The notes contained a step:
+% % $b(x(t + dt)) dW = \left(\tfrac {dt}2\right) b' (x(t)) b\left(x\left(t + \tfrac {dt}2\right)\right) = \tfrac {dt}2 b'(x(t)) \left[ b(x(t)) + O(\sqrt{dt}) \right] = dt \dfrac{b'(x(t)) b(x(t))}2$
+% % This seems like a condensed way of capturing the result derived above, focusing only on the correction term arising from the quadratic variation part. The notation b(x(t+dt))dW might be confusing there.
+
+% Now substitute this result back into the Stratonovich discretization \eqref{eq:strato_discrete}:
+% \begin{align}
+%     x(t + dt) - x(t) &\approx a(x(t)) dt + \left[ b(x(t)) \Delta W_t + \frac{1}{2} b'(x(t)) b(x(t)) dt \right] \\
+%     &= \left[ a(x(t)) + \frac{1}{2} b'(x(t)) b(x(t)) \right] dt + b(x(t)) \Delta W_t
+% \end{align}
+% Comparing this to the Ito discretization \eqref{eq:ito_discrete}, we see it has the same form but with a modified drift term.
+
+% \section{The Ito-Stratonovich Conversion Formula}
+
+% The derivation above shows that the Stratonovich SDE:
+% \begin{equation}
+%     dx = a(x) dt + b(x) \circ dW_t
+% \end{equation}
+% is equivalent to the following Ito SDE:
+% \begin{equation} \label{eq:conversion_formula}
+%     dx = \left[ a(x) + \frac{1}{2} b'(x) b(x) \right] dt + b(x) dW_t
+% \end{equation}
+% where $b'(x) = \frac{db}{dx}$.
+
+% This is the fundamental conversion formula. The Ito drift is equal to the Stratonovich drift plus an additional term $\frac{1}{2} b'(x) b(x)$, often called the "noise-induced drift" or "Ito correction term". This term arises purely from the mathematical interpretation of the stochastic integral and the properties of Brownian motion.
+
+% \section{Alternative Perspective: Symmetric Integral Approximation}
+
+% The Stratonovich integral can also be approximated using a symmetric rule (similar to the midpoint rule for ordinary integrals):
+% \begin{equation}
+%     \int_t^{t+\Delta t} f(x(\tau)) \circ dW_\tau \approx \sum_i \frac{f(x(t_i)) + f(x(t_{i+1}))}{2} (W(t_{i+1}) - W(t_i))
+% \end{equation}
+% where $t_i$ are points in a partition of $[t, t+\Delta t]$. Let's apply this idea to the term $b(x) \circ dW_t$ over one small interval $[t, t+dt]$:
+% \begin{equation}
+%     b(x) \circ dW_t \approx \frac{b(x(t)) + b(x(t+dt))}{2} \Delta W_t
+% \end{equation}
+% Again, we Taylor expand $b(x(t+dt))$ around $x(t)$:
+% \begin{equation}
+%     b(x(t+dt)) \approx b(x(t)) + b'(x(t))(x(t+dt) - x(t))
+% \end{equation}
+% Using a first approximation for the increment $x(t+dt) - x(t) \approx a(x(t))dt + b(x(t))\Delta W_t$ (the Ito increment is sufficient here as higher order terms won't contribute to the final result up to order $dt$):
+% \begin{equation}
+%     b(x(t+dt)) \approx b(x(t)) + b'(x(t))\left[ a(x(t))dt + b(x(t))\Delta W_t \right]
+% \end{equation}
+% Substitute this back into the symmetric approximation:
+% \begin{align}
+%     b(x) \circ dW_t &\approx \frac{b(x(t)) + \left( b(x(t)) + b'(x(t))\left[ a(x(t))dt + b(x(t))\Delta W_t \right] \right)}{2} \Delta W_t \\
+%     &= \frac{2 b(x(t)) + b'(x(t))a(x(t))dt + b'(x(t))b(x(t))\Delta W_t}{2} \Delta W_t \\
+%     &= b(x(t))\Delta W_t + \frac{1}{2} b'(x(t))a(x(t)) dt \Delta W_t + \frac{1}{2} b'(x(t))b(x(t)) (\Delta W_t)^2
+% \end{align}
+% Again, we analyze the terms:
+% \begin{itemize}
+%     \item $b(x(t))\Delta W_t$ is the Ito term.
+%     \item $\frac{1}{2} b'(x(t))a(x(t)) dt \Delta W_t$ is order $dt^{3/2} \to 0$.
+%     \item $\frac{1}{2} b'(x(t))b(x(t)) (\Delta W_t)^2$ uses the Ito rule $(\Delta W_t)^2 \approx dt$.
+% \end{itemize}
+% So, keeping terms up to order $dt$:
+% \begin{equation}
+%      b(x) \circ dW_t \approx b(x(t))\Delta W_t + \frac{1}{2} b'(x(t))b(x(t)) dt
+% \end{equation}
+% % The notes show:
+% % $b(x(t+dt)) dW = \left[ b(x(t)) b'(x(t)) [a(x) dt + b(x) dW] \right] dW \Rightarrow b(x) dW + \dfrac 12 b'(x) b(x) dt$
+% % This seems like a very condensed notation for the argument above, focusing on the change in b multiplied by dW.
+
+% Substituting this into the Stratonovich SDE $dx = a(x) dt + b(x) \circ dW_t$:
+% \begin{align}
+%     dx &\approx a(x) dt + \left[ b(x(t))\Delta W_t + \frac{1}{2} b'(x(t))b(x(t)) dt \right] \\
+%     &= \left[ a(x) + \frac{1}{2} b'(x) b(x) \right] dt + b(x) \Delta W_t
+% \end{align}
+% This confirms the conversion formula \eqref{eq:conversion_formula} derived earlier.
+
+% \section{Summary}
+
+% The Ito and Stratonovich interpretations of SDEs differ in how the diffusion term is evaluated relative to the noise increment.
+% \begin{itemize}
+%     \item \textbf{Ito:} $dx = a(x) dt + b(x(t)) dW_t$ (Evaluates $b$ at start of interval)
+%     \item \textbf{Stratonovich:} $dx = a(x) dt + b(x) \circ dW_t$ (Effectively evaluates $b$ at midpoint)
+% \end{itemize}
+% They are related by the conversion formula:
+% The Stratonovich SDE $dx = a dt + b \circ dW_t$ is equivalent to the Ito SDE
+% $$ dx = \left[ a + \frac{1}{2} b' b \right] dt + b dW_t $$
+% Understanding this relationship is crucial for correctly applying and simulating SDE models depending on their origin and the desired mathematical properties.
+
+% \end{document}
+
+---
+
+$$
+dx = a(x) dt + b(x) \circ dW
+$$
+
+$$
+dx = \left[
+    a(x) + \dfrac{b'(x)b(x)}2
+\right] dt + b(x) dW
+$$
+
+$$
+\dfrac{\partial \rho}{\partial t} = - \dfrac{\partial}{\partial x} 
+\left[
+    a(x) \rho + \dfrac{b'(x)b(x)}2 \rho
+\right]
++ \dfrac{\partial^2}{\partial x^2} \left[
+    b(x)^2 \rho
+\right]
+=
+- \dfrac{\partial}{\partial x} 
+\left[
+    a(x) \rho
+\right]
++ \dfrac{\partial}{\partial x} 
+\left[
+    \dfrac 12 \dfrac {\partial}{\partial x} 
+    \left(
+        b(x)^2 
+    \right) \rho 
+\right] 
++ \dfrac{\partial^2}{\partial x^2} 
+\left[
+    b(x)^2 \rho
+\right]
+$$
+
+$$
+\dfrac {\partial \rho}{\partial t} = - \dfrac{\partial}{\partial x} [
+    a(x) \rho
+] + \dfrac 12 \dfrac{\partial}{\partial x} \left[
+    b(x) \dfrac{\partial}{\partial x} \{
+        b(x) \rho
+    \} \right]
+$$
+
+$$
+dx = \left[
+    a(x) + \dfrac{b'(x)b(x)}2
+\right] dt + b(x) dW
+$$
+
+---
+
+$$
+\dot x = \alpha(x) + p h(x) \qquad p \to p + \omega \xi(t)
+$$
+
+$$
+\dot x = \left[
+    \alpha(x) + ph(x)
+\right]
++
+\begin{cases}
+    \omega h(x) \xi(t) & \text{Ito} \\
+    \omega h(x) \circ \xi(t) & \text{Stratonovich}
+\end{cases}
+$$
+
+If we choose the Ito interpretation, we have:
+
+\dots
+
+Else, if we choose the Stratonovich interpretation, we have:
+
+$$
+dx = \left[
+    \alpha(x) + \dfrac{b'(x)b(x)}2
+\right] dt + b(x) dW
+$$
+
+\dots
+
+$$
+    a(x) + \dfrac{b'(x)b(x)}2 = b'(x) b(x)
+    \quad \Rightarrow \quad
+    a(x) = \dfrac{b'(x)b(x)}2
+$$
+
+---
+
+Suppose we have a population
+
+$$
+\dot X = Rx, \qquad R > 0
+$$
+
+if we have $R \to R + \omega \xi(t)$
+
+The Ito interpretation gives us:
+$$
+R < \dfrac {\omega^2}2 \to x(t) \to 0
+$$
+
+Instead, the Stratonovich interpretation gives us:
+$$
+dx = \underbrace{R x}_{a(x)} dt + \underbrace{\omega x}_{b(x)} \circ dW
+\quad \Rightarrow \quad
+dx = \left[
+    R + \dfrac{\omega^2}2
+\right] x dt + \omega x dW
+$$
+
+let's consider the transformation $\quad y = \ln x \quad \to \quad x = e^y$:
+
+$$
+dy = \left[
+    R + \cancel{\dfrac{\omega^2}2} - \cancel{\dfrac{\omega^2}2}
+\right] dt + \omega dW
+$$
+
+so
+
+$$
+dy = R dt + \omega dW 
+\quad \Rightarrow \quad
+y(t) = y_0 + R t + \omega W(t)
+$$
+
+---
+
+$$
+\dot x = a(x) + b(x) \eta_h (t)
+$$
+
+$$
+\langle \eta_h(t)\rangle = 0
+$$
+
+$\mathbb R_h$ is a function with a peak at $|z| < h$ and $\mathbb R_h (z) = 0$ for $|z| > h$.
+
+\vspace{0.5em}
+
+If the limit $\lim_{h \to 0^+} \mathbb R_h (z) = \delta(\tau)$, then:
+
+$$
+\dot x_h = a(x_h) + b(x_h) \eta_h (t)
+\quad \to \quad
+\dot x = a(x) + b(x) \circ \xi(t)
+$$
+
+---
+
+Let's consider a population and two opinions:
+
+$$
+x + y = 1
+$$
+
+People can change their opinion with a rate $R$ and the ratio of changing from $x$ to $y$ is $\theta$, and from $y$ to $x$ is $k$.
+
+$$
+\begin{cases}
+    \dot x = + \theta xy - k yx - \varepsilon x + \varepsilon y \\
+    \dot y = - \theta xy + k yx + \varepsilon x - \varepsilon y
+\end{cases}
+$$
+
+where $\varepsilon$ is the rate of changing opinion. (?)
+
+Substituting $y = 1 - x$ we can rewrite the first equation as:
+$$
+\dot x = x(1-x) (\theta - k) + \varepsilon (1-x) - \varepsilon x
+$$
+
+$$
+\dfrac{dx}{dt} = \lambda x(1-x) + 1 - 2 x, \quad \lambda \to \lambda + \alpha \xi(t)
+$$
+
+$$
+dx = \underbrace{\{\lambda x(1-x) + 1 - 2 x\}}_{a(x)} dt + \underbrace{\alpha x(1-x)}_{b(x)} \circ dW
+$$
+
+\dots
+
+$$
+dx = \left\{
+    1 - 2x
+\right\} dt + \alpha x(1-x) \circ dW
+$$
+
+$$
+a(x) = \tfrac 12 b'(x) b(x),
+\qquad
+b(x) = \alpha (x - x^2),
+\qquad
+b'(x) = \alpha (1 - 2x)
+$$
+
+so
+
+$$
+1 - 2x = \dfrac {\alpha^2}2 x(1-x)(1-2x)
+$$
+
+which has two equilibrium points:
+
+$$
+x_1 = \dfrac 12, \qquad x_2: 1 = \dfrac {\alpha^2}2 x(1-x) \ \ (?)
+$$
+
+\dots
+
+---
+
+$$
+m \ddot x = - \gamma_T \dot x + F_T(x) + \omega_T \xi(t)
+$$
+
+$$
+\begin{cases}
+    \dot x = v \\
+    \dot v = - \dfrac{\gamma_T}m v + \dfrac{F_T(x)}m + \dfrac{\omega_T}m \xi(t)
+\end{cases}
+$$
+
+to simplify the notation we can write:
+$$
+\gamma = \dfrac{\gamma_T}m, \qquad
+F = \dfrac{F_T(x)}m, \qquad
+\omega = \dfrac{\omega_T}m, \qquad
+\underbrace{U = \int F_T(x) dx, \qquad
+U' = \dfrac{dU}{dx} = F_T(x)}_{?}
+$$
+
+we get:
+
+$$
+\begin{cases}
+    \dot x = v \\
+    \dot v = - \gamma v + F(x) + \omega \xi(t)
+\end{cases}
+$$
+
+$$
+\dfrac{\partial p}{\partial t} = - v \dfrac{\partial p}{\partial x} - \dfrac{\partial}{\partial v} \left[
+    (F(x) - \gamma v) p
+\right] + \dfrac{\partial^2}{\partial v^2} \dfrac {\omega^2} 2
+$$
+
+$$
+\dfrac{\partial p}{\partial t} = - v \dfrac{\partial p}{\partial x} - F(x) \dfrac{\partial p}{\partial v} + \gamma \dfrac{\partial}{\partial v}(vp) + \dfrac{\partial^2}{\partial v^2} \dfrac {\omega^2} 2
+$$
+
+$$
+0 = - v \dfrac{\partial p}{\partial x} + U'(x) \dfrac{\partial p}{\partial v} + \gamma p + \gamma v \dfrac{\partial p}{\partial v} + \dfrac{\partial^2}{\partial v^2} \dfrac {\omega^2} 2
+$$
+
+$$
+p(x,v) = A(x)B(v)
+$$
+$$
+-v A'(x) B(v) + U'(x) A(x) B'(v) + \gamma A(x) B(v) + \gamma v A(x) B'(v) + \dfrac {\omega^2} 2 B''(v) = 0
+$$
+
+$$
+\overbrace{\underbrace{- v \dfrac{A'(x)}{A(x)} + U'(x) \dfrac{B'(v)}{B(v)}}_{= \ 0}}^{1^{st} \text{ term}} + 1\overbrace{\gamma + \gamma v \dfrac{B'(v)}{B(v)} + \dfrac {\omega^2} 2 \dfrac{B''(v)}{B(v)}}^{2^{nd} \text{ term}} = 0
+$$
+
+We have to options:
+ 
+\begin{enumerate}
+    \item set the second term to zero
+    \item boh
+\end{enumerate}
+
+Let's consider the first option and let's define some "test" variables $B_T$ and $B'_T$. We have:
+
+$$
+\dfrac{B'_T(v)}{B_T(v)} = - \eta v 
+\quad \Rightarrow \quad
+B'_T(v) = - \eta v B_T(v)
+\quad \Rightarrow \quad
+B(v) = C e^{-\eta v^2/2}
+$$
+
+we have
+
+$$
+B'(v) = - \eta v B(v), \qquad
+B''(v) = - \eta v B'(v) = - \eta v \left( - \eta v B(v) \right)
+$$
+
+\missing{boh}
+
+$$
+P_s = \dfrac 1z e ^{- \tfrac \gamma{\omega^2} v^2 - \tfrac{2 \gamma}{\omega^2} U(x)}
+=
+\dfrac 1z e ^{- \tfrac {2\gamma}{\omega^2} \left[
+    \tfrac{v^2}2 + U(x)
+\right]}
+$$
+
+Applying back the transformation we have:
+
+$$
+p(x,v) = \dfrac 1z e ^{- \tfrac {2\gamma_T}{\omega_T} \left[
+    \tfrac{mv^2}2 + U_T(x)
+\right]}
+$$
+so:
+$$
+\iint p_s(x,v)dxdv = 1, \qquad
+\dfrac 1z \iint e ^{- \tfrac {2\gamma_T}{\omega_T^2} E_T(x,v)} dxdv = 1
+$$
+
+\todo{check if this is correct}
+
+\missing{fishes example ?}
+
+$$
+dx = f(x) dt - \underbrace{(cx dt + \omega x dW)}_{\# \text{fishes killed in } (t,\ t + dt)}
+$$
+
+We want the number of fishes to be positive.
+
+\missing{end of the lecture}

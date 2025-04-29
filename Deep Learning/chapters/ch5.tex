@@ -1,0 +1,338 @@
+\chapter{Convolutional Neural Networks}
+
+\section{Introduction}
+
+\textbf{Convolutional Neural Networks} (CNNs) are specialized architectures built to handle the unique challenges of image data. Images are inherently large in dimensionality, requiring significant computation and memory, yet their neighboring pixels often share strong statistical relationships.
+
+CNNs leverage this local connectivity through convolutional layers, where learnable filters slide over the image to detect meaningful patterns. By reusing filter parameters across the entire image, CNNs greatly reduce their overall complexity compared to fully connected networks. Furthermore, convolutional layers preserve important features even if the image shifts slightly, helping the network learn position-invariant representations.
+
+This makes CNNs particularly effective for visual tasks like object recognition, segmentation, and more.
+
+\subsubsection{Image Kernels}
+
+Image kernels, also referred to as filters, are essential in the field of image processing. They enable the detection of edges, smoothing, and other transformations necessary for feature extraction in deep learning.
+
+The key idea behind image kernels is to apply a small matrix (the kernel) to an image in a sliding window fashion. This process is known as \bfit{convolution}. The kernel is a small matrix that contains weights, and it is applied to the image to produce a new image, often referred to as the \bfit{feature map} or \bfit{output image}. The convolution operation involves multiplying the kernel values with the corresponding pixel values in the image and summing them up to produce a single output pixel.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/convolution.png}
+    \caption{Convolution operation with a kernel}
+    \label{fig:convolution}
+\end{figure}
+
+\subsubsection{Invariance and equivariance}
+
+\textbf{Invariance} in convolutional neural networks refers to the property that certain transformations in the input image (e.g., small translations) do not significantly affect the output. By using kernels and pooling, CNNs learn features that remain stable even if the object shifts slightly within the field of view.
+
+Formally, a function $f[x]$ is \textit{invariant} to a transformation $t[x]$ if:
+
+$$
+f[t[x]] = f[x], \quad \forall x
+$$
+
+In other words, the output of the function $f[x]$ is the same regardless of the transformation $t[x]$.
+
+\textbf{Equivariance} indicates that a transformation applied to the input is reflected in the output but preserves the structure of the transformation. Convolution operations naturally ensure that shifting an input image leads to a corresponding shift in the resulting feature map, allowing the network to detect features regardless of their position in the image.
+
+Formally, a function $f[x]$ is \textit{equivariant} to a transformation $t[x]$ if:
+
+$$
+f[t[x]] = t[f[x]], \quad \forall x
+$$
+
+This means that if we apply a transformation $t[x]$ to the input, the output will also be transformed in the same way.
+
+
+\section{Convolutional Networks for 1D inputs}
+
+Convolutional networks consist of a series of convolutional layers, each of which is equivariant to translation. They also typically include pooling mechanisms that induce partial invariance to translation.
+
+Convolution is a mathematical operation that combines two functions to produce a third function. In the context of image processing, it involves applying a kernel (or filter) to an image to extract features or perform transformations.
+
+\subsubsection{1D Convolution operation}
+
+Convolutional layers are network layers based on the convolution operation. In 1D, a convolution transforms an input vector $x$ into an output vector $z$ so that each output $z_i$ is a weighted sum of nearby inputs. The same weights are used at every position and are collectively called the \bfit{convolution kernel or filter}. The size of the region over which inputs are combined is termed the kernel size. For a kernel size of three, we have:
+$$
+z_i = w_1 x_{i-1} + w_2 x_i + w_3 x_{i+1}
+$$
+
+where $[w_1, w_2, w_3]^\top$ is the kernel.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.8\textwidth]{assets/1D-conv.png}
+    \caption{1D convolution with kernel size three}
+\end{figure}
+
+More in general, we have $z_i = \sum_{j=0}^{k-1} w_j x_{i+j-k/2}$, where $k$ is the kernel size, and $w_j$ are the weights of the kernel.
+
+\subsubsection{Padding}
+
+As we have seen, each output is computed by taking a weighted sum of the
+previous, current, and subsequent positions in the input. This means that the first and last elements of the output are computed using fewer inputs. We can address this problem by adding \textbf{padding} to the input. The most common used is the \bfit{Zero-padding}, which assumes the input is zero outsize its valid range. 
+
+Another approach is to discard the output positions where the kernel exceeds the range of input positions. These valid convolutions have the advantage of introducing no extra information at the edges of the input. However, they have the disadvantage that the representation decreases in size.
+
+\subsubsection{Stride, dilation, and kernel size}
+
+In the example above, each output was a sum of the nearest three inputs. However, this is just one of a larger family of convolution operations, the members of which are distinguished by their stride, kernel size, and dilation rate.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.8\textwidth]{assets/stride.png}
+    \caption{Stride, kernel size, and dilation}
+    \label{fig:stride}
+\end{figure}
+
+When we evaluate the output at every position, we term this a \bfit{stride} of one. However, it is also possible to shift the kernel by a stride greater than one. If we have a stride of two, we create roughly half the number of outputs 
+
+The \bfit{kernel size} can be increased to integrate over a larger area (\cref{fig:stride}) However, it typically remains an odd number so that it can be centered around the current position. Increasing the kernel size has the disadvantage of requiring more weights. This leads to the idea of dilated or atrous convolutions, in which the kernel values are interspersed with zeros. For example, we can turn a kernel of size five into a dilated kernel of size three by setting the second and fourth elements to zero.
+
+We still integrate information from a larger input region but onlu require three weights to do this. The number of zeros we intersperse between the weights determins the \bfit{dilation rate}.
+
+\subsubsection{Convolutional layers}
+
+A convolutional layer computes its output by convolving the input, adding a bias $β$, and passing each result through an activation function $a[\cdot]$. With kernel size three, stride one, and dilation rate one, the $i^{th}$ hidden unit $h_i$ would be computed as:
+$$
+\begin{array}{rcl}
+h_i & = & a\left[\beta + w_1 x_{i-1} + w_2 x_i + w_3 x_{i+1}\right]\\
+& = & a\left[\beta + \sum_{j=1}^{3} w_j x_{i+j-2}\right]\\
+\end{array}
+$$
+
+Where the bias $\beta$ and the weights $w_j$ are learnable parameters. 
+
+This is a special case of a fully connected layer that computes the ith hidden unit as:
+$$
+h_i = a\left[\beta_i + \sum_{j=1}^{D} w_{ij} x_{j}\right]
+$$
+
+If there are $D$ inputs and $D$ hidden units, this requires $D^2$ weights. In contrast, the convolutional layer only requires three weights and one bias. A fully connected layer can reproduce this ecactly if most weights are set to zero and others are constrained to be identical.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.8\textwidth]{assets/fc-vs-conv.png}
+    \caption{Fully connected vs. convolutional layers}
+    \label{fig:fc-vs-conv}
+\end{figure}
+
+\subsubsection{Multiple channels}
+
+If we only apply a single convolution, information will likely be lost; we are averaging nearby inputs, and the ReLU activation function clips results that are less than zero. Hence, it is usual to compute several convolutions in parallel. Each convolution produces a new set of hidden variables, termed a \bfit{feature map} or \bfit{channel}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.8\textwidth]{assets/channels.png}
+    \caption{Multiple channels in a convolutional layer}
+    \label{fig:multiple-channels}
+\end{figure}
+
+\cref{fig:multiple-channels} illustrates this with two convolution kernels of size three and with zero-padding. The first kernel computes a weighted sum of the nearest three pixels, adds a bias, and passes the result through the activation function to produce hidde units $h_1$ to $h_6$. The second kernel computes a different weighted sum of the nearest three pixels, adds a different bias, and passes the results through the activation function to create hidden units $h_7$ to $h_{12}$. 
+
+In general, the input and the hidden layers all have multiple channels. If the incoming layer has $C_i$ channels and we select a kernel size $K$ per channel, the hidden units in each output channell are computed as a weighted sum over all $C_i$ channels and $K$ kernel entries using a weight matrix $\Omega \in \mathbb{R}^{C_i \times K}$ and one bias.
+Hence, if htere are $C_o$ channels in the next layer, then we need $\Omega \in \mathbb{R}^{C_i \times C_o \times K}$ weights and $\beta \in \mathbb{R}^{C_o}$ biases. 
+
+\subsubsection{Receptive fields}
+
+Convolutional networks comprise a sequence of convolutional layers. The \bfit{receptive field} of a hidden unit in the network is the region of the original input that feeds into it. Consider a convolutional network where each convolutional layer has kernel size three. The hidden units in the first layer take a weighted sum of the three closest inputs, so have receptive fields of size three. The units in the second layer take a weighted sum of the three closest positions in the first layer, which are themselves weighted sums of three inputs. Hence, the hidden units in the second layer have a receptive field of size five. In this way, the receptive field of units in successive layers increases, and information from across the input is gradually integrated.
+
+% \section{Convolutional Networks for 2D inputs}
+
+
+
+% \chapter{Convolutional Neural Networks}
+
+% \section{Introduction}
+
+% \textbf{Convolutional Neural Networks} (CNNs) are a class of deep neural networks particularly well-suited for processing grid-like data, such as images. Standard neural networks struggle with the high dimensionality of raw image data, leading to a prohibitive number of parameters and computational cost. Images, however, exhibit strong \textit{spatial locality}: nearby pixels are often highly correlated.
+
+% CNNs exploit this structure through several key architectural features:
+% \begin{itemize}
+%     \item \textbf{Local Connectivity:} Neurons in a convolutional layer are connected only to a small, localized region of the input (the \textit{receptive field}).
+%     \item \textbf{Parameter Sharing:} The same set of weights (a \textit{kernel} or \textit{filter}) is applied across different spatial locations in the input. This drastically reduces the number of parameters compared to fully connected networks and makes the network sensitive to patterns regardless of their position.
+%     \item \textbf{Hierarchical Feature Extraction:} CNNs typically stack multiple layers, allowing them to learn increasingly complex patterns, from simple edges and textures in early layers to object parts and entire objects in deeper layers.
+% \end{itemize}
+% These properties make CNNs highly effective and efficient for tasks like image classification, object detection, semantic segmentation, and many other computer vision applications. They achieve a degree of \textit{translation equivariance}, meaning the network's response shifts along with shifts in the input pattern.
+
+% % Moved Kernels and Equivariance/Invariance up as core concepts
+% \subsection{The Convolution Operation and Kernels}
+
+% At the heart of CNNs lies the \textbf{convolution operation}. In image processing, convolution involves applying a small matrix of weights, known as a \textbf{kernel} or \textbf{filter}, to an input image. The kernel slides across the input image, and at each position, an element-wise multiplication between the kernel entries and the overlapping input patch is performed, followed by a summation of the results. This produces a single value in the output.
+
+% Repeating this process across the entire input generates an \textbf{output feature map} (also called an \textit{activation map}). Each feature map highlights the presence of the specific pattern detected by its corresponding kernel (e.g., edges, corners, textures).
+
+% \begin{figure}[htbp] % Changed [H] to [htbp] for better float handling
+%     \centering
+%     \includegraphics[width=0.6\textwidth]{assets/convolution.png} % Slightly increased width for visibility
+%     \caption{Illustration of a 2D convolution operation. A kernel (e.g., 3x3) slides over the input image, computing dot products to produce the output feature map.}
+%     \label{fig:convolution}
+% \end{figure}
+
+% Kernels act as learnable feature extractors. During training, the network learns kernel weights that are effective for the specific task.
+
+% \subsection{Equivariance and Invariance}
+% \label{sec:equivariance_invariance} % Added label for cross-referencing
+
+% Two important properties related to how CNNs handle transformations, especially translation, are equivariance and invariance.
+
+% \textbf{Equivariance} means that if the input changes, the output changes in a predictable and corresponding way. Specifically for translation, if the input image is shifted, the resulting feature map is also shifted by the same amount. The convolution operation itself provides this \textit{translation equivariance}. This is highly desirable because it means the network can detect a feature regardless of its absolute position in the image.
+
+% Formally, a function $f(x)$ is \textit{equivariant} to a transformation $t(\cdot)$ if:
+% \[
+% f(t(x)) = t(f(x)), \quad \forall x
+% \]
+% In the context of convolution $f$ and translation $t$, this means convolving a translated input yields a translated feature map.
+
+% \textbf{Invariance}, on the other hand, means that if the input changes, the output does not change (or changes very little). \textit{Translation invariance} implies that shifting the object in the input image ideally does not change the final classification output of the network. While convolution provides equivariance, perfect invariance is often achieved (or approximated) through subsequent operations like \textbf{pooling} layers (\cref{sec:pooling} - *assuming you add a section on pooling later*) which summarize feature responses over spatial neighborhoods. This makes the representation more robust to small shifts and distortions.
+
+% Formally, a function $f(x)$ is \textit{invariant} to a transformation $t(\cdot)$ if:
+% \[
+% f(t(x)) = f(x), \quad \forall x
+% \]
+% CNNs aim for feature equivariance in early layers and achieve increasing degrees of invariance in deeper layers and the final output.
+
+% \section{Convolutional Layers: A 1D Perspective}
+% \label{sec:conv_1d}
+
+% To understand the mechanics, let's first consider convolutional networks applied to 1-dimensional (1D) inputs, like time series data or sequences. The core principles extend directly to 2D (images) and 3D (volumetric data).
+
+% A 1D convolutional layer applies the convolution operation to transform an input vector $\mathbf{x}$ into an output vector $\mathbf{z}$. Each element $z_i$ in the output is computed as a weighted sum of a local neighborhood of inputs around position $i$. The weights used for this sum are defined by the \textbf{kernel}, and importantly, the \textit{same} kernel weights are used to compute every output element $z_i$. This is the parameter sharing property.
+
+% \subsection{1D Convolution Mechanics} % Changed from 'operation' to 'mechanics' for clarity
+
+% Let the input be $\mathbf{x} = [x_1, x_2, \dots, x_D]$ and the kernel be $\mathbf{w} = [w_1, w_2, \dots, w_K]$, where $K$ is the \textbf{kernel size}. A common way to define the $i$-th element of the output $\mathbf{z}$ (assuming a stride of 1, see \cref{sec:stride_dilation}) is:
+% \[
+% z_i = \sum_{k=1}^{K} w_k x_{i+k - \lceil K/2 \rceil}
+% \]
+% This formula assumes the kernel is centered around the output position $i$. For example, with a kernel size $K=3$ (i.e., $\mathbf{w} = [w_1, w_2, w_3]$), the output $z_i$ is computed as:
+% \[
+% z_i = w_1 x_{i-1} + w_2 x_i + w_3 x_{i+1}
+% \]
+% This corresponds to applying the kernel centered at position $i$.
+
+% \begin{figure}[htbp] % Changed [H] to [htbp]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{assets/1D-conv.png}
+%     \caption{1D convolution with a kernel of size $K=3$ and stride 1. Each output element is a weighted sum of three neighboring input elements using the same kernel weights.}
+%     \label{fig:1d_conv} % Added label
+% \end{figure}
+
+% % Note: The general formula provided in the original text, z_i = \sum_{j=0}^{k-1} w_j x_{i+j-k/2}, is slightly ambiguous about indexing and centering, especially for even k. The formula above is more explicit for centered odd-sized kernels. Another common definition is the cross-correlation: z_i = \sum_{k=1}^{K} w_k x_{i+k-1} (non-centered). The exact indexing can vary, but the principle of a sliding weighted sum remains.
+
+% \subsection{Padding}
+% \label{sec:padding}
+
+% When applying a kernel near the boundaries of the input signal, the kernel window may extend beyond the available input elements. \textbf{Padding} refers to adding artificial values (usually zeros) around the input boundaries to handle this.
+
+% Common padding strategies include:
+% \begin{itemize}
+%     \item \textbf{Valid Padding (No Padding):} The convolution is only computed where the kernel fully overlaps with the input. This causes the output size to shrink with each layer. If the input has size $D$ and the kernel has size $K$, the output size is $D - K + 1$.
+%     \item \textbf{Same Padding:} Sufficient padding (typically zero-padding) is added so that the output feature map has the same spatial dimension as the input feature map (assuming a stride of 1). For a kernel of size $K$, this usually requires adding $P = \lfloor K/2 \rfloor$ zeros on each side. This is very common as it simplifies network design by maintaining spatial dimensions.
+%     \item \textbf{Full Padding:} Padding is added such that every input element contributes to the output through the kernel's full extent. This increases the output size.
+% \end{itemize}
+% \textbf{Zero-padding} is the most common method, where the input is assumed to be zero outside its defined range.
+
+% \subsection{Stride, Dilation, and Kernel Size}
+% \label{sec:stride_dilation}
+
+% The behavior of the convolution operation can be further controlled by three key hyperparameters:
+
+% \begin{itemize}
+%     \item \textbf{Kernel Size ($K$):} Defines the number of input elements considered in the local neighborhood (e.g., $K=3$, $K=5$). Larger kernels capture information from wider context but require more parameters. Odd kernel sizes (3, 5, 7) are common as they have a natural center position.
+%     \item \textbf{Stride ($S$):} Specifies the step size by which the kernel slides across the input. A stride of $S=1$ moves the kernel one element at a time. A stride of $S=2$ skips every other position, resulting in an output that is roughly half the size (downsampling).
+%     \item \textbf{Dilation Rate ($D$):} Introduces gaps between the kernel elements, effectively expanding the kernel's view without increasing the number of parameters. A dilation rate of $D=1$ is standard convolution. A dilation rate of $D=2$ means the kernel elements access input positions that are spaced apart by one element (effectively inserting $D-1$ zeros between kernel weights). This allows capturing larger receptive fields efficiently and is also known as \textit{atrous convolution}.
+% \end{itemize}
+
+% \begin{figure}[htbp] % Changed [H] to [htbp]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{assets/stride.png}
+%     \caption{Illustration of stride, kernel size, and dilation in 1D convolution.}
+%     \label{fig:stride}
+% \end{figure}
+
+% The output size $O$ of a 1D convolution can be calculated based on the input size $I$, kernel size $K$, padding $P$ (on each side), stride $S$, and dilation $D$:
+% \[
+% O = \left\lfloor \frac{I + 2P - D(K-1) - 1}{S} \right\rfloor + 1
+% \]
+% Note: The effective kernel size with dilation $D$ becomes $K_{eff} = D(K-1) + 1$.
+
+% \subsection{Convolutional Layers}
+% \label{sec:conv_layers_1d}
+
+% A complete convolutional layer typically involves three steps:
+% \begin{enumerate}
+%     \item Performing the convolution operation using learnable kernel weights $\mathbf{w}$.
+%     \item Adding a learnable bias term $\beta$ to each element of the result.
+%     \item Applying a non-linear activation function $a(\cdot)$, commonly the Rectified Linear Unit (ReLU), element-wise.
+% \end{enumerate}
+
+% For a 1D input $\mathbf{x}$, kernel $\mathbf{w}=[w_1, w_2, w_3]$ ($K=3$), bias $\beta$, stride 1, and dilation 1, the $i$-th hidden unit $h_i$ is computed as:
+% \begin{align*} % Using align* for better math formatting
+% h_i &= a\left( \beta + w_1 x_{i-1} + w_2 x_i + w_3 x_{i+1} \right) \\
+%     &= a\left( \beta + \sum_{k=1}^{3} w_k x_{i+k-2} \right)
+% \end{align*}
+% Here, $\mathbf{w}$ and $\beta$ are parameters learned during training.
+
+% Compared to a \textbf{fully connected (dense) layer}, where each output unit $h_i$ is connected to \textit{every} input unit $x_j$ via a unique weight $w_{ij}$:
+% \[
+% h_i = a\left( \beta_i + \sum_{j=1}^{D_{in}} w_{ij} x_{j} \right)
+% \]
+% a convolutional layer imposes two strong constraints:
+% \begin{itemize}
+%     \item \textbf{Sparsity of Connections:} Each output $h_i$ only depends on a small local subset of inputs (determined by kernel size).
+%     \item \textbf{Parameter Sharing:} The same weights $\mathbf{w}$ (and bias $\beta$) are used across all spatial locations $i$.
+% \end{itemize}
+% If an input has size $D_{in}$ and the layer has $D_{out}$ hidden units, a fully connected layer requires $D_{in} \times D_{out}$ weights and $D_{out}$ biases. A convolutional layer (with one output channel, kernel size $K$) requires only $K$ weights and 1 bias, significantly reducing the parameter count and computational load, especially for large inputs like images.
+
+% \begin{figure}[htbp] % Changed [H] to [htbp]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{assets/fc-vs-conv.png}
+%     \caption{Comparison: A fully connected layer (left) connects every input to every output neuron with unique weights. A convolutional layer (right, with K=3) uses local connections and shared weights (same color indicates same weight).}
+%     \label{fig:fc-vs-conv}
+% \end{figure}
+
+% \subsection{Multiple Channels}
+% \label{sec:multiple_channels}
+
+% Real-world data often has multiple channels. For example, color images have Red, Green, and Blue (RGB) channels ($C_{in}=3$). Similarly, hidden layers within a CNN typically consist of multiple feature maps, each representing different learned patterns.
+
+% When applying convolution to a multi-channel input (say, $C_{in}$ channels), the kernel must also have a depth matching the number of input channels. A single 1D kernel is thus actually 2D: $K \times C_{in}$. To produce one output feature map (one channel), the convolution is performed across all input channels simultaneously, and the results are summed up, plus a single bias term, before applying the activation function.
+
+% Specifically, let the input be $\mathbf{X} \in \mathbb{R}^{D_{in} \times C_{in}}$ and we want to compute one output channel. The kernel will be $\mathbf{W} \in \mathbb{R}^{K \times C_{in}}$ and a bias $\beta \in \mathbb{R}$. The output $z_i$ at position $i$ is:
+% \[
+% z_i = \beta + \sum_{c=1}^{C_{in}} \sum_{k=1}^{K} W_{k,c} \, X_{i+k-\lceil K/2 \rceil, c}
+% \]
+% (assuming stride 1, centered kernel). Notice how the kernel sums contributions from all input channels ($c=1$ to $C_{in}$) at each spatial location.
+
+% To produce an output layer with $C_{out}$ channels (feature maps), we use $C_{out}$ independent kernels (each of size $K \times C_{in}$) and $C_{out}$ corresponding biases. Each kernel produces one output channel.
+
+% \begin{figure}[htbp] % Changed [H] to [htbp]
+%     \centering
+%     \includegraphics[width = 0.8\textwidth]{assets/channels.png}
+%     \caption{Convolution with multiple input channels ($C_{in}$) and multiple output channels ($C_{out}$). Each output channel is generated by a distinct kernel (each spanning all $C_{in}$ input channels). In this 1D example, $C_{in}=1$, $C_{out}=2$. A more general case would show kernels spanning multiple input channels.}
+%     \label{fig:multiple-channels}
+% \end{figure}
+
+% Therefore, a convolutional layer transforming an input with $C_{in}$ channels to an output with $C_{out}$ channels using kernels of size $K$ requires:
+% \begin{itemize}
+%     \item Number of weights: $C_{out} \times (K \times C_{in})$
+%     \item Number of biases: $C_{out}$
+% \end{itemize}
+% The learnable parameters for the layer are these weights and biases.
+
+% \subsection{Receptive Fields}
+% \label{sec:receptive_field}
+
+% In a multi-layer CNN, the \textbf{receptive field} of a neuron (or a unit in a feature map) is the specific region in the \textit{original input space} whose values influence the computation of that neuron.
+
+% As we stack convolutional layers, the receptive field size increases. Consider a network with two consecutive 1D convolutional layers, each with kernel size $K=3$ and stride $S=1$.
+% \begin{itemize}
+%     \item Neurons in the first hidden layer (\texttt{conv1}) have a receptive field of size 3 in the input layer. Each neuron "sees" 3 input values.
+%     \item Neurons in the second hidden layer (\texttt{conv2}) are computed from a neighborhood of 3 neurons in \texttt{conv1}. Since each \texttt{conv1} neuron sees 3 input values, a \texttt{conv2} neuron effectively integrates information from a wider region of the original input. With $K=3, S=1$, the receptive field size grows linearly. A neuron in \texttt{conv2} will have a receptive field of size $3 + (3-1) = 5$ in the original input.
+% \end{itemize}
+% In general, for stride 1 layers, the receptive field size $R_{l}$ of layer $l$ can be related to the receptive field size $R_{l-1}$ of the previous layer and the kernel size $K_l$ of the current layer by:
+% \[ R_l = R_{l-1} + (K_l - 1) \]
+% If strides greater than 1 or pooling are used, the receptive field grows faster.
+
+% The increasing receptive field size allows neurons in deeper layers to capture information from larger spatial contexts, enabling the network to learn hierarchical features from local patterns to global structures.

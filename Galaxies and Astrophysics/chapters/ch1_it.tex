@@ -1,4 +1,9 @@
-\chapter{Geometrie Non Euclidee}
+\chapter{Geometria Differenziale} \label{ch:geometria_differenziale}
+
+La geometria differenziale rappresenta il linguaggio matematico fondamentale per descrivere spazi curvi e le loro proprietà intrinseche. In astrofisica e cosmologia, essa fornisce gli strumenti per analizzare la struttura dello spazio-tempo: tramite tensori, forme differenziali e concetti come curvature e connessioni, si può modellare il comportamento della gravità come descritto dalla relatività generale. 
+
+
+\section{Geometrie Non Euclidee}
 
 La teoria che studieremo è una \textit{teoria geometrica}:
 
@@ -8,18 +13,18 @@ La teoria che studieremo è una \textit{teoria geometrica}:
     \item Una retta può essere prolungata indefinitamente in entrambe le direzioni.
     \item Dato un punto $O$ ed un raggio $R$, esiste esattamente un cerchio con centro in $O$ e raggio $R$.
     \item Tutti gli angoli retti sono congruenti.
-    \item Data una retta r ed un punto P fuori da essa, per
-    il punto P passa una ed una sola retta parallela ad r (possiamo dare al termine parallelo il significato di \textit{che incontra r solo all'infinito}, in un punto improprio).
+    \item Data una retta $r$ ed un punto $P$ fuori da essa, per il punto $P$ passa una ed una sola retta parallela ad $r$ (possiamo intenede "parallelo" con \textit{che incontra r solo all'infinito}, in un punto improprio).
+
 \end{enumerate}
 
 Il quinto postulato è più complesso degli altri; i tentativi di dimostrare tale postulato a partire dagli altri postulati, considerati più evidenti, non hanno permesso di arrivare a questo, ma hanno portato, nell'800, alla nascita delle geometrie non-Euclidee (Gauss, Bolyai, Lobachevski, Klein).
 
 \begin{center}
-\begin{tikzpicture}[scale=1.0]
+\begin{tikzpicture}[scale=0.65]
     % Draw a dashed line at the top
     \draw[dashed] (-3,1) -- (3,1);
     % Create point P at the center of the dashed line
-    \fill (0,1) circle (1pt) node[above] {$P$};
+    \fill (0,1) circle (1.5pt) node[above] {$P$};
     % Draw the line r at the bottom
     \draw (-3,0) -- (3,0);
     % Place the label r at the left end of the line
@@ -36,7 +41,7 @@ Il quinto postulato si è rivelato indipendente dagli altri enunciati di Euclide
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{assets/geometries.png}
+    \includegraphics[width=0.55\textwidth]{assets/geometries.png}
     \caption{Geometrie ellittiche e iperboliche}
 \end{figure}
 
@@ -52,12 +57,12 @@ Definito sulla sfera un triangolo con i lati formati da archi di cerchi massimi,
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}{0.3\textwidth}
+    \begin{minipage}{0.35\textwidth}
         \centering
-        \includegraphics[width=0.85\textwidth]{assets/spherical_geometry.png}
+        \includegraphics[width=0.86\textwidth]{assets/spherical_geometry.png}
         \caption{Geometria sferica}
     \end{minipage} \hspace{1cm}
-    \begin{minipage}{0.3\textwidth}
+    \begin{minipage}{0.35\textwidth}
         \centering
         \includegraphics[width=0.82\textwidth]{assets/spherical_triangle.png}
         \caption{Triangolo sferico}
@@ -66,25 +71,31 @@ Definito sulla sfera un triangolo con i lati formati da archi di cerchi massimi,
 
 \vspace{-1em}
 
-In questo contesto, i triangoli, noti come triangoli sferici, mostrano una proprietà intrigante: la somma dei loro angoli interni supera i 180° ($\alpha + \beta + \gamma > \pi$), un fenomeno noto come eccesso sferico, con l'eccesso proporzionale all'area del triangolo.
+In questo contesto, i triangoli, noti come triangoli sferici, mostrano una proprietà interessante: la somma dei loro angoli interni supera i 180° ($\alpha + \beta + \gamma > \pi$), un fenomeno noto come eccesso sferico, con l'eccesso proporzionale all'area del triangolo.
 \vspace{0.2em}
 $$
 S = R^2(\alpha + \beta + \gamma - \pi) \quad \text{dove per} \quad R \to \infty \quad \text{si ha} \quad \dfrac S{R^2} \to 0 \quad \text{e} \quad \alpha + \beta + \gamma \to \pi
 $$
-Per costruire un modello della geometria ellittica piana siamo ricorsi all'uso di una sfera (superficie bidimensionale, indicata con $S^2$) immersa (\textit{embedded}) in uno spazio euclideo tridimensionale $E^3$. 
+Per costruire un modello della geometria ellittica piana siamo ricorsi all'uso di una sfera (superficie bidimensionale, indicata con $\mathbf S^2$) immersa (\textit{embedded}) in uno spazio euclideo tridimensionale $\mathbf E^3$. 
 
-Notiamo che per rappresentare il 5° postulato abbiamo dovuto ricorrere ad una superficie \textit{curva}, cioè la sfera. Questa curvatura deve essere inoltre costante in tutto il piano perché gli altri postulati descrivono lo spazio come omogeneo, e se la curvatura variasse questa proprietà verrebbe meno.
+Notiamo che per rappresentare il 5° postulato abbiamo dovuto ricorrere ad una superficie \textit{curva}, cioè la sfera. Questa \textit{curvatura} deve essere inoltre costante in tutto il piano perché gli altri postulati descrivono lo spazio come omogeneo, e se la curvatura variasse questa proprietà verrebbe meno.
 
-Questo ci porta a comprendere che le diverse geometrie non euclidee possono essere caratterizzate matematicamente attraverso diverse definizioni di distanza. La curvatura dello spazio diventa quindi un elemento fondamentale per distinguere tra i vari tipi di geometrie:
+Questo ci porta a comprendere che le diverse geometrie non euclidee possono essere caratterizzate matematicamente attraverso diverse definizioni di distanza. La \bfit{curvatura} dello spazio diventa quindi un elemento fondamentale per distinguere tra i vari tipi di geometrie, ed è data da:
+\vspace{0.3em}
+$$
+k = \dfrac{1}{R^2} \quad \text{dove} \quad R = \text{raggio della superficie}
+$$
+\vspace{-0.5em}
+Si ha quindi:
 \begin{itemize}
-    \item Curvatura zero → geometria euclidea
-    \item Curvatura positiva costante → geometria ellittica
-    \item Curvatura negativa costante → geometria iperbolica
+    \item Curvatura zero $(k = 0)$\phantom{iiiiii costante} → geometria euclidea
+    \item Curvatura positiva costante $(k>0)$ \ → geometria ellittica
+    \item Curvatura negativa costante $(k<0)$ → geometria iperbolica
 \end{itemize}
 
 \subsection{Geometria Iperbolica}
 
-La geometria iperbolica piana è una geometria non euclidea in cui il quinto postulato di Euclide non vale, ammettendo più parallele a una retta data. I triangoli iperbolici hanno somma degli angoli inferiore a 180°, con “difetto” proporzionale all’area. Il piano iperbolico non può essere immerso interamente in uno spazio euclideo 3D, ma esistono modelli come il \emph{cerchio di Klein} (1870), in cui i punti sono all’interno di una circonferenza unitaria e le rette ne sono le corde. Da un punto $P$ passano due parallele a una retta data, e ne esistono infinite che non la intersecano.
+La geometria iperbolica piana è una geometria non euclidea in cui il quinto postulato di Euclide non vale, ammettendo più parallele a una retta data. I triangoli iperbolici hanno somma degli angoli inferiore a 180°, con “difetto” proporzionale all'area. Il piano iperbolico non può essere immerso interamente in uno spazio euclideo 3D, ma esistono modelli come il \emph{cerchio di Klein} (1870), in cui i punti sono all'interno di una circonferenza unitaria e le rette ne sono le corde. Da un punto $P$ passano due parallele a una retta data, e ne esistono infinite che non la intersecano.
 
 \begin{figure}[H]
     \centering
@@ -98,13 +109,13 @@ La distanza tra due punti $A$ e $B$ è
 $$
 d(A,B) = \frac12 \log \!\Bigl(\frac{RA\cdot SB}{RB\cdot SA}\Bigr),
 $$
-che diverge se uno dei punti tende al bordo. Una rappresentazione parziale di $H^2$ in uno spazio euclideo 3-D $E^3$ è la cosiddetta \bfit{pseudosfera}, una superficie a curvatura negativa costante, in contrasto con la sfera a curvatura positiva.
+che diverge se uno dei punti tende al bordo. Una rappresentazione parziale di $\mathbf H^2$ in uno spazio euclideo 3-D $\mathbf E^3$ è la cosiddetta \bfit{pseudosfera}, una superficie a curvatura negativa costante, in contrasto con la sfera a curvatura positiva.
 
-\section{Curva piana}
+\section{Curva piana} \label{sec:curva_piana}
 
-Si può parametrizzare una curva piana nel modo seguente: $\bar x(t) = (x_1(t), x_2(t))$, dove $t$ è un parametro, non necessariamente il tempo; il vettore tangente (velocità) è ${d\bar x}/{dt}$. Possiamo definire l'ascissa curvilinea $s(t)$:
+Si può parametrizzare una curva piana nel modo seguente: $\bar x(t) = (x_1(t), x_2(t))$, dove $t$ è un parametro, non necessariamente il tempo; il vettore tangente (velocità) è ${d\bar x}/{\dd t}$. Possiamo definire l'ascissa curvilinea $s(t)$:
 $$
-O \equiv \bar x(t = 0) \quad P \equiv \bar x(t) \quad ds = |d\bar x| = |\dfrac {d\bar x}{dt}| dt \quad \to \quad s(t) = \int_0^t |d\bar x| = \int_0^t |\dfrac {d\bar x}{dt}| dt
+O \equiv \bar x(t = 0) \quad P \equiv \bar x(t) \quad ds = |d\bar x| = \bigg|\dfrac {d\bar x}{\dd t}\bigg| \dd t \quad \to \quad s(t) = \int_0^t |d\bar x| = \int_0^t \bigg|\dfrac {d\bar x}{\dd t}\bigg| \dd t
 $$
 
 \vspace{-1em}
@@ -162,7 +173,7 @@ $$
     \rho\;:\;\text{raggio di curvatura}.
 \end{cases}
 $$
-Misurando l’angolo $\theta$ da un riferimento fisso (ad esempio, rispetto all’asse $x$), si ottiene
+Misurando l'angolo $\theta$ da un riferimento fisso (ad esempio, rispetto all'asse $x$), si ottiene
 
 $$
 \Delta s
@@ -213,26 +224,33 @@ $$
 
 Più che di \emph{superfici} in senso esteso, ci interesseremo degli \emph{elementi di superficie}, poiché vogliamo esaminare le proprietà locali. Anche in questo caso, useremo una rappresentazione parametrica.
 
-Sia
+Sia:
+\vspace{0.2em}
 $$
 \bar{x}\colon D \subseteq \mathbb{R}^2 \;\to\; \mathbb{R}^3
 $$
-una funzione biunivoca (dunque invertibile) che descrive una superficie nello spazio euclideo tridimensionale $E^3$. In coordinate:
+
+una funzione biunivoca (invertibile) che descrive una superficie nello spazio euclideo tridimensionale $\mathbf E^3$. 
+
+In coordinate:
+\vspace{0.2em}
 $$
 \bar{x}(u,v)
 \;=\;
 \bigl(x_1(u,v),\;x_2(u,v),\;x_3(u,v)\bigr).
 $$
+
 Se la superficie è del tipo $z = f(x,y)$, allora la parametrizzazione diventa $\bar x(u,v) = \bigl(u,\,v,\,f(u,v)\bigr)$.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{assets/surface.png}
+    \includegraphics[width=0.75\textwidth]{assets/surface.png}
     \caption{Superficie parametrica}
 \end{figure}
 
 \begin{definitionblock}[Superficie Regolare]
-Una \bfit{superficie regolare} (o \emph{smooth}) è tale se, definendo
+Una \bfit{superficie regolare} (o \emph{smooth}) è tale se, definendo:
+
 $$
 \bar{x}_u
 \;=\;
@@ -246,15 +264,17 @@ $$
 \;=\;
 \Bigl(\dfrac{\partial x_1}{\partial v},\;\dfrac{\partial x_2}{\partial v},\;\dfrac{\partial x_3}{\partial v}\Bigr),
 $$
-si ha che in ogni punto del dominio (cioè ovunque in $D$) risulta
+
+si ha che in ogni punto del dominio (cioè ovunque in $D$) risulta:
+
 $$
 \bar{x}_u \;\times\; \bar{x}_v \;\neq\; 0.
 $$
 \end{definitionblock}
 
-Fissando $v=v_0$ e variando $u$ nei pressi di un punto $P'\!\in D$ (che corrisponde al punto $P$ sulla superficie $M$), si ottiene una curva su $M$ il cui vettore tangente è $\bar{x}_u$. Analogamente, $\bar{x}_v$ è tangente a un’altra curva, e i due vettori definiscono il piano tangente in $P$.
+Fissando $v=v_0$ e variando $u$ nei pressi di un punto $P'\!\in D$ (che corrisponde al punto $P$ sulla superficie $M$), si ottiene una curva su $M$ il cui vettore tangente è $\bar{x}_u$. Analogamente, $\bar{x}_v$ è tangente a un'altra curva, e i due vettori definiscono il piano tangente in $P$.
 
-Un versore normale alla superficie è dato da
+Un versore normale alla superficie è dato da:
 \vspace{0.4em}
 $$
 \hat{n}
@@ -263,7 +283,7 @@ $$
 $$
 e i tre vettori $\hat{n},\,\bar{x}_u,\,\bar{x}_v$ formano un triedro locale.
 
-Poiché la corrispondenza tra $D$ e l’intorno di $P$ su $M$ è biunivoca, possiamo considerare $(u,v)$ come un sistema di coordinate curvilinee sull’intorno di $P$ (ad esempio, i paralleli e i meridiani su una sfera).
+Poiché la corrispondenza tra $D$ e l'intorno di $P$ su $M$ è biunivoca, possiamo considerare $(u,v)$ come un sistema di coordinate curvilinee sull'intorno di $P$ (ad esempio, i paralleli e i meridiani su una sfera).
 
 \newpage
 
@@ -280,11 +300,11 @@ rappresenta la curva su $M$ passante per $\bar{x}(u_0,v_0)$. Il vettore velocit�
 $$
 \dot{\bar{r}}
 \;=\;
-\frac{d\bar{r}}{dt}
+\frac{d\bar{r}}{\dd t}
 \;=\;
-\bar{x}_u \;\frac{du}{dt}
+\bar{x}_u \;\frac{du}{\dd t}
 \;+\;
-\bar{x}_v \;\frac{dv}{dt}.
+\bar{x}_v \;\frac{dv}{\dd t}.
 $$
 
 \begin{figure}[H]
@@ -296,7 +316,7 @@ $$
 Poiché $\dot{\bar{r}}$ è tangente alla curva e appartiene quindi al piano tangente di $M$, ogni vettore tangente a $M$ in $P$ si può scrivere come combinazione lineare di $\bar{x}_u$ e $\bar{x}_v$. Viceversa, per ogni combinazione $\,\bar{v} = a\,\bar{x}_u + b\,\bar{x}_v\,$ esiste una corrispondente curva su $M$ la cui velocità è esattamente $\bar{v}$. In tal senso, $\bar{x}_u$ e $\bar{x}_v$ formano una base del piano tangente.
 
 \begin{exampleblock}[Superficie di una sfera di raggio $R$]
-Consideriamo la sfera di raggio $R$ centrata nell’origine. La sua superficie si parametrizza come
+Consideriamo la sfera di raggio $R$ centrata nell'origine. La sua superficie si parametrizza come
 $$
 \bar{x}(u,v)
 \;=\;
@@ -356,27 +376,18 @@ $$
 In geometria differenziale, la \bfit{prima forma fondamentale} (o \textit{forma metrica}) di una superficie definisce la sua metrica intrinseca. Grazie a essa possiamo misurare lunghezze, angoli e aree \emph{rimanendo} sulla superficie, ossia senza far riferimento esplicito allo spazio tridimensionale in cui la superficie è immersa.
 
 \begin{definitionblock}[Prima Forma Fondamentale]
-    Sia $M$ una superficie regolare immersa in $\mathbb{R}^3$, e sia 
+    Sia $M$ una superficie regolare immersa in $\mathbb{R}^3$, e sia:
     \vspace{0.4em}
     $$
     \bar{x}\colon U\subset\mathbb{R}^2 \to \mathbb{R}^3
     $$
-    una parametrizzazione locale di $M$. La \textbf{prima forma fondamentale} in un punto $p \in M$ è il bilineare simmetrico
-    $$
-    I_p\colon T_pM \times T_pM \to \mathbb{R},
-    $$
-    definito per ogni coppia di vettori tangenti $v, w \in T_pM$ (lo spazio tangente alla superficie $M$ passante per $p$) mediante
-    $$
-    I_p(v, w) = \langle d\bar{x}_p(v),\, d\bar{x}_p(w) \rangle,
-    $$
-    dove $\langle \cdot, \cdot \rangle$ indica il prodotto scalare euclideo in $\mathbb{R}^3$. In coordinate locali $(u,v)$, ponendo
-    \vspace{0.4em}
+    una parametrizzazione locale di $M$. In coordinate locali $(u,v)$, ponendo:
     $$
     \bar{x}_u = \frac{\partial \bar{x}}{\partial u},\quad \bar{x}_v = \frac{\partial \bar{x}}{\partial v},
     $$
-    l'espressione si riduce a
+    l'espressione della \textbf{prima forma fondamentale} e:
     $$
-    ds^2 = E\,du^2 + 2F\,du\,dv + G\,dv^2,
+    \dd s^2 = E\,\dd u^2 + 2F\,\dd u\,\dd v + G\,\dd v^2,
     $$
     con
     $$
@@ -390,24 +401,24 @@ Sia $\bar{r}(t) = \bar{x}\bigl(u(t),\,v(t)\bigr)$, con $t\in[a,b]$, una curva su
 \vspace{0.4em}
 $$
 L \;=\; s(b) 
-\;=\; \int_a^b \frac{ds}{dt}\,dt 
-\;=\; \int_a^b \bigl|\dot{\bar{r}}(t)\bigr| \,dt.
+\;=\; \int_a^b \frac{ds}{\dd t}\,\dd t 
+\;=\; \int_a^b \bigl|\dot{\bar{r}}(t)\bigr| \,\dd t.
 $$
 Poiché
 $$
 \dot{\bar{r}}
 \;=\;
-\frac{d\bar{r}}{dt}
+\frac{d\bar{r}}{\dd t}
 \;=\;
 \bar{x}_u\,\dot{u}
 \;+\;
 \bar{x}_v\,\dot{v}
-\quad\text{(dove }\dot{u} = \tfrac{du}{dt},\; \dot{v} = \tfrac{dv}{dt}\text{),}
+\quad\text{(dove }\dot{u} = \tfrac{du}{\dd t},\; \dot{v} = \tfrac{dv}{\dd t}\text{),}
 $$
 segue che
 \vspace{0.4em}
 $$
-\biggl(\frac{ds}{dt}\biggr)^2
+\biggl(\frac{ds}{\dd t}\biggr)^2
 \;=\;
 \bigl\lvert \dot{\bar{r}}\bigr\rvert^2
 \;=\;
@@ -437,7 +448,7 @@ $$
 e otteniamo
 \vspace{0.4em}
 $$
-\biggl(\frac{ds}{dt}\biggr)^2
+\biggl(\frac{ds}{\dd t}\biggr)^2
 \;=\;
 E\,\dot{u}^2
 \;+\;
@@ -456,22 +467,22 @@ L
 \;+\;
 2\,F\,\dot{u}\,\dot{v}
 \;+\;
-G\,\dot{v}^2\,}\,dt
+G\,\dot{v}^2\,}\,\dd t
 \;=\;
 \int_{\bar{r}}
-\sqrt{\,E\,du^2 \;+\; 2\,F\,du\,dv \;+\; G\,dv^2\,},
+\sqrt{\,E\,\dd u^2 \;+\; 2\,F\,\dd u\,\dd v \;+\; G\,\dd v^2\,},
 $$
 che in forma differenziale si esprime come
 \vspace{0.5em}
 $$
 \boxed{
-ds^2
+\dd s^2
 \;=\;
-E\,du^2
+E\,\dd u^2
 \;+\;
-2\,F\,du\,dv
+2\,F\,\dd u\,\dd v
 \;+\;
-G\,dv^2.
+G\,\dd v^2.
 }
 $$
 Questa espressione, chiamata \bfit{prima forma fondamentale}, descrive la geometria intrinseca della superficie. “Intrinseco” significa che tutte le misure (di distanze, angoli, ecc.) possono essere effettuate senza “uscire” dallo spazio bidimensionale della superficie.
@@ -479,7 +490,7 @@ Questa espressione, chiamata \bfit{prima forma fondamentale}, descrive la geomet
 Poiché esiste una corrispondenza biunivoca tra $D\subset \mathbb{R}^2$ e la porzione di superficie $M$, le linee $u=\text{cost}$ e $v=\text{cost}$ formano sulla superficie una \emph{griglia} di coordinate curvilinee, mentre $E(u,v)$, $F(u,v)$ e $G(u,v)$ sono interpretate come \emph{funzioni} definite su $M$. In questo modo, ipotetici “abitanti” bidimensionali potrebbero compiere misurazioni di distanze \emph{sulla superficie} per determinare la forma di $E$, $F$ e $G$, giungendo così a una descrizione completa della metrica locale.
 
 \begin{exampleblock}[Il piano]
-Consideriamo il piano in $E^3$ descritto da $\bar{x}(u,v)=(u,\,v,\,0)$, con coordinate cartesiane $x=u$ e $y=v$. Allora
+Consideriamo il piano in $\mathbf E^3$ descritto da $\bar{x}(u,v)=(u,\,v,\,0)$, con coordinate cartesiane $x=u$ e $y=v$. Allora
 $$
 \bar{x}_u=(1,0,0), 
 \quad
@@ -493,13 +504,13 @@ G=\bar{x}_v\cdot\bar{x}_v=1.
 $$
 Quindi,
 $$
-ds^2=du^2+dv^2,
+\dd s^2=\dd u^2+\dd v^2,
 $$
 che corrisponde al classico \emph{teorema di Pitagora} in forma differenziale. La lunghezza di una curva $y=f(x)$, parametrizzata da $x=t$ e $y=f(t)$, è
 $$
 L
 \;=\;
-\int_a^b \sqrt{1 + \bigl(f'(x)\bigr)^2}\,dx.
+\int_a^b \sqrt{1 + \bigl(f'(x)\bigr)^2}\,\dd x.
 $$
 \end{exampleblock}
 
@@ -518,11 +529,10 @@ $$
     \end{cases}
     $$
     \normalsize
-    
     dove $u \in [-\pi, \pi]$, $v \in [-\pi/2, \pi/2]$
     
     Calcoliamo i coefficienti della prima forma fondamentale:
-    
+    \vspace{-0.2em}
     $$
     \begin{cases}
     E = \bar{x}_u \cdot \bar{x}_u = R^2 \cos^2 v \sin^2 u + R^2 \cos^2 v \cos^2 u & = R^2 \cos^2 v
@@ -534,9 +544,8 @@ $$
     $$
     
     Quindi, la prima forma fondamentale è:
-    
     $$
-    ds^2 = R^2 \cos^2 v\, du^2 + R^2 dv^2
+    \dd s^2 = R^2 \cos^2 v\, \dd u^2 + R^2 \dd v^2
     $$
     
 \end{exampleblock}
@@ -588,6 +597,8 @@ Ricordiamo che, essendo $\bar x_u \times \bar x_v$ perpendicolare al piano tange
 
 \renewcommand{\qedsymbol}{C.V.D.}
 
+\vspace{-1.2em}
+\rule{\textwidth}{0.5pt}
 \newtheorem{theorem}{Teorema}[chapter]
 \begin{theorem}
 
@@ -624,14 +635,15 @@ Ricordiamo che, essendo $\bar x_u \times \bar x_v$ perpendicolare al piano tange
     $$
     |\bar x_u \times \bar x_v|^2 = (|\bar x_u|^2 |\bar x_v|^2 \sin^2 \theta) = |\bar x_u|^2 |\bar x_v|^2 (1 - \cos^2 \theta) = \underbrace{|\bar x_u|^2}_E \cdot \underbrace{|\bar x_v|^2}_G - \underbrace{(\bar x_u \cdot \bar x_v)^2}_{F^2}
     $$
-
-    
     Ricordando che $|\bar x_u \times \bar x_v|^2 = \det \begin{pmatrix} E & F \\ F & G \end{pmatrix}$, otteniamo l'identità di Lagrange:
     
     $$
     \det \begin{pmatrix} E & F \\ F & G \end{pmatrix} = EG - F^2
     $$ 
+    \vspace{-1em}
 \end{proof}
+\vspace{-0.8em}
+\rule{\textwidth}{0.5pt}
 
 Dalla condizione che la superficie sia regolare, segue che $E G - F^2 \neq 0$
 
@@ -640,7 +652,7 @@ Dalla condizione che la superficie sia regolare, segue che $E G - F^2 \neq 0$
 A questo punto facciamo un cambiamento nella simbologia usata; come vedremo questo porterà ad una notevole semplificazione delle formule.
 
 Chiamiamo: $\quad
-g_{11} \equiv E, \quad g_{12} = g_{21} \equiv F, \quad g_{22} \equiv g, \qquad \bar x_1 \equiv \bar x_u, \quad \bar x_2 \equiv \bar x_v
+g_{11} \equiv E, \quad g_{12} = g_{21} \equiv F, \quad g_{22} \equiv G, \qquad \bar x_1 \equiv \bar x_u, \quad \bar x_2 \equiv \bar x_v
 $
 
 E scriviamo $\quad u^1 \equiv u, \quad u^2 = v \quad$ (dove gli apici 1 e 2 sono indici alti e non esponenti).9
@@ -658,26 +670,26 @@ detto $g = det(g_{ij}) = EG - F^2$, allora (dall'identità di Lagrange) $|\bar x
 Nella nuova notazione la prima forma fondamentale diventa:
 
 $$
-ds^2 = g_{11} (du^1)^2 + 2g_{12} du^1 du^2 + g_{22} (du^2)^2 = g_{ij} du^i du^j
+\dd s^2 = g_{11} (\dd u^1)^2 + 2g_{12} \dd u^1 \dd u^2 + g_{22} (\dd u^2)^2 = g_{ij} \dd u^i \dd u^j
 $$
-
-\begin{tipsblock}[Notazione di Einstein]
-Nella \emph{notazione di Einstein}, quando un indice compare una volta in alto e una in basso, si sottointende una somma su tutti i valori possibili di tale indice. Per esempio, $g_{ij}\,du^i\,du^j$ significa $\sum_{i,j} g_{ij}\,du^i\,du^j$.
-\end{tipsblock}
 
 Abbiamo usato la relazione $2g_{12} = g_{12} + g_{21}$ poiché la forma metrica è simmetrica, ossia $g_{ij} = g_{ji}$.
 
+\begin{tipsblock}[Notazione di Einstein]
+Nella \emph{notazione di Einstein}, quando un indice compare una volta in alto e una in basso, si sottointende una somma su tutti i valori possibili di tale indice. Per esempio, $g_{ij}\,\dd u^i\,\dd u^j$ significa $\sum_{i,j} g_{ij}\,\dd u^i\,\dd u^j$.
+\end{tipsblock}
+
+
 Un vettore tangente alla superficie $M$ nel punto $P$ può essere scritto come
+\vspace{0.4em}
 $$
 \bar v = a\,\bar x_1 + b\,\bar x_2,
-$$
-oppure, in forma esplicita,
-$$
+\quad \text{oppure, in forma esplicita}\quad
 \bar v = v^1\,\bar x_1 + v^2\,\bar x_2 = \sum_{i} v^i\,\bar x_i,
 $$
 dove l'indice $i$ è una variabile indicizzata (è intercambiabile con altre lettere).
 
-Se consideriamo due vettori tangenti $\bar v = \sum_{i} v^i\,\bar x_i$ e $\bar w = \sum_{j} w^j\,\bar x_j$, entrambi definiti in $P$, il loro prodotto scalare risulta:
+Consideriamo due vettori tangenti $\bar v = \sum_{i} v^i\,\bar x_i$ e $\bar w = \sum_{j} w^j\,\bar x_j$, entrambi definiti in $P$, il loro prodotto scalare è:
 $$
 \bar v \cdot \bar w 
 =\; \sum_{i,j} \Bigl( v^i\,\bar x_i \cdot w^j\,\bar x_j \Bigr)
@@ -707,7 +719,7 @@ ovvero, in forma compatta,
 $$
 \sum_{j} g_{ij}\,g^{jk} = \delta_i^k,
 $$
-dove $\delta_i^k$ è la \bfit{delta di Kronecker} (matrice identità), definita da: 
+dove $\delta_i^k$ è la \bfit{delta di Kronecker} è definito da: 
 $
 \quad
 \delta_i^k =
@@ -730,9 +742,10 @@ Sia $x: D \to E^3$ una superficie e sia $\Omega\subset D$ una regione del domini
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{assets/area.png}
+    \includegraphics[width=0.7\textwidth]{assets/area.png}
     \caption{Area di una superficie}
 \end{figure}
+\vspace{-1em}
 
 Ad una piccola areola di $\Omega$ con lati $\Delta u^1$ e $\Delta u^2$ corrisponde, approssimativamente, un pezzo di superficie a forma di parallelogramma, i cui lati sono paralleli ai vettori $\bar x_1$ e $\bar x_2$. Le lunghezze dei lati sono rispettivamente
 $$
@@ -755,15 +768,15 @@ dove $\theta$ è l'angolo tra $\bar x_1$ e $\bar x_2$ e $g = \det(g_{ij})$.
 Passando al limite in cui $\Delta u^1,\,\Delta u^2 \to 0$ e sommando su tutte le areole, l'area di $x(\Omega)$ è data da:
 \vspace{0.4em}
 $$
-A = \iint_{\Omega} \sqrt{g}\,du^1\,du^2.
+A = \iint_{\Omega} \sqrt{g}\,\dd u^1\,\dd u^2.
 $$
 
-Osserviamo che, in due dimensioni, la misura di un insieme coincide con l'area; in spazi di dimensione $n$, l'integrale di $\sqrt{g}$ fornisce rispettivamente un volume $n$-dimensionale. Questo procedimento vale per spazi (o \emph{manifolds}) \bfit{Riemanniani}, in cui $ds^2>0$. Negli spazi \bfit{pseudo-Riemanniani} (ad esempio, lo \emph{spazio-tempo di Minkowski} nella Relatività Speciale) alcuni elementi del tensore metrico possono essere negativi; in tali casi, poiché il determinante $g$ può risultare negativo, si usa in generale $\sqrt{|g|}$.
+Osserviamo che, in due dimensioni, la misura di un insieme coincide con l'area; in spazi di dimensione $n$, l'integrale di $\sqrt{g}$ fornisce rispettivamente un volume $n$-dimensionale. Questo procedimento vale per spazi (o \emph{manifolds}) \bfit{Riemanniani}, in cui $\dd s^2>0$. Negli spazi \bfit{pseudo-Riemanniani} (ad esempio, lo \emph{spazio-tempo di Minkowski} nella Relatività Speciale) alcuni elementi del tensore metrico possono essere negativi; in tali casi, poiché il determinante $g$ può risultare negativo, si usa in generale $\sqrt{|g|}$.
 
 \begin{exampleblock}[Sfera]
     La sfera è uno spazio Riemanniano:
     $$
-    ds^2 = R^2 \cos^2 v du^2 + R^2 dv^2
+    \dd s^2 = R^2 \cos^2 v \dd u^2 + R^2 \dd v^2
     \qquad
     \begin{cases}
     - \pi < u < \pi \\
@@ -781,18 +794,17 @@ Osserviamo che, in due dimensioni, la misura di un insieme coincide con l'area; 
     $$
     Calcoliamo l'area:
     $$
-    A = \iint_{\Omega} \sqrt{g} du dv = \int_{-\pi}^{\pi} du \int_{-\frac{\pi}{2}}^{\frac{\pi}{2}} R^2 \cos v dv = \boxed{4 \pi R^2}
+    A = \iint_{\Omega} \sqrt{g}\ \dd u\; \dd v = \int_{-\pi}^{\pi} \dd u \int_{-\frac{\pi}{2}}^{\frac{\pi}{2}} R^2 \cos v\; \dd v = \boxed{4 \pi R^2}
     $$
 \end{exampleblock}
 
 \begin{exampleblock}[Toro]
     Consideriamo un esmepio più complesso, il toro:
 
-    $$
-    \bar x (u, v) = [R + r \cos u] \cos v, [R + r \cos u] \sin n, r \sin u,
-    $$
-    
-    \begin{minipage}[H]{0.5\textwidth}
+    \begin{minipage}[H]{0.6\textwidth}
+        $$
+        \bar x (u, v) = [R + r \cos u] \cos v, [R + r \cos u] \sin n, r \sin u,
+        $$
         $$
         \begin{cases}
             0 < v < 2\pi \\
@@ -801,10 +813,10 @@ Osserviamo che, in due dimensioni, la misura di un insieme coincide con l'area; 
         \end{cases}
         $$
     \end{minipage}%
-    \begin{minipage}[H]{0.5\textwidth}
+    \begin{minipage}[H]{0.4\textwidth}
         \begin{figure}[H]
             \centering
-            \includegraphics[width=0.6\textwidth]{assets/toro.png}
+            \includegraphics[width=0.8\textwidth]{assets/toro.png}
         \end{figure}
     \end{minipage}
 
@@ -824,7 +836,7 @@ Osserviamo che, in due dimensioni, la misura di un insieme coincide con l'area; 
 
     $$
     \begin{array}{rl}
-    \displaystyle A &= \displaystyle \int_0^{2\pi} \left[ \int_0^{2\pi} r(R + r\cos u) du \right] dv \;=\; 2\pi r \left[ \int_0^{2\pi} R\; du + \int_0^{2\pi} r\cos u\; du \right] = \\[1em]
+    \displaystyle A &= \displaystyle \int_0^{2\pi} \left[ \int_0^{2\pi} r(R + r\cos u) du \right] \dd v \;=\; 2\pi r \left[ \int_0^{2\pi} R\; du + \int_0^{2\pi} r\cos u\; du \right] = \\[1em]
     \displaystyle &= \displaystyle 2\pi r \left[ 2\pi R +r \int_0^{2\pi} \cos u\; du \right] \; 
     \quad \;=\; \quad \boxed{4 \pi^2 R r}
     \end{array}

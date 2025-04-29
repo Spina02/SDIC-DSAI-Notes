@@ -1,0 +1,54 @@
+\chapter{Loop Optimization and Prefetching}
+
+\subsubsection{Loop CLassification}
+
+\textbf{Linear Loops} $O(N)/O(N)$:
+
+
+    
+\textbf{2-level loop} $O(N^2)/O(N^2)$:
+
+\begin{itemize}
+\item \textbf{Avoid unecessary loads / stores}
+
+\item \textbf{Loop unrolling}
+Unroll outern loop and fuse in the inner loop; there is potential vectorisation
+
+\begin{codeblock}[language = C]
+for (int i = 0; i < N; i++)
+    S += A[i]
+\end{codeblock}
+
+If we change this into:
+
+\begin{codeblock}[language = C]
+for (int i = 0; i < N; i++)
+    S = S + A[i]
+\end{codeblock}
+
+then,
+
+\begin{codeblock}[language = C]
+for (int i = 0; i < N; i+=2)
+    S = (S + A[i]) + A[i+1]
+\end{codeblock}
+
+but we can do better, just moving a parenthesis:
+
+\begin{codeblock}[language = C]
+for (int i = 0; i < N; i+=2)
+    S = S + (A[i] + A[i+1])
+\end{codeblock}
+
+In this case the compiler is able to \bfit{vectorize} the operations
+
+\begin{figure}
+    \caption{Loop unrolling}
+    \includegraphics[width=0.6\textwidth]{assets/loop_unrolliing.png}
+\end{figure}
+
+\end{itemize}
+
+\textbf{3rd type}: $O(N^3)/O(N^2)$
+
+

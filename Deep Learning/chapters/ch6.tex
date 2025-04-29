@@ -1,0 +1,170 @@
+\chapter{Lecture 15/04/2025}
+
+\subsubsection{Problem Definition}
+
+Consider a network $f[x, \phi]$ with multivariate input $x$, parameters $\phi$, and three hidden
+layers $h_1$, $h_2$, and $h_3$:
+$$
+\begin{array}{rcl}
+    h_1 & = & a[\beta_0 + \Omega_0 x]\\
+    h_2 & = & a[\beta_1 + \Omega_1 h_1]\\
+    h_3 & = & a[\beta_2 + \Omega_2 h_2]\\
+    f[x, \phi] & = & \beta_3 + \Omega_3 h_3
+\end{array}
+$$
+
+where the function $a[\bullet]$ applies the activation function separately to every element of the
+input. The model parameters $\phi = \{\beta_0, \Omega_0, \beta_1, \Omega_1, \beta_2, \Omega_2, \beta_3, \Omega_3\}$ consist of the bias vectors $\beta_k$ and the weight matrices $\Omega_k$ between every later.
+
+We also have individual loss terms $\ell_i$, which resultsrn the negative log-likelihood of the grount truth $y_i$ given the model output $f[x_i, \phi]$. The total loss is the sum of the individual losses over the training set:
+
+$$
+L[\phi] = \sum_i \ell_i
+$$
+
+The most commonly used optimization algotirhm for training neural network is stochastic gradient descent (SGD), which updates the parameters as:
+
+$$
+\phi_{t + 1} \leftarrow \phi_t - a \sum_{i \in B_t} \dfrac{\partial \ell_i[\phi_t]}{\partial \phi}
+$$
+
+where $a$ is the learning rate, $B_t$ contains the batch indices at iteration $t$. To compute this update, we need to compute the derivatives:
+
+$$
+\dfrac{\partial \ell_i}{\partial \beta_k} \quad \text{and} \quad \dfrac{\partial \ell_i}{\partial \Omega_k}
+$$
+
+for every parameters $\{\beta_k, \Omega_k\}$ at every layer $k \in \{0, 1, ..., K\}$ and for each index $i$ in the batch $B_t$.
+
+The backpropagation algorithm computes these derivatives efficiently by reusing the results of the forward pass. The algorithm is based on the chain rule of calculus, which allows us to compute the derivative of a function with respect to its parameters by breaking it down into smaller parts.
+
+\section{Computng Derivatives}
+
+The derivatives of the loss tell us how the loss changes when we make a small change to the parameters. Optimization algorithms exploit this information to manipulate the parameters so that the loss becomes smaller. The backpropagation algorithm computes these derivatives. 
+
+\begin{itemize}
+    \item \textbf{Observation 1.} Each weight (element of $\Omega_k$) multiplies the activation at a source hidden unit and adds the result to a destination hidden unit in the next layer. It follows that the effect of any small change to the weight is amplified or attenuated by the activation at the source hidden unit. Hence, we run the network for each data example in the batch and store the activations of all the hidden units. This is known as the forward pass. The stored activations will subsequently be used to compute the gradients.
+    \item \textbf{Observation 2.} A small change in a bias or weight causes a ripple effect of changes through the subsequent network. The change modifies the value of its destination hidden unit. This, in turn, changes the values of the hidden units in the subsequent layer, which will change the hidden units in the layer after that, and so on, until a change is made to the model output and, finally, the loss.
+\end{itemize}
+
+Hence, to know how changing a parameter modifies the loss, we also need to know how changes to every subsequent hidden layer will, in turn, modify their successor. These same quantities are required when considering other parameters in the same or earlier layers. It follows that we can calculate them once and reuse them.
+
+\subsection{Backpropagation algorithm}
+
+The backpropagation algorithm computes the derivatives of the loss with respect to the parameters in a neural network. The algorithm consists of two main steps: the forward pass and the backward pass.
+
+\subsubsection{Forward pass}
+
+In the forward pass, we compute the activations of all the hidden units and the model output for each data example in the batch. We store these activations for later use in the backward pass. The forward pass is done by applying the activation function to the weighted sum of the inputs at each layer.
+
+$$
+\begin{array}{rcl}
+    f_0 & = & \beta_0 + \Omega_0 x_i \\
+    h_1 & = & a[f_0] \\
+    f_1 & = & \beta_1 + \Omega_1 h_1 \\
+    h_2 & = & a[f_1] \\
+    f_2 & = & \beta_2 + \Omega_2 h_2 \\
+    h_3 & = & a[f_2] \\
+    f_3 & = & \beta_3 + \Omega_3 h_3 \\
+    \ell_i & = & \ell[f_3, y_i]
+\end{array}
+$$
+
+where $f_{k-1}$ represents the pre-activations at the $k^{th}$ hidden layer, and $h_k$ contains the activations at the $k^{th}$ hidden layer. The term $\ell[f_3, y_i]$ is the loss function.
+
+In the forward pass, we work through these calculations and store all the intermediate quantities.
+
+\subsubsection{Backward pass}
+
+Now let's consider how the loss changes when the pre-activations $f_0$, $f_1$, $f_2$ change. Applying the chain rule, the expression for the derivative of the loss $\ell_i$ with respect to $f_2$ is:
+
+$$
+\dfrac{\partial \ell_i}{\partial f_2} = \dfrac{\partial h_3}{\partial f_2} \dfrac{\partial f_3}{\partial h_3} \dfrac{\partial \ell_i}{\partial f_3}
+$$
+
+The three terms on the right-hand side have sized $D_3 \times D_3$, $D_3 \times D_f$, $D_f \times 1$, respectively, where $D_3$ is the number of hidden units in the last layer, $D_f$ is the number of output units, and $1$ is the size of the loss. 
+
+Similarly we can compute the loss changes when we change the pre-activations $f_1$ and $f_0$:
+
+$$
+\begin{array}{rcl}
+    \dfrac{\partial \ell_i}{\partial f_1} & = & \dfrac{\partial h_2}{\partial f_1} \dfrac{\partial f_2}{\partial h_2} \left(
+        \dfrac{\partial h_3}{\partial f_2} \dfrac{\partial f_3}{\partial h_3} \dfrac{\partial \ell_i}{\partial f_3}
+    \right)\\[1em]
+    \dfrac{\partial \ell_i}{\partial f_0} & = & \dfrac{\partial h_1}{\partial f_0} \dfrac{\partial f_1}{\partial h_1} \left(
+        \dfrac{\partial h_2}{\partial f_1} \dfrac{\partial f_2}{\partial h_2} \dfrac{\partial h_3}{\partial f_2} \dfrac{\partial f_3}{\partial h_3} \dfrac{\partial \ell_i}{\partial f_3}
+    \right)
+\end{array}
+$$
+
+Note that in each case, the term in brackets was computed in the previous step. By working backward through the network, we can reuse the previous computations.
+
+Working backward through the right-hand side of the equations we have:
+
+\begin{itemize}
+    \item The derivative $\partial \ell_i / \partial f_3$ of the loss $\ell_i$ with respect to the network output $f_3$ will depend on the loss function but usually has a simple form.
+    \item The derivative $\partial f_3 / \partial h_3$ of the network output $f_3$ with respect to the last hidden unit $h_3$ is simply the weight matrix $\Omega_3$:
+    $$
+    \dfrac{\partial f_3}{\partial h_3} = \dfrac{\partial}{\partial h_3} \left( \beta_3 + \Omega_3 h_3 \right) = \Omega_3^\top
+    $$
+    \item The derivative $\partial h_3 / \partial f_2$ of the last hidden unit $h_3$ with respect to the pre-activation $f_2$ depend on the activation function. It will be a diagonal matrix with the activation function's derivative on the diagonal. For ReLU functions, the diagonal terms are zero everywhere $f_2$ is less than zero and one otherwise. Rater than multiply by this matrix, we extract the diagonal terms as a vector $\mathbb I [f_2 > 0]$ and pointwise multiply, which is more efficient.
+    \item The terms on the right-hand side of the last two equations have similar forms. As we progress back through the network, we alternately (i) multiply by the transpose of the weight matrices $\Omega_k^\top$ and (ii) threshold based on the input $f_{k-1}$ to the hidden layer.
+\end{itemize}
+
+These inputs are stored during the forward pass.
+
+Now that we know how to compute $\partial \ll_1 / \partial f_k$, we can focus on calculating the derivatives of the loss with respect to the weights and biases. To calculate the derivatives of the loss with respect to the biases $\beta_k$, we again use the chain rule:
+
+$$
+\begin{array}{rcl}
+    \dfrac{\partial \ell_i}{\partial \beta_k} & = & \dfrac{\partial f_k}{\partial \beta_k} \dfrac{\partial \ell_i}{\partial f_k} \\[1em]
+    & = & \dfrac{\partial}{\partial \beta_i} (\beta_k + \Omega_k h_k) \dfrac {\partial \ell_i}{\partial f_k} \\[1em]
+    & = & \dfrac {\partial \ell_i}{\partial f_k}
+\end{array}
+$$
+
+which we already calculated.
+
+Similarly, the derivative for the weights matrix $\Omega_k$, is given by:
+
+$$
+\begin{array}{rcl}
+    \dfrac{\partial \ell_i}{\partial \Omega_k} & = & \dfrac{\partial f_k}{\partial \Omega_k} \dfrac{\partial \ell_i}{\partial f_k} \\[1em]
+    & = & \dfrac{\partial}{\partial \Omega_i} (\beta_k + \Omega_k h_k) \dfrac {\partial \ell_i}{\partial f_k} h_k^\top\\[1em]
+    & = & \dfrac {\partial \ell_i}{\partial f_k}
+\end{array}
+$$
+
+Again, the progression from line two to line three is not obvious, however, the result makes sense.
+
+The final line is a matrix of the same size as $\Omega_k$. It depends linearly on $h_k$, which was multiplied by $\Omega_k$ in the original expression.
+
+This is also consistent with the initial intuition that the derivative of the weights in $\Omega_k$ will be proportional to the values of the hidden units $h_k$ that they multiply.
+
+\newpage
+
+\subsubsection{Summarizing}
+
+Consider a deep neural network $f[x_i, \phi]$ that takes input $x_i$, has $K$ hidden layers with ReLU activations, and individual loss term $\ell_i = l[f[x_i, \phi], y_i]$. The goal of backpropagation is to compute the derivatives $\partial \ell_i / \partial \beta_k$ and $\partial \ell_i / \partial \Omega_k$ with respect to the biases $\beta_k$ and weights $\Omega_k$ of the network.
+
+\textbf{Forward pass:} $\quad$ We compute and store the following quantities:
+
+$$
+\begin{array}{rcll}
+f_0 & = & \beta_0 + \Omega_0  \\
+h_k & = & a[f_{k-1}] \qquad & k \in \{0, 1, ..., K\}\\
+f_k & = & \beta_k + \Omega_k h_{k-1} \qquad & k \in \{0, 1, ..., K\}\\ 
+\end{array}
+$$
+
+
+\textbf{Backward pass:} $\quad$ We start with the derivative $\partial \ell_i / \partial f_K$ of the loss function with respect to the output $f_K$ and work backword through the network:
+
+$$
+\begin{array}{rcll}
+\dfrac{\partial \ell_i}{\partial \beta_k} & = & \dfrac{\partial \ell_i}{\partial f_k} \qquad & k \in \{0, 1, ..., K\}\\[1em]
+\dfrac{\partial \ell_i}{\partial \Omega_k} & = & \dfrac{\partial \ell_i}{\partial f_k} h_k^\top \qquad & k \in \{0, 1, ..., K\}\\[1em]
+\dfrac{\partial \ell_i}{\partial f_{k-1}} & = & \mathbb I [g_{k-1} > 0] \odot \left( \Omega_k^\top \dfrac{\partial \ell_i}{\partial f_k} \right)
+\qquad & k \in \{0, 1, ..., K\}
+\end{array}
+$$
