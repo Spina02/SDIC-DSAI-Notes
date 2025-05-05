@@ -1,0 +1,656 @@
+
+\chapter{Bayesian Linear Regression}
+
+In this chapter we will introduce the simplest Bayesian machine learning
+approach, namely Bayesian linear regression. Under a Gaussian likeli-
+hood model for observations, the solution can be computer analytically,
+requiring a matrix inversion from a computational perspective. We will
+start by an introduction to Gaussian distributions, Bayesian inference
+and linear regression (to fix notation). Then we will dig into Bayesian
+regression, discuss the role of model evidence or marginal likelihood
+and briefly touch upon model comparison.
+
+\section{Gaussian Distributions}
+
+We are going to view in detail a number of useful properties of Multi-
+variate Gaussian Distribution, which will be very useful in the following
+sections and chapters.
+
+Let's start by defining the probability density of the d-dimensional Multivariate Gaussian, denoted by $N(x|\mu,\Sigma)$, where $\mu$ is a d-dimensional vector and represents the mean of the Gaussian and $\Sigma$ is a $d\times d$ positive definite matrix, called \textbf{Covariance matrix}:
+$$
+N(x|\mu, \Sigma) = ((2\pi)^d det(\Sigma))^{-\frac{1}{2}}\cdot \exp\left(-\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)\right)
+$$
+
+Sometimes $\Sigma^{-1} = A$, called the \textbf{Precision matrix}, is used instead of the covariance matrix in the definition of a Gaussian. We also refer to $(x-\mu)^T\Sigma^{-1}(x-\mu)$ as the \textbf{Mahalonobis distance}. Notice that having $\Sigma = I$ one obtains the \textbf{euclidean distance}.
+
+\subsection{Principal Components}
+
+Since $\Sigma$ is positive definite, we can diagonalize it and decompose it in $\Sigma = E\Lambda E^T$ where $\Lambda = diag(\lambda_1, \dots, \lambda_n)$ is a diagonal matrix composed of the eigenvalues of $\Sigma$ and $E$ is an orthogonal matrix (i.e. such that $EE^T = I$ holds) whose rows are eigenvectors of $\Sigma$. 
+
+We can do a change of coordinate in this way:
+$$
+y = \Lambda^{-\frac{1}{2}E^T(x-\mu)}
+$$
+
+Then we have that 
+$$
+(x-\mu)^T \Sigma^{-1}(x-\mu) = (x-\mu)^T E\Lambda^{-\frac{1}{2}}\Lambda^{-\frac{1}{2}}E^T(x-\mu) = y^Ty
+$$
+
+Practically, we obtain a Gaussian distribution with mean zero and Covariance distribution equal to the identity, $N(x|0,1)$. Geometrically we are roto-translating the ellipsoids describing the level sets of a Gaussian Distribution into a sphere centered in the axis, such that points at one standard from the mean have distance 1 from the origin. This linear change of basis can always be performed. 
+
+\subsection{Completing the square}
+
+Suppose that we have a probability density like 
+$$
+p(x) = c \cdot \exp\left(-\frac{1}{2}x^TAx - b^Tx\right)
+$$
+
+This is actually a Gaussian distribution; to show it we need to do some algebra on $\log p(x)$. The following identity can be proved:
+$$
+-\frac{1}{2}x^TAx - b^Tx = \frac{1}{2}(x-A^{-1}b)^TA(x-A^{-1}b) - \frac{1}{2}b^TA^{-1}b 
+$$
+
+Therefore we can use the properties of the exponential to get 
+$$
+x \cdot \exp(-\frac{1}{2}x^TAx - b^Tx) = N(x|A^{-1}b, A^{-1})\underbrace{\sqrt{(2\pi)^d det(A^{-1})}\cdot \exp(-\frac{1}{2}b^T A^{-1}b)\cdot c}_{=1}
+$$
+
+which means that 
+$$
+p(x) = N(x|A^{-1}b, A^{-1})
+$$
+
+Stated otherwise: \textbf{every distribution which is an exponential of a quadratic form is a Gaussian distribution}.
+
+\subsection{Further properties}
+
+The following properties will not be proved. You can find more details in the Bishop book:
+\begin{itemize}
+    \item \textbf{Linear transformation}: Suppose to have $y = Mx + \eta$ where $x \sim \mathcal{N}(\mu_x, \sum_x), \eta \sim \mathcal{N}(\mu, \sum), x \perp \eta$. Then $y$ is Gaussian, $y \sim \mathcal{N}(M\mu_x + \mu, M\sum_xM^T + \sum)$. This means that Gaussians are closed under linear transformations. 
+    \item \textbf{Marginals and conditionals}: Assume that
+    \[
+    z = \begin{bmatrix} x \\ y \end{bmatrix}, \quad 
+    z \sim \mathcal{N}(\mu, \Sigma)
+    \]
+
+    \[
+    \mu = \begin{bmatrix} \mu_x \\ \mu_y \end{bmatrix}, \quad 
+    \Sigma = \begin{bmatrix} \Sigma_{xx} & \Sigma_{xy} \\ \Sigma_{yx} & \Sigma_{yy} \end{bmatrix}
+    \]
+    The marginal distribution is pretty easy to obtain:
+    $$
+    x \sim \mathcal{N}(\mu_x, \Sigma_{xx})
+    $$
+    While the conditional distribution is just a little more complicated:
+    $$
+    p(x|y) = \mathcal{N}(x|\mu_x + \Sigma_{xy}\Sigma_{yy}^{-1}(y-\mu_y), \Sigma_{xx} + \Sigma_{xy}\Sigma_{yy}^{-1}\Sigma_{yx})
+    $$
+    \item \textbf{Product of Gaussians}: The product of two Gaussians densities is still a Gaussian 
+    $$
+    \mathcal{N}(x|\mu_1, \Sigma_1)\mathcal{N}(x|\mu_2, \Sigma_2) = \mathcal{N}(x|\mu, \Sigma) \cdot K 
+    $$
+    where
+    $$
+    \begin{array}{c}
+        S = \Sigma_1 + \Sigma_2 \\
+        \mu = S^{-1}(\Sigma_1\mu_1 + \Sigma_2\mu_2) \\
+        \Sigma = \Sigma_1S^{-1}\Sigma_2\\
+        K = \frac{\exp(-\frac{1}{2}(\mu_1 - \mu_2)^TS^{-1}(\mu_1 - \mu_2))}{\sqrt{det(2\pi S)}}
+    \end{array}
+    $$
+    \item \textbf{Bayesian Theorem}: Supposing to have 
+    $$
+    x \sim \mathcal{N}(x|\mu, A^{-1}), \quad p(y|x) = \mathcal{N}(y|Mx + b, L^{-1})
+    $$
+    Then the joint distribution of $x$ and $y$ is still a Gaussian
+    $$
+    z = \begin{bmatrix} x \\ y \end{bmatrix} \sim \mathcal{N}(z|\mu_z, \Sigma_z)
+    $$
+    In fact 
+    $$
+    \begin{array}{c}
+        \ln p(z) = \ln p(x) + \ln p(y|x) \\
+        const -\frac{1}{2}(x - \mu)^TA(x - \mu) - \frac{1}{2}(y - Mx - b)^TL(y - Mx - b) \\
+    \end{array}
+    $$
+    By completing the square we obtain a Gaussian with the following mean and covariance
+    $$
+    z \sim \mathcal{N}\left(\begin{bmatrix}
+        \mu \\
+        M\mu + b
+    \end{bmatrix}, R^{-1}\right)
+    $$
+    Where 
+    $$
+    R = \begin{bmatrix}
+        A + M^TLM & -M^TL \\
+        -LM & L
+    \end{bmatrix}
+    $$
+    And 
+    $$
+    R^{-1} = \begin{bmatrix}
+        A^{-1} + M^TL^{-1}M & -M^TL^{-1} \\
+        -LM & L^{-1}
+    \end{bmatrix}
+    $$
+    And then we can apply the marginalization and the conditional distribution formula that we have seen before to compute $p(y)$ and $p(x|y)$. 
+\end{itemize}
+
+
+
+
+
+
+
+
+
+
+\section{Bayesian Estimation}
+
+Consider $n$ observations of i.i.d. random variables $\underbar{x} = x_1, \dots, x_n$ ad a family of models $p(x|\theta)$, corresponding to out likelihood distribution, in which we are looking for the model that best fits our data. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.3\textwidth]{assets/fig21.png}
+\end{figure}
+
+In the Bayesian context, we also have a \textbf{priori} distribution $p(\theta)$ and we can compute the posterior distribution 
+$$
+p(\theta|\underbar{x}) = \frac{p(\underbar{x}|\theta)p(\theta)}{p(\underbar{x})}
+$$
+
+The problem in this scenario, as usual, is computing the \textbf{marginal likelihood}, because $p(x) = \int p(\underbar{x}|\theta)p(\theta) \,d\theta$ is a hard integral to approximate in a high dimensional setting. 
+
+Now, we could compute the maximum a-posteriori, i.e. $\theta_{map} = max_{\theta}p(\theta|\underbar{x})$, but in this way, from the estimated parameters, we could obtain only point estimates as output. Instead, we want to get the entire distribution in order to have a complete representation of uncertainty. So, it's more convenient to compute the \textbf{predictive distribution} of $x$ by using all the information contained in the posterior 
+$$
+p(x|\underbar{x}) = \int p(x|\theta)p(\theta|\underbar{x}) \,d\theta
+$$
+
+Which is obtained by the usual factorization
+$$
+\int p(x, \theta|\underbar{x}) \,d\theta = \int p(x|\theta, \underbar{x})p(\theta|\underbar{x}) \,d\theta = \int p(x|\theta)p(\theta|\underbar{x})\,d\theta 
+$$
+
+Let's study an example: suppose to have $x_1, \dots, x_n \in \{0,1\}$ so that $p(\underbar{x}|\theta) = Bernoulli(\theta)$, and that we observed $(1) k$ times and $(0) n-k$ times. A good choice for our prior in this scenario is 
+$$
+p(\theta) = Beta(\theta|\alpha,\beta) = \frac{1}{B(\alpha, \beta)}\theta^{\alpha-1}(1-\theta)^{\beta-1}
+$$
+
+Where B is the \textbf{Beta function}. It representa a family of distributions having a domain in $[0,1]$, which can be skewed more toward 0 or 1 by playing with the parameters. It can be showed that 
+$$
+\mathbb{E}_{Beta(\alpha, \beta)}[\theta] = \frac{\alpha}{\alpha+\beta}
+$$
+
+By using the priori and the likelihood we can compute the logarithm of the posterior 
+$$
+\begin{array}{rl}
+    \log p(\theta|\underbar{x}) 
+    & = L(\theta) + \log B(\theta|\alpha, \beta) + \log p(\underbar{x})\\
+    & = k\log \theta + (n-k)\log (1-\theta) + (\alpha - 1)\log \theta + (\beta - 1)\log(1-\theta) + C \\
+    & = C + (k + \alpha - 1)\log \theta  +(N - k + \beta - 1)\log(1 - \theta) 
+\end{array}
+$$
+
+where the term C incorporates all the terms that are independent of $\theta$. By recognising the functional form of a Beta distribution we arrive at the last equality 
+$$
+\log p(\theta|\underbar{x}) = \log Beta(\theta|k + \alpha, N - k + \beta)
+$$
+
+The predictive distribution is then defined through the following expectation:
+$$
+p(x = 1|\underbar{x}) = \int p(x = 1|\theta)p(\theta|\underbar{x})\,d\theta = \int_{0}^{1} \theta Beta(\theta|k+\alpha, N-k+\beta)\,d\theta = \frac{k + \alpha}{N + \alpha + \beta} 
+$$
+
+The Bernoulli and the Beta distribution are an example of \textbf{conjugate priors}.
+
+\begin{definitionblock}[Conjugate Priors]
+    We say that the prior distribution and the likelihood
+    distribution are \textbf{conjugate priors} if the corresponding posterior distribution
+    has the the same functional form of the prior.
+\end{definitionblock}
+
+\section{Linear Regression}
+
+We will start with an introduction to linear regression. This will serve as a recap of notions that will be expanded in Bayesian setting later on. 
+
+We are moving from the problem of describing probabilistic models and performing inference on them, to the problem of \textbf{supervised learning}.
+
+We have data, in the form of $\underbar{x}, \underbar{y} : (x_i, y_i)$ where $i = 1, \dots, N$, i.e. we have pairs of inputs and outputs. Assume that $p(y|x) = p(y|x, \theta)$ is a parametric model of our random variables. At first, we are going to choose $\theta_{ML}$ with a maximum likelihood approach 
+$$
+\theta_{ML} = argmax p(\underbar{y}|\underbar{x}, \theta)
+$$
+
+Therefore what we need to do is to identify our parametric model, which in linear regression is just 
+$$
+p(y|x, \theta) = N(y|f(x, w), \beta^{-1})
+$$
+
+Notice that in this case $\theta = (w, \beta)$. We can equivalently rewrite this with the (perhaps more familiar) notation 
+$$
+y = f(x, w) + \epsilon \quad \epsilon \sim N(0, \beta^{-1})
+$$
+
+In particular, in linear regression, we will have that our function $f$ is linear w.r.t. our weights $w$, that is 
+$$
+f(x, w) = w_0\psi_0(x) + \dots + w_{M-1}\psi_{M-1}(x)
+$$
+
+Notice that $\psi$ can be, and usually are, non-linear functions of the input data. They are the \textbf{basis function} for our regression model. They can be monomials, Gaussian RBF, sigmoids (NN), ... 
+
+This means that the log likelihood of our model is, in fact 
+$$
+\log p(y|x, \theta) \propto -E_D(w) = -\frac{1}{2}\sum_{i=1}^{N}\left(y_i - w^T\phi(x_i)\right)^2
+$$
+
+Minimizing the sum of squares $E_D$ means maximizing the likelihood, hence, taking the gradient of the function we get 
+$$
+\nabla_w E_D(w) = \sum_{i=1}^{N}\left(y_i + w^T\phi(x_i)\right)\phi^T(x_i) = 0
+$$
+
+which yields the following close form for our weights 
+$$
+w_m = \left(\Phi^T \Phi\right)^{-1}\Phi^T \underbar{y}
+$$
+
+\begin{definitionblock}[Defign Matrix]
+    $\Phi_{ij} = \phi_j(x_i)$ is called the \textbf{design matrix}, it is the j-th feature (basis function) evaluated on the i-th datum.
+\end{definitionblock}
+
+If M is large, solving the direct problem might be computationally difficult, but we can rely on optimization algorithms, such as gradient descent, to actually find the minimum of our negative log-likelihood, exploiting the fact that we are dealing with a quadratic form here. 
+
+In order to avoid overfitting, especially if the chosen basis functions are enough complex and expressive, we seldom introduce further regularization terms in the loss function, such as 
+$$
+f(x) =
+\begin{cases} 
+    \frac{1}{2}\|w\|_2^2, & Ridge \\
+    \frac{1}{2}\|w\|_1, & Lasso
+\end{cases}
+$$
+
+Therefore we will minimize the quadratic loss plus one of the two penalty terms above:
+$$
+E_D(w) + \lambda E_W(w)
+$$
+
+where $\lambda$ is the regularization coefficient. 
+
+\begin{exampleblock}
+    As an example, we can generate synthetic datasets by adding Gaussian noise to a set of points belonging to the curve $y = \sin(2\pi x)$
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\textwidth]{assets/fig22.png}
+        \caption{On the left, the sinusoidal
+        function and the generated data points.
+        On the right, the true conditional distri-
+        bution $p(t|x)$ in which the green curve
+        denotes the mean and the shaded region
+        spans one standard deviation on each
+        side of the mean (Bishop)}
+    \end{figure}
+    We build 100 data sets, each having 25 data points, and we perform Linear Regression using 24 Gaussian basis functions on the datasets varying the regularization coefficient $\lambda$.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\textwidth]{assets/fig23.png}
+        \caption{On the left, the result of fit-
+        ting the model to the diﬀerent data sets
+        varying $\ln(\lambda)$. On the right, the average
+        of the fits on the ￿￿￿ datasets (Bishop)}
+    \end{figure}
+\end{exampleblock}
+
+\section{Bayesian Linear Regression}
+
+By adding the regularization term, we are modifying the loss function
+in order to obtain better results in terms of overfitting, but one of the
+drawbacks is that we lose a nice probabilistic interpretation of our model:
+the object we are minimizing is not a negative likelihood anymore. How
+can we go back towards a more rigorous probabilistic setting?
+
+The key point to observe in order to do this step is that the regularization term is, in fact, a \textbf{bias} that we introduce in our data. What we can do instead of adding a penalty term in the loss, is to encode the bias in a \textbf{prior} distribution of our parameters. $p(w|\alpha)$ and then treat our problem in a Bayesian way. As an example:
+$$
+p(w|\alpha) = N(w|0, \alpha^{-1}I)
+$$
+
+where $\alpha$ is a \textbf{hyper-parameter} of our distribution (we will see some methods to choose it). This is a typical choice for our bias since then our weights will be forced to be small (which is the goal of the regularization). 
+
+For the moment let's suppose we have fixed our $\alpha$. Since we have a likelihood of our observation, we can compute the posterior. Let's also introduce a Gaussian noise in the observations with precision $\beta$. 
+
+We can visualize the model in graphical terms as:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.5\textwidth]{assets/fig24.png}
+\end{figure}
+
+Applying Bayes theorem, the posterior is 
+$$
+p(w|\underbar{x}, \underbar{y}, \alpha, \beta) = \frac{p(\underbar{y}|\underbar{x}, w, \beta)p(w|\alpha)}{p(\underbar{y}|\underbar{x}, \alpha, \beta)}
+$$
+
+In this scenario, choosing a Gaussian prior and having the Gaussian likelihoodof the linear regression problem, we have an analytical form for our posterios distribution, as we are about to see. 
+
+Let's consider the logarithm of the posterior first 
+$$
+\log p(w|\underbar{x}, \underbar{y}, \alpha, \beta) = -\frac{\beta}{2}\sum_{j=1}^{N}\left(y_i - w^T\phi(x_i)\right)^2 - \alpha w^Tw + const 
+$$
+
+The logarithm of the marginal likelihood does not depend on $w$ and is treated as a constant. The trick is to notice that we have a quadratic function of $w$, and, as we have seen in the first paragraph, if the logarithm of a distribution is a quadratic function then that distribution is a Gaussian. 
+$$
+p(w|\underbar{x}, \underbar{y}, \alpha, \beta) = N(w|m_N, S_N)
+$$
+
+where 
+$$
+\begin{array}{c}
+    m_N = \beta S_N \Phi^T \underbar{y} \\
+    S_N^{-1} = \alpha I + \beta \Phi^T \Phi
+\end{array}
+$$
+
+which is very similar (but not equal) to what we get as a solution in Ridge Regression. 
+
+If we use a general Gaussian prior instead, of the form $p(w|m_0, S_0) = N(w|m_0, S_0)$, then our posterior becomes 
+$$
+p(w|\underbar{x}, \underbar{y}, \alpha, \beta) = N(w|m_n, S_N)
+$$
+
+with 
+$$
+\begin{array}{c}
+    m_N = S_N \left[S_0^{-1}m_0 + \beta\Phi^T\underbar{y}\right]\\
+    S_N^{-1} = S_0^{-1} + \beta \Phi^T \Phi
+\end{array}
+$$
+
+So, in Bayesian regression, we treat our parameters probabilistically,
+placing a prior distribution over them, computing the posterior given
+the observation that we have and we using it to make predictions. We
+have seen that for a Gaussian prior we have a Gaussian posterior, and we
+also have an analytically computable posterior, given that we know how
+to invert matrices.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/fig25.png}
+\caption{Samples from the posterior
+distribution of a Bayesian regression
+model on the dataset shown in section 6.3. Increasing the size of the dataset,
+the predictive distribution approximates
+better the true data distribution (Bishop)}
+\end{figure}
+
+\subsection{Online Learning}
+
+There is an extra feature which is typical of Bayesian learning. When we
+first pick a prior distribution we are basically having random weights,
+corresponding to random lines in the data space (remember what the
+weights actually represent!). Once we compute the posterior, we are
+reshaping the Gaussian distribution from which we sample our weights,
+up until it becomes highly centered towards a point once we get a lot of
+observations. In this process, nothing forbids us to start from a prior that
+already takes into account some observations! This is a general principle
+of Bayesian learning: when we observe new data points, we use as new
+prior the posterior relative to the previous observations. Hence, Bayesian
+linear regression, is, \textit{naturally}, an \textbf{online method}, which means that every
+time we observe new data we can easily incorporate them into our model
+without retraining the model from the start!
+
+\begin{exampleblock}[Online learning]
+    In order to visualize how the posterior distribution is updated when including new training data, we consider the simple example reported in the Bishop's book. We want to fit a linear model of the form $f(x, \textbf{w}) = w_0 + w_1 \cdot x$, assuming $\alpha$ and $\beta$ known. The columns of figure \ref{fig:onlinelearning} show:
+    \begin{itemize}
+        \item First column: the likelihood of the last data point ($\underbar{x}, \underbar{y}$) added to the training set as a function of \textbf{W}, i.e. $p(\underbar{y}|\underbar{x}, \textbf{w})$
+        \item Second column: the posterior distribution obtained multiplying the prior (which is the posterior of the previous row) by the likelihood reported in the same row 
+        \item Third column: some samples of the regression function obtained by drawing samples of \textbf{w} from the posterior distribution 
+    \end{itemize}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\textwidth]{assets/fig26.png}
+        \caption{Illustration of sequentila Bayesian learning for a sample linear model of the form $f(x, \textbf{w}) = w_0 + w_1 \cdot x$ (Bishop).}
+        \label{fig:onlinelearning}
+    \end{figure}
+    The first row corresponds to the situation before any data points are observed: the prior distribution of $w_0, w_1$ is a multivariate standard normal distribution. In the next rows this distribution is reshaped by the information contained in the dataset and the posterior distribution becomes sharper and centered on the true parameter values. 
+\end{exampleblock}
+
+
+\section{Predictive distribution}
+
+Remember that the probability distribution is just the prediction of a new point given our observations.
+$$
+p(y|x, \underbar{x}, \underbar{y}, \alpha, \beta)
+$$
+In Bayesian learning we average over all possible models 
+$$
+p(y|x, \underbar{x}, \underbar{y}, \alpha, \beta) = \int p(y|x, w)p(w|\underbar{x}, \underbar{y}, \alpha, \beta) p(w|\underbar{x}\cdot \underbar{y}, \alpha, \beta)\,dw
+$$
+Since in the linear regression setting we have that both these distributions are Gaussians, we know that the product of Gaussians densities is a Gaussian, and also the marginal of a Gaussian is a Gaussian. Therefore it can be shown that the probabilitiy above is 
+$$
+\begin{array}{c}
+    p(y|x, \underbar{x}, \underbar{y}, \alpha, \beta) = \mathcal{N}(y|m_N^T \phi(x), \sigma_N^2(x)) \\
+    \sigma_N^2(x) = \frac{1}{\beta} + \phi^T(x)S_N\phi(x) \\
+    \sigma_N^2(x) \geq \sigma_{N+1}^2(x), \quad \sigma_N^2 \to \frac{1}{\beta} \to \infty
+\end{array}
+$$
+
+The prediction is a Gaussian centered on an average prediction and having a variance which has two terms: one takes into account the noise observations, while the second one takes into account the epistemic uncertainty of our model. As we increase our knowledge, the epistemic uncertainty goes to zero and we are left with just the aleatoric uncertainty. 
+
+As such, we can see, graphically, that the credibility interval of our model shrinks the more we add observations. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/fig27.png}
+\caption{Example of the predictive
+distribution for a Bayesian linear regres-
+sion model on the dataset shown in
+section 6.3. Increasing the number of
+data points, the red curve (which rep-
+resents the mean of the predictive dis-
+tribution) approximates better the sinu-
+soidal function and the standard devia-
+tion (the shaded region) decreases. Note
+that the predictive uncertainty is smallest
+in the neighbourhood of the data points
+(Bishop)}
+\end{figure}
+
+We can represent the Bayesian linear regression model including the predictive with the following probabilistic graphical model:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.4\textwidth]{assets/fig28.png}
+\end{figure}
+
+Potentially, we could treat this problem also as an inference in a PGM (even though this does not make much sense in practice since we have an analytical solution for the problem).
+
+\section{Model evidence}
+
+How can we deal with the hyper-parameters $\alpha$ and $\beta$? Remember that $\alpha^{-1}$ represents the variance of the prior distribution whereas $\beta^{-1}$ is the noise of the observations. The tool to estimate them is to use the marginal likelihood 
+$$
+p(\underbar{y}|\underbar{x}, \alpha, \beta) = \int p(\underbar{y}|\underbar{x}, w, \alpha, \beta)p(w|\alpha)\,dw
+$$
+
+as the posterior is 
+
+$$
+p(w|\underbar{y}, \underbar{x}, \alpha, \beta) = \frac{p(\underbar{y}|\underbar{x}, \alpha, \beta)p(w|\alpha)}{p(\underbar{y}|\underbar{x}, \alpha, \beta)}
+$$
+
+If we would treat the hyper-parameters in a Bayesian way then we would need to place a prior over them, and this would mean having a hyperprior $p(\alpha, \beta)$ and then computing the posterior distribution $p(\alpha, \beta|\underbar{y}, \underbar{x}) \propto p(\underbar{y}|\underbar{x}, \alpha, \beta)p(\alpha, \beta)$.
+
+This is doable, but then we would need to introduce other hyper-hyper parameters and this would lead us to a hierarchy of hyper-parameters.
+
+An alternative instead is to make an approximation at this level. We need two approximations in fact:
+\begin{enumerate}
+    \item First of all, we ask for an \textbf{uninformative prior} $p(\alpha, \beta)$, it can be a uniform distribution over an interval, or a Gaussian with a very broad variance. Let's suppose then that $p(\alpha, \beta) = const$
+    \item The posterior should be sharply peaked around the Maximum a Posteriori (MAP) of $\alpha$ and $\beta$. Hence $p(\alpha, \beta|\underbar{y}, \underbar{x}) \approx \delta_{MAP(\alpha, \beta)}$
+\end{enumerate}
+
+In fact, these two approximation means that we can fix $\alpha$ and $\beta$ with Maximum Likelihood, which means that we can find our best hyperparameters by maximizing the Marginal Likelihood. 
+
+How to compute the marginal likelihood? Again, we rely on the closure
+properties of the Gaussian distribution. Since we have computed the
+posterior, and we already know the likelihood and the prior, we can
+just take the logarithm of the left and right term of Bayes’ Theorem and
+solve the equation, else we can compute it directly (it is an integral of a
+Gaussian).
+
+Therefore it can be proved that the marginal likelihood has the form
+$$
+\begin{array}{c}
+    \log p(\underbar{y}|\underbar{x}, \alpha, \beta) = \frac{M}{2}\log \alpha + \frac{N}{2}\log \beta - \mathbb{E}(m_N) - \frac{1}{2}\log |S_N^{-1}| - \frac{N}{2}\log 2\pi \\
+    \mathbb{E}(m_N) = \frac{\beta}{2} \lVert y - \Phi m_N \rVert^2 + \frac{\alpha}{2}m_N^T m_n \\
+    m_N = \beta S_N \Phi \cdot \underbar{y} \\
+    S_N^{-1} = \alpha I + \beta \Phi^T \Phi
+\end{array}
+$$
+
+where N is the size of the dataset and M is the number of parameters. In
+order to maximize this we can of course compute the gradient with respect
+to $\alpha$ and $\beta$ and do gradient ascent on the expression, for example.
+
+\subsection{Fixed-point algorithm}
+
+Here we will consider an alternative approach via a fixed-point algorithm. The general idea is to take $\nabla \log p(\underbar{y}|\underbar{x}, \alpha, \beta) = 0$ and to derive fix point equations
+$$
+\begin{array}{c}
+    \alpha = g_{\alpha}(\alpha, \beta) \\
+    \beta 0 = g_{\beta}(\alpha, \beta)
+\end{array}
+$$
+
+The algorithm works like this:
+\begin{enumerate}
+    \item Fix $\alpha_0$ and $\beta_0$
+    \item Compute 
+    $$
+    \begin{array}{c}
+        \alpha_{n+1} = g_{\alpha}(\alpha_n, \beta_n) \\
+        \beta_{n+1} = g_{\beta}(\alpha_n, \beta_n)
+    \end{array}
+    $$
+    \item Iterate step 2 until convergence, i.e. up until 
+    $$
+    \lVert \alpha_{n+1} - \alpha_n \rVert + \lVert \beta_{n+1} - \beta_n \rVert < \epsilon
+    $$
+\end{enumerate}
+
+Therefore we just need to compute 
+$$
+\nabla \log p(\underbar{y}|\underbar{x}, \alpha, \beta) = \frac{M}{2} \log \alpha + \frac{N}{2} \log \beta - \mathbb{E}(m_N) - \frac{1}{2} \log |S_N^{-1}| - \frac{N}{2} \log 2\pi 
+$$
+
+Let's start from the term 
+$$
+\begin{array}{c}
+    \log |S_N^{-1}| \\
+    S_N^{-1} = \alpha I + \beta \Phi^T \Phi \\
+\end{array}
+$$
+
+In order to compute this determinant we first need to compute the eigenvalues $\lambda_i$ of $\beta \Phi^T \Phi$. Then 
+
+$$
+|S_N^{-1}| = \prod_{i=0}^{m-1}(\alpha + \lambda_i) 
+$$
+
+Notice that $\lambda_i$ does not depend on $\alpha$. Which means that 
+
+$$
+\frac{d}{d\alpha} \log |S_N^{-1}| = \frac{d}{d\alpha}\sum \log(\alpha + \lambda_i) = \sum_{i=1}^{m-1}\frac{1}{\alpha + \lambda_i}
+$$
+
+Moreover
+
+$$
+\frac{d}{d\beta}\lambda_i = \frac{\lambda_i}{\alpha + \lambda_i}
+$$
+
+In the end, bu also deriving all the other terms we get
+
+$$
+\begin{array}{c}
+    \alpha = \frac{\gamma}{m_N^Tm_N} = g_{\alpha}(\alpha, \beta), \quad \gamma = \sum_{i=0}^{m-1}\frac{\lambda_i}{\alpha + \lambda_i} \\
+    \frac{1}{\beta} = \frac{1}{N-\gamma}\sum_{n=1}^{N}\left(y_n - m_N^T \Phi(x_n)\right)^2 = \frac{1}{g_{\beta}(\alpha, \beta)}
+\end{array}
+$$
+
+\subsection{Effective number of parameters}
+
+Let's focus on the parameter
+
+$$
+\gamma = \sum_{i=0}^{M-1}\frac{\lambda_i}{\alpha + \lambda_i}
+$$
+
+where $\lambda_i$ are the eigenvalues of $\beta \Phi^T \Phi$ and they give us information about the maximum likelihood solution for $w$. In fact, they give us the \textbf{curvature} of the likelihood function (they represent the Hessian of the likelihood). Small $\lambda_i$ means a large curvature of the likelihood function which implies a large uncertainty on $w_i$ and vice versa. When we have a large uncertainty on $w_i$, it means that taking the Maximum Likelihood solution of that particular weight is not very sensible. That's because introducing a prior on the parameter would likely change this value a lot (the Bayesian estimation would be different than the maximum likelihood estimation). The effective number of parameters gives us the effective number of parameters which Maximum Likelihood estimation is close to their Maximum a Posteriori estimation. 
+
+In fact, we have that 
+
+$$
+\begin{array}{c}
+    \lambda_i < < \alpha \implies \frac{\lambda_i}{\alpha + \lambda_i} \approx 0 \\
+    \lambda_i > > \alpha \implies \frac{\lambda_i}{\alpha + \lambda_i} \approx 1
+\end{array}
+$$
+
+and by definition of $\gamma$ we have the meaning that we have been introducing before. 
+
+Notice also that in the regime of large data $N > > M$, then $\gamma \approx M$. Here the equation for $\alpha$ and $\beta$ are also simplified.
+
+In this scenario, the theorem of Bernstein-von Mises implies that the prior
+has no asymptotic influence on the posterior and that posterior inference
+is consistent with the frequentist approach (i.e. Maximum Likelihood
+estimation). Of course, there are some assumptions for this theorem to
+hold: the key assumption is that the "true" value of the parameter is
+interior to the parameters space.
+
+Thus, the eﬀective number of parameters in Bayesian estimation is
+adaptive: parameters will be “included" (in the sense that their uncertainty
+is low) in the model only if there is enough evidence in the data to justify
+their use. In a certain sense, a Bayesian model can say “I don’t know"
+when needed. This has the eﬀect of avoiding overfitting and giving a
+more correct estimation of the error when doing predictions.
+
+\section{Model Comparison}
+
+Imagine that we are doing linear regression and we pick two diﬀerent
+sets of basis functions. Which of the two models should we choose?
+
+To answer this question, we can leverage the marginal likelihood.
+
+Suppose that we have two models $\mathbb{M}_1$ and $\mathbb{M}_2$ which are different (in the linear regression context, this means having two different sets of basis functions). Which one is the best to explain the data $D = {\underbar{x}, \underbar{y}}$?
+
+Since we want to be Bayesian, let's place a prior distribution on the models, $p(\mathbb{M}_j)$. The posterior distribution, by Bayes' theorem, is 
+
+$$
+p(\mathbb{M}_j|D) = \frac{p(D|\mathbb{M}_j)p(\mathbb{M}_j)}{\Sigma_j p(D|\mathbb{M}_j)p(\mathbb{M}_j)}
+$$
+
+Notice that $p(D|\mathbb{M}_j) = \int p_{\mathbb{M}_j}(D, \theta_{\mathbb{M}_j}|\mathbb{M}_j) \,d\theta_{\mathbb{M}_j}$ is the \textbf{marginal likelihood} with respect to the parameters of $\mathbb{M}_j$. In fact, since we are not looking at a specific configuration of the parameters of the model $\mathbb{M}_j$, we have to marginalize them, obtaining the marginal likelihood. We also assume that hyper-parameters are fixed in this scenario. 
+
+How to perform model selection? We have two choices
+\begin{enumerate}
+    \item Model averaging (a fully Bayesian approach): instead of choosing one model we consider both of them, weighted according to the posterior distribution. The predictive distribution then is 
+    $$
+    p(y|x, D) = \sum_{j}p(y|x, D, \mathbb{M}_j) \cdot p(\mathbb{M}_j|D)
+    $$
+    \item Choose the best model by computing 
+    $$
+    \frac{p(D|\mathbb{M}_1)}{D|\mathbb{M}_2}
+    $$
+    which is known as the \textbf{Bayes Factor} (of $\mathbb{M}_1$ versus $\mathbb{M}_2$). It is basically a ration of the evidences of the two models. The model $\mathbb{M}_j$ to choose is the one with the largest Bayes factor.
+    Given that 
+    $$
+    \int p(D|\mathbb{M}_1)\log \frac{p(D|\mathbb{M}_1)}{p(D|\mathbb{M}_2)} \,dD > 0
+    $$
+    since this is a Kullback-Leibler divergence, we observe that if $\mathbb{M}_1$ is the true model (i.e. $D \sim p(D|\mathbb{M}_1)$), the expectation of the logarithm of the Bayes Factor $\log \frac{p(D|\mathbb{M}_1)}{p(D|\mathbb{M}_2)}$ will be positive. Hence, on average, the correct model will have the largest Bayes factor. 
+
+    \begin{exampleblock}
+        Let $\mathbb{M}_1$ and $\mathbb{M}_2$ be two models s.t. $\mathbb{M}_1$ is nested in $\mathbb{M}_2$, i.e., the set of parameters of $\mathbb{M}_1$ is a subset of the parameters of $\mathbb{M}_2$ (for example, linear models where the set of basis functions of $\mathbb{M}_1$ is contained in the one of $\mathbb{M}_2$). This implies $\mathbb{M}_2$ is a more complex model than $\mathbb{M}_1$, and that the distributino $p(D|\mathbb{M}_2)$ is more spread than $p(D|\mathbb{M}_1)$ since the model can explain more data instances. Nevertheless, if $\mathbb{M}_1$ generated the data, then the Bayes factor will be in favor of $\mathbb{M}_1$, since $p(D|\mathbb{M}_1)$ is more concentrated on the few
+        data instances that it can explain. Hence we can see the Occam’s
+        Razor principle emerging from the use of the Bayes factor, since
+        the simpler model will be favored in absence of enough evidence
+        to accept the more complex one.
+    \end{exampleblock}
+\end{enumerate}
