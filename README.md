@@ -34,7 +34,7 @@
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Introduction%20to%20ML/main.pdf">Introduction to Machine Learning</a></td>
       <td><strong><span style="color: orange;">[DONE]</span></strong></td>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Probabilistic%20ML/main.pdf">Probabilistic Machine Learning</a></td>
-      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
+      <td><strong><span style="color: orange;">[DONE]</span></strong></td>
     </tr>
     <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Programming/main.pdf">Advanced Programming</a></td>
