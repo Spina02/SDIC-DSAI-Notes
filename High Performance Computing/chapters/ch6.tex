@@ -1,0 +1,72 @@
+\chapter{Lecture 29/04/2025}
+
+% TODO: adapt this part
+
+As we have seen when we discussed the modern architectures, a unique
+central memory with a fixed bandwidth would be a major bottleneck in a
+system with a fast growing number of cores/sockets and sockets.
+The problem is avoided by physically disjointing the memory in separated units
+(the memory banks) each of which is connected to a socket; All the sockets are
+inter-connected so that each core can access all the memory and a cache-
+coherency system “glues” the data.
+This way, the resulting aggregated bandwidth scales as the number of sockets
+(although, we know, the cache-coherency becomes the new limiting factor).
+However, the major drawback is that the access time is no more uniform.
+This has severe consequences on how you have to write and run your codes.
+
+OpemMP and OS offer the capacity to decide where each thread have to tun, i.e. on which core and/or how the threads have to distribute on the available cores.
+
+We know that each core may have the capability of running more than
+one thread, which is called (∗) Simultaneous MultiThreading (SMT).
+In the next slides, let’s call strands or hwthreads (hardware threads) the
+different threads that a physical core could run, as opposed to “swthreads”
+(software threads) that indicates the OpenMP threads.
+
+The placement of OpenMP threads on cores is called “threads affinity”.
+
+%TODO: -------------------------------------------------
+
+\missing{part to "Threads affinity - PLACES"}
+
+\subsubsection{Places}
+
+To pass OpemMP the information about the placement of threads, we have to use the environment variable \texttt{OMP\_PLACES}:
+
+\begin{codeblock}[language=bash]
+export OMP_PLACES = { sockets | cores | threads }
+
+# examples:
+    # 1 socket
+    export OMP_PLACES = “{0}:4:12
+    # 2 sockets
+    export OMP_PLACES = “{0:11,48:11},{24:12,72:12}
+\end{codeblock}
+
+\missing{part to "Threads affinity - BIND"}
+
+\subsubsection{Binding}
+
+\textbf{Binding} defines how the OpenMP software threads (swthreads) are mapped onto hardware \textit{places}.
+
+\subsubsection{Binding Types}
+
+\begin{itemize}
+    \item \textbf{NONE}: Placement is left up to the operating system (OS).
+    \item \textbf{CLOSE}: Threads are placed as close as possible to each other (assigned in a round-robin way).
+    \item \textbf{SPREAD}: Threads are distributed as evenly as possible, then filled in round-robin.
+    \item \textbf{MASTER}: Threads run on the same place as the master thread.
+\end{itemize}
+
+\subsubsection{Using \texttt{OMP\_PROC\_BIND}}
+
+You can specify binding in OpenMP using the environment variable:
+
+\begin{codeblock}[language=bash]
+export OMP_PROC_BIND = { false | true | master | close | spread }
+\end{codeblock}
+
+\begin{itemize}
+    \item \texttt{false}: No placement policy; OS decides and may migrate threads.
+    \item \texttt{true}: No placement policy; OS decides but cannot migrate threads.
+    \item \texttt{master}, \texttt{close}, \texttt{spread}: Specify exact placement; OS cannot migrate threads.
+\end{itemize}

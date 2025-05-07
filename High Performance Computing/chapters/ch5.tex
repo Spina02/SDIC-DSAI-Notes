@@ -267,20 +267,24 @@ and then:
 
 \dots
 
+\section{OpenMP}
+
+OpenMP is a standard API for shared-memory parallel programming. The name stands for \textbf{Open specifications for MultiProcessing}. It enables the development of multi-threaded programs with consistent, portable behavior by using a set of compiler directives embedded in the source code:
+
+\begin{itemize}
+    \item \textbf{Pragmas} (\texttt{\#pragma}) in C/C++
+    \item \textbf{Specially formatted comments} in Fortran
+\end{itemize}
+
+OpenMP supports both fine-grained and coarse-grained parallelism, ranging from loop-level parallelism to explicit assignment of tasks to threads.
+
 \subsection{Threads and Processes}
 
 \begin{minipage}{0.6\textwidth}
-A \textbf{process} is an independent sequence of instructions and the ensemble of
-resources needed for their execution.
-A program needs much more than just its binary code (i.e. the list of ops to be
-executed): it needs to access to a protected memory space and to access system
-resources (e.g. files and network).
-A “process” is then a program that
-has been allocated with the necessary
-resources by the operating system.
-There may be different instances of the
-same program as different, independent
-processes
+A \textbf{process} is an independent sequence of instructions and the ensemble of resources needed for their execution.
+A program needs much more than just its binary code (i.e. the list of ops to be executed): it needs to access to a protected memory space and to access system resources (e.g. files and network).
+A “process” is then a program that has been allocated with the necessary resources by the operating system.
+There may be different instances of the same program as different, independent processes.
 \end{minipage}%
 \begin{minipage}{0.4\textwidth}
     \hfill
@@ -295,22 +299,83 @@ A \textbf{thread} is an independent instance of code execution within a process.
 may be from one to many threads within the same process.
 Each thread shares the same code, memory address space and resources than its father process.
 
-While each thread has its own stack, ip and sp, the heap will be shared among threads,
-which then operate in shared-memory. threads also share the stack of the father thread.
-In geneal spawning threads inside a process is much less costly than creating processes.
+While each thread has its own private stack for local variables and function calls (allocated within the process's address space), they share access to the process's heap and global data segments. In geneal, spawning threads inside a process is much less costly than creating processes.
 \end{minipage}%
 
 A thread can run either on the same computational units of its father process or on a different one.
 
 A computational unit nowadays amounts to a core, either inside the same CPU (socket) on which the father process runs, or inside a sibling socket in the same NUMA region.
 
-\subsection{OpenMP}
+\subsubsection{OpenMP vs MPI}
 
-OpenMP is a set of compiler directives, library routines, and environment variables that influence run-time behavior. It is designed for shared-memory parallel programming in C, C++, and Fortran. OpenMP is not a programming language but rather an API that provides a portable and scalable model for parallel programming.
+\begin{minipage}{0.48\textwidth}
+    \textbf{Shared-Memory (e.g., OpenMP)}
+    \begin{itemize}
+        \item A single process spawns multiple threads.
+        \item All threads share a common address space and can directly access shared variables.
+        \item Communication between threads occurs via shared variables in memory.
+        \item Synchronization is required to avoid race conditions (e.g., critical sections, barriers).
+        \item Typically used for parallelism within a single node (multi-core CPU).
+    \end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \textbf{Distributed-Memory (e.g., MPI)}
+    \begin{itemize}
+        \item Multiple independent processes are launched, each with its own memory space.
+        \item Processes cannot directly access each other's memory.
+        \item Communication occurs by explicit message passing (send/receive).
+        \item Synchronization is achieved via communication primitives (e.g., barriers, broadcasts).
+        \item Suitable for parallelism across multiple nodes in a cluster or supercomputer.
+    \end{itemize}
+\end{minipage}
 
-\dots
+\vspace{1em}
 
-\subsubsection{OpenMP Directives}
+\noindent
+\textbf{Hybrid Programming:} Modern HPC applications often combine OpenMP and MPI to exploit both shared-memory and distributed-memory parallelism. For example, OpenMP is used for intra-node (within a node) parallelism, while MPI handles inter-node (across nodes) communication.
+
+\begin{observationblock}[MPI Shared Memory Extensions]
+    Since MPI~3.0, the standard introduced features to:
+    \begin{enumerate}
+        \item Allow shared-memory-like access among MPI processes running on the same node (using \plaintt{MPI\_Win\_allocate\_shared}).
+        \item Enable direct remote memory access (RMA) to other processes' memory, known as Remote Memory Access (one-sided communication).
+    \end{enumerate}
+    These features blur the strict boundary between shared and distributed memory, enabling more flexible hybrid programming models.
+\end{observationblock}
+
+\subsubsection{OpenMP programming model}
+
+The main advantages of a directive-based approach are the following ones:
+
+\begin{itemize}
+    \item \textbf{Abstraction}: Subtleties of pthread and hardware-specific aspects are hidden. You can focus on data and workflow much more easily.
+
+    \item \textbf{Efficiency}: The learning curve to achieve reasonable results is much  hallower.
+    The code’s design is easier, the result/effort ratio is  avourable with respect to pthread.
+
+    \item \textbf{Incremental} approach No need to re-write your whole code. You start  oncentrating on some sections only, following the suggestions from  rofiling.
+
+    \item \textbf{Portability}: The compiler will take care of this for you. You still  ave to develop a design able to adapt to different topologies.
+
+    \item \textbf{One source}: Through conditional compilation, serial and parallel  ersions can easily coexist.
+\end{itemize}
+
+The main logic behind OpenMP is to use a single master thread for serial operations and to spawn a team of threads to perform parallel work. This is called \textbf{\textit{fork-join} model}: a thread meets, at some point in its existence, a directive that activates the creation of a pool of children threads.
+
+\begin{minipage}{0.37\textwidth}
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/openmp.png}
+\end{minipage}%
+\begin{minipage}{0.63\textwidth}
+In OpenMP, threads operate by accessing and modifying shared memory regions. To prevent race conditions or situations where multiple threads attempt to read and write shared data simultaneously, synchronization mechanisms are employed, either explicitly (such as critical sections and locks) or implicitly (such as barriers at the end of parallel regions). Unlike distributed-memory paradigms, there is no explicit message-passing between threads; all communication occurs through shared variables.
+\end{minipage}%
+
+However, parallelizing code is not always straightforward. For example, if a loop contains dependencies between iterations (loop-carried dependencies), it can severely limit or even prevent parallel speedup. Therefore, careful management of shared and private variable attributes is essential to minimize race conditions and reduce the need for synchronization.
+
+Each thread executes its portion of the parallel workload in its own stack and private memory space, which are isolated from other threads and from the serial regions of the program. OpenMP also supports nested parallelism, allowing parallel regions to be created within other parallel regions if needed. Additionally, the number of threads used in a parallel region can be set dynamically, providing flexibility to adapt to different workloads or system resources.
+
+\subsection{OpenMP Directives}
 
 An OpenMP directive is a specially-formatted pragma for C/C++ and comment for FORTRAN codes. Most of the directives apply to structured code block, i.e. a block with a single input and a single output points and no branch within it.
 
@@ -331,7 +396,7 @@ The directives allows to:
 }
 \end{codeblock}
 
-Every function call from within a parallel region determines the creation of a dynamic extent to which the same directives apply.
+The lexical scope of structured blocks defines the static extent of an OpenMP parallel region. Every function call from within a parallel region determines the creation of a dynamic extent to which the same directives apply.
 
 \begin{codeblock}[language=C]
 // static extent:
@@ -361,22 +426,43 @@ The dynamic extent includes the original static extent and all the instructions 
     The functions called in the dynamic extent can contain additional OpenMP directives.
 \end{observationblock}
 
-\subsubsection{Shared / private memory}
+% \subsubsection{Shared / private memory}
 
-you can specify the number of threads to be spawned in the parallel region by setting the environment variable: \plaintt{export OMP\_NUM\_THREADS=n}.
+% you can specify the number of threads to be spawned in the parallel region by setting the environment variable: \plaintt{export OMP\_NUM\_THREADS=n}.
 
-You can also specify it in each parallel region:
-\plaintt{\#pragma omp parallel num\_threads(n)}
+% You can also specify it in each parallel region:
+% \plaintt{\#pragma omp parallel num\_threads(n)}
 
-\newpage
+% \newpage
 
-\chapter{Lecture 15/04/2025}
+% \chapter{Lecture 15/04/2025}
 
-\section{Parallel Regions}
+% \section{Parallel Regions}
 
-The region starts at the opening \{ brace and ends at the closing \} one.
+As we have seen, the region starts at the opening \{ brace and ends at the closing \} one. An implicit synchronization barrier is present at the end of the region.
 
-An implicit synchronization barrier is present at the end of the region.
+The general OpenMP directive in C/C++ is:
+\begin{codeblock}[language = C]
+    #pragma omp <directive> [<clause> [, <clause> [ ... ]]]
+\end{codeblock}
+
+to associate multiple statements use a {} block:
+
+\begin{codeblock}[language = C]
+#pragma omp <directive> [<clause> [, <clause> [ ... ]]]
+{
+statement;
+statement;
+}
+\end{codeblock}
+
+with C++ syntax ( requires ≥ 5.1 )
+
+\begin{codeblock}[language = C]
+[[ omp :: <directive> [<clause> [, <clause> [ ... ]]] ]]
+[[ using omp : <directive> [<clause> [, <clause> [ ... ]]] ]]
+[[ omp :: sequence( [omp::<directive>... [, omp::<directive>...]] ) ]]
+\end{codeblock}
 
 A parallel region can be as short as a single line:
 \begin{codeblock}[language = C]
@@ -592,3 +678,55 @@ The copying is ultimated before any threads leave the implicit barrier at then e
     // other threads
 }
 \end{codeblock}
+
+
+
+
+
+
+
+
+
+
+
+
+\subsubsection{Other to know about OpenMP}
+
+OpenMP is made of 3 components:
+
+\begin{enumerate}
+    \item \textbf{Compiler directives} give indication to the compiler about how to manage threads internals
+    \item \textbf{Run-time libraries} linked by the compiler
+    \item \textbf{Environment variables} set by the user, determine the behaviour of the omp library; for instance, the number of threads to be spawned or the requirements about the thread-cores-memory affinity
+\end{enumerate}
+
+By default, when the compiler is instructed to activate the processing of OpenMP directives:
+
+\begin{codeblock}[language=bash]
+gcc -fopenmp …
+icc -fopenmp …
+pgcc -mp …
+\end{codeblock}
+
+it defines a macro that let you to conditionally compile sections of the code:
+
+\begin{codeblock}[language=bash]
+#ifdef _OPENMP
+my_thread_id = omp_some_function();
+#endif
+…
+\end{codeblock}
+
+\begin{observationblock}[\plaintt{\_OPENMP}]
+    The macro \plaintt{\_OPENMP} is automatically defined by the compiler when OpenMP support is enabled (e.g., with \plaintt{-fopenmp}). You can use it to conditionally compile code that should only be included when OpenMP is available.
+
+    This approach allows your code to remain portable and functional even when compiled without OpenMP support. It is especially useful for writing hybrid codes (e.g., MPI+OpenMP) or for debugging and performance comparisons between serial and parallel versions.
+
+    \begin{codeblock}[language=C]
+#ifdef _OPENMP
+    // OpenMP-specific code here
+#else
+    // Fallback or serial code here
+#endif
+    \end{codeblock}
+\end{observationblock}
