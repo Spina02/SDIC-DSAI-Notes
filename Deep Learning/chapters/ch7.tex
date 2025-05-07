@@ -1,0 +1,75 @@
+\chapter{Lecture: 06/05/2025}
+
+\section{Models for sequences}
+
+We are talking about models able to learn from sequences of data. For "sequence" we mean a sequence of symbols, for instance:
+
+\begin{itemize}
+    \item text, DNA, RNA, protein, etc.
+    \item time series, etc.
+    \item anything that can be represented as a sequence of symbols (e.g. an image)
+\end{itemize}
+
+Our models will need a "vocabulary" of symbols. For instance, in the case of text, we can have a vocabulary of words or characters.
+
+In these kinds of models, it is not suggested to use classical one hot encoding. The reason is that the vocabulary can be very large, and one hot encoding would create a very sparse representation of the data. Moreover, some symbols can be very similar to each other, and one hot encoding would not take this into account. For instance, in the case of text, the words "cat" and "dog" are very similar, but one hot encoding would represent them as completely different vectors.
+
+We'll use a different representation, called "embedding". An embedding is a dense representation of the data, where similar symbols are represented by similar vectors.
+
+The embedding matrix is a matrix of size $|V| \times d$, where $|V|$ is the size of the vocabulary and $d$ is the size of the embedding. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/embedding.png}
+    \caption{Embedding matrix}
+    \label{fig:embedding}
+\end{figure}
+
+Let's explore firstly the n-gram models. An n-gram model is a type of probabilistic language model used to predict the next item in a sequence based on the previous $n-1$ items. The model uses the conditional probability of the next item given the previous $n-1$ items, which can be represented mathematically as:
+
+$$
+P(w_n | w_1, w_2, \ldots, w_{n-1}) = \frac{P(w_1, w_2, \ldots, w_n)}{P(w_1, w_2, \ldots, w_{n-1})}
+$$
+
+where $w_i$ represents the $i$-th word in the sequence.
+
+For instance, a \textit{bigram} model (where $n=2$) would predict the next word based on the previous word, while a \textit{trigram} model (where $n=3$) would predict the next word based on the previous two words.
+
+\subsection{FF-Neural Language Models}
+
+A feedforward neural network language model (FF-NNLM) is a type of neural network used for language modeling. It uses a feedforward architecture to learn the probability distribution of sequences of words. The model takes a sequence of words as input and outputs a probability distribution over the next word in the sequence.
+
+The FF-NNLM consists of an input layer (one hot encoded), an embedding layer, a hidden layer, and an output layer. The input layer represents the sequence of words as one-hot vectors, which are then passed through the embedding layer to obtain dense representations of the words. The hidden layer processes these representations and outputs a probability distribution over the next word in the sequence. The output layer uses a softmax activation function to produce the final probability distribution.
+
+\subsubsection{Recurrent neural networks}
+
+Recurrent neural networks (RNNs) are designed for processing sequences. They achieve this by incorporating a "context vector" (or hidden state) that captures information from previous time steps. This context vector is updated at each step based on the current input and its previous state, and is fed back as an additional input to the network. This feedback mechanism allows RNNs to model long-term dependencies across the sequence.
+
+When processing, for example, word embeddings, these are passed sequentially through a series of identical neural network units. Each unit produces an output (e.g., an output embedding) and an updated context vector. This updated context vector is then passed to the next unit in the sequence, along with the next input (e.g., the next word embedding), as depicted by the orange arrows in \cref{fig:rnn}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/RNN.png}
+    \caption{RNN}
+    \label{fig:rnn}
+\end{figure}
+\vspace{-1em}
+Each output embedding contains information about the word itself and its context in the preceding sentence fragment. In principle, the final output contains information about the entire sentence and could be used to support classification tasks similarly to the <cls> token in a transformer encoder model. However, RNNs sometimes gradually “forget” about tokens that are further back in time.
+
+In principle, the "context" vector could be used to represent the entire history of the sequence. However, in practice, RNNs have difficulty retaining information from earlier time steps, especially when the sequences are long. This is due to the vanishing gradient problem, where gradients become very small during backpropagation through time, making it difficult for the model to learn long-term dependencies.
+
+The backpropagation algorithm for RNNs is called \bfit{backpropagation through time} (BPTT). It involves the calculation of the loss (e.g., cross-entropy loss) at each time step and then backpropagating the gradients through the entire sequence. This is done by unrolling the RNN for a fixed number of time steps and treating it as a feedforward network. The gradients are then calculated for each time step and accumulated to update the model parameters.
+
+There are different types of RNNs, including \textit{one to one}, \textit{one to many}, \textit{many to one}, and \textit{many to many} architectures. The choice of architecture depends on the specific task and the nature of the input and output sequences.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/RNN_types.png}
+    \caption{Types of RNNs}
+    \label{fig:rnn_types}
+\end{figure}
+
+The case we were observing is the \textit{many to one} case, where we have a sequence of inputs and a single output. This is typically used for tasks such as sentiment analysis, where we want to classify the entire sequence based on its content, or if we just want to predict the next word in a sequence.
+
+
+
