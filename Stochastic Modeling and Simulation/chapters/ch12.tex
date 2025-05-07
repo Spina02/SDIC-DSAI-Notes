@@ -1,0 +1,225 @@
+\chapter{Lecture: 05/05/2025}
+
+\dots
+
+... if there is no linearity, ...
+
+$$
+\dfrac{\partial P}{\partial t} = - \dfrac{\partial}{\partial x} \left\{
+    (\theta \int z P(z,t) \dd z + (1-\theta)x - x^3)P
+\right\} + \dfrac{\omega^2}2 \dfrac {\partial^2 P}{\partial x^2} \qquad N \gg 1
+$$
+
+$$
+M(t) = \int_{\mathbb R} x P(x,t) dx
+$$
+
+$$
+P_s(x,M_s) = C(M_s) \exp \left\{
+    \theta M_s x + ...
+\right\}
+$$
+
+\missing{end of the formula above}
+
+This solution is not actually so "usable"
+
+$$
+M_s = \int_{\mathbb R} x P_s(x; M_s) dx \quad \Rightarrow \quad M_s = \Psi (M_s)
+$$
+
+$$
+M_s = \Psi(M_s) \quad \to \quad \text{"unique solution"}
+$$
+
+There are more interesting cases, for instance when $\Psi(M_s)$ has more than one solution:
+
+In this case, our system has more than one steady states. It means that we loose the unicity of the solution (so there is no more global actractiveness)
+
+\vspace{0.5em}
+
+E.g: 
+
+$$\dot X_i = f(x_i, <x>) + g(x_i) \xi_i \quad N \gg 1$$
+
+$$
+\dot x = f(x,M(t)) + g(x) \xi(t)
+$$
+
+$$
+M(t) = \int z P(z,t) dt
+$$
+
+The Fokker-Plank equation will be:
+
+$$
+\dfrac{\partial P}{\partial t} = - \dfrac \partial{\partial x} [f(x, M(t))] + \dfrac 12 \dfrac {\partial^2}{\partial x^2} [g^2(x)P]
+$$
+
+The steady state solutions will be the solutions of the following equation:
+
+$$
+\begin{cases}
+0 = -\dfrac {\dd}{\dd x} [t(x,M_s)P] + \dfrac {\dd^2}{\dd x^2} \left[
+    \dfrac{g^2(x)}2 P
+\right]
+\\[1em]
+M_s = \int z P_s (z; M_s) dx
+\end{cases}
+$$
+
+$$
+\boxed{
+    M_s = \Psi(M_s)
+}
+$$
+
+\todo{add linking sentence}
+
+$$
+P(x, M_s, \theta) = C(M, \theta) \exp \left[
+    \dfrac 2\omega \left(
+        \theta M_s x + (1-\theta) \dfrac {x^2}2 - \dfrac {x^4}4
+    \right)
+\right]
+$$
+
+$$
+\boxed{M_s = 0}
+$$
+
+\dots (?)
+
+$0 < \theta < \theta_c$
+
+\dots (?)
+
+So we have two solutions:
+
+$$
+\begin{array}{l}
+    M_s = a\\
+    M_s = -a
+\end{array}
+$$
+
+\begin{exampleblock}
+    $$
+    M_s = \Psi(M_s; \theta)
+    $$
+
+    $$
+    \begin{cases}
+        y = M_s\\
+        y = \Psi(M_s; \theta)
+    \end{cases}
+    \quad \Rightarrow \quad
+    \begin{array}{c}
+        P_s(x;M_1)\\
+        P_s(x;M_2)\\
+        P_s(x;M_3)
+    \end{array}
+    $$
+
+    so for $\theta = \theta_1$ we have \bfit{multistability}, while for $\theta = \theta_2$ we have \bfit{monostability}.
+
+\end{exampleblock}
+
+
+\newtheorem{theorem}{Theorem}
+
+\begin{theorem}
+    $$
+    \left|
+        \left.\dfrac {\dd \Psi}{\dd M_s}
+    \right|_{M_s = M_c}\right| < 1
+    \quad \Rightarrow \quad
+    P_s(x;M_1, \theta^1) \text{ is locally stable}
+    $$
+    $$
+    \left|
+        \left.\dfrac {\dd \Psi}{\dd M_s}
+    \right|_{M_s = M_c}\right| > 1
+    \quad \Rightarrow \quad
+    P_s(x;M_2, \theta^2) \text{ is locally unstable}
+    $$
+\end{theorem}
+
+\begin{center}
+    \begin{minipage}{0.4\textwidth}
+        \includegraphics[width=0.8\textwidth]{assets/ex.png}
+    \end{minipage}
+    \begin{minipage}{0.4\textwidth}
+        \includegraphics[width=0.8\textwidth]{assets/ex2.png}
+    \end{minipage}%
+\end{center}
+
+\dots
+
+\newpage
+
+$$
+\dot x = (ax + x^3 - x^5) - D(x - M(t)) + \alpha (1+x^2) \odot \xi(t)
+$$
+
+$$
+M = \Psi(M;D,\alpha)
+$$
+
+we have that for small $D$ and $\alpha$ we have a unique solution, while for large $D$ and $\alpha$ we have 5 different solutions.
+
+\begin{center}
+    \begin{minipage}{0.4\textwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=0.8\textwidth]{assets/ex_2.png}
+            \caption{1 solution}
+        \end{figure}
+        \end{minipage}%
+    \begin{minipage}{0.4\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{assets/ex_1.png}
+        \caption{5 solutions}
+    \end{figure}
+    \end{minipage}
+\end{center}
+
+So 0 is always a solution, and from a certain value of $D$ we have 5 solutions, 3 of which are stable and 2 are unstable.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{assets/ex_3.png}
+    \caption{Stable solutions of the system}
+\end{figure}
+
+\dots
+
+$$
+\dot x = F(x_i, <x>) + g(x_i, <x>) \xi_i(t)
+$$
+
+An example iis the movement of a guitar string that vibrates.
+
+$$
+m_i \ddot x_i = - \gamma \dot x_i
+$$
+
+If the deviation is big, we have a function in the copmplex space, but if the deviation is small, we can use the linear approximation.
+
+$$
+m_j \ddot z_j = - \gamma \dot z_j - k(z_j - z_{j-1}) - k(z_j - z_{j+1}) = - \gamma \dot z_j - k \left(z_{j-1} - 2z_j + z_{j+1}\right)
+$$
+
+we have now a discretization of the position of the string $z(t,x)$:
+
+$$
+m_j \dfrac {\dd^2 z}{\dd t^2} (t, x_j) = - \gamma \dfrac {\dd z}{\dd t} (t,x_j) + k [z(t, x_j + D) - 2z(t,x_j) + z(t, x_j - D)] 
+$$
+
+$$
+\mu \dfrac{\partial^2 z}{\partial t^2} = - \gamma \dfrac{\partial z}{\partial t} + c \dfrac{\partial^2 z}{\partial x^2} + \hat \omega \xi(x,t)
+$$
+
+We can see the stochastic term as the wind that moves the string.
+

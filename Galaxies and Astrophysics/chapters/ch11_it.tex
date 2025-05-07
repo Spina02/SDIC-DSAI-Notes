@@ -60,13 +60,17 @@ Prove dell'isotropia dell'universo:
 
 ---
 
-Abbiamo prove evidenti (dalle osservazioni) che l'universo non è sempre stato come lo vediamo oggi. Inizialmente questo era infatti \bfit{opaco}, cioè non era possibile vedere oltre i 3000 anni luce. Questo perché la radiazione elettromagnetica non poteva viaggiare liberamente, essendo assorbita dalle particelle di materia. Col tempo l'universo si è espanso e raffreddato, permettendo alla radiazione di viaggiare liberamente. Questo fenomeno è noto come \bfit{decoupling} e ha portato alla formazione del fondo cosmico a microonde (CMB), una radiazione residua che permea l'universo e fornisce informazioni preziose sulla sua evoluzione.
+Abbiamo prove evidenti (dalle osservazioni) che l'universo non è sempre stato come lo vediamo oggi. Inizialmente questo era infatti \bfit{opaco}, meentre ora è \bfit{trasparente}. Questo significa che l'universo ha subito un'evoluzione nel tempo, passando da uno stato iniziale in cui la materia era concentrata e calda a uno stato attuale in cui è più dispersa e fredda.
 
 ---
 
 \section{Principio Cosmologico}
 
-"\textit{Ad ogni epoca fissata l'universo appare lo stesso in ogni punto, a parte le irregolarità locali}"
+Se vogliamo applicare la Relatività Generale (intesa come la miglior teoria disponibile per descrivere il moto dei corpi per effetto della distribuzione di materia) allo studio del cosmo, dovremo aspettarci che, in generale, la geometria dello spazio tempo non sia statica, ma dipenda dal tempo. Questo è anche suggerito dall'evidenza osservativa di un moto generale di allontanamento delle galassie da noi (legge di Hubble).
+
+L'espansione dell'universo appare abbastanza regolare. Vi sono, a causa della presenza di disomogeneità (come gruppi, ammassi di galassie), delle perturbazioni nei moti delle galassie indotti dall'azione gravitazionale di queste disomogeneità. Ma questi moti sono relativamente "piccoli", con velocità dell'ordine di $100 \div 1000 km/s$, rispetto alle velocità di allontanamento (\textit{recessione}) da noi delle galassie che, nelle survey ottiche, arrivano anche a frazioni significative della velocità della luce. Inoltre questi moti sono generalmente non sistmatici.
+
+\curlyquotes{\textit{Ad ogni epoca fissata l'universo appare lo stesso in ogni punto, a parte le irregolarità locali}}
 
 Immaginiamo di riempire fittamente questo spazio "smussato" e omogeneo di osservatori, ognuno con orologio e regoli, ognuno in quiete rispetto al moto medio della materia circostante. Le linee di universo (cioè le geodetiche) di questi osservatori non si intersecano, eccetto possibilmente in un punto singolare nel passato e, forse, nel futuro. C'è una sola geodetica che passa per un punto dello spazio-tempo, e quindi la materia possiede, in ogni punto, una ben definita velocità. Questo substrato "smussato" si comporta come un fluido perfetto. La regolarità del moto degli osservatori (postulato di Weyl) permette di definire, per ogni valore del tempo cosmico, una sezione spaziale $t = cost$ dello spazio-tempo. Queste sezioni spaziali sono perpendicolari alle geodetiche descritte dagli osservatori (vedi più avanti).
 
@@ -135,3 +139,388 @@ $$
 
 \todo{missimg something}
 
+\subsection{Metrica di Robertson-Walker}
+
+Usiamo anzitutto il fatto di avere una simmetria sferica dovuta all'isotropia scegliendo un sistema di coordinate sferico, che riflette questa simmetria. Restiamo, per ora, nello spazio euclideo e definiamo:
+
+$$
+\begin{cases}
+    x = R \sin \theta \cos \varphi \\
+    y = R \sin \theta \sin \varphi \\
+    z = R \cos \theta
+\end{cases}
+$$
+
+Definita in questo modo la superficie sferica è immediato ricavare il tensore metrico:
+
+$$
+\begin{array}{l}
+    \bar x_R = (\sin \theta \cos \varphi, \sin \theta \sin \varphi, \cos \theta) \\
+    \bar x_\theta = (R \cos \theta \cos \varphi, R \cos \theta \sin \varphi, -R \sin \theta) \\
+    \bar x_\varphi = (-R \sin \theta \sin \varphi, R \sin \theta \cos \varphi, 0)
+\end{array}
+\qquad \Rightarrow \qquad
+\ ^3g_{ij} =
+\begin{pmatrix}
+    1 & 0 & 0 \\
+    0 & R^2 & 0 \\
+    0 & 0 & R^2 \sin^2 \theta
+\end{pmatrix}
+$$
+
+da cui:
+
+$$
+\dd l^2 = \dd R^2 + R^2 (\dd \theta^2 + \sin^2 \theta \dd \varphi^2) = \dd R^2 + R^2 \dd \Omega^2
+$$
+
+Per $R = cost$ sarà $dl^2 = R^2 \dd \Omega^2$, con $\ ^2g_{ij} = \begin{pmatrix} R^2 & 0 \\ 0 & R^2 \sin^2 \theta \end{pmatrix}$. Ricordiamo che l'area della superficie si può ottenere dalla relazione:
+
+$$
+dA = \sqrt{\,^2g}\ \dd \theta \dd \varphi = R^2 \sin \theta \dd \theta \dd \varphi
+$$
+
+da cui l'area della sfera è:
+
+$$
+A = \int_{0}^{2\pi} \int_{0}^{\pi} R^2 \sin \theta \dd \theta \dd \varphi = 4 \pi R^2
+$$
+
+Questa relazione si può generalizzare alle tre dimensioni ottenendo in questo caso un volume:
+
+$$
+dV = \sqrt{\,^3g}\ \dd R \dd \theta \dd \varphi = R^2 \sin \theta \dd R \dd \theta \dd \varphi
+$$
+
+da cui otteniamo:
+
+$$
+V = \dfrac 43 \pi R^3
+$$
+
+\todo{missing something}
+
+
+
+
+
+\newpage
+
+\chapter{Cosmologia}
+
+La cosmologia (\textit{Cosmos}: Universo, bellezza; \textit{Logos}: studio) è la branca della fisica e dell'astronomia che indaga l'origine, l'evoluzione, la struttura su larga scala e il destino ultimo dell'Universo. Sebbene le prime riflessioni sulla natura del cosmo risalgano ai filosofi greci, la cosmologia moderna affonda le sue radici nella rivoluzione scientifica del Rinascimento. Figure come Copernico, con il suo modello eliocentrico, Keplero, che descrisse le orbite ellittiche dei pianeti, e Galileo Galilei, le cui osservazioni telescopiche fornirono prove cruciali, scardinarono la visione geocentrica millenaria, aprendo la via a una nuova comprensione del nostro posto nell'Universo.
+
+\section{Introduzione Storica e Concettuale}
+
+Comprendere la vastità dell'Universo e la nostra posizione al suo interno divenne la sfida successiva. Tecniche come la \textbf{parallasse} stellare – il cambiamento apparente della posizione di una stella vicina rispetto allo sfondo lontano dovuto al moto orbitale della Terra – permisero le prime misure dirette di distanza, rivelando le immense scale del cosmo. Astronomi come William Herschel tentarono di mappare la struttura tridimensionale della Via Lattea basandosi sulla distribuzione e luminosità delle stelle.
+
+Tuttavia, all'inizio del XX secolo, la natura stessa delle "nebulose" spiraliformi osservate era oggetto di un acceso dibattito (il "Great Debate"): erano parte della nostra Galassia, rendendola di fatto l'intero Universo conosciuto (posizione sostenuta da Heber Curtis), o erano esse stesse "universi-isola", galassie distinte e lontane simili alla nostra (come proposto da Harlow Shapley)?
+
+Questa domanda fondamentale si intrecciava con un antico enigma noto come \textbf{Paradosso di Olbers}:
+\begin{observationblock}[Paradosso di Olber]
+    Perché il cielo notturno è buio, se l'Universo fosse infinito, eterno e uniformemente pieno di stelle? In tale scenario, ogni linea di vista dovrebbe intercettare la superficie di una stella, rendendo la volta celeste abbagliante.
+    $$
+    f = \frac{L}{4 \pi d^2} \qquad \text{Flusso da una stella a distanza } d
+    $$
+    $$
+    dJ = \frac{L}{4 \pi d^2} n (4\pi d^2 dr) = L n dr \qquad \text{Contributo da un guscio sferico}
+    $$
+    Integrando su un universo infinito:
+    $$
+    J = \int_{r = 0}^{\infty} L n dr = \infty
+    $$
+    L'oscurità del cielo suggerisce che almeno una delle ipotesi (infinito, eterno, statico, omogeneo) debba essere errata. Le possibili soluzioni includono:
+    \begin{enumerate}
+        \item L'universo ha un'età finita (la luce dalle stelle più lontane non ci ha ancora raggiunto).
+        \item L'universo è in espansione (la luce delle galassie lontane perde energia).
+    \end{enumerate}
+\end{observationblock}
+
+La chiave per risolvere il dibattito sulla natura delle nebulose e per gettare nuova luce sul paradosso di Olbers giunse dalle misure di velocità e distanza delle galassie. Già si osservava che molte nebulose mostravano uno spostamento sistematico delle loro linee spettrali verso il rosso (\textbf{redshift}), interpretabile come un allontanamento dovuto all'effetto Doppler. Fu Edwin Hubble, nel 1929, a stabilire la relazione cruciale: misurando le distanze di varie galassie (usando stelle Cefeidi come riferimento) e correlandole con i loro redshift, scoprì la \textbf{Legge di Hubble}:
+$$
+v = H_0 d
+$$
+dove $v$ è la velocità di recessione, $d$ la distanza e $H_0$ è la \textbf{costante di Hubble}. Questa legge fornì la prova definitiva che le nebulose erano altre galassie esterne alla nostra e, soprattutto, che l'Universo è in \textbf{espansione}.
+
+L'espansione cosmica è il pilastro del modello cosmologico standard attuale, il \textbf{Big Bang}. Estrpolando l'espansione indietro nel tempo, si deduce che l'universo dovesse trovarsi in uno stato iniziale estremamente denso e caldo, dal quale si è espanso e raffreddato fino allo stato attuale. Questo scenario fornisce un quadro coerente per spiegare sia la legge di Hubble sia il paradosso di Olbers.
+
+Per descrivere matematicamente un universo in espansione, la cosmologia moderna adotta il \textbf{Principio Cosmologico}: su scale sufficientemente grandi (tipicamente > 100 Mpc), l'Universo è \textbf{omogeneo} (uguale in ogni punto) e \textbf{isotropo} (uguale in ogni direzione). Sebbene l'universo appaia chiaramente disomogeneo su piccola scala (pianeti, stelle, galassie), queste assunzioni sono ben supportate dalle osservazioni su larga scala, come la distribuzione degli ammassi di galassie e, in modo spettacolare, dalla \textbf{Radiazione Cosmica di Fondo} (CMB). Quest'ultima, un residuo dell'universo primordiale caldo, permea tutto lo spazio con uno spettro di corpo nero quasi perfetto (T ≈ 2.725 K) e mostra un'isotropia eccezionale, confermando le ipotesi del Principio Cosmologico.
+
+Infine, numerose prove osservative indicano che l'universo \textit{evolve} nel tempo. Ad esempio, l'universo primordiale era \textbf{opaco} alla radiazione, mentre oggi è largamente \textbf{trasparente}. Questo cambiamento di stato, insieme all'espansione e al raffreddamento testimoniati dalla CMB e dalla legge di Hubble, sottolinea la natura dinamica del cosmo che andremo a studiare nei prossimi capitoli.
+
+\dots
+
+\section{La metrica di Robertson e Walker}
+
+Usiamo anzitutto il fatto di avere una simmetria sferica dovuta all'isotropia scegliendo un sistema di coordinate sferico, che riflette questa simmetria. Restiamo, per ora, nello spazio euclideo e definiamo:
+
+$$
+\begin{cases}
+    x = R\sin\theta\cos\varphi\\
+    y = R\sin\theta\sin\varphi\\
+    z = R\cos\theta
+\end{cases}
+$$
+
+\dots
+
+$$
+ds^2 = c^2 dt^2 + a(t)^2 g_{ij} sx^isx^j
+$$
+
+dove la dipendenza dal tempo è tutta nella funzione a(t) detta fattore di scala, ed i gij non dipendono dal tempo. 
+
+Il rapporto $a(t_1)/a(t_0)$ rappresenta l'ingrandimento al tempo $t_1$, rispetto al ltempo $t_0$, di una lunghezza misurata lungo le due superfici $t = t_1$ e $t = t_0$.
+
+\dots
+
+$$
+d\ell^2 = R^2d\Omega^2 \quad \Rightarrow \quad d\ell^2 = \underbrace{g(r')}_{r^2} d\Omega^2
+$$
+
+
+
+\begin{observationblock}
+    $g_{r\theta}$ e $g_{r\phi}$ sono nulle 
+\end{observationblock}
+
+\dots
+$$
+t = t_0 \quad \Rightarrow a(t_0) = cost
+$$
+
+
+$$
+g_{ij} = 
+\begin{pmatrix}
+a^2f(r)\\
+& a^2r^2\\
+&& a^2r^2\sin^2\theta
+\end{pmatrix}
+\qquad
+g^{ij} =
+\begin{pmatrix}
+    \frac1{a^2f(r)}\\
+    & \frac 1{a^2r^2}\\
+    && \frac 1{a^2r^2\sin^2\theta}
+\end{pmatrix}
+\qquad
+g = a^6f(r)r^4\sin^2\theta
+$$
+
+Poichè siamo in uno spazio omogeneo, abbiamo che in ogni punto in cui $t = t_0$ la curvatura è costante.
+
+Vogliamo imporre la condizione che lo spazio sia omogeneo; questo significa che anche la curvatura dello spazio sarà costante ovunque. Ho una sola funzione da definire, $f (r)$, per cui mi basta una sola condizione, cioè che lo scalare di Ricci della sezione spaziale a tempo cosmico costante, 3R, sia costante.
+
+Ricordiamo che:
+
+$$
+\ ^3R=g^{\alpha\beta}\ ^3R_{\alpha\beta}, \quad e \quad
+$$
+
+abbiamo messo l'apice $\ ^3$ davanti a $R$ per indicare che ci riferiamo alla parte spaziale, non allo spazio-tempo completo.
+
+Si inizia come sempre dalle connessioni affini (simboli di Kristoffel); ce ne sono 18 indipendenti; di queste solo 7 sono diverse da zero:
+
+$$
+\Gamma^1_{11} = \dfrac 12 \dfrac {\dd f}{\dd r}
+\quad
+\Gamma^1_{22} = - \dfrac rf
+\quad
+\Gamma^1_{33} = \dfrac {r \sin^2 \theta}{f}
+\quad
+\Gamma^2_{12} = \Gamma^2_{21} = \dfrac 1r
+\quad
+\Gamma^3_{13} = \Gamma^3_{31} = \dfrac 1r
+\quad
+\Gamma^2_{33} = - \sin \theta \cos \theta
+\quad
+\Gamma^3_{23} = \Gamma^3_{32} = \dfrac{\cos \theta}{\sin \theta}
+$$
+
+Poichè  $\ ^3R = g^{\alpha\beta} R_{\alpha\beta} = g^{11} R_{11} + g^{22} R_{22} + g^{33} R_{33}$, abbiamo:
+
+$$
+\ ^3R_{11} = \dfrac 1r \cdot \dfrac 1f \dfrac {\dd f}{\dd r}
+\qquad
+\ ^3R_{22} = 1 - \dfrac 1f + \dfrac 12 \dfrac r{f^2} \dfrac {\dd f}{\dd r}
+\qquad
+\ ^3R_{33} = \sin^2 \theta \cdot \ ^3R_{22}
+$$
+
+da cui, imponendo $\ ^3R = costante = K$:
+
+$$
+\ ^3R = g^{11}R_{11} + g^{22} R_{22} + g^{33} R_{33}
+$$
+
+$$
+\ ^3R = K = \dfrac 2{a^2r^2} \left[
+    1 - \dfrac 1f + \dfrac r{f^2} \dfrac{\dd f}{\dd r}
+\right]
+= \dfrac 2{a^2r^2}
+\left[
+    1 - \dfrac {\dd}{\dd r}\left(
+        \dfrac rf
+    \right)
+\right]
+=
+\dfrac 2{a^2r^2} \dfrac \dd {\dd r}
+\left[
+    r\left(
+        1 - \dfrac 1f
+    \right)
+\right]
+$$
+
+da cui:
+
+$$
+\dd \left[
+    r \left(
+        1 - \dfrac 1f
+    \right)
+\right]
+=
+\dfrac{Ka^2r^2}2 \dd r
+$$
+
+Integrando otteniamo:
+
+$$
+r \left(
+1 - \dfrac 1f
+\right)
+=
+\dfrac{Ka^2r^3}6 + A
+\qquad \Rightarrow \qquad
+f(r) = \dfrac1{1+\frac{Ka^2r^2}6 - \frac Ar}
+$$
+
+Ma, se $r \to 0$, la metrica sarà quella euclidea, per cui $f(r) \equiv 1$; ne segue che $A = 0$ eccetto
+
+$$
+\dd s^2 = c^2 \dd t^2 - a^2(t) \left[ \dfrac{\dd r^2}{1-\frac{Ka^2(t)r^2}6} + r^2 \dd \Omega \right]
+$$
+
+Osserviamo però che, come avevamo detto, la dipendenza dal tempo della parte spaziale si esplica attraverso la $a^2(t)$ davanti alla parentesi quadra, ed il termine all'interno di questa non dipende dal tempo. Questo significa che $Ka^2$ è funzione di $r$. Sarà allora $K = K(t)$.
+
+Definiamo un cambiamento di scala in $r$ tale che $\dfrac{Ka2r2}6 ≡ k\tilde r^2$, dove $k = 0$ se $K = 0$, altrmenti $k$ ha lo stesso segno di $K$, ma modulo 1. 
+
+$$
+k = \begin{cases}
+    0 & if\ K = 0\\
+    sign(K) & if\ K \not = 0
+\end{cases}
+$$
+
+Abbiamo quindi:
+
+$$
+r^2 = \dfrac {6k}{Ka^2} \tilde r^2
+\qquad \Rightarrow \qquad
+r = \tilde r \sqrt{\dfrac {6k}{Ka^2}} \quad \dd r = \sqrt{\dfrac {6k}{Ka^2}} \dd\tilde r
+$$
+
+e quindi:
+
+$$
+\dd t^2 = \tilde a^2(t) \left[
+    \dfrac{6k}{K(t)a^2(t)} \cdot \dfrac{\dd \tilde r^2}{1 - k \tilde r^2} + \dfrac{6k}{K(t)a^2(t)} \tilde r^2 \dd \Omega^2
+    \right]
+    =
+    \dfrac{6k}{K(t)} \left[
+    \dfrac{\dd \tilde r^2}{1 - k \tilde r^2} + \tilde r^2 \dd \Omega^2
+    \right]
+$$
+
+Se vogliamo che $dt^2 = \tilde a^2(t)[...]$, definiamo $\dfrac{6k}{K(t)} = \tilde a^2(t)$, da cui:
+
+$$
+dt^2 = \tilde a^2(t) \left[
+    \dfrac{\dd \tilde r^2}{1 - k \tilde r^2} + \tilde r^2 \dd \Omega^2
+    \right]
+$$
+
+in cui $K(t) = \ ^3R(t) \equiv \dfrac{6k}{\tilde a^2(t)}$.
+
+\section{Topologia dell'Universo}
+
+Vediamo ora in dettaglio le proprietà topologiche dei modelli cosmologici corrispondenti ai tre casi k = 0, +1, -1.
+
+\begin{enumerate}
+    \item \textbf{Caso $k = 0$} (universo piatto): 
+    
+    In questo caso l'universo è omogeneo e isotropo, ma non ha curvatura. La geometria è euclidea e le linee di universo sono rette. La topologia è quella di uno spazio euclideo tridimensionale, quindi l'universo è infinito e non ha bordi.
+    $$\mathbb E^3 \to "spazio\ piatto" \quad 0 < r < \infty \quad \to \quad "spazio\ infinito"$$
+    \item \textbf{Caso $k = +1$} (universo chiuso): 
+
+    Per $\dd \theta = \dd \varphi = 0$ abbiamo $\dd \ell = a(t) \dfrac{\dd r}{\sqrt{1-r^2}}$ per cui $|r|<1$ e la metrica diverge se $r \to 1$.
+    Possiamo eliminare tale divergenza scegliendo una nuova coordinata $\chi$ al posto di $r$, tale che $r = \sin \chi$ così che:
+
+    $$
+    \dd r = \cos \chi \dd \chi = \sqrt{1-\sin^2\chi}\dd\chi = \sqrt{1-r^2}\dd\chi
+    $$
+    $$
+    \dd \ell^2 = a^2(t) \left[
+        \dfrac{\cancel{(1 - r^2)}\dd \chi^2}{\cancel{1 - r^2}} + \sin^2 \chi \dd \Omega^2
+    \right] =
+    a^2(t) \left[
+        \dd \chi^2 + \sin^2 \chi \dd \Omega^2
+        \right]
+    $$
+
+    Con $0\le\chi\le\pi$, $0\le\theta\le\pi$, $0\le\varphi\le2\pi$.
+    
+    Confonrtiamo tale topologia con la sfera in 2-D in $\mathbb E^3$. Sarà $\chi = s/a$; $s = a\chi$, $a\sin\chi = x$:
+    $$
+    \dd t^2 = a^2 \dd \chi^2 + x^2 \dd \varphi^2 = a(\dd\chi^2 + \sin^2\chi \dd \varphi^2)
+    $$
+
+    Inoltre, detto $u = x/a, \ u = \sin \chi,\ \dd u ? \cos \chi \dd \chi = \sqrt{1-\sin^2\chi}\dd\chi = \sqrt{1-u^2}\dd \chi$ e la metrica diventa:
+
+    $$
+    \dd t^2 = a^2 \left[
+        \dfrac{\dd u^2}{1-u^2} + u^2 \dd \varphi^2
+    \right]
+    $$
+
+    Vedo che la coordinata r in Robertson-Walker con $k = +1$ corrisponde a $x/a$ nel caso 2-D della sfera; $\chi$ varia tra $0$ e $\pi$.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.3\textwidth]{assets/caso_k_1.png}
+        \caption{Universo chiuso}
+        \label{fig:universo_chiuso}
+    \end{figure}
+
+    Consideriamo ora una ipersfera: una sfera 3-D in $\mathbb E^4$; L'equazione della sfera, estendendo il teorema di pitagora e ricordando che la quarta dimensione sarà in qualche modo perpendicolare alle altre tre, sarà:
+
+    $$
+    x^2 + y^2 + z^2 + u^2 = a^2 \qquad \quad a = cost = \text{raggio della sfera}
+    $$
+
+    Sia $r^2 = x^2 + y^2 + z^2$ (sfera 2-D per cui $u = cost$) così che $a^2 = r^2 + u^2 = cost$. Differenziando otteniamo:
+
+    $$
+    2r\dd r + 2 u \dd u = 0 \qquad \Rightarrow \qquad r\dd r = -u \dd u
+    $$
+    $$
+    \dd u^2 = \dfrac{r2\dd r^2}{u^2} = \dfrac{r^2 \dd r^2}{a^2 - r^2} 
+    $$
+ 
+    Questo per garantire che lo spostamento $\dd u$ sia sulla ipersfera in $\mathbb E^4$; Il $\dd\ell^2$ in $\mathbb E^4$ sarà:
+
+    $$
+    \dd\ell^2 = \dd x^2 + \dd y^2 + \dd z^2 + \dd u^2
+    $$
+
+    In coordinate polari abbiamo:
+
+    $$
+    \dd\ell^2 = \dd r^2 + r^2 \dd\Omega^2 + \dd u^2 = \dd r^2 + r^2 \dd\Omega^2 + \dfrac{r^2 \dd r^2}{a^2 - r^2} = \dd r^2 \left[ 1 + \dfrac{r^2}{a^2 - r^2} \right] + r^2 \dd\Omega^2 = \dfrac{\dd r^2}{1-r^2/a^2} + r^2 \dd\Omega^2
+    $$
+
+    Posto $\tilde r = r/a$ abbiamo che ($\dd r = a \dd \tilde r$):
+
+\end{enumerate}
