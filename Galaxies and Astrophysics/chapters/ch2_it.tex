@@ -901,7 +901,8 @@ In uno spazio euclideo, per derivare un vettore $A_i(u^i)$ si procede \emph{spos
 $$
 \lim_{du^i \to 0}\;\frac{A_i(u^i + du^i) \;-\; A_i(u^i)}{du^i}.
 $$
-Come riprodurre un processo analogo in uno spazio non euclideo? Definiamo il \emph{trasporto parallelo} da $u^i$ a $u^i + du^i$ come quello spostamento che produce una variazione $\delta A_i$ tale che, passando a un sistema localmente euclideo (il che, localmente, è sempre possibile), tale variazione risulti nulla: $\delta A_i = 0$. Pertanto, in $P'$, abbiamo $A_i + dA_i \equiv A_i(u^i + du^i)$ e $A_i + \delta A_i$, corrispondente al trasporto parallelo di $A_i(u^i)$ da $P$ a $P'$. La differenza
+In uno spazio non euclideo, definiamo il \emph{trasporto parallelo} da $u^i$ a $u^i + du^i$ come quello spostamento che produce una variazione $\delta A_i$ tale che, passando a un sistema localmente euclideo (il che, localmente, è sempre possibile), tale variazione risulti nulla: $\delta A_i = 0$. Pertanto, in $P'$, abbiamo $A_i + dA_i \equiv A_i(u^i + du^i)$ e $A_i + \delta A_i$, corrispondente al trasporto parallelo di $A_i(u^i)$ da $P$ a $P'$. La differenza:
+\vspace{0.4em}
 $$
 DA_i
 \;=\;
@@ -909,9 +910,9 @@ DA_i
 \;=\;
 dA_i \;-\;\delta A_i
 $$
-è un vettore, perché è la differenza di due vettori applicati allo stesso punto. Questo $DA_i$, chiamato \bfit{Diferenziale Assoluto}, ci consente di definire il nuovo tipo di derivata che si comporta come un tensore, la \bfit{derivata covariante}.
+è un vettore, in quanto differenza tra due vettori applicati nello stesso punto. Questo $DA_i$, denominato \bfit{Differenziale Assoluto}, permette di introdurre una nuova tipologia di derivata che si comporta come un tensore: la \bfit{derivata covariante}.
 
-Resta ora da determinare $\delta A_i$: se imponiamo che $DA_i$ (dierenziale assoluto) sia lineare come i dierenziali ordinari, $\delta A_i$ dovrà dipendere linearmente sia dal vettore trasportato $A_i$ che dallo spostamento $du^i$, per cui potremo scrivere:
+Resta ora da determinare $\delta A_i$: se imponiamo che $DA_i$ sia lineare come i dierenziali ordinari, $\delta A_i$ dovrà dipendere linearmente sia dal vettore trasportato $A_i$ che dallo spostamento $du^i$, per cui potremo scrivere:
 \vspace{0.4em}
 $$
 \delta A_i = \Delta_{m\,i}^l A_m du^l
@@ -924,9 +925,258 @@ $$
 DA_i = \dd A_i - \delta A_i = \dfrac{\partial A_i}{\partial u^l} du^l - \Gamma^m_{il} A_m
 $$
 
-La \textbf{derivata covariante} $DA_i / \partial u^l$ indicata con $A_{i,l}$ sarà:
-
+La \textbf{derivata covariante per un vettore covariante} $DA_i / \partial u^l$ indicata con $A_{i,l}$ sarà:
+\vspace{0.4em}
 $$
 A_{i,l} = \dfrac{DA_i}{\partial u^l} = \dfrac{\partial A_i}{\partial u^l} - \Gamma^m_{il} A_m
 $$
 
+La derivata covariante di un tensore si può ricavare considerando questo come il prodotto di due vettori e richiedendo che essa soddisfi la regola di \emph{Leibniz} per la derivazione di un prodotto. 
+
+Consideriamo allora un tensore di rango due $T_{ik} \equiv A_iB_k$, si ha che:
+\vspace{0.4em}
+$$
+\begin{array}{rcl}
+    T_{ik;l} & = & B_kA_{i;l} + A_iB_{k;l} \\[0.8em]
+    & = & B_k \left(\dfrac{\partial A_i}{\partial u^l} - \Gamma_{il}^m A_m\right) + A_i \left(\dfrac{\partial B_k}{\partial u^l} - \Gamma_{kl}^m B_m\right) \\[0.8em]
+    & = & B_k \dfrac{\partial A_i}{\partial u^l} + A_i \dfrac{\partial B_k}{\partial u^l} - \Gamma_{il}^m A_m B_k - \Gamma_{kl}^m A_i B_m \\[0.8em]
+    & = & \dfrac{\partial T_{ik}}{\partial u^l} - \Gamma_{il}^m T_{mk} - \Gamma_{kl}^m T_{im}
+\end{array}
+$$
+
+Questa relazione vale in generale. Osserviamo ora l'espressione:
+\vspace{0.4em}
+$$
+A_{i;l} = (g_{ik}A^k)_{;l} = g_{ik;l}A^k + g_{ik}A^k_{;l}
+$$
+
+Ma $A_{i;k}$ è un tensore, e posso usare il tensore metrico per scriverlo come $A_{i;l} = g_{ik}A_{;l}^k$; se confrontiamo con l'espressione scritta sopra vediamo che $g_{ik;l} = 0$.
+
+\newpage
+
+Usiamo ora la relazione per la derivata covariante di un tensore per esplicitare questo risultato:
+\vspace{0.4em}
+\begin{alignat}{2}
+g_{ik;l} = 0 \quad \rightarrow \quad \dfrac{\partial g_{ik}}{\partial u^l} - \Gamma_{il}^m g_{mk} - \Gamma_{kl}^m g_{im} = 0
+\tag*{(I)}
+\end{alignat}
+
+Facciamo ora, in questa relazione, una rotazione in senso antiorario degli indici $i$, $k$ e $l$; otteniamo:
+\vspace{0.4em}
+\begin{alignat}{2}
+\dfrac{\partial g_{kl}}{\partial u^i} - \Gamma_{ki}^m g_{ml} - \Gamma_{li}^m g_{km} = 0
+\tag*{(II)}
+\end{alignat}
+
+Ed ancora una rotazione degli indici:
+% \vspace{0.4em}
+\begin{alignat}{2}
+\dfrac{\partial g_{li}}{\partial u^k} - \Gamma_{lk}^m g_{mi} - \Gamma_{ik}^m g_{lm} = 0
+\tag*{(III)}
+\end{alignat}
+
+Se facciamo ora (I) + (III) - (II) otteniamo, sfruttando la simmetria degli indici bassi di 
+$\Gamma_{il}^m$ e $g_{ik}$:
+\vspace{0.4em}
+$$
+\dfrac{\partial g_{ik}}{\partial u^l} + \dfrac{\partial g_{li}}{\partial u^k} - \dfrac{\partial g_{kl}}{\partial u^i} - \cancel{\Gamma_{il}^m g_{mk}} - \Gamma_{kl}^m g_{im} - \Gamma_{lk}^m g_{mi} - \cancel{\Gamma_{ik}^m g_{lm}} + \cancel{\Gamma_{ki}^m g_{ml}} + \cancel{\Gamma_{li}^m g_{km}} = 0
+$$
+E semplificando:
+$$
+\dfrac{\partial g_{ik}}{\partial u^l} + \dfrac{\partial g_{li}}{\partial u^k} - \dfrac{\partial g_{kl}}{\partial u^i} - 2 \Gamma_{kl}^m g_{im} = 0
+$$
+
+Moltiplicando ora quest'ultima relazione per $\frac 12 g^{ij}$ otteniamo:
+\vspace{0.4em}
+$$
+\dfrac 12 \left(
+    \dfrac{\partial g_{ik}}{\partial u^l} + \dfrac{\partial g_{li}}{\partial u^k} - \dfrac{\partial g_{kl}}{\partial u^i} 
+\right)
+= \Gamma_{kl}^m g_{im}g^{ij} = \Gamma_{kl}^m \delta_m^j = \Gamma_{kl}^j
+$$
+
+Ritroviamo quindi la relazione che definisce la connessione affine, verificando così l'assunzione $\Delta_{il}^m \equiv \Gamma^m_{il}$.
+
+Consideriamo ora il \emph{prodotto scalare} $A_iB^i$; essendo una quantità scalare essa non cambia per trasporto parallelo ($\delta (A_iB^i) = 0$), da cui:
+\vspace{0.4em}
+$$
+B^i\delta A_i + A_i\delta B^i = 0 \quad \rightarrow \quad A_i\delta B^i = -B^i\delta A_i
+$$
+
+Sostituendo $\delta A_i = \Gamma^m_{il} A_m du^l$ otteniamo:
+\vspace{0.4em}
+$$
+A_i\delta B^i = -B^i\Gamma^m_{il} A_mdu^l
+$$
+
+Essendo $i$ ed $m$ indici muti sommati, li scambio tra loro:
+\vspace{0.4em}
+$$
+A_i\delta B^i = -B_m\Gamma_{ml}^i A_idu^l
+$$
+
+ed essendo $A_i$ un vettore generico, dovrà essere:
+\vspace{0.4em}
+$$
+\delta B^i = -\Gamma^i_{ml}B^mdu^l
+$$
+
+da cui la relazione che esprime la \textbf{derivata covariante per un vettore controvariante}:
+\vspace{0.4em}
+$$
+\dfrac{DB^i}{du^l} = \dfrac{\partial B^i}{\partial u^l} - \Gamma^i_{ml}B^m
+$$
+che è l'opposto in segno della derivata covariante per un vettore covariante.
+
+\begin{definitionblock}[Regola generale per la derivazione covariante]
+    La regola generale per la derivazione covariante di un tensore di rango arbitrario consiste nel farne la derivata parziale e poi di aggiungere un termine del tipo $+\Gamma$ per ogni indice controvariante ed un termine del tipo $-\Gamma$ per ogni indice covariante.
+\end{definitionblock}
+
+\subsection{Trasporto parallelo e tensore di curvatura}
+
+Sia $u^i = u^i(s)$ l'equazione parametrica di una curva, con $s$ ascissa curvilinea misurata a partire da un certo punto sulla curva. Sappiamo che $du^i$ è un vettore (dalla definizione di vettore controvariante), ds è uno scalare, e $du^i/ds \equiv v^i$ è quindi un vettore. In particolare, $v^i$ è il versore tangente alla curva.
+
+\begin{tipsblock}[Verifica di un versore]
+    possiamo verificare che $v^i$ è un versore, cioè ha modulo unitario, eseguendo il prodotto scalare $v_iv^i$:
+    $$
+    v_iv^i =  g_{ij}v^iv^j = g_{ij} \dfrac{du^i}{ds} \dfrac{du^j}{ds} \equiv 1 \quad \text{da} \quad ds^2 = g_{ij}du^idu^j
+    $$
+\end{tipsblock}
+
+Se fossi in uno spazio Euclideo, per definire una geodetica come un segmento di linea retta, direi che il versore
+tangente non cambia con $s$:
+$$
+\dfrac{dv^i}{ds} = 0
+$$
+Se ora voglio generalizzare questa relazione ad uno spazio qualsiasi, a 2 o più dimensioni, devo usare non la derivata normale, ma quella covariante:
+$$
+\dfrac{Dv^i}{ds} = 0
+$$
+Esplicitando i termini
+$$
+\dfrac{Dv^i}{ds} = \dfrac{dv^i}{du^l} \dfrac{du^l}{ds} = 
+\dfrac{du^l}{ds}
+\left( \dfrac{\partial v^i}{\partial u^l} + \Gamma^i_{ml}v^m
+\right) = 0
+$$
+Cioè:
+$$
+\dfrac{dv^i}{du^l} \dfrac{du^l}{ds} + \Gamma^i_{ml}v^m \dfrac{du^l}{ds} = 0
+\quad \Rightarrow \quad
+\dfrac{dv^i}{ds} + \Gamma^i_{ml}v^m v^l = 0
+$$
+da cui, ricordando che $du^i/ds = v^i$, abbiamo:
+$$
+\dfrac{d^2u^i}{ds^2} + \Gamma^i_{ml} \dfrac{du^m}{ds} \dfrac{du^l}{ds} = 0
+$$
+
+Ritroviamo cioè la nostra equazione della geodetica (anche a riprova del fatto che, passando dal caso Euclideo a quello generale, si devono sostituire le derivate "normali" con quelle covarianti).
+
+Vediamo che lungo la geodetica $Dv^i = 0$, cioè $dv^i = \delta v^i$: il versore $v^i$, trasportato parallelamente da un punto $u^i$ sulla geodetica, a un punto $u^i + du^i$ silla stessa geodetica, coincide con il vettore $v^i + dv^i$, tangente alla geodetica in $u^i + du^i$.
+
+Consideriamo ora un vettore $A_i$ che viene trasportato parallelamente lungo la stessa geodetica. L'angolo che esso forma con $v^i$, versore tangente, sarà dato dal prodotto scalare $A_iv^i$. Ma uno scalare non cambia per trasporto parallelo, per cui lungo la geodetica l'angolo tra $A_i$ e $v^i$ rimane costante: \bfit{un vettore trasportato parallelamente lungo una geodetica forma sempre lo stesso angolo con la tangente alla curva}.
+
+Immaginiamo ora di trasportare parallelamente un vettore $\bar v_0$ lungo un triangolo formato da pezzi di geodetica.
+Se siamo in uno spazio Euclideo (ad esempio su un piano) il vettore $\bar v_f$ che ottengo dopo aver chiuso il cammino coinciderà con $\bar v_0$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/vec_transport.png}
+    \caption{Trasporto di un vettore lungo un triangolo nelle varie geometrie.}
+    \label{fig:vec_transport}
+\end{figure}
+\vspace{-1.5em}
+La stessa cosa non accade lungo un triangolo sferico: il vettore appare ruotato di un angolo che ha lo stesso
+verso di rotazione del verso in cui ho percorso il triangolo sferico. L'opposto accade per un triangolo iperbolico (K < 0).
+
+Possiamo vedere la cosa anche in un altro modo: immaginiamo di andare da un punto A ad un punto B sia direttamente che passando per un punto C, sempre lungo archi di geodetica. 
+
+Nello spazio Euclideo il risultato del trasporto parallelo lungo i due percorsi è il medesimo, ma la stessa cosa non accade sulle superfici curve (quanto qui detto per un triangolo formato da archi di geodetica vale per un percorso generico, che si può pensare come costituito da un gran numero di archetti di geodetica). Il risultato è che, a meno di non essere in uno spazio Euclideo, \bfit{non esiste un modo naturale e non ambiguo per muovere un vettore da un punto ad un altro}; possiamo trasportarlo parallelamente, ma il risultato dipende dal cammino, e non c'è una scelta naturale per questo. Quindi \bfit{posso confrontare due vettori solamente se sono applicati allo stesso punto}. Ad esempio, due particelle che passano una accanto all'altra hanno una velocità relativa ben definita (e minore di $c$, con $c$ velocità della luce), ma due particelle in differenti punti di uno spazio generico non hanno una velocità relativa ben definita.
+
+Vediamo di quantificare quanto detto sopra in modo qualitativo. Muovendosi lungo un cammino chiuso formato
+da archi di geodetica, un vettore $A_k$ trasportato parallelamente subirà, tornando al punto di partenza, una
+variazione
+$$
+\Delta A_k = \oint \delta A_k = \oint \Gamma^i_{km}A_i du^m
+$$
+
+Per risolvere l'integrale usiamo il Teorema di Stokes:
+
+\rule{\textwidth}{0.4pt}
+\begin{theorem}
+    \textbf{Teorema di Stokes}:
+    
+    La circuitazione di una curvatura $C_1$ in un campo vettoriale A è data dall'integrale del rotore di A lungo il perimetro della curva chiusa C:
+    $$
+    \oint_{C_1} A \cdot dl = \int_S \nabla \times A \cdot dS
+    $$
+    \rule{\textwidth}{0.4pt}
+\end{theorem}
+
+Applicando il teorema di Stokes all'integrale precedente otteniamo:
+
+$$
+\oint
+A_idu^i = \dfrac 12 \int_{Superficie}
+\left(
+    \dfrac{\partial A_m}{\partial u^l} - \dfrac{A_l}{\partial u^m}
+\right)
+df^{lm}
+$$
+
+dove $df^{lm}$ è un tensore che corrisponde alla proiezione dell'elemento di area della superficie sui piani coordinati. Nel nostro caso $A_m du^m \rightarrow \Gamma_{km}^i A_i du^m$, per cui:
+
+$$
+\Delta A_k = \dfrac 12 \int_{Superficie}
+\left[
+    \dfrac{\partial (\Gamma_{km}^iA_i)}{\partial u^l} - \dfrac{\partial (\Gamma_{kl}^iA_i)}{\partial u^m}
+\right]
+df^{lm}
+$$
+
+Se supponiamo che la superficie delimitata dalla curva chiusa sia infinitesima (una superficie finita si può scomporre in elementi infinitesimi), l'integrando sarà costante, a meno di infinitesimi di ordine superiore, e potremo scrivere:
+
+$$
+\Delta A_k = \dfrac 12 \left[
+    \dfrac{\partial (\Gamma_{km}^i)}{\partial u^l} A_i - \dfrac{\partial (\Gamma_{kl}^i)}{\partial u^m} A_i + \Gamma_{km}^i \dfrac{\partial A_i}{\partial u^l} - \Gamma_{kl}^i \dfrac{\partial A_i}{\partial u^m}
+\right] \Delta f^{lm}
+$$
+
+Siccome $A_i$ viene spostato parallelamente sulla curva:
+
+$$
+\dfrac{\partial A_i}{\partial u^l} = \dfrac{\delta A_i}{\partial u^l}=\Gamma_{il}^n A_n
+$$
+
+Allora:
+
+
+% $$
+% DA_i = dA_i - \int A_i = \dfrac{\partial A_i}{\partial u}
+% $$
+
+** here missing something **
+
+$$
+\begin{array}{rcl}
+\Delta A_k & = & \dfrac 12 \Delta f^{lm} \left[
+    \dfrac{\partial \Gamma_{km}^i}{\partial u^l} A_i - \dfrac{\partial \Gamma_{kl}^i}{\partial u^m} A_i + \Gamma_{km}^i \Gamma_{il}^n A_n - \Gamma_{kl}^i \Gamma_{im}^n A_n
+\right] = \\
+& = & \dfrac 12 A_i \Delta f^{lm} \left[
+    \dfrac{\partial \Gamma_{km}^i}{\partial u^l} - \dfrac{\partial \Gamma_{kl}^i}{\partial u^m} + \Gamma_{km}^n \Gamma_{nl}^i - \Gamma_{kl}^n \Gamma_{nm}^i
+\right]
+\end{array}
+$$
+
+dove il secondo passaggio, in cui si è esplicitato $A_i$, è stato ottenuto scambiando tra loro gli indici muti $i$ ed $n$ nei termini con i prodotti delle connessioni affini. La quantità in parentesi graffa è un tensore, poichè lo sono $A_i$, $\Delta f^{lm}$ e $\Delta A_k$ (differenza di due vettori applicati allo stesso punto). Ad essa si da il nome di \textbf{tensore di Riemann - Christoffel} o \textbf{tensore di curvatura}:
+
+$$
+R^i_{klm} = \dfrac{\partial \Gamma^i_{km}}{\partial u^l} - \dfrac{\partial \Gamma^i_{kl}}{\partial u^m} + \Gamma^n_{km} \Gamma^i_{nl} - \Gamma^n_{kl} \Gamma^i_{nm}
+$$
+
+\underline{\textbf{Nota bene}}: talvolta lo si trova definito con i segni scambiati
+
+Se in un punto, o una zona di spazio, $R^i_{klm} = 0$, allora $\Delta A_k = 0$: il trasporto parallelo lungo una curva chiusa lascia il vettore inalterato, e la zona di spazio si dice \bfit{piatta}.
+
+Questo accade in uno spazio Euclideo, come anche in qualunque (zona di) spazio in cui $g_{ij}$ sia costante, perchè le connessioni affini sono nulle e così pure il tensore di curvatura; e poichè un tensore uguale a
+zero in un sistema di coordinate rimane nullo in qualunque sistema di coordinate, allora $R^i_{klm} = 0$ in qualunque sistema di riferimento. Se invece $R^i_{klm} \neq 0$ il trasporto parallelo dipende dal percorso, e lo spazio (o la zona di spazio) si dice, per contrasto, curvo (da qui in nome di tensore di curvatura).

@@ -523,4 +523,318 @@ Vediamo ora in dettaglio le proprietà topologiche dei modelli cosmologici corri
 
     Posto $\tilde r = r/a$ abbiamo che ($\dd r = a \dd \tilde r$):
 
+    \todo{finire caso $k = +1$}
+
+    \item \textbf{Caso $k = -1$} (universo aperto):
+
+    \missing{caso $k = -1$}
+
 \end{enumerate}
+
+Chiudiamo il paragrafo facendo osservare che la metrica di R\&W, oltre che nel modo in cui l'abbiamo presentata sopra, cioè
+
+$$
+\dd s^2 = c^2 \dd t^2 - a^2(t) \left[ \dfrac{\dd r^2}{1-\frac{Kr^2}6} + r^2 (\dd \theta^2 + \sin^2 \theta \dd \varphi^2) \right]
+$$
+
+può essere scritta anche come:
+
+$$
+\dd s^2 = c^2 \dd t^2 - R^2(t) \left[ \dd \chi^2 + S^2_k(\chi) (\dd \theta^2 + \sin^2 \theta \dd \varphi^2) \right]
+$$
+
+con $R(t)$ fattore di scala e $S_k(\chi)$ funzione che dipende dal tipo di universo, definita come:
+
+$$
+S_k(\chi) = 
+\begin{cases}
+    \sin \chi & (k = +1)\\
+    \chi & (k = 0)\\
+    \sinh \chi & (k = -1)
+\end{cases}
+$$
+
+\begin{warningblock}[Forme equivalenti]
+    Al posto di $\chi$ si può trovare scritto $r$, per cui bisogna capire dal contesto quale delle due relazioni viene usata! Noi useremo generalmente la prima delle due forme.
+\end{warningblock}
+
+\subsubsection{Topologie più complesse}
+
+Nei tre casi visti sopra abbiamo analizzato le tre topologie più semplici: $\mathbf E^3$, $\mathbf S^3$ ed $\mathbf H^3$. Ma la Relatività Generale è in realtà una teoria locale, e la nostra assunzione di isotropia e omogeneità locali implica che lo spazio è localmente quello di $\mathbf E^3$, $\mathbf S^3$ ed $\mathbf H^3$.
+
+Sono però possibili topologie più complesse: se partiamo inizialmente in 2 dimensioni possiamo costruire un \bfit{toro 2D} ($\mathbf T^2$) partendo da una ruperficie rettangolare piana (euclidea); Si identificano in modo opportuno punti appartenenti al bordo del rettangolo e questo si può visualizzare immaginando di eseguire piegature ed incollaggi come mostrato qui sotto (ma la curvatura si mantiene nulla, mentre la ciambella qui sotto non ha curvatura nulla in E3!):
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/toro_2d.png}
+    \caption{Toro 2D}
+    \label{fig:toro_2d}
+\end{figure}
+\vspace{-1em}
+Immaginiamo ora un insetto che cammina sulla superficie del toro. L'insetto attraversa il confine superiore in 2 e rientra dal basso in 2', esce in 3 a destra e rientra in 3' a sinistra. Il toro è equivalente ad un rettangolo i cui bordi sono identificati a due a due. Pur essendo finita, la superficie non ha confini.
+
+\begin{center}
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/toro_2d_flat.png}
+\end{minipage}
+\hspace{1em}
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/toro_2d_ghosts.png}
+\end{minipage}
+\end{center}
+
+Un altro effetto tipico di questo tipo di topologia compatta è la presenza di fantasmi (ghosts), cioè di immagini multiple dello stesso oggetto S, che arrivano in O da varie direzioni. Poiché i cammini, e quindi i tempi di percorrenza, sono diversi, le varie immagini dello stesso oggetto ce lo mostrano in diversi momenti della sua evoluzione (quindi non è banale riconoscerlo!).
+
+L'analogo di $\mathbf T^2$ in 3D è il toro 3D, $\mathbf T^3$. Un osservatore posto al suo interno ha l'impressione di trovarsi in una stanza con pareti, soffitto e pavimento ricoperti di specchi che però non rovesciano l'immagine. Anche qui osserveremo, per ogni oggetto reale, i suoi fantasmi in tutte le direzioni.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.35\textwidth]{assets/toro_3d.png}
+\end{figure}
+
+Quanto detto vale per uno spazio Euclideo (2D o 3D), che può essere rappresentato, oltre che con una celletta a forma di parallelepipedo, anche con una a forma di prisma a base esagonale. Nel caso di uno spazio 3D euclideo ci sono 10 varietà euclidee compatte candidate a rappresentare il nostro universo, che apparentemente non presentano confini, come il toro 2D o 3D.
+
+\missing{varietà non euclidee compatte}
+
+\section{Legge di Hubble}
+
+Consideriamo un osservatore co-movente preso come origine, un punto caratterizzato dalle coordinate co-moventi $(r, \theta, \varphi)$ ed un raggio luminoso (il metodo più efficiente per scambiare informazioni) che li congiunge radialmente $(\dd \theta = \dd \varphi = 0)$. Sappiamo che per i fotoni $ds^2 = 0$.
+
+Dalla metrica di R\&W avremo:
+
+$$
+ds^2 = c^2 \dd t^2 - a^2(t) \dfrac{\dd r^2}{1-Kr'^2} \equiv 0
+$$
+
+Un segnale luminoso emesso dal punto (r, θ, φ) a t = 0 (nell'ipotesi che esista un istante iniziale dell'universo, come nel modello del Big Bang) giungerà a r = 0 (l'osservatore) all'istante t tale che (ricordiamo che, se dt è positivo, dr è negativo, cioè al trascorrere del tempo il raggio luminoso passa per punti via via a noi più vicini)
+
+$$
+\int_0^t \dfrac{c \dd t'}{a(t')} = \int_0^r \dfrac{\dd r'}{\sqrt{1-Kr'^2}}
+$$
+
+Vediamo il significato del termine a destra. Immaginiamo di misurare, ad un istante $t$ fissato, con una serie di regoli (immaginando di congelare l'espansione durante la misura) la distanza radiale tra l'origine e il punto di coordinate $(r, \theta, \varphi)$; dalla parte spaziale (dt ≡ 0) di R\&W avremo che questa distanza, detta \bfit{distanza propria} $d_{pr}$, sarà espressa da:
+
+$$
+d_{pr}(t) = \int_0^r \dfrac{a(t) \cdot \dd r}{\sqrt{1-Kr^2}} = a(t) \int_0^r \dfrac{\dd r'}{\sqrt{1-Kr'^2}} = a(t) \cdot f_k(r)
+$$
+
+dove, per quanto abbiamo già visto quando avevamo fatto le sostituzioni $r = \sin \chi$, $r = \chi$, $r = \sinh \chi$:
+
+$$
+f_k(r) = 
+\left\{\begin{array}{ll}
+    \arcsin r \approxeq r + r^3/6 + O(r^5) & (k = +1)\\
+    r & (k = 0)\\
+    \sinh r \approxeq r + r^3/6 + O(r^5) & (k = -1)
+\end{array}
+\right\}
+\approxeq r + k\dfrac{r^3}{6} + O(r^5)
+$$
+
+n realtà la $d_{pr}(t)$ non è direttamente misurabile. Il suo legame con $d_{pr}(t_0)$ ($t = t_0$ corrisponde all'epoca attuale)viene dal fatto che
+
+$$
+\begin{array}{lcl}
+    \dfrac{d_{pr}(t)}{a(t)} = \dfrac{d_{pr}(t_0)}{a(t_0)} = f_k(r) & \qquad & \text{essendo $r = cost$ nel tempo}\\[1.5em]
+    d_{pr}(t) = \dfrac{a(t)}{a_0} d_{pr}(t_0) & \qquad & (a_0 = a(t_0))
+\end{array}
+$$
+
+$d_{pr}(t)$ è quindi funzione del tempo tramite $a(t)$. La quantità $f_k(r)$, o anche $a_0 f_k(r)$, invariante nel tempo, viene
+chiamata anche distanza co-movente.
+
+Se deriviamo rispetto al tempo la relazione $d_{pr}(t) = a(t) \cdot f_k(r)$ otteniamo il tasso di variazione di $d_{pr}$ nel tempo,
+che dimensionalmente è una velocità, e che viene chiamata \bfit{velocità di recessione} $v_r$:
+
+$$
+v_r(t) \equiv \dfrac{\dd d_{pr}(t)}{\dd t} = \dot a(t) f_k(r) = \dfrac{\dot a(t)}{a(t)} d_{pr}(t) = H(t) d_{pr}(t)
+$$
+dunque:
+$$
+\boxed{v_r(t) = H(t) d_{pr}(t)}
+$$
+
+Questa relazione esprime la \bfit{legge di Hubble} e la quantità $H(t) = \dot a(t)/a(t)$ è detta \bfit{parametro di Hubble}.
+
+Se scriviamo questa relazione per il tempo attuale $t_0$ avremo $v_r(t_0) = H_0 d_{pr}(t_0)$, dove $H_0 \equiv H(t_0)$ è la cosiddetta costante di Hubble. Si usa parametrizzare l'incertezza sul suo valore sperimentale scrivendo $H_0 = 100 h \text{km s}^{-1} \text{Mpc}^{-1}$, con $0.5 \leq h \leq 1.0$. $H_0$ ha le dimensioni dell'inverso di un tempo, ed è approssimativamente $1/H_0 \approx 3 \cdot 10^{17} h^{-1} \text{s}$. Dopo decenni di dispute, il valore di $H_0$ sembra finalmente abbastanza definito; il valore fornito di recente dal Key Program a questo dedicato dallo Hubble Space Telescope è $H_0 = 72 \pm 8 \text{km s}^{-1} \text{Mpc}^{-1}$, mentre dal fondo a microonde e dalla struttura a grande scala dell'universo si ha, in ottimo accordo, $H_0 = 71 \pm 0.04 \text{km s}^{-1} \text{Mpc}^{-1}$.
+
+
+Sulla legge di Hubble va fatto un commento importante. Fissato $H_0$, se $d_{pr}$ cresce a sufficienza, $v_r$ può diventare maggiore della velocità della luce. La distanza propria alla quale $v_r = c$ viene detta \bfit{raggio di Hubble}, $R_H$, che viene quindi definito come:
+
+$$
+R_H(t) = \dfrac{c}{H(t)}
+$$
+
+e dipende dal tempo, così come $H$. Il fatto che, per $d_{pr} > R_H$, risulti $v_r > c$ può creare qualche sconcerto, ma questo non è in contrasto con la Relatività Ristretta perchè, rispetto agli osservatori co-moventi, la velocità di qualunque oggetto è, localmente, sempre minore di c. Nessuna informazione viaggia con $v > c$. È la distanza tra osservatori, lo spazio tra loro interposto, che cresce più rapidamente di c, ma questo non corrisponde ad una trasmissione di informazione. Inoltre, per misurare una velocità relativa ad un osservatore, devo poter spostare i due vettori velocità (dell'oggetto e dell'osservatore) nello stesso punto e fare la differenza; in uno spazio euclideo questo implica un trasporto parallelo il cui risultato, però, in uno spazio curvo, dipende dal percorso. In uno spazio curvo non ha quindi senso parlare di velocità relativa di oggetti che non si trovino nello stesso punto.
+
+Oltre alla costante (parametro) di Hubble è stato definito un altro parametro: il cosiddetto \bfit{parametro di decelerazione} $q$, così detto in quanto legato a $\ddot a$ che, in un universo senza costante cosmologica, è sempre negativo. Per definizione:
+
+$$
+q(t) \equiv - \dfrac{\ddot a(t) a(t)}{\dot a(t)^2}
+$$
+
+con il corrispondente valore $q_0$ relativo al tempo $t_0$. I due parametri $H_0$ e $q_0$ tornano utili nello sviluppo in serie di $a(t)$ in un intorno di $t = t_0$. Avremo:
+
+$$
+a(t) = a(t_0) + \dot a(t_0)(t - t_0) + \dfrac{1}{2} \ddot a(t_0)(t - t_0)^2 + \ldots = a(t_0)[1 + H_0(t - t_0) - \dfrac{1}{2} q_0 H_0^2 (t - t_0)^2 + \ldots]
+$$
+
+che ci sarà utile in seguito
+
+\section{Redshift Cosmologico}
+
+Abbiamo scritto la metrica di R\&W nella forma:
+
+$$
+\dd s^2 = c^2 \dd t^2 - a^2(t) \left[
+    \dd \chi^2 + S^2_k(\chi) (\dd \Omega^2)
+\right],
+\quad \text{con} \quad S_k(\chi) = 
+\left\{\begin{array}{ll}
+    \sin \chi & (k = +1)\\
+    \chi & (k = 0)\\
+    \sinh \chi & (k = -1)
+\end{array}
+\right\}
+$$
+
+In questo caso si dice che si usa il \textit{gauge sincrono}. È utile talvolta separare completamente il fattore di scala dal resto. Per fare questo si definisce il \textit{tempo conforme} $\eta$ in modo che $\dd \eta = c \dd t / a(t)$, e la metrica si può scrivere (\textit{gauge conforme}):
+
+$$
+\dd s^2 = a^2(\eta) \left[ \dd \eta^2 - \left( \dd \chi^2 + S^2_k(\chi) \dd \Omega^2 \right) \right]
+$$
+
+Se consideriamo il moto di un fotone che ci arriva con $\theta = \varphi = cost$ e per cui $\dd s^2 = 0$, sarà
+
+$$
+a^2(\eta) \left[ \dd \eta^2 - \dd \chi^2 \right] = 0
+$$
+
+cioè $\dd \eta = \pm \dd \chi$ che rappresenta il cono luce, con i raggi inclinati a 45°. Se $\eta = 0$ rappresenta l'inizio dell'universo, vedo che ci sono valori di $\chi$ tali che da essi non è arrivata ancora l'informazione: c'è un orizzonte delle particelle.
+
+Per un fotone che si muove verso l'osservatore ($\chi = 0$) sarà $\eta = \eta_0 - \chi$ con $\eta_0 = \text{η attuale}$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/particle_horizon.png}
+    \caption{Orizzonte delle particelle (a sinistra) e  (a destra)}
+    \label{fig:particle_horizon}
+\end{figure}
+
+Due segnali, emessi ai tempi $\eta_e$ e $\eta_e + \dd \eta_e$ da una sorgente co-movente a $\chi = \chi_e$, saranno ricevuti in $\chi = 0$ ai tempi $\eta_0$ ed $\eta_0 + \dd \eta_0$. 
+
+Poichè nel gauge conforme il moto dei fotoni è sempre inclinato di 45°, sarà $\dd \eta_e \equiv \dd \eta_0$ e quindi
+$$
+\dfrac{c \dd t_e}{a(t_e)} = \dfrac{c \dd t_0}{a(t_0)}
+$$
+
+Se $\dd t_e$ è il periodo di un'onda elettromagnetica di frequenza $\nu_e = 1/\dd t_e$, la frequenza osservata $\nu_0 = 1/\dd t_0$ sarà
+$$
+\nu_e = \dfrac{a_0}{a(t_e)} \nu_0
+$$
+cioè:
+$$
+\dfrac{\nu_e}{\nu_0} = \dfrac{a_0}{a(t_e)} \quad \rightarrow \quad \dfrac{\lambda_e}{\lambda_0} = \dfrac{a(t_e)}{a_0}
+$$
+
+La lunghezza d'onda subisce una \textit{dilatazione} pari a quella del fattore di scala. E' la variazione del fattore di scala dovuta all'espansione, e non la velocità relativa tra sorgente e ricevitore, che produce questo effetto, che quindi è improprio definire effetto Doppler. Per illustrare questo fatto supponiamo che in un ideale modello cosmologico un fotone venga emesso quando $a(t)$ è costante; poi subentra una fase di espansione da $a_e$ ad $a_0$, seguita da una nuova fase di $a = cost = a_0$, durante la quale il fotone viene ricevuto da un osservatore. Sorgente e osservatore \bfit{sono in quiete relativa} quando il fotone viene emesso e ricevuto, quindi non c'è effetto Doppler, ma il redshift cosmologico è presente e $\lambda_0/\lambda_e = a_0/a_e$!
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/redshift_cosmologico.png}
+    \caption{Redshift cosmologico}
+    \label{fig:redshift_cosmologico}
+\end{figure}
+
+Se definiamo il redshift $z$ come:
+
+$$
+z \equiv \dfrac{\lambda_0 - \lambda_e}{\lambda_e} = \dfrac{\lambda_0}{\lambda_e} - 1 = \dfrac{a_0}{a(t_e)} - 1
+$$
+
+otteniamo:
+
+$$
+\dfrac{\lambda_0}{\lambda_e} = 1 + z = \dfrac{a_0}{a(t_e)}
+\qquad \Rightarrow \qquad
+a(t) = \dfrac{a_0}{1-z}
+$$
+
+Questa relazione è anche utile per legare il redshift al fattore di scala.
+
+Anche se il redshift cosmologico non è dovuto all'effetto Doppler, localmente, al prim'ordine in $v/c$, il fenomeno può essere visto in questi termini. Infatti, dalla formula dell'effetto Doppler, si ha:
+
+$$
+\dfrac vc = \dfrac{\Delta\lambda}{\lambda} = \dfrac{\lambda_0 - \lambda_e}{\lambda_e} = \dfrac{\lambda_0}{\lambda_e} - 1 = \dfrac{a_0 - a(t_e)}{a(t_e)}
+$$
+
+ma $a(t_e) \simeq a_0 + H_0 a_0 (t_e - t_0) + O(\Delta t^2)$, quindi:
+
+$$
+v 
+\simeq
+c \dfrac{H_0 a_0 (t_e - t_0)}{a_0 + H_0 a_0 (t_e - t_0)}
+\simeq
+c H_0 (t_0 - t_e)[1 + H_0 (t_0 - t_e)]
+\simeq
+c H_0 \Delta t
+$$
+
+Ma, se $\dd s^2 = 0$ e $\dd \theta = \dd \varphi = 0$, $c^2 \dd t^2 = a^2(t) \dd \chi^2$, e $c\Delta t = a_0 \Delta \chi = d_{pr}$ e quindi $v = H_0 d_{pr}$, cioè proprio la legge di Hubble! uindi, procedendo a ritroso a partire da questa, mi ritrovo la formula dell'effetto Doppler. Localmente, quindi, il redshift cosmologico si può interpretare come un effetto Doppler dovuto al moto differenziale tra due osservatori co-moventi vicini.
+
+Ma possiamo anche interpretarlo \textit{su grande scala} come un effetto Doppler \textit{integrato}, somma dei tanti effetti differenziali lungo il cammino del fotone dalla sorgente all'osservatore.
+
+\missing{fine del redshift cosmologico}
+
+\begin{observationblock}[Redshift cosmologico]
+Tanto più è alto il redshift (e dunque il soggetto appare più tendente al rosso), tanto più è grande la distanza tra sorgente e osservatore
+\end{observationblock}
+
+\section{Orizzonti}
+
+La difficoltà nel definire la topologia globale dell'universo risiede anche in un limite osservativo, non di tipo semplicemente strumentale, ma di natura fisica. Una domanda che ci si potrebbe porre è: Qual è la frazione dell'universo dai cui punti mi è arrivata finora informazione? Come abbiamo già più volte sottolineato, l'evidenza osservativa ci suggerisce che l'universo abbia avuto un'origine nel tempo (e gran parte dei modelli teorici supportano questa evidenza).
+
+Abbiamo visto che un segnale luminoso, emesso alla coordinata co-movente $r = r_H$ a $t = 0$ arriva all'osservatore ($r = 0$) al tempo $t$ secondo la relazione:
+
+$$
+\int_0^t \dfrac{c \dd t'}{a(t')} = \int_0^{r_H} \dfrac{\dd r}{\sqrt{1-Kr^2}}
+$$
+
+In base alla definizione di distanza propria avremo che
+
+$$
+\int_0^t \dfrac{c \dd t'}{a(t')} = \int_0^{r_H} \dfrac{\dd r}{\sqrt{1-Kr^2}} = f_k(r_H) \equiv \dfrac{d_{pr}(t, r_H)}{a(t)}
+$$
+
+La quantità
+
+$$
+d_H(t) \equiv d_{pr}(t, r_H) = a(t) \int_0^t \dfrac{c \dd t'}{a(t')}
+$$
+
+rappresenta la distanza propria massima dalla quale, al tempo t, abbiamo ricevuto segnali luminosi. Se $d_H (t)$ è finito, esiste una parte dell'universo dalla quale non ci sono ancora giunti segnali luminosi ed esiste quello che si chiama \bfit{orizzonte delle particelle} (PH).
+
+Il fatto che $d_H (t)$ sia finito dipende dal comportamento di $a(t)$. Per modelli ragionevoli vedremo che $d_H (t) \propto t$ ed è quindi finito. Per modelli cosmologici senza singolarità iniziale (come il modello dello Stato Stazionario) il limite inferore di integrazione va posto non a $0$ ma a $-\infty$.
+
+Se guardiamo invece avanti, possiamo chiederci: Da quale distanza potremmo in futuro ricevere segnali che partono oggi? La risposta si ottiene integrando tra $t$ e $\infty$ (o $t = t_{max}$ se c'è ricollasso) anzichè tra $0$ e $t$.
+
+$$
+d_E(t) = e^{Ht} \cdot \int_t^\infty \dfrac{c \dd t'}{a(t')}
+$$
+
+Se l'integrale diverge basta avere pazienza per vedere un qualunque evento; altrimenti ci sono distanze dalle quali non riceveremo mai informazione. In questo caso si ha un \bfit{orizzonte degli eventi} (EH). Poichè questo accada occorre che $a(t)$ cresca più rapidamente di $t$. Ad esempio se $a(t) \propto e^{Ht}$, con $H = cost$, avremo:
+
+$$
+d_E(t) = e^{Ht} \cdot \int_t^\infty \dfrac{c \dd t'}{e^{Ht'}} = c e^{Ht} \left[
+    \dfrac{1}{H} e^{-Ht}
+\right]_t^\infty = c e^{Ht} \cdot \dfrac{e^{-Ht}}{H} = \dfrac{c}{H} = cost
+$$
+
+\missing{fine del paragrafo su orizzonti}
+
+\begin{observationblock}[Orizzonte degli eventi]
+    A causa dell'espansione accelerata dell'universo, la nostra visione del cosmo si ridurrà progressivamente nel tempo, isolandoci sempre più dal resto dell'universo osservabile.
+\end{observationblock}
+
