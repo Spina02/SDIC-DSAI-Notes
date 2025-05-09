@@ -39,8 +39,8 @@
     <tr>
       <td>Global and Multi-Objective Optimisation</td>
       <td><strong><span style="color: red;">[TODO]</span></strong></td>
-      <td>Introduction to Galaxies and Astrophysics</td>
-      <td><strong><span style="color: red;">[TODO]</span></strong></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Galaxies%20and%20Astrophysics/main.pdf">Introduction to Galaxies and Astrophysics</td>
+      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
   </tbody>
 </table>
