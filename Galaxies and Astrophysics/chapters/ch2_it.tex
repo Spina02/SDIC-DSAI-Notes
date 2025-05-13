@@ -1103,17 +1103,19 @@ $$
 Per risolvere l'integrale usiamo il Teorema di Stokes:
 
 \rule{\textwidth}{0.4pt}
-\begin{theorem}
-    \textbf{Teorema di Stokes}:
-    
-    La circuitazione di una curvatura $C_1$ in un campo vettoriale A è data dall'integrale del rotore di A lungo il perimetro della curva chiusa C:
+\begin{theorem}[Teorema di Stokes]
+    Sia $S$ una superficie orientata delimitata da una curva chiusa $C$ orientata positivamente. Per ogni campo vettoriale $\vec{A}$ di classe $C^1$ definito su $S$, vale la relazione:
+    vspace{0.4em}
     $$
-    \oint_{C_1} A \cdot dl = \int_S \nabla \times A \cdot dS
+    \oint_{C} \vec{A} \cdot d\vec{l} = \int_{S} (\nabla \times \vec{A}) \cdot d\vec{S}
     $$
+    dove $d\vec{l}$ è l'elemento di linea lungo $C$ e $d\vec{S}$ è l'elemento di superficie orientato su $S$.
+
+    \vspace{-0.6em}
     \rule{\textwidth}{0.4pt}
 \end{theorem}
 
-Applicando il teorema di Stokes all'integrale precedente otteniamo:
+Nella forma tensoriale, l'integrale di linea di un vettore $A_i$ lungo una curva chiusa si scrive come:
 
 $$
 \oint
@@ -1124,7 +1126,7 @@ A_idu^i = \dfrac 12 \int_{Superficie}
 df^{lm}
 $$
 
-dove $df^{lm}$ è un tensore che corrisponde alla proiezione dell'elemento di area della superficie sui piani coordinati. Nel nostro caso $A_m du^m \rightarrow \Gamma_{km}^i A_i du^m$, per cui:
+dove $df^{lm}$ è un tensore che corrisponde alla proiezione dell'elemento di area della superficie sui piani coordinati. Nel nostro caso $A_i du^i \rightarrow \Gamma_{km}^i A_i du^m$, per cui:
 
 $$
 \Delta A_k = \dfrac 12 \int_{Superficie}
@@ -1150,13 +1152,6 @@ $$
 
 Allora:
 
-
-% $$
-% DA_i = dA_i - \int A_i = \dfrac{\partial A_i}{\partial u}
-% $$
-
-** here missing something **
-
 $$
 \begin{array}{rcl}
 \Delta A_k & = & \dfrac 12 \Delta f^{lm} \left[
@@ -1169,14 +1164,242 @@ $$
 $$
 
 dove il secondo passaggio, in cui si è esplicitato $A_i$, è stato ottenuto scambiando tra loro gli indici muti $i$ ed $n$ nei termini con i prodotti delle connessioni affini. La quantità in parentesi graffa è un tensore, poichè lo sono $A_i$, $\Delta f^{lm}$ e $\Delta A_k$ (differenza di due vettori applicati allo stesso punto). Ad essa si da il nome di \textbf{tensore di Riemann - Christoffel} o \textbf{tensore di curvatura}:
-
+\vspace{0.4em}
 $$
-R^i_{klm} = \dfrac{\partial \Gamma^i_{km}}{\partial u^l} - \dfrac{\partial \Gamma^i_{kl}}{\partial u^m} + \Gamma^n_{km} \Gamma^i_{nl} - \Gamma^n_{kl} \Gamma^i_{nm}
+\boxed{R^i_{klm} = \dfrac{\partial \Gamma^i_{km}}{\partial u^l} - \dfrac{\partial \Gamma^i_{kl}}{\partial u^m} + \Gamma^n_{km} \Gamma^i_{nl} - \Gamma^n_{kl} \Gamma^i_{nm}}
 $$
 
-\underline{\textbf{Nota bene}}: talvolta lo si trova definito con i segni scambiati
+\begin{warningblock}[Tensore di Riemann]
+    Nella letteratura il tensore di Riemann può essere definito con i segni scambiati rispetto alla definizione qui presentata (il che non cambia le sue proprietà, ma può essere fonte di confusione).
+\end{warningblock}
 
 Se in un punto, o una zona di spazio, $R^i_{klm} = 0$, allora $\Delta A_k = 0$: il trasporto parallelo lungo una curva chiusa lascia il vettore inalterato, e la zona di spazio si dice \bfit{piatta}.
 
 Questo accade in uno spazio Euclideo, come anche in qualunque (zona di) spazio in cui $g_{ij}$ sia costante, perchè le connessioni affini sono nulle e così pure il tensore di curvatura; e poichè un tensore uguale a
 zero in un sistema di coordinate rimane nullo in qualunque sistema di coordinate, allora $R^i_{klm} = 0$ in qualunque sistema di riferimento. Se invece $R^i_{klm} \neq 0$ il trasporto parallelo dipende dal percorso, e lo spazio (o la zona di spazio) si dice, per contrasto, curvo (da qui in nome di tensore di curvatura).
+
+\subsection{Proprietà del tensore di curvatura}
+
+Si può dimostrare che $R^i_{klm}$ è l'unico tensore che può essere costruito dal tensore metrico e dalle sue derivate prime e seconde, e che è lineare nelle derivate seconde e quadratico nelle derivate prime. Del tensore metrico si può scrivere la forma totalmente covariante $R_{jklm} = g_{ji}R^i_{klm}$.
+
+Consideriamo il tensore $R^i_{klm}$ come scritto sopra, e mettiamoci nel sistema localmente euclideo in cui, nel punto $u^i$, risulta $\partial g_{ij}/\partial u^k = 0$. Allora le connessioni affini (simboli di Christoffel) sono nulle, e le derivate covarianti si riducono a semplici derivate parziali. In questo sistema:
+\vspace{0.4em}
+$$
+R^i_{klm;j} = \dfrac{\partial R^i_{klm}}{\partial u^j} = \dfrac{\partial^2 \Gamma^i_{km}}{\partial u^j \partial u^l} - \dfrac{\partial^2 \Gamma^i_{kl}}{\partial u^j \partial u^m}
+$$
+
+si annullano in $u^i$ le connessioni affini, ma non necessaraimente le loro derivate.
+
+Permutando ciclicamente gli indici $l, m$ e $j$ otteniamo:
+\vspace{0.4em}
+$$
+R^i_{kmj;l} = \dfrac{\partial^2 \Gamma^i_{kj}}{\partial u^l \partial u^m} - \dfrac{\partial^2 \Gamma^i_{km}}{\partial u^l \partial u^j}
+\qquad \qquad
+R^i_{kjl;m} = \dfrac{\partial^2 \Gamma^i_{kl}}{\partial u^m \partial u^j} - \dfrac{\partial^2 \Gamma^i_{kj}}{\partial u^m \partial u^l}
+$$
+
+Sommando le tre relazioni, è facile vedere che si ottiene:
+\vspace{0.4em}
+$$
+\boxed{R^i_{klm;j} + R^i_{kmj;l} + R^i_{kjl;m} = 0}
+$$
+
+Questa è detta \bfit{identità di Bianchi}. Ricordiamo che, anche se l'abbiamo ricavata nel sistema localmente euclideo, essendo una relazione tensoriale, essa vale in tutti i sistemi di riferimento.
+
+Possiamo anche abbassare l'indice controvariante con il tensore metrico e otteniamo:
+\vspace{0.3em}
+$$
+R_{ijkl;m} + R_{ijml;k} + R_{ijlk;m} = 0
+$$
+
+\newpage
+
+Vediamo le proprietà del tensore di Riemann nella versione completamente covariante $R_{jklm} = g_{ji}R^i_{klm}$:
+
+\begin{itemize}
+    \item \textbf{Simmetria}:
+    $$
+    R_{jklm} = R_{lmjk}
+    $$
+    \item \textbf{Antisimmetria}:
+    $$
+    R_{jklm} = -R_{kjlm} = -R_{jkml} = R_{kjml}
+    $$
+    \item \textbf{Ciclicità}:
+    $$
+    R_{jklm} + R_{klmj} + R_{lmjk} = 0
+    $$
+\end{itemize}
+
+Dal tensore di Riemann, per contrazione, si può ricavare un tensore di rango 2, chiamato \bfit{tensore di Ricci}, definito come:
+$$ \boxed{R_{km} = R^i_{kim}} $$
+
+Per le proprietà di antisimmetria del tensore di Riemann, contraendo $i$ ed $m$ in $R^i_{klm}$ otteniamo nuovamente il tensore di Ricci, ma con un segno meno:
+$$ R^i_{kli} = -R^i_{kil} = - R_{kl}$$
+
+Il tensore di Ricci è \bfit{simmetrico}:
+\vspace{0.3em}
+$$
+R_{mk} = R^i_{mik} = g^{ir}R_{rmik} = g^{ir}R_{ikrm} = R^r_{krm} = R_{km}
+$$
+
+Esso è l'unico tensore simmetrico di rango 2 che si può ottenere da $R^i_{klm}$. Da esso si ricava lo \bfit{scalare di Ricci} o \bfit{scalare di curvatura}:
+$$
+R = g^{km}R_{km}
+$$
+
+Esso è il solo scalare che si può ottenere da $R^i_{klm}$.
+
+Le proprietà sopra evidenziate del tensore di Riemann fanno si che, in $N$ dimensioni, il numero delle sue componenti indipendenti sia:
+$$
+\mathcal N = \dfrac{N^2(N^2-1)}{12}
+$$
+
+
+
+\begin{itemize}
+\item Per $N = 1, \mathcal N = 0$ ed $R_{1111} \equiv 0$ sempre: una curva ha sempre curvatura (intrinseca) nulla, non ho informazioni su come la curva è "embedded" in uno spazio a 2 o più dimensioni. Ciò si traduce nel fatto che non posso capire su quale spazio è adagiata la mia curva, e quindi non posso parlare di curvatura.
+
+\item Per $N = 2, \mathcal N = 1$. C'è un'unica componente indipendente, ad esempio $R_{1221}$:
+
+$$
+R_{11} = R^l_{1l1} = g^{il} R_{i1l1} = \underbrace{g^{11}R_{1111}}_{=\,0} + \underbrace{g^{11}R_{1121}}_{=\,0} + \underbrace{g^{21}R_{2111}}_{=\,0} + g^{22}R_{2121} = g^{22}R_{1212}
+$$
+
+Dove, per antisimmetria, $R_{ijkl} = - R_{jikl} = - R_{ijlk}$, dunque $R_{1111} = - R_{1111} = 0$, e lo stesso per $R_{1121}$ e $R_{2111}$. Analogamente otteniamo:
+$$
+R_{12} = R_{21} = -g^{21}R_{1212}, \qquad R_{22} = g^{11}R_{1212}
+$$
+
+Ora che abbiamo tutte le componenti, possiamo calcolare lo scalare di Ricci:
+
+$$
+\begin{array}{rcl}
+R &=& g^{11}g^{22} R_{1212} - 2 g^{12}g^{21}R_{2121} + g^{22}g^{11}R_{1212}\\[0.3em]
+&=&
+2 R_{1221}\left(
+g^{11}g^{22} - g^{12}g^{21}
+\right)\\[0.3em]
+&=&
+2 R_{1221} \det g^{ij}
+\end{array}
+$$
+
+\item Per $N = 3, \mathcal N = 6$.  tante quante sono le componenti del tensore di Ricci (simmetrico). Quindi per $N = 3$ basta conoscere $R_{km}$ per descrivere la curvatura dello spazio.
+
+\item Per $N = 4, \mathcal N = 20$, mentre $R_{km}$ ha 10 componenti soltanto. È necessario ricorrere al tensore $R^i_{klm}$ completo (a parte situazioni di particolare simmetria, e vedremo che così sarà nel caso dell'universo isotropo ed omogeneo).
+\end{itemize}
+
+Dall'identità di Bianchi, nella forma covariante, sfruttando le proprietà di antisimmetria del tensore di Riemann, si ha:
+$$
+R_{iklm;j} - R_{kimj;l} - R_{iklj;m} = 0
+$$
+moltiplichiamo per $g^{il}g^{km}$ e otteniamo:
+\vspace{0.3em}
+$$
+g^{km}R^l_{klm;j} - g^{il} R^m_{imj;l} - g^{km}R^l_{klj;m} = 0
+$$
+cioè:
+$$
+g^{km}R_{km;j} - g^{il} R_{ij;l} - g^{km}R_{kj;m} = 0
+$$
+da cui:
+$$
+R_{;j} - R^l_{j;l} - R^m_{j;m} = R_{;j} -  2 R^l_{j;l} = 0
+$$
+dalla quale si ha:
+$$
+R^l_{j;l} = \dfrac{1}{2} R_{;j} = \dfrac{1}{2} \dfrac{\partial R}{\partial u^j}
+$$
+
+dove l'ultimo passaggio è dovuto al fatto che $R$ è uno scalare, non dipende quindi dal sistema di riferimento usato, e la sua derivata covariante coincide con la semplice derivata parziale. La quantità $R^l_{j;l}$ rappresenta la divergenza (covariante) del tensore di Ricci. Consideriamo ora il tensore misto:
+\vspace{0.4em}
+$$
+R^l_j - \dfrac 12 \delta^l_j R
+$$
+
+La sua divergenza sarà (per la regola della derivazione di un prodotto ed essendo $\delta^l_{j;l} = 0$):
+\vspace{0.4em}
+$$
+R^l_{j;l} - \dfrac 12 \delta_j^l \dfrac{\partial R}{\partial u^l} = R^l_{j;l} - \dfrac 12 \dfrac{\partial R}{\partial u^j} = 0
+$$
+
+per quanto visto poco sopra. Il tensore in questione ha quindi divergenza (covariante) nulla. Se passiamo alle componenti covarianti otteniamo:
+\vspace{0.4em}
+$$
+g_{il}R^l_j - \dfrac 1 2 g_{il}\delta^l_j R = R_{ij} - \dfrac 1  g_{ij} R \equiv G_{ij}
+$$
+dove $G_{ij}$ è detto \bfit{tensore di Einstein}. Questo tensore ha importantissime proprietà: è \textit{simmetrico}, ha \textit{divergenza nulla} e, derivando dal tensore di Riemann, contiene termini \textit{lineari nelle derivate seconde} della metrica e \textit{quadratici nelle sue derivate prime}.
+
+%! Non nel programma (?)
+
+% \section{Il Theorema Egregium}
+
+% In 2 dimensioni il \bfit{Theorema Egregium} di Gauss afferma che la curvatura di Gauss $K$ si può ricavare a partire dal tensor metrico; in particolare, si ha che $K = R_{1212}/g$.
+
+% Diamo qui una giustificazione del Theorema Egregium. Abbiamo visto che, localmente, in un intorno del punto $P$, un elemento di superficie si può scrivere nella forma
+% \vspace{0.4em}
+% $$
+% z = f (x, y) = \dfrac{x^2}{2\rho_1} + \dfrac{y^2}{2\rho_2}
+% $$
+% che, messo nella forma $x(u, v)$, si può esprimere come $(x \equiv u, y \equiv v)$:
+% \vspace{0.4em}
+% $$
+% \bar x = \left(
+%     u, v, \dfrac{u^2}{2\rho_1} + \dfrac{v^2}{2\rho_2},
+% \right)
+% \qquad \quad
+% \bar x_u = \left(
+%     1, 0, \dfrac{u}{\rho_1},
+% \right)
+% \qquad \quad
+% \bar x_v = \left(
+%     0, 1, \dfrac{v}{\rho_2},
+% \right)
+% $$
+% Otteniamo:
+% $$
+% E = \bar x_u \cdot \bar x_u = 1 + \dfrac{u^2}{\rho_1^2}
+% \qquad
+% F = \bar x_u \cdot \bar x_v = \dfrac{uv}{\rho_1 \rho_2}
+% \qquad
+% G = \bar x_v \cdot \bar x_v = 1 + \dfrac{v^2}{\rho_2^2}
+% $$
+% Sostituendo nella prima forma metrica:
+% $$
+% ds^2 = \left(1 + \dfrac{u^2}{\rho_1^2}\right) du^2 + 2 \dfrac{uv}{\rho_1 \rho_2} du dv + \left(1 + \dfrac{v^2}{\rho_2^2}\right) dv^2
+% $$
+% otteniamo:
+% $$
+% g_{ij} = \begin{pmatrix}
+%     1 + \frac{u^2}{\rho_1^2} & \frac{uv}{\rho_1 \rho_2} \\
+%     \frac{uv}{\rho_1 \rho_2} & 1 + \frac{v^2}{\rho_2^2}
+% \end{pmatrix}
+% \qquad \to \qquad
+% g = \det g_{ij} = 1 + \frac{u^2}{\rho_1^2}+ \frac{v^2}{\rho_2^2}
+% $$
+% Notimao che, in $P$, $g_{ij} = \begin{pmatrix}
+%     1 & 0 \\
+%     0 & 1
+% \end{pmatrix}$ e $g_{ij;k} = 0$. Ad essere non nulle sono le derivate seconde:
+% \vspace{0.4em}
+% $$
+% g^{ij} = \dfrac 1g
+% \begin{pmatrix}
+%     1 + \frac{v^2}{\rho_2^2} & -\frac{uv}{\rho_1 \rho_2} \\
+%     -\frac{uv}{\rho_1 \rho_2} & 1 + \frac{u^2}{\rho_1^2}
+% \end{pmatrix}
+% \qquad \qquad
+% K|_P = \dfrac{R_{1212}|_P}{g|_P}
+% $$
+% Calcoliamo ora $R_{1212}$ in $P$, considerando che $g_{12} = 0$ e $g_{11} = 1$:
+% \vspace{0.4em}
+% $$
+% R_{1212} = g_{1k}R^k_{212} = g_{11}R^1_{212} + g_{12}R^2_{212} = R^1_{212}|_P
+% $$
+
+% ma le $\Gamma$ contengono le $g_{ij,k}$ che in $P$ sono nulle e rimane:
+% \vspace{0.4em}
+% $$
+% R^1_{212} = \dfrac{\partial \Gamma^1_{22}}{\partial u}\bigg|_P - \dfrac{\partial \Gamma^1_{21}}{\partial v}\bigg|_P
+% $$

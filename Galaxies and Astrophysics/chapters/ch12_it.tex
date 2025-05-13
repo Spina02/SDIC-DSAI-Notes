@@ -1,4 +1,200 @@
+\chapter{Modelli cosmologici (Lecture: 13/05/2025)}
+\dots
+% take a look at:
+% https://people.smp.uq.edu.au/TamaraDavis/scienceimages/Spacetime_diagrams.pdf
 
+\section{Equazioni di Friedmann}
+
+Possiamo, a questo punto, ricavare le equazioni che regolano il comportamento del fattore di scala $a(t)$ in un universo con la metrica di Robertson-Walker e con un tensore energia-impulso proprio di un fluido perfetto.
+
+Partiamo con lo scrivere il tensor metrico; le coordinate sono $(x^0, x^1, x^2, x^3) = (ct, r, \theta, \phi)$:
+\small
+$$
+g_{\alpha \beta} = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & -\frac{a^2}{1-Kr^2} & 0 & 0 \\
+    0 & 0 & -a^2 r^2 & 0 \\
+    0 & 0 & 0 & -a^2 r^2 \sin^2 \theta
+\end{pmatrix},
+\quad \ \ 
+\ ^4g = - \frac{a^6r^4\sin^2\theta}{1-Kr^2},
+\quad \ \ 
+g^{\alpha \beta} = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & -\frac{1-Kr^2}{a^2} & 0 & 0 \\
+    0 & 0 & -\frac{1}{a^2 r^2} & 0 \\
+    0 & 0 & 0 & -\frac{1}{a^2 r^2 \sin^2 \theta}
+\end{pmatrix}
+$$
+\normalsize
+Passiamo poi a calcolare le connessioni affni. Molte di queste sono nulle; quelle diverse da zero sono le seguenti:
+
+$$
+\Gamma_{ij}^0 = \dfrac{\dot a}{a} \dfrac{g_{ij}}{c}
+$$
+
+$$
+\Gamma_{0j}^i = \dfrac{\dot a}{a} \dfrac {\delta^i_j}{c}
+$$
+
+con i, j = 1, 2, 3, mentre i termini del tipo $\Gamma^i_{jk}$ sono gli stessi già calcolati per definire la metrica di R\&W (i fattori $-1$ presenti in $g_{ij}$ e $g^{ij}$ si elidono): basta sostituire, al posto della funzione $f (r)$ incognita, l'espressione: $\dfrac{1}{1-kr^2}$ ad esempio: $\Gamma^1_{11} = \dfrac{kr}{1-kr^2}$.
+
+Occorre poi passare dalle $\Gamma^\alpha_{\beta \gamma}$ al tensore di Ricci $R_{\alpha\beta} = R^\gamma_{\alpha \gamma \beta}$; con un po' di pazienza risulta che le componenti diverse da zero sono:
+
+$$
+R_{00} = - \dfrac 3{c^2} \dfrac{\ddot a}{a}
+\qquad \qquad
+\underbrace{R_{ij} = \dfrac{g_{ij}}{c^2} \left[
+    \dfrac{\ddot a}{a} + \dfrac{\dot a^2}{a^2} + \dfrac{2kc^2}{a^2}
+\right]}_{\text{(3 componenti $\not = 0$: $R_{11}, R_{22}, R_{33}$)}}
+$$
+
+e lo scalare di Ricci è:
+
+$$
+R = g^{\alpha\beta} R_{\alpha\beta} = - \dfrac{6}{c^2} \left[ \dfrac{\ddot a}{a} + \dfrac{\dot a^2}{a^2} + \dfrac{K}{a^2} \right]
+$$
 
 \dots
+
+Per la componente $R_{00}$ si ha la \bfit{prima equazione di Friedmann}:
+
+$$
+\boxed{\dot a^2 + kc^2 = \dfrac{8\pi G}{3c^2} \rho a^2 + \dfrac13 a^2 c^2 \Lambda}
+$$
+
+\begin{observationblock}[Prima equazione di Friedmann]
+    Se leviamo la costante cosmologica dall'equazione, possiamo osservare che $\ddot a$ è sempre negativo. Tale costante è ciò che invece permette all'universo di espandersi in modo accelerato.
+\end{observationblock}
+
+Da una qualunque delle tre componenti $R_{11}, R_{22}, R_{33}$ si ottiene la \bfit{seconda equazione di Friedmann}:
+
+$$
+\boxed{\ddot a + \dfrac 1{2a}(\dot a^2 + kc^2) = \dfrac{4\pi G}{c^2}p\,a + \dfrac12 \Lambda c^2 a}
+$$
+
+e, sostituendo in questa la prima equazione di Friedmann, otteniamo:
+
+$$
+\ddot a = - \dfrac{4\pi G}{3} (\rho + \dfrac{3p}{c^2}) a + \dfrac13 \Lambda c^2 a
+$$
+
+Le due equazioni di Friedmann non sono indipendenti: se esplicitiamo $\rho$ dalla prima e derivando rispetto al tempo, otteniamo la \bfit{terza equazione di Friedmann}:
+
+$$
+\boxed{\dot \rho + 3\dfrac{\dot a}{a} \left( \rho + \dfrac{p}{c^2} \right) = 0}
+$$
+
+Ma una relazione di questo tipo (con lo spigolo L di uno spazio cubico al posto del fattore di scala a) l'avevamo già vista derivare dalla conservazione dell'entropia e dal 1º Principio della Termodinamica, parlando del tensore energia-impulso di un gas ideale, ed è quindi legata alla quadridivergenza di $T^{\alpha \beta}$ uguale a zero: $T^{\alpha \beta}_{;\beta} = 0$ (il termine con la costante cosmologica soddisfa automaticamente questa relazione, essendo $g^{\alpha \beta}_{;\beta} \equiv 0$ e non altera quindi con la sua presenza il risultato). La si può considerare come un'equazione di continuità.
+
+
+La terza equazione di Friedmann si può porre in forme analoghe del tipo $dQ = dU + dL = 0$, infatti:
+
+$$
+\dfrac{\dd}{\dd t} ( \rho c^2 a^3) + p \dfrac{\dd}{\dd t} (a^3) = 0
+\qquad \to \qquad
+\dd(\rho c^2 a^3) + p \dd(a^3) = 0
+$$
+
+\section{La densità dell'universo}
+
+Come si vede esaminando le equazioni di Friedmann, uno dei parametri fondamentali è la densità dell'Universo, per cui cercheremo di valutarne il valore. È utile definire anzitutto il parametro, detto \bfit{densità critica} $\rho_{cr}$, come:
+
+$$
+\rho_{cr} = \dfrac{3H^2}{8\pi G}
+$$
+
+che, dipendendo da $H$, dipende da $t$. Il valore attuale, usando $H_0 = h \cdot 100 km\, s^{-1}\,Mpc^{-1} = h \cdot 3.241 \cdot 10^{-18} s^{-1} = (h/3.086\cdot 10^{17})s^{-1}$ fornisce una $\rho_{cr} \simeq 1.879 \cdot 10^{-26} h^2 g\,cm^{-3}$.
+
+Si usa esprimere la densità $\rho$ in funzione di $\rho_{cr}$ usando il parametro di densità $\Omega$:
+
+$$
+\Omega = \dfrac{\rho}{\rho_{cr}}
+$$
+
+Poiché vi sono, come vedremo subito, vari contributi alla densità dell'Universo, avremo un valore particolare di $\Omega$ per ognuno di questi. Vediamo quindi il contributo alla densità totale delle varie componenti dell'universo.
+
+\subsubsection{Materia luminosa}
+
+Un'altra radiazone da tenere in considerazione è quella derivata dai neutrini, calcolabile dai fotoni. Si ha però che i neutrini hanno una massa, possiamo quindi calcolare la loro densità di energia come:
+
+La densità $\rho_{lum}$ della materia luminosa, essenzialmente stelle, si può ottenere dalla densità di luminosità $\rho_L$ dell'universo ($\rho_L \sim 2 \cdot 10^8 h L_{\odot} M pc^{-3}$), e assumendo un rapporto massa-luminosità $\langle M/L \rangle \sim 1 M_{\odot}/L_{\odot}$ ($L_{\odot}$ è la "luminosità solare"). Si ottiene $\Omega_{lum} \equiv \rho_{lum}/\rho_{cr}$:
+
+$$
+\Omega_{lum} h \simeq 0.002 - 0.006
+$$
+
+\dots
+
+\subsubsection{Nucleosintesi primordiale}
+
+\missing{rivedere registrazione -> slides}
+
+\subsubsection{Catastrofe barionica}
+
+Possiamo utilizzare gli ammassi di galassie come "oggetto astrofisico" per misurare il rapporto $\Omega_b/\Omega_M$.
+
+Possiamo calcolare la "quantità di massa visibile" (stelle, gas) come:
+
+$$
+\Omega_b/\Omega_M \ge 0.006\, h^{-3/2} + 0.02 \to \Omega_{M} \le \dfrac{0.002 h^{-2}}{0.006 h^{-3/2} + 0.02} \le 0.33
+$$
+
+se assumiamo $h \sim 0.7$. Il termine catastrofe barionica risale all'inizio degli anni novanta, quando si riteneva che $\Omega_M \simeq 1$; la catastrofe era rappresentata dall'impossibilità di avere un valore di $\Omega_M$ prossimo all'unità.
+
+\subsubsection{Materia oscura}
+
+Curve di rotazione delle galassie -> misurare la velocità con cui ruotano gli oggetti nella galassia man mano che ci si allontana dal centro. Applicando la fisica newtoniana, considerando solo la materia visibile, si ottiene che la velocità di rotazione dovrebbe diminuire al crescere della distanza dal centro, mentre invece si mantiene costante.
+
+Sempre più evidenze sperimentali indicano che la materia oscura è presente nell'universo.
+
+Un'altra evidenza sperimentale è il "lensing": Possiamo ricostruire la massa dell'oggetto che causa il lensing osservando la deformazione che l'oggetto provoca sulla luce che lo attraversa. Quello che possiamo notare vedendo alcuni esempi (e.g. "bullet cluster") è che è presente una sfasatura tra la massa dei due oggetti.
+
+\todo{risistemare quanto riportato sopra}
+
+Tutte queste evidenze ci portano a concludere che nel nostro universo è presente una componente di materia oscura, con le seguenti caratteristiche:
+
+\begin{itemize}
+    \item elettricamente neutra
+    \item incolore (neutral color change)
+    \item interazioni deboli (no collisioni, no pressione)
+    \item stabile (si è originata agli albori dell'universo)
+    \item velocità trascurabile (cold)
+\end{itemize}
+
+Le teorie più accreditate per la materia oscura prevedono che essa componga circa il 25\% della densità totale dell'universo.
+
+Abbiamo:
+
+\begin{itemize}
+    \item cold dark matter (CDM):
+        particelle non interagenti, non relativistiche, con massa non troppo elevata
+    \item warm dark matter (WDM):
+        particelle non interagenti, non relativistiche, con massa elevata
+    \item hot dark matter (HDM):
+        particelle interagenti, relativistiche, con massa non troppo elevata
+\end{itemize}
+
+Lo scenario preferito al momento è quello della cold dark matter, in quanto la hot dark matter rallenta la formazione delle strutture, e la warm dark matter ha bisogno di una quantità di energia maggiore per formare strutture.
+
+\subsubsection{dark matter detection}
+
+Esperimenti diretti:
+
+La materia oscura interagisce con la materia ordinaria ...
+
+Esperimenti indiretti:
+
+Misurare 
+
+\dots
+
+Un tentativo di dimostrare l'esistenza della materia oscura è stato effettuato nel laboratorio del Gran Sasso, con l'esperimento "DAMA/LIBRA".
+
+L'idea è che la Terra, girando intorno al sole, dovrebbe passare periodi dell'anno in cui avrà una velocità relativa rispetto alla materia oscura maggiore, e quindi dovrebbe interagire di più con essa, ed altri in cui avrà una velocità minore, e quindi dovrebbe interagire di meno.
+
+Quindi, misurando il flusso di eventi in un laboratorio, dovremmo essere in grado di misurare l'interazione della materia oscura con la materia ordinaria.
+
+Lo scetticismo dei risultati ottenuti è che non è stato possibile riprodurli con esperimenti
+
 

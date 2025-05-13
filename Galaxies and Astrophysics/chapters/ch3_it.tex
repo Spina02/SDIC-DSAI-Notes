@@ -1,0 +1,94 @@
+\chapter{Relatività Generale}
+
+La relatività generale è una teoria fisica che descrive la gravità come una manifestazione della curvatura dello spazio-tempo causata dalla presenza di massa ed energia. Sviluppata da Albert Einstein tra il 1907 e il 1915, questa teoria rappresenta una generalizzazione della relatività speciale e della legge di gravitazione universale di Newton.
+
+A differenza della relatività speciale, che si occupa di sistemi di riferimento inerziali in assenza di gravità, la relatività generale estende questi concetti a sistemi di riferimento accelerati e include gli effetti gravitazionali. La teoria si basa sul principio di equivalenza, secondo il quale gli effetti della gravità sono localmente indistinguibili da quelli di un'accelerazione.
+
+La relatività generale ha avuto un impatto profondo sulla nostra comprensione dell'universo, permettendo di spiegare fenomeni come la precessione dell'orbita di Mercurio, la deflessione della luce da parte di corpi massivi e il redshift gravitazionale. La teoria ha anche portato alla predizione di oggetti esotici come i buchi neri e le onde gravitazionali, quest'ultime osservate per la prima volta nel 2015.
+
+\begin{tipsblock}[Convenzioni sugli indici]
+    Nel seguito useremo, per convenzione, gli indici greci $\alpha, \beta, \gamma, \dots$
+    se questi variano da 0 a 3, mentre useremo gli indici italici $i, j, k, \dots$ se questi variano da 1 a 3.
+    \end{tipsblock}
+
+\section{Lo spazio di Minkovski}
+
+Nella relatività speciale, la distanza infinitesima tra due eventi è data da:
+\vspace{0.4em}
+$$
+ds^2 = -c^2 dt^2 + (dx^2 + dy^2 + dz^2)
+$$
+
+Se definiamo $x^0 = ct; x^1 = x; x^2 = y; x^3 = z$, possiamo riscrivere l'espressione come:
+\vspace{0.4em}
+$$
+ds^2 = \eta_{\alpha \beta} dx^\alpha dx^\beta
+\qquad \text{con} \qquad
+\eta_{\alpha \beta} = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & -1 & 0 & 0 \\
+    0 & 0 & -1 & 0 \\
+    0 & 0 & 0 & -1
+\end{pmatrix}
+$$
+
+Abbiamo la metrica dello spazio di Minkoswki, che è "pseudo-euclideo", ma è comunque piatto: infatti gli $\eta_{\alpha \beta}$
+sono costanti e quindi i $\Gamma^i_{jk}$ e $R^i_{jkl}$ sono nulli.
+
+\begin{warningblock}[Attenzione ai segni]
+    In letteratura si trova anche la convenzione opposta. Anche $\eta_{\alpha \beta}$ è definito spesso con i segni opposti, cioè con
+    la segnatura $(-1, 1, 1, 1)$ invece di $(1, -1, -1, -1)$.
+\end{warningblock}
+
+Diciamo anche che l'intervallo $ds^2$ è:
+\begin{itemize}
+    \item di \textbf{tipo tempo} se $ds^2 > 0$ (corrispondente ad una traiettoria fisica con $v < c$)
+    \item di \textbf{tipo spazio} se $ds^2 < 0$
+    \item di \textbf{tipo luce} o \textbf{nulla} se $ds^2 = 0$ (corrispondente al moto di particelle, come i fotoni, con velocità $c$)
+\end{itemize}
+
+Se rappresento lo spazio-tempo (eliminando una delle coordinate spaziali) attorno ad un evento preso come origine, posso dividerlo in tre zone definite dal cono in \cref{fig:cono-luce}:
+
+\begin{center}
+\begin{minipage}{0.6\textwidth}
+\begin{itemize}
+    \item \textbf{Futuro}: tutti i punti con cui l'evento in O può interagire tramite corpi che seguono una traiettoria fisica, cioè la regione che può essere raggiunta da segnali emessi dall'origine.
+    \vspace{1em}
+    \item \textbf{Passato}: tutti i punti da cui l'evento in O può essere influenzato, cioè la regione da cui possono provenire segnali che raggiungono l'origine.
+    \vspace{1em}
+    \item \textbf{Altrove}: tutti i punti che non possono né influenzare né essere influenzati dall'evento in O, poiché richiederebbero segnali con velocità maggiore di c. Un osservatore in moto relativo può vedere O e un punto in questa regione come eventi simultanei.
+\end{itemize}
+\end{minipage}
+\hspace{1em}
+\begin{minipage}{0.3\textwidth}
+\vspace{-1.8em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/cono-luce.png}
+
+    \vspace{-1em}
+    \caption{Cono di luce}
+    \label{fig:cono-luce}
+\end{figure}
+\end{minipage}
+\end{center}
+
+Consideriamo ora un osservatore con un regolo (per misurare le distanze) e un orologio (per misurare i tempi). Consideriamo due eventi $A$ e $B$ che si verificano in tempi diversi ma nello stesso luogo ($dx = dy = dz = 0$). Si ha che tra $\dd s$ e $\dd t$ vale la relazione: $\dd s = c \dd t$.
+
+La distanza ds tra due medesimi eventi, per un osservatore per cui avvengono nello stesso punto, e per un altro osservatore per cui avvengono a distanza $\dd l$, sarà la stessa:
+
+$$
+\dd s = c \dd \tau^2 = c^2 \dd t^2 - |\dd \bar l^2|
+\qquad \to \qquad
+\dd \tau^2 = \dd t^2 \left(
+    1 - \dfrac 1{c^2} \dfrac{|\dd \bar l|}{\dd t} \cdot \dfrac{|\dd \bar l|}{\dd t}
+\right) = \dd t^2 \left(
+    1 - \dfrac {v^2}{c^2}
+\right)
+$$
+
+
+
+
+
+

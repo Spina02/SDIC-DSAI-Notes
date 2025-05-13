@@ -1,0 +1,72 @@
+\chapter{Transformers (13/05/2025)}
+
+Transformers are a type of neural network architecture that are particularly effective for natural language processing tasks. They are based on the \textit{attention mechanism}, which allows the model to focus on different parts of the input sequence.
+\vspace{-1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/attention.png}
+\end{figure}
+\vspace{-1em}
+Let's consider an initial set of vectors $x_1, \ldots, x_n$, at each step of the attention mechanism, we want to compute a new set of vectors $y_1, \ldots, y_n$ (in the same space) which are a function of the $x_i$'s. In this way, each new step creates another representation of the same input token.
+
+Let's see now how to realize this kind of architecture.
+
+A standard neural network layer $f[x]$, takes a $D \times 1$ input $x$ and applies a linear transformation followed by an activation function like a ReLU, so:
+$$
+f[x] = ReLU[\beta + \Omega x]
+$$
+where $\beta$ contains the biases, and $\Omega$ contains the weights.
+
+A self-attention block $\mathbf{sa}[\bullet]$ takes $N$ inputs $x_1, \ldots, x_N$, each of dimension $D \times 1$, and returns $N$ outputs, each of which is also of size $D \times 1$. In the context of NLP, each input represents a word or word fragment. First, a set of values are computed for each input:
+$$
+v_m = \beta_v + \Omega_v x_m
+$$
+where $\beta_v \in \mathbb{R}^{D \times 1}$ and $\Omega_v \in \mathbb{R}^{D \times D}$ represent biases and weights, respectively.
+
+Then the $n^{th}$ output $\mathbf{sa}_n[x_1, \ldots, x_N]$ is a weighted sum of all the values $v_1, \ldots, v_N$:
+\vspace{0.4em}
+$$
+\mathbf{sa}_n[x_1, \ldots, x_N] = \sum_{m=1}^{N} a[x_m, x_n] v_m
+$$
+The scalar weight $a[x_m, x_n]$ is the attention that the $n^{th}$ output pays to input $x_m$. The $N$ weights $a[\bullet, x_n]$ are non-negative and sum to one. Hence, self-attention can be thought of as routing the values in different proportions to create each output.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/self-attention-route.png}
+    \caption{The self-attention mechanism takes $N$ inputs $x_1, \ldots, x_N \in \mathbb{R}^D$ (here $N = 3$ and $D = 4$) and processes each separately to compute $N$ value vectors. The $n^{th}$ output $\mathbf{sa}_n[x_1, \ldots, x_N]$ ($\mathbf{sa}_n[x_\bullet]$ for short) is then computed as a weighted sum of the $N$ value vectors, where the weights are positive and sum to one. \cite{understanding}}
+\end{figure}
+
+\vspace{-1em}
+The value vectors $\beta_v + \Omega_v x_m$ are computed independently for each input $x_m$, and these vectors are combined linearly by the attention weights $a[x_m, x_n]$. However, the overall self-attention computation is nonlinear.
+
+This is an example of a \bfit{hypernetwork}, where one network branch computes the weights of another.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/self-attention.png}
+    \caption{Self-attention for N = 3 inputs $x_n$, each with dimension $D = 4$.}
+    \label{fig:self-attention}
+\end{figure}
+
+To compute the attention, we apply two more linear transformations to the inputs:
+\vspace{0.4em}
+$$
+q_n = \beta_q + \Omega_q x_n,
+\qquad \qquad
+k_m = \beta_k + \Omega_k x_m
+$$
+where $\{q_n\}$ and $\{k_m\}$ are termed queries and keys, respectively. Then we compute dot products between the queries and keys and pass the results through a softmax function:
+\vspace{0.4em}
+$$
+a[x_m, x_n] = \text{softmax}_m [k^\top_\bullet q_n] = \frac{\exp(k^\top_\bullet q_n)}{\sum_{m'} \exp(k^\top_{m'} q_n)}
+$$
+so for each $x_n$, they are positive and sum to one. This is known as \bfit{dot-product self-attention}.
+
+The dot product operation returns a measure of similarity between its inputs, so the weights $a[x_m, x_n]$ depend on the relative similarities between the $n^{th}$ query and all of the keys. The softmax function means that the key vectors “compete” with one another to contribute to the final result.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/dot-prod-self-att.png}
+    \caption{Computing attention weights: (a) Compute the query, key, and value vectors for each input. (b) Apply softmax to query-key dot products to form non-negative attentions that sum to one. (c) These route the value vectors via the sparse matrix from \cref{fig:self-attention}.}
+    \label{fig:dot-prod-self-att}
+\end{figure}
