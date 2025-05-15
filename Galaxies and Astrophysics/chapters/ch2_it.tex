@@ -1236,7 +1236,6 @@ $$ \boxed{R_{km} = R^i_{kim}} $$
 
 Per le proprietà di antisimmetria del tensore di Riemann, contraendo $i$ ed $m$ in $R^i_{klm}$ otteniamo nuovamente il tensore di Ricci, ma con un segno meno:
 $$ R^i_{kli} = -R^i_{kil} = - R_{kl}$$
-
 Il tensore di Ricci è \bfit{simmetrico}:
 \vspace{0.3em}
 $$
@@ -1254,8 +1253,6 @@ Le proprietà sopra evidenziate del tensore di Riemann fanno si che, in $N$ dime
 $$
 \mathcal N = \dfrac{N^2(N^2-1)}{12}
 $$
-
-
 
 \begin{itemize}
 \item Per $N = 1, \mathcal N = 0$ ed $R_{1111} \equiv 0$ sempre: una curva ha sempre curvatura (intrinseca) nulla, non ho informazioni su come la curva è "embedded" in uno spazio a 2 o più dimensioni. Ciò si traduce nel fatto che non posso capire su quale spazio è adagiata la mia curva, e quindi non posso parlare di curvatura.
@@ -1283,6 +1280,18 @@ g^{11}g^{22} - g^{12}g^{21}
 &=&
 2 R_{1221} \det g^{ij}
 \end{array}
+$$
+Ma $\qquad
+\det \begin{pmatrix}
+\frac{g_22}{g} & - \frac{g_{12}}{g} \\
+- \frac{g_{21}}{g} & \frac{g_{11}}{g}
+\end{pmatrix} = (g_{11}g_{22} - g_{12}g_{21})/g^2 = \frac 1g
+$, dunque:
+
+$$
+\underbrace{R = 2 \dfrac {R_{1221}}g}_{\text{tensore di curvatura}}
+\qquad \to \qquad
+\boxed{\dfrac R2 = \dfrac {R_{1221}}g = K_{Gauss}}
 $$
 
 \item Per $N = 3, \mathcal N = 6$.  tante quante sono le componenti del tensore di Ricci (simmetrico). Quindi per $N = 3$ basta conoscere $R_{km}$ per descrivere la curvatura dello spazio.
@@ -1330,76 +1339,3 @@ $$
 g_{il}R^l_j - \dfrac 1 2 g_{il}\delta^l_j R = R_{ij} - \dfrac 1  g_{ij} R \equiv G_{ij}
 $$
 dove $G_{ij}$ è detto \bfit{tensore di Einstein}. Questo tensore ha importantissime proprietà: è \textit{simmetrico}, ha \textit{divergenza nulla} e, derivando dal tensore di Riemann, contiene termini \textit{lineari nelle derivate seconde} della metrica e \textit{quadratici nelle sue derivate prime}.
-
-%! Non nel programma (?)
-
-% \section{Il Theorema Egregium}
-
-% In 2 dimensioni il \bfit{Theorema Egregium} di Gauss afferma che la curvatura di Gauss $K$ si può ricavare a partire dal tensor metrico; in particolare, si ha che $K = R_{1212}/g$.
-
-% Diamo qui una giustificazione del Theorema Egregium. Abbiamo visto che, localmente, in un intorno del punto $P$, un elemento di superficie si può scrivere nella forma
-% \vspace{0.4em}
-% $$
-% z = f (x, y) = \dfrac{x^2}{2\rho_1} + \dfrac{y^2}{2\rho_2}
-% $$
-% che, messo nella forma $x(u, v)$, si può esprimere come $(x \equiv u, y \equiv v)$:
-% \vspace{0.4em}
-% $$
-% \bar x = \left(
-%     u, v, \dfrac{u^2}{2\rho_1} + \dfrac{v^2}{2\rho_2},
-% \right)
-% \qquad \quad
-% \bar x_u = \left(
-%     1, 0, \dfrac{u}{\rho_1},
-% \right)
-% \qquad \quad
-% \bar x_v = \left(
-%     0, 1, \dfrac{v}{\rho_2},
-% \right)
-% $$
-% Otteniamo:
-% $$
-% E = \bar x_u \cdot \bar x_u = 1 + \dfrac{u^2}{\rho_1^2}
-% \qquad
-% F = \bar x_u \cdot \bar x_v = \dfrac{uv}{\rho_1 \rho_2}
-% \qquad
-% G = \bar x_v \cdot \bar x_v = 1 + \dfrac{v^2}{\rho_2^2}
-% $$
-% Sostituendo nella prima forma metrica:
-% $$
-% ds^2 = \left(1 + \dfrac{u^2}{\rho_1^2}\right) du^2 + 2 \dfrac{uv}{\rho_1 \rho_2} du dv + \left(1 + \dfrac{v^2}{\rho_2^2}\right) dv^2
-% $$
-% otteniamo:
-% $$
-% g_{ij} = \begin{pmatrix}
-%     1 + \frac{u^2}{\rho_1^2} & \frac{uv}{\rho_1 \rho_2} \\
-%     \frac{uv}{\rho_1 \rho_2} & 1 + \frac{v^2}{\rho_2^2}
-% \end{pmatrix}
-% \qquad \to \qquad
-% g = \det g_{ij} = 1 + \frac{u^2}{\rho_1^2}+ \frac{v^2}{\rho_2^2}
-% $$
-% Notimao che, in $P$, $g_{ij} = \begin{pmatrix}
-%     1 & 0 \\
-%     0 & 1
-% \end{pmatrix}$ e $g_{ij;k} = 0$. Ad essere non nulle sono le derivate seconde:
-% \vspace{0.4em}
-% $$
-% g^{ij} = \dfrac 1g
-% \begin{pmatrix}
-%     1 + \frac{v^2}{\rho_2^2} & -\frac{uv}{\rho_1 \rho_2} \\
-%     -\frac{uv}{\rho_1 \rho_2} & 1 + \frac{u^2}{\rho_1^2}
-% \end{pmatrix}
-% \qquad \qquad
-% K|_P = \dfrac{R_{1212}|_P}{g|_P}
-% $$
-% Calcoliamo ora $R_{1212}$ in $P$, considerando che $g_{12} = 0$ e $g_{11} = 1$:
-% \vspace{0.4em}
-% $$
-% R_{1212} = g_{1k}R^k_{212} = g_{11}R^1_{212} + g_{12}R^2_{212} = R^1_{212}|_P
-% $$
-
-% ma le $\Gamma$ contengono le $g_{ij,k}$ che in $P$ sono nulle e rimane:
-% \vspace{0.4em}
-% $$
-% R^1_{212} = \dfrac{\partial \Gamma^1_{22}}{\partial u}\bigg|_P - \dfrac{\partial \Gamma^1_{21}}{\partial v}\bigg|_P
-% $$

@@ -1,0 +1,29 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{tikz}
+\usetikzlibrary{tikzmark,arrows.meta,calc}
+
+% Definizione dei comandi per i tikzmark
+\newcommand{\tikzmarkin}[2][]{\tikz[overlay,remember picture,baseline=(#2.base)] \node[inner sep=0pt,#1] (#2) {$#2$};}
+\newcommand{\tikzmarkout}[2][]{\tikz[overlay,remember picture,baseline=(#2.base)] \node[inner sep=0pt,#1] (#2) {$#2$};}
+\newcommand{\DrawArrow}[3][]{
+    \begin{tikzpicture}[overlay,remember picture]
+        \draw[-stealth,thick,#1] ($(#2.south) + (0,-0.2)$) -- ($(#3.north) + (0,0.2)$);
+    \end{tikzpicture}
+}
+
+% Definizione per beta in grassetto
+\newcommand{\bfit}[1]{\textbf{\textit{#1}}}
+
+\begin{document}
+
+\noindent Sostituendo quest'ultimo risultato nella precedente relazione e raccogliendo $u^\beta$ abbiamo:
+$$u^\beta \left\{ \tikzmarkin{parte1}\frac{\partial(p+\rho c^2)}{\partial x^\beta}\tikzmarkout{parte1} - \frac{p+\rho c^2}{n} \frac{\partial n}{\partial x^\beta} - \frac{\partial p}{\partial x^\beta} \right\} = 0$$
+
+\noindent Osserviamo ora che:
+$$\frac{\partial}{\partial x^\beta}\left(\frac{p+\rho c^2}{n}\right) = \frac{1}{n^2}\left[\tikzmarkin{parte2}\frac{\partial(p+\rho c^2)}{\partial x^\beta}n - (p+\rho c^2)\frac{\partial n}{\partial x^\beta}\tikzmarkout{parte2}\right] = \frac{1}{n}\left[\frac{\partial(p+\rho c^2)}{\partial x^\beta} - \frac{p+\rho c^2}{n}\frac{\partial n}{\partial x^\beta}\right]$$
+
+\DrawArrow[blue,line width=1pt]{parte1}{parte2}
+
+\end{document} 

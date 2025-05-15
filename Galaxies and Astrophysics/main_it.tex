@@ -8,6 +8,8 @@
 \usepackage{../template/styles}
 \usepackage{../template/frames}
 \usepackage{../template/macros}
+\usepackage{tikz}
+\usetikzlibrary{tikzmark,arrows.meta,calc}
 
 %%%%%%%%%%%%%%
 % Title Page %
@@ -46,6 +48,14 @@
 }
 
 \addbibresource{./references.bib}
+
+\newcommand{\tikzmarkin}[2][]{\tikz[overlay,remember picture,baseline=(#2.base)] \node[inner sep=0pt,#1] (#2) {$#2$};}
+\newcommand{\tikzmarkout}[2][]{\tikz[overlay,remember picture,baseline=(#2.base)] \node[inner sep=0pt,#1] (#2) {$#2$};}
+\newcommand{\DrawArrow}[3][]{
+    \begin{tikzpicture}[overlay,remember picture]
+        \draw[-stealth,thick,#1] ($(#2.south) + (0,-0.2)$) -- ($(#3.north) + (0,0.2)$);
+    \end{tikzpicture}
+}
 
 \begin{document}
 
