@@ -485,72 +485,83 @@ $$
     
     \end{exampleblock}
     
-    Si ha come risultato che, nel sistema in cui il fluido è in quiete, l'entropia per particella (o, se preferiamo,
-    l'entropia per un certo numero $N$ di particelle contenute in un volume cubico $V$ di spigolo $L$, che può variare
-    mantenendo però sempre al suo interno lo stesso numero di particelle) è costante. Questo è legato al fatto che,
-    nel fluido ideale, non c'è scambio di energia per conduzione (o irraggiamento), né vi è dissipazione. Dal $1^{\circ}$
-    principio della termodinamica, nel sistema che segue il fluido, $dQ = dU + pdV$ e $U = \rho c^2 \cdot V$, per cui:
+    Si ha come risultato che, nel sistema in cui il fluido è in quiete, l'entropia per particella (o, se preferiamo, l'entropia per un certo numero $N$ di particelle contenute in un volume cubico $V$ di spigolo $L$, che può variare mantenendo però sempre al suo interno lo stesso numero di particelle) è costante. Questo è legato al fatto che, nel fluido ideale, non c'è scambio di energia per conduzione (o irraggiamento), né vi è dissipazione. Dal $1^{\circ}$ principio della termodinamica, nel sistema che segue il fluido, $dQ = dU + pdV$ e $U = \rho c^2 \cdot V$, per cui:
     \vspace{0.4em}
     $$
     dQ = \rho c^2 dV + Vd(\rho c^2) + pdV = (p + \rho c^2)dV + Vd(\rho c^2) = TdS
     $$
-    Poichè $dQ = 0 \rightarrow dS = 0$.
+    Poichè $dQ = 0 \rightarrow dS = 0$, cioè l'entropia totale (o per particella) si conserva durante l'espansione adiabatica del fluido ideale.
     
-    Se si scrive $p = w \rho c^2$ (con $w$ costante, anche se, più in generale, potrà dipendere dalla temperatura $w = w(T)$),
+    Se si scrive $p = w \rho c^2$ (con $w$ costante, anche se, più in generale, potrà dipendere dalla temperatura $w = w(T)$), si ottiene:
     $$
     (1 + w) \rho c^2 dV = - V d(\rho c^2)
     $$
-    e se $w = cost$, ho $d \rho / \rho = - (1 + w) dV / V$, cioè $\rho V^{1 + w} = cost$.
+    Dividendo entrambi i membri per $\rho c^2 V$ e integrando, si trova:
+    $$
+    \frac{d\rho}{\rho} = - (1 + w) \frac{dV}{V} \qquad \Rightarrow \qquad \rho V^{1 + w} = \text{costante}
+    $$
+    Questa relazione esprime come varia la densità di energia del fluido al variare del volume, a seconda del valore di $w$.
     
     Incontreremo tre casi interessanti in cosmologia:
     
     \begin{enumerate}
-        \item Per un gas non-relativistico $p \ll \rho_0 c^2$ ($\rho \approx \rho_0$) per cui $w \approx 0$ e quindi $\rho_0 V \approx \text{cost}$. Detto $L$ lo spigolo di un volume cubico $V = L^3$, abbiamo $\rho \propto 1/L^3$
+        \item Per un \textbf{gas non-relativistico} ($p \ll \rho_0 c^2$, quindi $\rho \approx \rho_0$), si ha $w \approx 0$ e quindi $\rho_0 V \approx \text{costante}$. Detto $L$ lo spigolo di un volume cubico $V = L^3$, si ottiene:
+        $$
+        \rho \propto \frac{1}{L^3}
+        $$
+        In questo caso, la densità di energia (che coincide praticamente con la densità di massa) diminuisce semplicemente perché il numero di particelle rimane costante mentre il volume aumenta. Questo è il comportamento tipico della materia ordinaria (polvere cosmica).
     
-        \item Per un gas di fotoni $\rho_{\text{rad}} \propto aT^4$ e $p = \frac{1}{3} \rho c^2$; $w = \frac{1}{3}$:
-        
-        $$T^4 V^{4/3} = \text{cost}
+        \item Per un \textbf{gas di fotoni} (radiazione), la densità di energia è legata alla temperatura dalla legge di Stefan-Boltzmann: $\rho_{\text{rad}} \propto aT^4$, e la pressione è $p = \frac{1}{3} \rho c^2$, quindi $w = \frac{1}{3}$:
+        $$
+        T^4 V^{4/3} = \text{costante}
         \quad\Rightarrow\quad
-        T \cdot V^{1/3} = \text{cost}
+        T \cdot V^{1/3} = \text{costante}
         \quad\Rightarrow\quad
         V \propto L^3
         \quad\Rightarrow\quad
-        T \propto \frac{1}{L}$$
+        T \propto \frac{1}{L}
+        $$
+        Quindi, se il volume aumenta, la temperatura diminuisce come l'inverso della lunghezza caratteristica del sistema.  
+        Inoltre:
+        $$
+        \rho_{\text{rad}} V^{4/3} = \text{costante}
+        \quad\Rightarrow\quad
+        V^{4/3} \propto L^4
+        \quad\Rightarrow\quad
+        \rho_{\text{rad}} \propto \frac{1}{L^4}
+        $$
+        Questo riflette il fatto che, oltre alla diluizione dovuta all'espansione del volume, l'energia dei fotoni diminuisce anche a causa del redshift cosmologico (allungamento della lunghezza d'onda).
     
-        $$\rho_{\text{rad}}V^{4/3} = \text{cost}
-        \quad\Rightarrow\quad
-        V \propto L^3
-        \quad\Rightarrow\quad
-        V^{4/3} \approx L^4
-        \quad\Rightarrow\quad
-        \rho_{\text{rad}} \approx \frac{1}{L^4}$$
-    
-        \item Se $p = - \rho c^2 \quad (w = -1) \quad \leftarrow \quad \rho V^0 = cost$, cioè $\rho$ non dipende da $V$ e da $L$ e rimane costante se $V$ varia.
+        \item Se $p = - \rho c^2 \quad (w = -1)$, si ha:
+        \vspace{0.4em}
+        $$
+        \rho V^0 = \text{costante} \qquad \Rightarrow \qquad \rho = \text{costante}
+        $$
+        In questo caso, la densità di energia non dipende dal volume: anche se l'universo si espande, la densità di energia rimane costante. Questo è il comportamento tipico dell'energia oscura (costante cosmologica).
     \end{enumerate}
     
     Possiamo riscrivere il primo principio in un'altra forma utile, ponendo $V \propto L^3$:
-    
+    \vspace{0.4em}
     $$
-    \left( \rho + \dfrac {p}{c^2} \right) dC + V d\rho = 0 \qquad \rightarrow \qquad \left(\rho + \dfrac {p}{c^2}\right) \cdot 3L^2 dL + L^3 d\rho = 0
+    \left( \rho + \frac{p}{c^2} \right) dV + V d\rho = 0 \qquad \rightarrow \qquad \left(\rho + \frac{p}{c^2}\right) \cdot 3L^2 dL + L^3 d\rho = 0
     $$
-    
     da cui:
-    
     $$
     3 \left(
-        \rho + \dfrac {p}{c^2}
-    \right) \dfrac {dL}{L} + d\rho = 0
+        \rho + \frac{p}{c^2}
+    \right) \frac{dL}{L} + d\rho = 0
     $$
-    
     e, tenendo conto di una dipendenza di $L$ dal tempo:
-    
+    \vspace{0.4em}
     $$
     3 \left(
-        \rho + \dfrac {p}{c^2}
-    \right) \dfrac {dL}{dt} + \dfrac {d\rho}{dt} = 0
+        \rho + \frac{p}{c^2}
+    \right) \frac{dL}{dt} + \frac{d\rho}{dt} = 0
     $$
+    Queste relazioni sono fondamentali in cosmologia per descrivere l'evoluzione della densità di energia dei diversi componenti dell'universo durante l'espansione.
     
-    Abbiamo scritto $\partial_\alpha T^{\beta \alpha} = 0$ nello spazio di Minkowski; se però $\Gamma^\alpha_{\beta\gamma}$ non sono tutti nulli, ed in generale sarà così, al posto della derivata parziale semplice si deve utilizzare la derivata covariante:
+    Abbiamo scritto $\partial_\alpha T^{\beta \alpha} = 0$ nello spazio di Minkowski; se però $\Gamma^\alpha_{\beta\gamma}$ non sono tutti nulli (cioè in uno spazio-tempo curvo), al posto della derivata parziale semplice si deve utilizzare la derivata covariante:
+    \vspace{0.4em}
     $$
     T^{\alpha\beta}_{;\beta} = 0
     $$

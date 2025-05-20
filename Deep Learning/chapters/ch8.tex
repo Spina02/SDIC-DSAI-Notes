@@ -1,4 +1,7 @@
-\chapter{Transformers (13/05/2025)}
+
+\chapter{Transformers}
+
+\section{Lecture (13/05/2025)}
 
 Transformers are a type of neural network architecture that are particularly effective for natural language processing tasks. They are based on the \textit{attention mechanism}, which allows the model to focus on different parts of the input sequence.
 \vspace{-1em}
@@ -70,3 +73,124 @@ The dot product operation returns a measure of similarity between its inputs, so
     \caption{Computing attention weights: (a) Compute the query, key, and value vectors for each input. (b) Apply softmax to query-key dot products to form non-negative attentions that sum to one. (c) These route the value vectors via the sparse matrix from \cref{fig:self-attention}.}
     \label{fig:dot-prod-self-att}
 \end{figure}
+
+\section{The transformer layer (Lecture 20/05/2025)}
+
+The self-attention mechanism is only a part of a larger \bfit{transformer layer}.
+This consist of a multi-head self-attention unit, followed by a fully connected network $\bm{mlp}[x_\bullet]$; Both units are residual networks. In addition, it is typical to add a LayerNorm operation after both the self-attention and fully connected networks.
+
+The LayerNorm is similar to the batch norm, but normalized each embedding in each batch element separately, using statictics calculated across its $D$ dimensions.
+
+Since we have:
+
+$$
+f_k = \beta_k + \Omega_k a(f_{k-1})
+$$
+
+this means that the norm of the $k^{th}$ layer is much lower than the norm of the $(k-1)^{th}$ layer:
+
+$$
+\| f_k \| < \| f_{k-1} \|
+\qquad \text{or} \qquad
+\| f_k \| < \dfrac 12 \|a(f_{k-1})\|
+$$
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/transformer_layer.png}
+    \caption{A transformer layer.}
+    \label{fig:transformer-layer}
+\end{figure}
+
+% We have also that the derivative of th losses of the $k^th$ and $k-1^th$ layer are related by the following relationship:
+% $$
+%! missing
+% $$
+
+\dots
+
+% $$
+% \begin{cases}
+%     f_j \sim \mathcal N(0, \sigma^2 \Omega)
+%     \\
+    
+% \end{cases}
+% $$
+
+$$
+\mathbf E(f'_j) = \mathbf E (\beta_j + \sum_e \Omega_{je} h_e) = \underbrace{\mathbf E(\beta_j)}_{=\ 0} + \mathbf E(\sum_e \underbrace{\Omega_{je} h_e}_{=\ 0}) = 0
+$$
+
+$$
+\sigma^2 (f'_j) = \mathbf E({f_j'}^2) - \cancel{(\mathbf E(f_j'))^2}
+= 
+\sum_e \sum_j \mathbf E(\Omega_{ij} \Omega_{ie})  \mathbf E(h_j h_e)
+$$
+
+\dots
+
+$$
+\sigma^2_{f'} = \dfrac 12 D_h \cdot \sigma^2_\Omega \cdot \sigma^2_f
+\qquad \Rightarrow \qquad
+1 = \dfrac 12 D_h \cdot \sigma^2_\Omega
+\qquad \Rightarrow \qquad
+\boxed{\sigma^2_\Omega = \dfrac 2{D_h}}
+$$
+
+Transformer layers consist of two residual networks stacked together. Without proper normalization, the residual connections would experience exponential growth in size as they propagate through the network. To address this issue, we apply BatchNorm before each residual connection, which constrains the growth to be linear rather than exponential.
+
+In this way we have that, at initialization, the deeper nodes of the network contribute less to the output, creating a sort of "effective depth" in the first layer. As the training progresses, the deeper nodes contribute more to the output, and the effective depth increases.
+
+\section{Transformers for NLP}
+
+A typical NLP pipeline starts with a tokenizer, which are mapped to a learning embedding, and then pass through different transformer layers.
+
+There are different architectures we are interested in:
+\begin{itemize}
+    \item Encoder (BERT)
+    \item Decoder (GPT)
+    \item Encoder-Decoder
+    \item IMG
+\end{itemize}
+
+\subsection{Encoder model: BERT}
+
+BERT is an encoder model which uses a vocabolary of about $30.000$ tokens. Input tokens are converted into 1024 dimensional word embeddings and passed through 24 transformer layers. Each layer contains a mechanism of 16 heads. The total amount of parameters is about $340$ million.
+
+The input tokens (and a special <cls> token denoting the start of the sequence) are converted to word embeddings. These embeddings are passed through a series of transformer layers to create a set of output embeddings.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/bert.png}
+    \caption{Pre-training for BERT-like encoders.}
+    \label{fig:bert}
+\end{figure}
+
+\subsubsection{Pre-training}
+
+In the pre-training stage, the network is trained using self-supervision. For BERT, the self-supervision task consists of predicting missing words from sentences from a large internet corpus, forcing the transformer network to understand some syntax. A small fraction of the input tokens are randomly replaced with a generic <mask> token. In pre-training, the goal is to predict the missing word from the associated output embedding. To this end, the outputs corresponding to the masked tokens are passed through softmax functions, and a multiclass classification loss is applied to each. This task has the advantage that it uses both the left and right context to predict the missing word but has the disadvantage that it does not make efficient use of data; here, seven tokens need to be processed to add two terms to the loss function.
+
+After pre-training, the encoder is fine-tuned using manually labeled data to solve a particular task. Usually, a linear transformation or a multi-layer perceptron (MLP) is appended to the encoder to produce whatever output is required.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/pre-training-bert.png}
+    \caption{Pre-training for BERT-like encoders.}
+    \label{fig:bert-pre-training}
+\end{figure}
+
+\subsection{Decoder model: GPT}
+
+The decoder is a transformer model with a single attention head. It's aimed to predict the next word of a sentence, and generate a coherent text passage by feeding the extended sequence back into the model.
+
+An autoregressive model predicts the conditional distributions $\Pr(t_n | t_1, \ldots, t_{n-1})$ for each token given all the prior ones, and hence, indirectly, computes the joint distribution $\Pr(t_1, \ldots, t_N)$ of all the $N$ tokens:
+
+$$
+\Pr(t_1, \ldots, t_N) = \Pr (t_1) \prod_{n = 2}^N \Pr(t_n | t_1, \dots, t_{n-1})
+$$
+
+The autoregressive formulation demonstrates the connection between maximizing the joint probability of the tokens and the next token prediction task.
+
+\dots
+
+(to be continued)
