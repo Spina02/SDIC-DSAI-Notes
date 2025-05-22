@@ -1,0 +1,199 @@
+\chapter{Message Passing Interface}
+
+The Message Passing Interface (MPI) is a standardized library that implements the distributed memory programming model. Its primary purpose is to facilitate data movement between distinct address spaces in a parallel computing environment.
+
+In MPI, each process operates as an independent entity with its own private memory space. From a programming perspective, memory management within each process follows the same principles as sequential programming, making it conceptually straightforward for developers.
+
+Processes interact through explicit message passing for both synchronization and data exchange. This communication model requires explicit collaboration between processes - data is only shared when processes explicitly send and receive messages.
+
+It's important to note that MPI is implemented as a library rather than a programming language. This means that all parallel operations are performed through library function calls, which provides flexibility in terms of language integration while maintaining a consistent interface across different platforms.
+
+So here must exist a way to send a message from one process to another; this method should accept the following parameters:
+
+\begin{itemize}
+    \item the message to send
+    \item the length of the message
+    \item the receiver process
+    \item the framework this message belongs to
+\end{itemize}
+
+In the same way, there must be a way to receive a message from another process; this method should accept the following parameters:
+\begin{itemize}
+    \item where to store the message
+    \item the length of the message
+    \item the sender process
+    \item the framework this message belongs to
+\end{itemize}
+
+So, we expect that there must be point-to-point
+\begin{itemize}
+    \item a way to send messages
+    \item a corresponding way to receive messages
+    \item a way to know “the names” in “the framework”
+\end{itemize}
+
+Since sometimes we need to broadcast messages, it would be nice if:
+\begin{itemize}
+    \item there was a broadcasting (one-to-many) mechanism
+    \item there was a collection mechanism (many-to-one) mechanism
+    \item the answer/collection was possible many-to-many
+\end{itemize}
+
+\subsubsection{Communicators}
+
+Communicators and groups are a very central concepts in MPI: tasks can form groups (a task can belong to more than one group) and the same group can be in different situations.
+
+The \bfit{communicator} is the combination of a group and its “context”.
+
+You can build as many groups as you want, and they may or not have a communicator. However, if you want to communicate among tasks in a group, you need a communicator.
+
+This functionality offers the capability of isolating communication between application modules with an effective “sandbox” for different contexts.
+
+For instance, a parallel library and your application will use internally their own communicator, separating contexts.
+
+\begin{itemize}
+    \item By creating groups of MPI processes, that may or not overlap with each other, it is possible to
+    \begin{itemize}
+        \item separate contexts within different modules of the same application
+        (useful or even advisable)
+        \item express multiple levels of parallelism
+    \end{itemize}
+\end{itemize}
+
+MPI provides several predefined communicators that are available after initialization:
+
+\begin{itemize}
+    \item \texttt{MPI\_COMM\_WORLD} is the default communicator available right after the call to \texttt{MPI\_Init}. Its group contains all the tasks started by your job.
+    
+    \item \texttt{MPI\_COMM\_NULL} signals an invalid or non-existent communicator. This is often used as a return value to indicate errors in communicator operations.
+    
+    \item \texttt{MPI\_COMM\_SELF} contains only the process itself. This is useful when a process needs to communicate with itself.
+    
+    \item \texttt{MPI\_GROUP\_NULL} signals an invalid or non-existent group. Similar to \texttt{MPI\_COMM\_NULL}, it's used to indicate errors in group operations.
+\end{itemize}
+
+These predefined communicators serve as fundamental building blocks for MPI communication patterns and are essential for both basic and advanced MPI programming.
+
+\subsubsection{Send and Receive}
+
+MPI provides two basic functions for sending and receiving messages between processes:
+
+\begin{codeblock}[language=C]
+int MPI_Send(
+    const void *buf,        /* starting address of send buffer */
+    int count,              /* number of elements in send buffer */
+    MPI_Datatype datatype,  /* datatype of each buffer element */
+    int dest,               /* rank of destination */
+    int tag,                /* message tag */
+    MPI_Comm comm           /* communicator */
+)
+\end{codeblock}
+
+\begin{codeblock}[language=C]
+int MPI_Recv(
+    void *buf,              /* starting address of receive buffer */
+    int count,              /* number of elements in receive buffer */
+    MPI_Datatype datatype,  /* datatype of each buffer element */
+    int source,             /* rank of source */
+    int tag,                /* message tag */
+    MPI_Comm comm,          /* communicator */
+    MPI_Status *status      /* status object */
+)
+\end{codeblock}
+
+The data type is a fundamental concept in MPI. It defines the type of data being sent or received. MPI provides a variety of predefined data types, including:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        \textbf{MPI DataType} & \textbf{C DataType} \\
+        \hline
+        \plaintt{MPI\_CHAR} & \plaintt{char} \\
+        \plaintt{MPI\_BYTE} & \plaintt{unsigned char} \\
+        \plaintt{MPI\_SHORT}, \plaintt{MPI\_UNSIGNED\_SHORT} & (\plaintt{unsigned}) \plaintt{short int} \\
+        \plaintt{MPI\_INT}, \plaintt{MPI\_UNSIGNED\_INT} & (\plaintt{unsigned}) \plaintt{int} \\
+        \plaintt{MPI\_LONG}, \plaintt{MPI\_UNSIGNED\_LONG} & (\plaintt{unsigned}) \plaintt{long int} \\
+        \plaintt{MPI\_LONG\_LONG}, \plaintt{MPI\_UNSIGNED\_LONG\_LONG} & (\plaintt{unsigned}) \plaintt{long long int} \\
+        \plaintt{MPI\_FLOAT} & \plaintt{float} \\
+        \plaintt{MPI\_DOUBLE} & \plaintt{double} \\
+        \plaintt{MPI\_LONG\_DOUBLE} & \plaintt{long double} \\
+        \plaintt{MPI\_PACKED} & \plaintt{--} \\
+        \hline
+    \end{tabular}
+    \caption{Correspondence between MPI predefined datatypes and C datatypes.}
+    \label{tab:mpi-c-datatypes}
+\end{table}
+
+\begin{exampleblock}[Send and Receive Example]
+    \begin{codeblock}[language=C]
+int N;
+if ( Myrank == 0 )
+    MPI_Send( &N, 1, MPI_INT, 1, 0, MPI_COMM_WORLD );
+else if ( Myrank == 1 ) {
+    MPI_Status status;
+    MPI_Recv( &N, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, &status );
+}
+else if ( Myrank == 1 )
+    MPI_Recv( &N, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE );
+    \end{codeblock}
+
+    \underline{\textbf{NOTE}}: \plaintt{MPI\_STATUS\_IGNORE} is always valid instead of putting an \plaintt{MPI\_Status} varible's address as last argument of \plaintt{MPI\_Recv}
+\end{exampleblock}
+
+\begin{exampleblock}[Sending things of different types]
+    \begin{codeblock}[language=C]
+typedef struct {
+    int i, j;
+    double d, f;
+    char s[4];
+} my_data;
+
+unsigned int length = N * sizeof(my_data);
+
+if (Myrank == 0) {
+    MPI_Send(data, length, MPI_BYTE, 1, 0, MPI_COMM_WORLD);
+} else if (Myrank == 1) {
+    MPI_Recv(data, length, MPI_BYTE, 0, 0, MPI_COMM_WORLD,
+             MPI_STATUS_IGNORE);
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\dots
+
+\missing{probe}
+
+\dots
+
+When we do send a message, we specify the memory region that contains the data, at what point in the future it is safe to modify the memory region involved in the send? Or better, how can we be sure that the communication has ended and the data have all been received?
+
+The MPI standard prescribes that \plaintt{MPI\_Send} returns when it is safe to modify the send buffer. So, whenever \plaintt{MPI\_Send} returns, it is safe to act on the memory region that has been sent.
+
+\dots
+
+\missing{protocols}
+
+\dots
+
+Code that rely on the system's bufferization to run correctly are called \bfit{unsafe}.
+
+Solution to cure, or better, to avoid the unsafe situations are:
+
+\begin{itemize}
+    \item designing more carefully the communication pattern
+    \item checking the runnability by substituting \plaintt{MPI\_Send} with \plaintt{MPI\_Ssend}
+    \item using \plaintt{MPI\_Sendrecv}
+    \item supplying explicitly buffer with \plaintt{MPI\_Bsend}
+    \item non-blovking operations
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/unsafe-code.png}
+    \caption{Deadlock, Unsafe and Safe code}
+    \label{fig:unsafe-code}
+\end{figure}
+
+
+
