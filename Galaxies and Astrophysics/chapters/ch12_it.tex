@@ -809,3 +809,110 @@ $$
 \dots
 
 Questo modello non è utile per descrivere il nostro universo in generale, ma può tornare utile per descrivere zone dell'universo ad alta densità (l'universo è isotropo su larga scala, ma localmente può non esserlo).
+
+\newpage
+
+\subsection{Modelli con $\Lambda \neq 0$ (Lecture: 23/05/2025)}
+
+\dots
+
+\subsection{Il nostro Universo}
+
+Come abbiamo visto, il nostro universo, dopo l'equivalenza, è stato dominato prima dalla materia e poi dal vuoto. Esiste una soluzione analitica per un universo con \textit{materia + costantecosmologica} e piatto ($\Omega_M + \Omega_\Lambda = 1$).
+
+Dalla (F1) scritta, in questo caso, nella forma:
+\vspace{0.4em}
+$$
+\left(
+    \dfrac{\dot a}{a_0}
+\right)^2 = H_0^2 \left[\Omega_M \left(\dfrac{a_0}{a}\right) + \Omega_\Lambda \left(\dfrac{a_0}{a}\right)^{-2}\right]
+$$
+
+si ha, ponendo $R \equiv a/a_0$, che:
+\vspace{0.4em}
+$$
+\dfrac{\dd R}{\dd t} = H_0 \left[ \dfrac{\Omega_M}{R} + \Omega_\Lambda R^2\right]^{\frac 12}
+$$
+
+che può essere integrata.
+
+\dots
+
+Posto $a/a_0 = (1+z)^{-1}$, questa relazione fornisce, per questo modello, l'età dell'universo in funzione del redshift. Nel grafico seguente è riportato l'andamento del fattore di scala in funzione del tempo per il nostro modello di universo ($\Omega_M = 0.27$, $\Omega_\Lambda = 0.73$, e $h = 0.71$, come dalle osservazioni di WMAP ). Si noti come la linea tratteggiata, tangente alla curva al tempo attuale, passi con ottima approssimazione per l'origine: con questi parametri cosmologici il tempo di Hubble coincide praticamente con l'età attuale dell'Universo!
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/eta_redshift.png}
+    \label{fig:eta_redshift}
+\end{figure}
+
+Nel grafico seguente vediamo sempre, con gli stessi parametri cosmologici, il legame tra età dell'Universo (in miliardi di anni) ed il redshift.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/eta_universo.png}
+    \label{fig:eta_universo}
+\end{figure}
+
+\subsection{L'età dell'Universo}
+
+Abbiamo finora visto l'età dell'Universo in funzione del redshift per alcuni modelli particolari. Vediamo ora una formulazione generale. Dalla stessa definizione del parametro di Hubble abbiamo:
+\vspace{0.4em}
+$$
+H = \dfrac{\dot a}{a} = \dfrac 1a \dfrac{\dd a}{\dd t}
+\qquad \Rightarrow \qquad
+\dd t = \dfrac{\dd a}{a \cdot H} = \dfrac{\dd(a/a_0)}{(a/a_0) \cdot H(a)}
+$$
+
+da cui, posto $a/a_0 = u$, otteniamo:
+\vspace{0.4em}
+$$
+t(a/a_0) = \int_0^{a/a_0} \dfrac{\dd u}{u \cdot H(u)}
+$$
+
+integrabile data la dipendenza di $H$ da $a/a0$ e dai parametri cosmologici. Più pratico è usare il redshift, ricordando che $a/a_0 = 1/(1 + z)$ e che quindi:
+\vspace{0.4em}
+$$
+\dd a = - \dfrac{a_0}{(1 + z)^2} \dd z
+\qquad \Rightarrow \qquad
+\dd t = - \dfrac{a_0}{(1 + z)^2 a H} \dd z = - \dfrac{\dd z}{(1+z) H(z)}
+$$
+
+dove si è inserito a0/a = 1 + z. Si ottiene quindi la formula generale:
+\vspace{0.4em}
+$$
+t(z) = \int_0^z \dfrac{\dd z'}{(1 + z') H(z')}
+$$
+
+dove,
+$$
+H(z) = H_0(1+z)[\Omega_R(1+z)^2 + \Omega_M(1+z) + \Omega_\Lambda (1+z)^{-2}+ 1 - \Omega_0]^{\frac 12}
+$$
+
+\dots
+
+
+\subsection{Ancora orizzonti}
+
+Vediamo di calcolare l'orizzonte delle particelle in un modello di Einstein-de Sitter:
+
+$$
+\begin{array}{rl}
+d_H(t) & = a(t) \int_0^t \dfrac{c \dd t'}{a(t')} = a(t) \int^{t/t_0}_0 \dfrac{c \dd \left(\dfrac{t}{t_0}\right)}{a_0\left(\dfrac{t'}{t_0}\right)^{\frac{2}{3(1+w)}}} = \dfrac {a(t)}{a_0} c t_0 \int_0^{t/t_0} \dfrac{\dd x}{x^{\frac{2}{3(1+w)}}}\\
+& = \dfrac {a(t)}{a_0} c t_0 \dfrac{3(1+w)}{1 + 3w} \left( \dfrac{t}{t_0} \right)^{\frac{1 + 3w}{3(1+w)}} = \dfrac{3(1+w)}{1 + 3w} ct \\
+& = \dfrac{3(1+w)}{1 + 3w} ct_0 \left( \dfrac{t}{t_0} \right) = \dfrac{2c}{H_0 (1+3w)} \left( \dfrac{a}{a_0} \right)^{\frac{3(1+w)}{2}}
+\qquad \text{dato che } t_0 = \dfrac{2}{3(1+w) H_0}
+$$
+
+Se esiste una fase inflattiva:
+
+$$
+a(t) = A e^{H_0 t}
+$$
+
+e quindi:
+
+$$
+d_H(t) = a(c) \int_0^t \dfrac{c \dd t'}{a(t')} = e^{H_0 t} \dfrac{c}{H_0} \left[ -e^{-H_0 t} \right] = \dfrac{c}{H_0} e^{H_0 t} \dfrac{c}{H_0} = R_H (e^{H_0 t} - 1)
+> R_H
+$$
