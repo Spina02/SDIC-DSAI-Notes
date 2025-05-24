@@ -1,0 +1,229 @@
+\chapter{Genetic Algorithms}\label{ch:ga}
+
+\section{Introduction}
+
+Genetic Algorithms (GAs) are a class of stochastic optimization methods inspired by the principles of natural selection and genetics, first formalized by John Holland in the 1970s~\cite{Holland1992}. At their core, GAs maintain a population of candidate solutions, called \bfit{individuals}, which are evolved over multiple generations to approximate an optimal or sufficiently good solution to a problem.
+
+Each individual in the population is typically represented as a fixed-length string (often a binary vector) termed the \bfit{genotype}. This genotype encodes a possible solution, whose \bfit{phenotype} is the actual candidate in the problem space, obtained by decoding the genotype. The quality of each individual is measured by a \bfit{fitness function} $f$, which assigns a scalar value indicating how well the individual solves the problem at hand.
+
+The standard evolutionary cycle in a GA consists of the following steps:
+\begin{enumerate}
+    \item \textbf{Selection:} Individuals are chosen probabilistically from the population based on their fitness. Fitter individuals have a higher probability of being selected as parents, implementing a form of artificial natural selection that drives evolution toward better solutions.
+    \item \textbf{Crossover:} Pairs of selected parents exchange genetic material to produce offspring, recombining their genotypes in various ways. This operator enables the algorithm to combine beneficial traits from different solutions and explore the search space effectively.
+    \item \textbf{Mutation:} Random, typically small, modifications are introduced into the offspring's genotypes to preserve genetic diversity and explore new regions of the search space. This operator helps prevent premature convergence and allows the discovery of novel solutions.
+    \item \textbf{Replacement:} The new generation replaces the old one, possibly retaining a fraction of the best solutions (elitism). This ensures the population maintains its best-found solutions while allowing for continuous improvement through evolution.
+\end{enumerate}
+
+This process iterates for a predefined number of generations or until a stopping criterion is met. A summary of the cycle is illustrated in \cref{fig:ga_cycle}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{assets/cycle.png}
+    \hfill
+    \includegraphics[width=0.54\textwidth]{assets/ga_example.png}
+    \caption{\small Left: Diagram showing the main components and their interactions in the evolutionary process. Right: Example of genetic operators (selection, crossover, mutation) acting on binary strings.}
+    \label{fig:ga_cycle}
+\end{figure}
+
+\vspace{-1em}
+
+\section{Core Components}
+
+\subsubsection{Representation}
+The \textbf{genotype} is the encoded representation of a solution (commonly a binary string or vector over a finite alphabet) on which the genetic operators (crossover and mutation) act. The \textbf{phenotype} is the decoded, actual candidate solution evaluated by the fitness function. Selection operates at the phenotypic level, favoring those solutions that yield higher fitness.
+
+\begin{observationblock}[Genotype vs. Phenotype]
+    The distinction between the two allow GAs to operate flexibly: operators modify representations (genotypes) while selection is based on problem-specific performance (phenotypes).
+\end{observationblock}
+
+\subsubsection{Key Parameters}
+The performance and behavior of a genetic algorithm depend on several critical parameters:
+
+\begin{itemize}
+    \item \textbf{Population size} $N$: Number of individuals maintained at each generation (tipically 100-200). Larger populations increase diversity and exploration but require more computational resources.
+    
+    \item \textbf{Number of generations} $G$: How many iterations the algorithm will perform (often determined empirically). This affects the total computational budget and exploration time.
+    
+    \item \textbf{Selection method}: The algorithm used to select parents (tournament, roulette wheel, ...). Different methods vary the selection pressures that affect diversity and convergence speed.
+    
+    \item \textbf{Crossover operator}: The method for recombining genotypes. Should be chosen based on problem representation and known/assumed relationships between genes.
+    
+    \item \textbf{Crossover probability} $p_\mathrm{cross}$: Probability with which crossover is applied. Higher values (typically 0.6-0.9) promote more exploration through recombination.
+    
+    \item \textbf{Mutation operator}: The method for introducing random changes. Must be appropriate for the chosen representation while maintaining solution feasibility.
+    
+    \item \textbf{Mutation probability} $p_\mathrm{mut}$: Probability of mutating each gene. Usually set to $1/n$ for length-$n$ genotypes to maintain a balance between exploration and stability.
+    
+    \item \textbf{Elitism} $e$: Number or percentage of best individuals preserved into the next generation. Small values (1-5\%) help maintain good solutions while allowing population turnover.
+\end{itemize}
+
+\subsection{Selection Methods and Genetic Operators}
+
+\subsubsection{Selection}
+
+Several strategies exist for parent selection, each with different characteristics in terms of selection pressure and diversity preservation:
+
+\begin{itemize}
+    \item \bfit{Roulette Wheel Selection:}
+    
+    Each individual's probability of being selected is proportional to its fitness:
+    \vspace{0.2em}
+    $$
+        P_{x,P} = \frac{f(x)}{\sum_{y \in P} f(y)}
+    $$
+    This method is simple to implement, but can reduce diversity if a single individual dominates.
+
+    \item \bfit{Ranked Selection:}
+    
+    Individuals are ranked by fitness. Selection probabilities depend only on rank, not raw fitness, which helps control selection pressure and maintain diversity.
+
+    \item \bfit{Tournament Selection:}
+    
+    $t$ individuals are sampled (with replacement) from the population, and the fittest among them is selected. The tournament size $t$ directly tunes \textit{selection pressure}: higher $t$ increases the probability that the best individuals are chosen.
+\end{itemize}
+
+\begin{tipsblock}[Selection Pressure]
+    Tournament selection is widely used due to its simplicity and ease of adjusting selection pressure by changing the tournament size.
+\end{tipsblock}
+
+\subsubsection{Crossover}
+Crossover operators create new individuals by combining genetic material from two parents:
+\begin{itemize}
+    \item \bfit{One-Point Crossover:}
+    
+    A single crossover point $k$ is randomly chosen between genes. The offspring inherit genes from parent A up to position $k$, and from parent B beyond $k$. This preserves contiguous gene sequences that may represent important building blocks:
+    \vspace{0.2em}
+    $$
+    \begin{array}{r}
+    \text{Parent A: } \plaintt{[1 1 1 | 1 1 1]} \\[-0.1em]
+    \text{Parent B: }\plaintt{[0 0 0 | 0 0 0]} \\[-0.1em]
+    \text{Offspring: }\plaintt{[1 1 1 | 0 0 0]}
+    \end{array}
+    $$
+
+    \vspace{-1em}
+    \item \bfit{Multi-Point Crossover:}
+    
+    Multiple crossover points are chosen, and genetic material is alternately swapped between parents. This allows more flexible recombination while still preserving some gene linkage:
+    $$
+    \begin{array}{r}
+    \text{Parent A: }\plaintt{[1 1 | 1 1 | 1 1]} \\[-0.1em]
+    \text{Parent B: }\plaintt{[0 0 | 0 0 | 0 0]} \\[-0.1em]
+    \text{Offspring: }\plaintt{[1 1 | 0 0 | 1 1]}
+    \end{array}
+    $$
+
+    \vspace{-1em}
+    \item \bfit{Uniform Crossover:}
+    
+    For each gene position, the gene is swapped between parents with a fixed probability (commonly $1/2$). This provides maximum mixing potential and is especially useful when there is little/no linkage between adjacent genes:
+    \vspace{0.2em}
+    $$
+    \begin{array}{r}
+    \text{Parent A: }\plaintt{[1 1 1 1 1 1]} \\[-0.1em]
+    \text{Parent B: }\plaintt{[0 0 0 0 0 0]} \\[-0.1em]
+    \text{Offspring: }\plaintt{[1 0 1 0 0 1]}
+    \end{array}
+    $$
+
+    \vspace{-0.5em}
+\end{itemize}
+
+The choice of crossover operator and its probability $p_\mathrm{cross}$ influences the balance between \bfit{exploration} and \bfit{exploitation} in the search process.
+
+\begin{tipsblock}[Crossover Design]
+    Select the crossover operator based on the structure of the problem representation. For representations where tightly coupled genes are adjacent, one-point crossover is often effective. For others, uniform crossover can better promote exploration.
+\end{tipsblock}
+
+\subsubsection{Mutation}
+Mutation introduces random changes to individuals, preserving genetic diversity and enabling the exploration of new areas in the search space. The most common operator for binary representations is the \bfit{bit-flip mutation}: for each gene, flip its value with probability $p_\mathrm{mut}$ (typically $1/n$ for length-$n$ genotypes, so that on average one bit per individual mutates per generation).
+
+\subsection{Common Variants}
+Several variations of the basic GA have been developed:
+
+\begin{itemize}
+\item \textbf{Elitism}
+
+Strategies that preserve the best individual(s) unchanged into the next generation, guaranteeing solution quality does not degrade. Variants include retaining the single best solution, top $k$ solutions, or best $p\%$.
+
+\item \textbf{Steady-State GA}
+
+Instead of replacing the entire population each generation, only a subset of individuals is replaced. The choice of which individuals to replace impacts algorithm dynamics.
+
+\item \textbf{Hybrid (Memetic) Algorithms}
+
+These incorporate local search techniques to further improve individuals after genetic operations. Also called \emph{Lamarckian algorithms} or \emph{Baldwin effect algorithms}, they require tuning of local search frequency and intensity.
+\end{itemize}
+
+\section{Representation}
+
+While we have focused on binary representations so far, genetic algorithms can be generalized to work with symbols from any finite alphabet $\Sigma$ instead of just binary values. When using a larger alphabet, mutation needs to be adapted - rather than simply flipping bits, it selects uniformly between the $|\Sigma|-1$ alternative symbols. For ordered alphabets like $\{0,1,2,3\}$, mutation can also be implemented to increment or decrement values, maintaining the ordering relationship.
+
+\subsection{Real-Valued GA}
+Traditional binary GAs can encode floating-point numbers using 32 or 64 binary genes, where different bit positions have varying impacts on the final value. However, real-valued GAs take a more direct approach by using floating-point genes directly and adapting the genetic operators accordingly.
+
+\subsubsection{Crossover}
+Real-valued GAs employ two main specialized crossover operators:
+
+\begin{itemize}
+    \item \textbf{Intermediate recombination:} Creates offspring by taking weighted averages of the parents' genes. Given parents $x_1$ and $x_2$:
+
+    \begin{minipage}{0.65\textwidth}
+        $$y_i = \alpha_i p_i + (1-\alpha_i) q_i, \quad \alpha_i \sim \text{Uniform}(0,1)$$
+    \end{minipage}
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.75\textwidth]{assets/int_rec.png}
+    \end{minipage}
+
+    \item \textbf{Line recombination:} Extends intermediate recombination by allowing exploration beyond parents:
+
+    \begin{minipage}{0.65\textwidth}
+        $$y_i = \alpha_i p_i + (1-\alpha_i) q_i, \quad\alpha_i \sim \text{Uniform}(-k, 1+k)$$
+    \end{minipage}
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \includegraphics[width=0.75\textwidth]{assets/lin_rec.png}
+    \end{minipage}
+\end{itemize}
+
+\vspace{-1em}
+
+\subsubsection{Mutation}
+For real-valued representations, mutation operates by adding small perturbations to each coordinate. 
+$$
+p \leftarrow p + \varepsilon
+$$
+These perturbations $\varepsilon$ can be drawn from either a \emph{uniform distribution} within specified bounds or a \emph{Gaussian distribution} centered at the current value. The choice between these distributions affects how mutation explores the search space.
+
+\subsection{Permutation-Based GA}
+Many optimization problems involve finding optimal permutations of elements $\{1,\ldots,n\}$. These problems require specialized genetic operators that preserve the permutation constraints. While mutation typically operates by simply swapping two positions, crossover requires more sophisticated approaches.
+
+\subsubsection{Partially Mapped Crossover (PMX)}
+PMX is a sophisticated crossover operator that preserves permutation validity through a four-step process:
+\begin{enumerate}
+    \item Two crossover points are selected in the parent permutations
+    \item A mapping is constructed between the segments defined by these points
+    \item The segments are exchanged between parents
+    \item Any conflicts are resolved by iteratively applying the mapping until a valid permutation is obtained
+\end{enumerate}
+
+\subsubsection{Cycle Crossover}
+Cycle crossover provides an alternative approach that preserves absolute positions from the parents. It operates by identifying and preserving cycles in the permutations: starting at a position $i$, it copies the value from the first parent, then finds that same value in the second parent, continuing until a cycle is completed. The remaining values are then copied from the second parent.
+
+\subsection{Graph Representation}
+Graphs can be represented in genetic algorithms using either direct or indirect encoding approaches.
+
+Direct encoding methods include:
+\begin{itemize}
+    \item \textbf{Adjacency Matrix:} A binary matrix indicates the presence or absence of edges between vertices
+    \item \textbf{Edge List:} Explicitly evolve sets of vertices $V$ and edges $E$
+\end{itemize}
+
+With edge lists, mutations can add or remove both edges and vertices (along with their associated edges).
+
+\begin{tipsblock}[Graph Crossover]
+    Graph representations pose particular challenges for crossover operations. In many cases, it may be more effective to rely solely on mutation operators rather than attempting to implement complex crossover schemes.
+\end{tipsblock}
+
+Indirect encoding offers an alternative approach using production rules that map non-terminal symbols to sequences or matrices of terminals and non-terminals. These rules are repeatedly applied until only terminal symbols remain, enabling compact representations of complex graph structures. This approach can be particularly effective for problems where graphs exhibit regular or hierarchical patterns.

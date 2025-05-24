@@ -1,0 +1,68 @@
+% chapters/ch1.tex
+\chapter{Introduction}
+
+\section{Problem formulation}
+Given a set $S$ of candidate solutions to an optimization problem, we seek a mapping $f: S \to \mathbb{R}$ which assigns to each solution $x\in S$ a fitness value $f(x)$. Our goal is to find:
+$$
+  \argmax{x\in S} f(x)
+  \quad\text{or}\quad
+  \argmin{x\in S} f(x).
+$$
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/intro.png}
+    \label{fig:intro}
+\end{figure}
+
+\vspace{-1em}
+
+In many practical settings it is not possible to solve this problem analytically: the search space $S$ may be exponentially large, the function $f$ may be a “black-box” (we have few assumptions on its smoothness or structure), and an exhaustive enumeration of all solutions can be infeasible.  In such cases, we aim instead for heuristics that return solutions of acceptable quality in reasonable time.
+
+\subsection{A simple illustrative example: OneMax}
+As a motivating example, let $S = \{0,1\}^n$ and define:
+\vspace{0.4em}
+$$
+  f(x) = \text{the number of ones in }x.
+$$
+Clearly the global maximiser is the string $1^n$, with fitness $n$.  Even this trivial problem becomes intractable for large $n$ if approached by brute-force enumeration.
+
+\subsubsection{Random search}
+A simplest stochastic approach is random search: pick an initial $b\in S$, then repeatedly sample:
+\vspace{0.4em}
+$$ x\sim\text{Uniform}(S),$$
+and if $f(x)\ge f(b)$ replace $b$ by $x$.  Terminate when a budget of evaluations is exhausted.  In the worst case this explores a constant fraction of $S$, which is equivalent to an exhaustive search in some enumeration order, and so scales poorly in practice.
+
+\begin{tipsblock}[Random search]
+  Even if repeated samples are avoided, random search still requires sampling a significant fraction of the space, so it is generally unfeasible for high-dimensional or combinatorial domains.
+\end{tipsblock}
+
+\subsubsection{Hill climbing}
+Hill climbing maintains a single incumbent solution $b$.  At each iteration we choose a neighbour $x$ of $b$ (according to some neighbourhood structure) and replace $b$ with $x$ if $f(x)\ge f(b)$.  The process stops when no improving neighbour can be found or a fixed evaluation budget is reached.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.5\textwidth]{assets/hill-climbing-1.png}
+  \hspace{2em}
+  \includegraphics[width=0.38\textwidth]{assets/hill-climbing-2.png}
+  \caption{With a poor neighbourhood (left), hill climbing can get trapped in a local optimum.  A richer neighbourhood (right) may eliminate local traps.}
+  \label{fig:hillclimb-neighborhood}
+\end{figure}
+
+The effectiveness of hill climbing depends critically on the choice of neighbourhood.  For \texttt{OneMax}, using the Hamming-1 neighbourhood (flip one bit at a time) guarantees reachability of the global optimum but may still require many steps; using only $\pm1$ on the integer-interpreted string can make the problem insoluble.
+
+\subsubsection{Simulated annealing}
+Simulated annealing augments hill climbing with occasional downhill moves to escape local optima.  Starting from $b\in S$ and a “temperature” $T$, at each step we pick a neighbour $x$.  If $f(x)\ge f(b)$ we accept it, otherwise we accept it with probability
+$$
+  \exp\!\bigl((f(x)-f(b))/T\bigr).
+$$
+We then decrease $T$ according to a cooling schedule.  Proper tuning of the schedule trades off exploration against exploitation.
+
+\begin{tipsblock}[Simulated annealing]
+  Allowing uphill moves with probability depending on the temperature and fitness gap helps avoid entrapment in local maxima.  The cooling schedule is crucial for performance.
+\end{tipsblock}
+
+\subsubsection{Multiple restarts and population-based search}
+Both hill climbing and simulated annealing can be repeated from fresh random starts to reduce the chance of permanent stagnation.  A more powerful paradigm uses a whole population of candidate solutions that “interact” (e.g.\ by recombination), leading naturally to evolutionary algorithms.
