@@ -1,0 +1,69 @@
+\documentclass[a4paper,12pt]{report}
+
+%%%%%%%%%%%%
+% packages %
+%%%%%%%%%%%%
+
+\usepackage{../template/pkgs}
+\usepackage{../template/styles}
+\usepackage{../template/frames}
+\usepackage{../template/macros}
+
+%%%%%%%%%%%%%%
+% Title Page %
+%%%%%%%%%%%%%%
+
+\institute{UniTs - University of Trieste}
+\faculty{Scientific and Data Intensive Computing}
+\department{mathematics informatics and geosciences}
+\title{Global and Multi-Objective Optimisation}
+\author{Andrea Spinelli}
+\lecturers{Prof. Luca Manzoni}
+\date{\today}
+\githublink{Spina02}
+\email{andreaspinelli2002@gmail.com}
+\license{\CCBYNCSA}
+
+%%%%%%%%%%%%
+% document %
+%%%%%%%%%%%%
+
+\AtBeginDocument{
+  \setlength{\parskip}{0.4em}
+
+  \crefformat{chapter}{#2Chapter~#1#3}
+  \crefname{chapter}{Chapter}{Chapters}
+
+  \crefformat{section}{#2Section~#1#3}
+  \crefname{section}{Section}{Sections}
+
+  \crefformat{figure}{#2Figure~#1#3}
+  \crefname{figure}{Figure}{Figures}
+
+  \crefformat{table}{#2Table~#1#3}
+  \crefname{table}{Table}{Tables}
+}
+
+\addbibresource{./references.bib}
+
+\begin{document}
+
+% Pagina di copertina
+\maketitle
+
+% Abstract
+\include{chapters/abstract}
+
+% Indice
+\toc
+
+% Chapters
+\includechapters
+
+% Bibliography
+\printbibliography
+
+\end{document}
+
+
+
