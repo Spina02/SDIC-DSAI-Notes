@@ -40,7 +40,7 @@ The \textbf{genotype} is the encoded representation of a solution (commonly a bi
 The performance and behavior of a genetic algorithm depend on several critical parameters:
 
 \begin{itemize}
-    \item \textbf{Population size} $N$: Number of individuals maintained at each generation (tipically 100-200). Larger populations increase diversity and exploration but require more computational resources.
+    \item \textbf{Population size} $N$: Number of individuals maintained at each generation (typically 100-200). Larger populations increase diversity and exploration but require more computational resources.
     
     \item \textbf{Number of generations} $G$: How many iterations the algorithm will perform (often determined empirically). This affects the total computational budget and exploration time.
     
@@ -200,30 +200,164 @@ These perturbations $\varepsilon$ can be drawn from either a \emph{uniform distr
 Many optimization problems involve finding optimal permutations of elements $\{1,\ldots,n\}$. These problems require specialized genetic operators that preserve the permutation constraints. While mutation typically operates by simply swapping two positions, crossover requires more sophisticated approaches.
 
 \subsubsection{Partially Mapped Crossover (PMX)}
-PMX is a sophisticated crossover operator that preserves permutation validity through a four-step process:
-\begin{enumerate}
-    \item Two crossover points are selected in the parent permutations
-    \item A mapping is constructed between the segments defined by these points
-    \item The segments are exchanged between parents
-    \item Any conflicts are resolved by iteratively applying the mapping until a valid permutation is obtained
-\end{enumerate}
+PMX is a sophisticated crossover operator that preserves permutation validity through a four-step process. It ensures that offspring maintain valid permutations by carefully handling element mappings and conflict resolution:
+
+\begin{minipage}{0.44\textwidth}
+    \begin{enumerate}
+        \item Two random crossover points are selected in both parent permutations, defining a matching segment
+        \item A mapping is constructed between corresponding elements in the segments, recording which values swap positions
+        \item The segments are directly exchanged between parents to create initial offspring
+        \item Remaining positions outside the segments are filled by:
+            \begin{itemize}
+                \item Copying values from the original parent if no conflicts exist
+                \item For conflicts, following the mapping chain until finding a non-conflicting value
+            \end{itemize}
+    \end{enumerate}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.55\textwidth}
+\vspace{-1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{assets/PMX.png}
+    \caption{Partially Mapped Crossover \cite{Tenemaza2020}.}
+    \label{fig:pmx}
+\end{figure}
+\end{minipage}
+
+This process guarantees that each element appears exactly once in the final offspring, maintaining permutation validity while allowing meaningful genetic exchange between parents.
 
 \subsubsection{Cycle Crossover}
 Cycle crossover provides an alternative approach that preserves absolute positions from the parents. It operates by identifying and preserving cycles in the permutations: starting at a position $i$, it copies the value from the first parent, then finds that same value in the second parent, continuing until a cycle is completed. The remaining values are then copied from the second parent.
 
-\subsection{Graph Representation}
-Graphs can be represented in genetic algorithms using either direct or indirect encoding approaches.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/CX.png}
+    \caption{Cycle Crossover. \cite{Tenemaza2020}}
+    \label{fig:cx}
+\end{figure}
 
-Direct encoding methods include:
+\subsection{Graph Representation}
+Graphs are ubiquitous structures in computer science, appearing in applications ranging from social networks and transportation systems to neural networks and circuit design. When applying genetic algorithms to graph-based problems, the graph representation must be carefully chosen. Graphs can be encoded in two fundamental ways:
+
 \begin{itemize}
-    \item \textbf{Adjacency Matrix:} A binary matrix indicates the presence or absence of edges between vertices
-    \item \textbf{Edge List:} Explicitly evolve sets of vertices $V$ and edges $E$
+    \item \textbf{Direct encoding:} The graph structure is explicitly represented through its vertices and edges, providing straightforward access to the graph's components but potentially requiring significant memory for large graphs
+    
+    \item \textbf{Indirect encoding:} Instead of representing the graph directly, this approach encodes a constructive process or set of rules that, when executed, builds the desired graph structure. This can be more compact and enable the emergence of patterns, though interpretation requires additional computation
 \end{itemize}
 
-With edge lists, mutations can add or remove both edges and vertices (along with their associated edges).
+\subsubsection{Direct Encoding}
+
+Direct encoding methods explicitly represent the graph structure, offering intuitive but potentially memory-intensive representations:
+
+\begin{itemize}
+    \item \textbf{Adjacency Matrix}
+    
+    A matrix $A$ where entry $a_{ij}$ represents the edge between vertices $i$ and $j$. For weighted graphs, entries can be numerical values indicating edge weights, while for unweighted graphs, binary values (0/1) indicate edge presence:
+
+    $$
+    A = \begin{bmatrix}
+    0.4 & \text{no edge} & 0.6 & -5.3 \\
+    \text{no edge} & 5.6 & 0.1 & 0.2 \\
+    2.4 & 0.8 & 4.1 & 8.3 \\
+    -0.2 & \text{no edge} & 0.5 & \text{no edge}
+    \end{bmatrix}
+    $$
+    
+    Where "no edge" denotes absence of connection. This representation allows for efficient edge lookup ($O(1)$) but requires $O(|V|^2)$ space complexity.
+
+    \item \textbf{Edge List}
+    
+    A more compact representation that explicitly maintains sets of vertices $V$ and edges $E$. Particularly efficient for sparse graphs where $|E| \ll |V|^2$.
+    
+    For example, given vertices:
+    \vspace{0.2em}
+    $$
+    V = \{a, b, c, d, e\}
+    $$
+
+    \vspace{-1em}
+
+    we might have edges 
+    \vspace{0.2em}
+    $$
+    E = \{(a, b), (a, c), (d, a), (e, e)\}
+    $$
+
+    For edge list representations, several specialized \bfit{mutation} operators are employed, each with carefully tuned probabilities to maintain graph validity:
+
+    \vspace{0.2em}
+
+    \begin{itemize}
+        \item Add a new edge between existing vertices (preserving graph constraints like maximum degree)
+        \item Remove an existing edge (maintaining connectivity if required)
+        \item Add a new vertex (with appropriate edge connections)
+        \item Remove a vertex and all its associated edges (ensuring graph remains valid)
+    \end{itemize}
+\end{itemize}
 
 \begin{tipsblock}[Graph Crossover]
-    Graph representations pose particular challenges for crossover operations. In many cases, it may be more effective to rely solely on mutation operators rather than attempting to implement complex crossover schemes.
+    Graph representations pose \textbf{significant challenges for crossover operations} due to the difficulty in preserving graph properties and structure. In practice, it is often more effective to rely solely on mutation rather than attempting to implement complex crossover schemes.
 \end{tipsblock}
 
-Indirect encoding offers an alternative approach using production rules that map non-terminal symbols to sequences or matrices of terminals and non-terminals. These rules are repeatedly applied until only terminal symbols remain, enabling compact representations of complex graph structures. This approach can be particularly effective for problems where graphs exhibit regular or hierarchical patterns.
+\subsubsection{Indirect Encoding}
+
+Indirect encoding takes a different approach by using \textbf{production rules} that generate graphs through an iterative expansion process. Rather than directly representing the graph structure, these rules define how to construct the graph step by step. Starting with a set of \emph{non-terminal symbols}, the rules map each symbol to \emph{sequences} or \emph{matrices} that may contain both terminal and non-terminal symbols. This process continues recursively, until only terminal symbols remain.
+
+\begin{exampleblock}[Hiroaki Kitano's graph generation system]
+For example, Kitano's graph generation system uses production rules of the form:
+
+$$
+\begin{array}{lllll}
+S \to \begin{bmatrix} A & B \\ C & D \end{bmatrix}, \\[0.9em]
+A \to \begin{bmatrix} c & P \\ a & c \end{bmatrix}, & 
+B \to \begin{bmatrix} a & a \\ a & e \end{bmatrix}, &
+C \to \begin{bmatrix} a & a \\ a & a \end{bmatrix}, &
+D \to \begin{bmatrix} a & a \\ a & b \end{bmatrix} \\[0.9em]
+a \to \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}, &
+b \to \begin{bmatrix} 0 & 0 \\ 0 & 1 \end{bmatrix}, &
+c \to \begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix}, &
+P \to \begin{bmatrix} 0 & 1 \\ 0 & 1 \end{bmatrix}, &
+e \to \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}
+\end{array}
+$$
+
+Starting from the axiom $S$, we can iterate through the production rules:
+
+$$
+S \longrightarrow 
+\begin{bmatrix} A & B \\ C & D \end{bmatrix} 
+\longrightarrow 
+\left[\begin{matrix}\\[-0.9em]
+    \color{red!70!black}\begin{bmatrix} c & P \\ a & c \end{bmatrix} & 
+    \color{green!60!black}\begin{bmatrix} a & a \\ a & e \end{bmatrix} \\[0.9em]
+    \color{blue!80!black}\begin{bmatrix} a & a \\ a & a \end{bmatrix} & 
+    \color{purple!80!black}\begin{bmatrix} a & a \\ a & b \end{bmatrix}\\[0.9em]
+\end{matrix}\right]
+\longrightarrow \cdots
+$$
+This process continues until we reach a final $8 \times 8$ binary matrix representing the adjacency matrix of a graph with 5 vertices (where some vertices may be isolated, meaning they have no connections to other vertices):
+
+$$
+\begin{bmatrix}\\[-0.9em]
+    \color{red!70!black}\begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{red!70!black}\begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{green!60!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{green!60!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} \\[0.9em]
+    \color{red!70!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{red!70!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{green!60!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{green!60!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} \\[0.9em]
+    \color{blue!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{blue!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{purple!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{purple!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} \\[0.9em]
+    \color{blue!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{blue!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{purple!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{purple!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 1 \end{bmatrix} \\[0.9em]
+\end{bmatrix}
+$$
+\end{exampleblock}
+
+Production rules in indirect encoding systems can typically be represented as fixed-length vectors or strings, making them amenable to traditional genetic algorithm operators. For example, in Kitano's system, the first element represents the head (non-terminal symbol) and the remaining elements represent the body (the matrix elements). For instance, the rule $\scriptsize S \to \begin{bmatrix} A & B \\ C & D \end{bmatrix}$ can be encoded as the vector $[S, A, B, C, D]$. 
