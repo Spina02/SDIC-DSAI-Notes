@@ -14,21 +14,21 @@
   </thead>
   <tbody>
     <tr>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Cloud%20Computing/main.pdf">Advanced Cloud Computing</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Advanced%20Cloud%20Computing/main.pdf">Advanced Cloud Computing</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/High%20Performance%20Computing/main.pdf">High Performance Computing</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/High%20Performance%20Computing/main.pdf">High Performance Computing</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
     <tr>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Cloud%20Computing/main.pdf">Cloud Computing</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Cloud%20Computing/main.pdf">Cloud Computing</a></td>
       <td><strong><span style="color: lime;">[DONE]</span></strong></td>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Reinforcement%20Learning/main.pdf">Reinforcement Learning</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
     <tr>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Algorithms/main.pdf">Algorithms</a></td>
-      <td><strong><span style="color: lime;">[DONE]</span></strong></td>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Deep%20Learning/main.pdf">Deep Learning</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Algorithms/main.pdf">Algorithms</a></td>
+      <td><strong><span style="color: lime;">[WIP]</span></strong></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Deep%20Learning/main.pdf">Deep Learning</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
     <tr>
