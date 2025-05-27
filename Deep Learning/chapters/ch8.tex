@@ -191,6 +191,101 @@ $$
 
 The autoregressive formulation demonstrates the connection between maximizing the joint probability of the tokens and the next token prediction task.
 
+\subsubsection{Masked self-attention}
+
+To train a decoder, we seek parameters that maximize the log probability of the input text under the autoregressive model. Ideally, we would like to replace all the log probabilities and gradients in the same forward pass rather than doing a forward pass for each token in the sentence. However, if we pass in the full sentence, the term computing $\log[\Pr(t_{next}|all\ tokens)]$ would have access to both the answer and the right context, so the model would simply copy the word after the one we want to learn, and won't train properly.
+
+Fortunately, the tokens only interact in the self-attention layers in a transformer network. Hence, the problem can be resolved by setting the corresponding self-products in the self-attention computation to zero so that the attention is only allowed between tokens before the answer. The input tokens are passed through the softmax function. This is known as \textbf{masked self-attention}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/masked_transformer.png}
+    \caption{Training GPT-type decoder with masked self-attention. Each token can only attend to previous tokens (orange connections) to predict the next token in sequence.}
+    \label{fig:masked-self-attention}
+\end{figure}
+
+\vspace{-1em}
+
+The decoder network operates through the following process:
+
+\begin{itemize}[noitemsep]
+\item Input text is first tokenized and converted into \bfit{embeddings}.
+
+\item These embeddings are processed through transformer layers that employ \bfit{masked self-attention}, ensuring that each token can only attend to itself and previous tokens in the sequence.
+
+\item Each output embedding represents the context up to that position in the sequence, with the objective of \bfit{predicting the subsequent token}.
+
+\item Following the transformer layers, a linear projection maps each output embedding to vocabulary size, and a softmax function transforms these logits into probability distributions over the \bfit{vocabulary}.
+\end{itemize}
+
+During training, the objective is to maximize the log-likelihood of the correct next tokens at each position in the ground truth sequence, accomplished through standard cross-entropy loss optimization.
+
+\subsubsection{Few-Shot Learning}
+
+Since the autoregressive language model defines a probability model over text sequences, it can be used to sample new examples of plausible text. To generate from the model, we start with an input sequence of text (which might be just the special <start> token indicating the beginning of the sequence) and feed this into the network, which then outputs the probabilities over possible subsequent tokens. The new extended sequence can be fed back into the decoder network to yield the probability distribution over the next token. By repeating this process, we can generate large bodies of text.
+
+Large language models such as GPT-3 implement these concepts at an unprecedented scale. A characteristic of models trained at this scale is their ability to execute various tasks without requiring fine-tuning. When presented with multiple examples of accurate question-answer pairs followed by a new question, these models frequently provide correct responses to the final question by extending the sequence pattern.
+
+\begin{exampleblock}[Correcting the grammar]
+\textbf{Train:}
+\begin{itemize}[noitemsep]
+\item \textbf{Poor English input:} I eated the purple berries.
+\item \textbf{Good English output:} I ate the purple berries.
+\item \textbf{Poor English input:} Thank you for picking me as your designer. I'd appreciate it.
+\item \textbf{Good English output:} Thank you for choosing me as your designer. I appreciate it.
+\item \textbf{Poor English input:} The mentioned changes have done. or I did the alteration that you requested. or I changed things you wanted and did the modifications.
+\item \textbf{Good English output:} The requested changes have been made. or I made the alteration that you requested. or I changed things you wanted and made the modifications.
+\end{itemize}
+\rule{\textwidth}{0.5pt}
+\textbf{Test:}
+\begin{itemize}[noitemsep]
+\item \textbf{Poor English input:} I'd be more than happy to work with you in another project.
+\item \textbf{Good English output:} I'd be more than happy to work with you on another project.
+\end{itemize}
+\end{exampleblock}
+
+\subsubsection{Encoder-Decoder Architecture}
+
+Translation between languages is an example of a \emph{sequence-to-sequence} task. One common approach uses both an encoder (to compute a good representation of the source sentence) and a decoder (to generate the sentence in the target language). This is aptly called an \bfit{encoder-decoder model}.
+
+The encoder-decoder architecture operates through the following process:
+
+\begin{itemize}[noitemsep]
+\item The \bfit{encoder} receives the source sentence and processes it through transformer layers to create output representations for each token.
+
+\item The \bfit{decoder} receives the target sequence and processes it through modified transformer layers that employ masked self-attention to predict the next token at each position.
+
+\item Crucially, decoder layers also attend to encoder outputs through \bfit{cross-attention}, where a new attention layer is inserted between the masked self-attention and feed-forward components.
+
+\item In cross-attention, queries are computed from decoder embeddings while keys and values derive from encoder embeddings, enabling the decoder to access source sequence information.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/encoder-decoder.png}
+    \caption{Encoder-decoder architecture. Two sentences are passed to the system with the goal of translating the first into the second. a) The first sentence is passed through a standard encoder. b) The second sentence is passed through a decoder that uses masked self-attention but also attends to the output embeddings of the encoder using cross-attention (orange rectangle). The loss function is the same as for the decoder model; we want to maximize the probability of the next word in the output sequence.}
+    \label{fig:encoder-decoder}
+\end{figure}
+
+\newpage
+
+\subsubsection{Transformers fot long sequences}
+
 \dots
 
-(to be continued)
+\subsection{Transformers for images}
+
+\dots
+
+\subsubsection{Vision Transformers (ViT)}
+
+The Vision Transformer tackled the problem of image resolution by dividing the image into $16 \times 16$ patches (\cref{fig:vit}). Each patch is mapped to an input embedding via a learned linear transformation, and these representations are fed into the transformer network
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/vit.png}
+    \caption{Vision Transformer architecture.}
+    \label{fig:vit}
+\end{figure}
+
+\dots
