@@ -1,0 +1,246 @@
+\chapter{Data Mining}
+
+\section{Exact Pattern Matching}
+
+Consider two strings: a \textbf{text} string $T[1, ..., n]$ of length $n$ and a \textbf{pattern} string $P[1, ..., m]$ of length $m$. Both strings are defined over a finite alphabet $\Sigma$ (e.g., ASCII characters, DNA nucleotides, etc.).
+
+We say that pattern $P$ occurs with shift $s$ (equivalently, occurs at position $s+1$) in text $T$ if:
+\begin{itemize}
+    \item \textbf{the shift is within valid bounds:} $0 \leq s \leq n-m$
+    \item \textbf{the substring matches exactly:} $T[s+1, ..., s+m] = P[1, ..., m]$
+\end{itemize}
+
+When $P$ occurs with shift $s$ in $T$, we call $s$ a \textbf{valid shift}. Conversely, if $P$ does not occur at shift $s$, we call it an \textbf{invalid shift}.
+
+By convention, we refer to:
+\begin{itemize}
+    \item $T$ as the \textbf{text} (the longer string being searched)
+    \item $P$ as the \textbf{pattern} (the shorter string being sought)
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/pattern.png}
+\end{figure}
+
+\subsection{Naive Algorithm (Shifts Version)}
+
+\begin{algorithm}
+    \caption{Naive Algorithm for Exact Pattern Matching}
+
+    \Input{a text $T$ of length $n$ and a pattern $P$ of length $m$}
+    \Output{all the occurrences (or valid shifts) of $P$ in $T$}
+    \hl
+    \begin{algorithmic}[1]
+        \State $sol \gets \emptyset$
+        \For{$s \gets 0$ to $n-m$}
+            \State $i \gets 1$
+            \While{$i\leq m$ and $T[s+i] = P[i]$}
+                \State $i \gets i + 1$ \Comment{i scans the pattern}
+            \EndWhile
+            \If{$i > m$} \Comment{if the pattern is found}
+                \State $sol \gets sol \cup \{s\}$
+            \EndIf
+        \EndFor
+        \State \Return sol;
+    \end{algorithmic}
+\end{algorithm}
+
+The internal \texttt{While loop} scans $m$ chars of the text, with a complexity of $O(m)$, and the external \texttt{For loop} scans the whole text, with a complexity of $O(n)$. So the overall complexity is $O(n \cdot m)$.
+
+\subsection{Knuth-Morris-Pratt (KMP) Algorithm}
+
+The idea is to preprocess $P$ to skip unnecessary comparisons computing how $P$ matches against itself. This is achieved by computing an array $\pi = [1, ..., |P|]$ such that $\pi[q]$ is the length of the longest proper suffix of $P[1, ..., q]$ which is also a prefix of $P$.
+
+First, consider one prefix of $P$ at a time in increasing order of length. Second, for each prefix, check each proper suffix in decreasing order of length.
+
+\begin{exampleblock}{Example}
+For a given pattern \plaintt{P = ababaca}, then we compute $\pi$ as:
+
+\vspace{0.4em}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+P & a & b & a & b & a & c & a \\
+\hline 
+$\pi$ & 0 & 0 & 1 & 2 & 3 & 0 & 1 \\
+\hline
+\end{tabular}
+\end{center}
+\end{exampleblock}
+
+Computing $\pi$ is useful because we know that if the first $q$ chars of $P$ matched with some shift $S$ the next potentially valid shift is $S' = S + (q - \pi[q])$. A string of length $m$ has $m$ proper suffixes/prefixes.
+
+\begin{algorithm}
+    \caption{Compute\_$\pi$(P)}
+
+    \Input{a pattern $P$ of length $m$}
+    \Output{an array $\pi$ of length $m$ containing the length of the longest proper suffix of $P[1, ..., q]$ which is also a prefix of $P$}
+    
+    \hl
+
+    \begin{algorithmic}[1]
+        \State allocate $\pi[1, \ldots, m]$
+        \State $\pi \gets 0$ for all $i = 1, \ldots, m$
+        \State $k \gets 0$
+        \For{$q \gets 2$ to $m$}
+            \While{$k > 0$ and $P[k + 1] \neq P[q]$}
+                \State $k \gets \pi[k]$
+            \EndWhile
+            \If{$P[k + 1] = P[q]$}
+                \State $k \gets k + 1$
+            \EndIf
+            \State $\pi[q] \gets k$
+        \EndFor
+        \State \Return $\pi$
+    \end{algorithmic}
+\end{algorithm}
+
+The complexity analysis of \texttt{Compute\_$\pi$} is based on the following observations:
+
+\begin{itemize}
+    \item The increase of $k$ is at most $|P| - 1 \ (= m - 1)$ across all iterations
+    \item $k$ is always decreased in the While loop
+    \item $k$ is never negative
+\end{itemize} 
+
+Adding all costs: $O(m)$ for initialization + $O(m)$ for For loop operations (excluding while) + $O(m)$ for amortized cost of while loop and condition checks + $O(1)$ for return.
+
+Therefore, the total complexity is $\Theta(m)$. This type of analysis, where an operation's cost varies per iteration but has a bounded total cost across all iterations, is called \bfit{amortized analysis}.
+
+\newpage
+
+\subsubsection{Prefix Function}
+
+$\pi$ can also be seen as a prefix function such that:
+\vspace{0.4em}
+$$\pi : [1, m] \rightarrow [0, m - 1]$$
+where
+$$\pi[q] = max(k | k < q \wedge P[1, ..., k] \text{ is a proper suffix of } P[1, ..., q])$$
+The \textbf{prefix function iteration} is the sequence:
+\vspace{0.4em}
+$$\pi^*[q] = \{\pi[q], \pi^{(2)}[q] = \pi[\pi[q]], ..., \pi^{(t)}[q]\}$$
+where $t$ is the smallest value such that:
+\vspace{0.4em}
+$$\pi^{(t)}[q] = 0 \wedge \pi^{(i)}[q] = \pi[\pi^{(i-1)}[q]]$$
+$\pi^*[q]$ contains the lengths of every proper suffix of the prefix $P[1, ..., q]$.
+
+\begin{exampleblock}[prefix function]
+For a given pattern $P = abababab$ and $q = 7$, let's compute the prefix function iteration:
+
+\vspace{0.4em}
+
+$\pi[7] = 5$ \hspace{5em} (since $ababa$ is the longest proper suffix that matches a prefix)
+
+$\pi^{(2)}[7] = \pi[5] = 3$ \hspace{1em} (next longest is $aba$)
+
+$\pi^{(3)}[7] = \pi[3] = 1$ \hspace{1em} (then $a$)
+
+$\pi^{(4)}[7] = \pi[1] = 0$ \hspace{1em} (finally empty string)
+
+\vspace{0.4em}
+
+Therefore $t = 4$ iterations are needed to reach 0. 
+
+The complete prefix function iteration is:
+\vspace{0.4em}
+$$
+\pi^*[7](abababab) = \{5 \text{ (ababab)}, 3 \text{ (abab)}, 1 \text{ (a)}, 0 \text{ (empty)}\}
+$$
+This sequence contains all lengths of proper suffixes of $P[1,\ldots,7]$ that are also prefixes of $P$.
+\end{exampleblock}
+
+% \newtheorem{lemma}{Lemma}
+
+\rule{\textwidth}{0.4pt}
+\begin{Lemma}[Prefix Function Property]
+
+    \phantom{c}
+
+    For any position $q$ in the pattern, if there exists a non-empty proper suffix that matches a prefix (i.e., $\pi[q] > 0$), then the length of that suffix minus 1 appears in the prefix function iteration of the previous position:
+    \vspace{0.4em}
+    $$
+    \forall q \in [1, m], \text{if } \pi[q] > 0 \quad \Rightarrow \quad \pi[q] - 1 \in \pi^*[q - 1]
+    $$
+\end{Lemma}
+
+\vspace{-1em}
+
+\hdashrule{\textwidth}{0.1pt}{2mm 1.5mm}
+
+\vspace{-0.5em}
+
+\begin{proof}[\textbf{Proof}] \renewcommand{\qedsymbol}{$q.e.d.$}
+
+    Let's prove this by following these steps:
+    \begin{enumerate}
+        \item Since $\pi[q] > 0$, we know that $P[1,\ldots,\pi[q]]$ is a proper suffix of $P[1,\ldots,q]$
+        \item By definition of proper suffix, $\pi[q] < q$
+        \item This implies $\pi[q] - 1 < q - 1$
+        \item Consider the substring $P[1,\ldots,\pi[q]-1]$:
+            \begin{itemize}
+                \item It is a prefix of $P[1,\ldots,\pi[q]]$ (which matches a suffix of $P[1,\ldots,q]$)
+                \item Therefore, it must be a proper suffix of $P[1,\ldots,q-1]$
+            \end{itemize}
+        \item By the definition of prefix function iteration, $\pi[q] - 1$ must be in $\pi^*[q-1]$
+    \end{enumerate}
+\end{proof}
+\vspace{-1em}
+
+\rule{\textwidth}{0.4pt}
+
+\subsubsection{The Knuth-Morris-Pratt Algorithm}
+    
+Let's define the set $E_{q-1}$ that helps us compute the prefix function values:
+$$
+E_{q-1} = \{k \in \pi^*[q-1]|P[k+1] = P[q]\} = \{k|k < q-1 \wedge P[1,...,k+1] \text{ is a suffix of } P[1,...,q]\}
+$$
+Intuitively, $E_{q-1}$ contains all values $k$ from the prefix function iteration $\pi^*[q-1]$ where:
+\begin{itemize}
+    \item The next character after position $k$ matches the current character at position $q$
+    \item The substring $P[1,...,k+1]$ forms a proper suffix of $P[1,...,q]$
+\end{itemize}
+
+Using this set, we can formally define the prefix function value at position $q$ as:
+
+$$
+\pi[q] = 
+\begin{cases}
+0 & \text{if } E_{q-1} = \emptyset \text{ $\ $ (no matching suffixes)} \\
+1 + \max(k \in E_{q-1}) & \text{otherwise $\ \ \ \ $ (take longest matching suffix)}
+\end{cases}
+$$
+
+With these mathematical foundations, we can now define the Knuth-Morris-Pratt algorithm:
+
+\begin{algorithm}[H]
+    \caption{KMP(T, P)}
+    \Input{a text $T$ of length $n$ and a pattern $P$ of length $m$}
+    \Output{all the occurrences (or valid shifts) of $P$ in $T$}
+
+    \hl
+
+    \begin{algorithmic}[1]
+        \State $\pi \gets$ Compute\_$\pi$(P)
+        \State $q \gets 0$ \Comment{Number of characters matched so far}
+        \State solution $\gets \emptyset$
+        \For{$i = 1$ \textbf{ to } $|T|$ \textbf{ do}} 
+            \While{$q > 0$ \textbf{ and } $P[q + 1] \neq T[i]$} \Comment{Next character does not match}
+                \State $q \gets \pi[q]$
+            \EndWhile
+            \If{$P[q + 1] = T[i]$} \Comment{Next character matches}
+                \State $q \gets q + 1$
+            \EndIf
+            \If{$q = |P|$} \Comment{Found complete pattern match}
+                \State $solution.append(i - |P| + 1)$
+                \State $q \gets \pi[q]$ \Comment{Look for next potential match}
+            \EndIf
+        \EndFor
+        \State \Return solution
+    \end{algorithmic}
+\end{algorithm}
+
+\vspace{-1em}
+
+The time complexity of the Knuth-Morris-Pratt algorithm is $\Theta(n + m)$, where $n$ is the length of the text $T$ and $m$ is the length of the pattern $P$. This result follows from aggregate analysis of the algorithm's behavior. The key insight is that each character in the text is examined at most twice: once when extending a match and once when falling back through the prefix function values.
