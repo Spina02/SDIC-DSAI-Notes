@@ -1,0 +1,76 @@
+\chapter{Cardinality Estimation}
+
+    \textbf{Cardinality problem:} count how many distinct elements appear in a stream $S$,
+    \\
+    \\
+    \color{Sepia}
+    \noindent\rule{15cm}{0.4pt}\\
+        \textbf{\textit{Example:}}
+        \\
+        \\
+        $S = x\;y\;x\;y\;z\;x\;z\;y\;z\;x\;z\;z\;y\;x \qquad x \neq y \neq z$\\\\
+        Cardinality of $S = 3$
+        \\
+    \noindent\rule{15cm}{0.4pt}\\
+    \color{black}
+
+    \textbf{Toy problem (Hat problem)}: you have a universe of $|\mathcal{U}|$ integers from (for example) 0 to 1000. Someone extracts a random subset of $\mathcal{U}$. Your task is to guess the cardinality of this subset by asking one question whose answer is a scalar.
+    \\
+    \\
+    E.g of valid queries: min / max / avg / median / ... \\
+
+    If we choose the minimum, and assuming than the subset is uniform randomly distributed, we can think that the step size from one item of the subset to the following one is that exact quantity. For example, if the minimum is 95, we can suppose that the set is divided in approximately 95-size steps so we can estimate the size as 
+
+    $$ 95 = \dfrac{1000}{N+1} $$
+
+    where $N$ is the true cardinality of the set. Then $N \sim 9.5$.
+    \\
+    \\
+    For simplicity, let's map the range values to an interval between 0 and 1: $h: \mathcal{U} \rightarrow [0,1]$. Our equation to solve the problem is 
+    
+    $$M \approx \dfrac{1}{N+1} $$
+
+    being $M$ the minimum hash value.
+    \\
+    \\
+    Let $M = \min(x_1, \dots, x_n)$ where $x_i$ is an independent random variable uniform over $[0,1]$. $x_i$ models the hash value of the i-th item of the set.
+    \\
+    \\
+    We desire that
+    
+    $$ E(M) = \dfrac{1}{N+1} $$
+    \\
+    \\
+    Define $I_i =   \begin{cases}
+                        1 & \text{if } x_i < \min_{i \neq j} x_j \\
+                        0 & \text{otherwise}
+                    \end{cases}$\\
+
+    $$E(I_i) = \dfrac{1}{N+1} \forall i \Rightarrow E(I_N+1) = \dfrac{1}{N+1} = \Pr(X_{N+1} < \min_{1 \leq i \leq N} x_i) = E(M)$$
+    \\
+    \\
+    If one of the items of the set is very close to 0, then the model might overestimate, i.e., it has a high variance. 
+
+    A different approach would be using the k-th smallest value for some $k>1$.
+    
+    Let $M_1 = \text{smallest value}, M_2 = \text{second smallest value}, \dots, M_k = \text{k-th smallest value}$. 
+
+    $$ E(M_k) = \dfrac{k}{N+1} \Rightarrow \dfrac{M_k}{k} = \dfrac{1}{N+1}$$
+    
+    An alternative could also be partitioning (before starting) the $[0,1]$ interval into $k$ equal intervals and maintaining the minimum of each interval. When an element arrives:
+
+    \begin{enumerate}
+        \item In $\Theta(1)$ time, find its interval.
+        \item  In $\Theta(1)$ time, compare it with the minimum of that interval.
+        \item Update it if needed.
+    \end{enumerate}
+    
+    It is important to:
+
+    \begin{itemize}
+        \item Consider each of the $k$ intervals separately.
+
+        \item Compute an estimate for $N$ separately for each interval.
+
+        \item Return the average of the estimates.
+    \end{itemize}
