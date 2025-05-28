@@ -1,6 +1,4 @@
-\chapter{Data Mining}
-
-\section{Exact Pattern Matching}
+\chapter{Exact Pattern Matching}
 
 Consider two strings: a \textbf{text} string $T[1, ..., n]$ of length $n$ and a \textbf{pattern} string $P[1, ..., m]$ of length $m$. Both strings are defined over a finite alphabet $\Sigma$ (e.g., ASCII characters, DNA nucleotides, etc.).
 
@@ -23,7 +21,7 @@ By convention, we refer to:
     \includegraphics[width=0.5\textwidth]{assets/pattern.png}
 \end{figure}
 
-\subsection{Naive Algorithm (Shifts Version)}
+\section{Naive Algorithm (Shifts Version)}
 
 \begin{algorithm}
     \caption{Naive Algorithm for Exact Pattern Matching}
@@ -48,7 +46,7 @@ By convention, we refer to:
 
 The internal \texttt{While loop} scans $m$ chars of the text, with a complexity of $O(m)$, and the external \texttt{For loop} scans the whole text, with a complexity of $O(n)$. So the overall complexity is $O(n \cdot m)$.
 
-\subsection{Knuth-Morris-Pratt (KMP) Algorithm}
+\section{Knuth-Morris-Pratt (KMP) Algorithm}
 
 The idea is to preprocess $P$ to skip unnecessary comparisons computing how $P$ matches against itself. This is achieved by computing an array $\pi = [1, ..., |P|]$ such that $\pi[q]$ is the length of the longest proper suffix of $P[1, ..., q]$ which is also a prefix of $P$.
 
@@ -83,8 +81,8 @@ Computing $\pi$ is useful because we know that if the first $q$ chars of $P$ mat
     \begin{algorithmic}[1]
         \State allocate $\pi[1, \ldots, m]$
         \State $\pi \gets 0$ for all $i = 1, \ldots, m$
-        \State $k \gets 0$
-        \For{$q \gets 2$ to $m$}
+        \State $k \gets 0$ \Comment{length of the current lowest prefix}
+        \For{$q \gets 2$ to $m$}\Comment{length of the substring we are currently checking}
             \While{$k > 0$ and $P[k + 1] \neq P[q]$}
                 \State $k \gets \pi[k]$
             \EndWhile
@@ -146,7 +144,7 @@ Therefore $t = 4$ iterations are needed to reach 0.
 The complete prefix function iteration is:
 \vspace{0.4em}
 $$
-\pi^*[7](abababab) = \{5 \text{ (ababab)}, 3 \text{ (abab)}, 1 \text{ (a)}, 0 \text{ (empty)}\}
+\pi^*[7](abababab) = \{5 \text{ (ababa)}, 3 \text{ (aba)}, 1 \text{ (a)}, 0 \text{ (empty)}\}
 $$
 This sequence contains all lengths of proper suffixes of $P[1,\ldots,7]$ that are also prefixes of $P$.
 \end{exampleblock}
@@ -225,15 +223,15 @@ With these mathematical foundations, we can now define the Knuth-Morris-Pratt al
         \State $\pi \gets$ Compute\_$\pi$(P)
         \State $q \gets 0$ \Comment{Number of characters matched so far}
         \State solution $\gets \emptyset$
-        \For{$i = 1$ \textbf{ to } $|T|$ \textbf{ do}} 
+        \For{$i = 1$ \textbf{ to } $n$ \textbf{ do}} 
             \While{$q > 0$ \textbf{ and } $P[q + 1] \neq T[i]$} \Comment{Next character does not match}
                 \State $q \gets \pi[q]$
             \EndWhile
             \If{$P[q + 1] = T[i]$} \Comment{Next character matches}
                 \State $q \gets q + 1$
             \EndIf
-            \If{$q = |P|$} \Comment{Found complete pattern match}
-                \State $solution.append(i - |P| + 1)$
+            \If{$q = m$} \Comment{Found complete pattern match}
+                \State $solution.append(i - m + 1)$
                 \State $q \gets \pi[q]$ \Comment{Look for next potential match}
             \EndIf
         \EndFor
