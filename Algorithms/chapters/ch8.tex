@@ -1,199 +1,271 @@
 \chapter{Stream Model}
 
-        \section{Bloom Filters}
-    
-        If the data is so large that it cannot fit in the main memory, we can propose a stream model. 
-        \\
-        \\
-        \textbf{Stream of keys:} We want to maintain a data structure to answer membership queries (given any key $k$, did $k$ appear in the stream?).
-        \\
-        \\
-        \subsection{Types of Bloom Filters}
-        
-        \begin{itemize}
-            \item \textit{1-binary array and 1-hash function.}\\\\
-            We have an array of bits of size $m$ and a hash function $h: \mathcal{U} \rightarrow [0, m-1]$. Whenever we read $k$ from the stream, we hash the key, $B[h(k)] \leftarrow 1$. If the cell is already set at 1, then we do nothing. Collisions are possible errors (answering \textit{yes} to queries for which the real answer is \textit{no}; it is not possible the opposite case). The probability of these errors is $\dfrac{n}{m}$.
-            \\
-            \\
-            \item \textit{i-binary array and i-hash functions.}\\\\
-            In order to decrease the probability of error, we could store $i$ binary arrays of size $m$, s.t. for inserting an item $i$, we compute all its hash functions $B[h_i(k)] \leftarrow 1$. This way we can still have collisions but with a smaller probability.
-            \\
-            \\
-            Say an item $q$ is not present in the stream. What is the probability to answer \textit{yes} to query $q = Pr(FP)$? Let $P$ be the max ratio of cells set to 1 in each of the $i$ arrays.
-    
-            $$ Pr(FP) \leq P_1^i$$
-    
-            The probability decreases exponentially for each new array added.
-            \\
-            \\
-            \item \textit{1-binary array and i-hash functions}.\\\\
-            Let's say we have a 1-binary array of size $m$ and $i$ hash functions (uniform and independent). To insert an element $k$, $B[h_i(k)] \leftarrow 1$.
-            \\
-            \\
-            What is the probability of having a bit equal to 0 or 1 after $n$ insertions in a BF of size $m$?
-                \begin{itemize}
-                    \item With 1 hash function and $n=1$, it is $(1-\dfrac{1}{m})$.
-    
-                    \item With $k$ hash functions and $n\geq q$ insertions, it is $(1 - \dfrac{1}{m})^{nk} = P_0$. Thus, the probability of having a bit set to 1 is $P_1 = 1 - P_0$.\\\\
-                \end{itemize}
-    
-            Then, the probability of getting a false positive is: 
-            
-            $$\Pr(FP) = P_1^k = (1-P_0)^k = (1-(1-\dfrac{1}{m})^{nk})^k = f$$
-            $$ \Pr(FP) \sim \left( 1 - e^{-\dfrac{n k}{m}} \right)^k = \Tilde{f}$$
-    
-            Say we fixed $\dfrac{n}{m} = c$ constant.
-            \\
-            \\
-            To calculate the optimal number of hash functions: $\tilde{f}' = 0$ for $k^*=\ln (2) \dfrac{m}{n}$. Roughly if $\dfrac{m}{n} = 10$, $k^* = 7$.
-            \\
-            \\
-            So we determined $k^*$. What is the probability of reading a 0 in the BF after choosing the optimal number of hash functions?
-    
-            $$ \tilde{P}_0 = e^{-\dfrac{nk}{m}} \Rightarrow \ln(\tilde{P}_0) = -\dfrac{nk}{m} \Rightarrow k = -\ln(\tilde{P}_0)\dfrac{m}{n} \Rightarrow -\ln(\tilde{P}_0) = \ln(2) \Rightarrow \tilde{P}_0 = \dfrac{1}{2}$$
-    
-            Problem: estimate how many items ($n$) we can insert, fixed $m$ and $k^*$ to get 50\% of 1s in the BF.
-    
-            \begin{itemize}
-                \item First insert adds a new 1 with prob 1.
-                \item Second insert adds a new 1 with prob $\dfrac{m-1}{m}$.
-                \item Third insert adds a new 1 with prob $\dfrac{m-2}{m}$.
-                \item i-th insert adds a new 1 with prob $\dfrac{m-i+1}{m}$
-            \end{itemize}
-    
-            Let $X$ be a random variable modeling. How many inserts can we make before having BF 50\% full?
-    
-            $$ X = \sum_{i=0}^{\frac{m}{2}-1} X_i$$
-    
-            where $X_i$ is a geometric variable with probability $P_i$ that represents the number of inserts between the (i-1)-th 1 and the i-th. Note that $E(X_i) = \dfrac{1}{P_1}$.
-    
-            $$ E(X) = \sum_{i=0}^{\frac{m}{2}-1} E(X_i) = \sum_{i=0}^{\frac{m}{2}-1} \dfrac{1}{P_i} = \sum_{i=0}^{\frac{m}{2}-1} \dfrac{m}{m-1} = m \sum_{i=0}^{\frac{m}{2}-1} \dfrac{1}{m-i} = m \sum_{i=1}^m \dfrac{1}{i}$$
-    
-            Example: if we have $m=100$ we can insert $68/69$ items before being 50\%.\\\\
-            
-            \end{itemize}
-    
+\section{Bloom Filters}
 
+A \textbf{Bloom filter} is a space-efficient probabilistic data structure designed to test whether an element is a member of a set. It is especially useful when the \bfit{data is so large that it cannot fit in main memory}, motivating the use of a stream model. Bloom filters allow for false positives (reporting an element is present when it is not), but never false negatives.
 
-        \subsection{Set operations}    
-    
-        Given two streams of data, $S_1$ and $S_2$. Can I estimate $S_1 \cap S_2$ and $S_1 \cup S_2$ with the bloom filter?
-    
-        \begin{itemize}
-            \item $S_1 \cup S_2$: We have $BF_1$ for $S_1$, $BF_2$ for $S_2$, of the same size $m$ and using the same $k$ hash functions. $B = B_1 \; OR \; B_2$ represents $S_1 \cup S_2$.
+\textbf{Problem:} Given a stream of keys, maintain a data structure to answer membership queries:
+$$
+\text{"Given any key, did $k$ appear in the stream?"}
+$$
 
-            \item $S_1 \cap S_2$: We have $BF_1$ for $S_1$, $BF_2$ for $S_2$, of the same size $m$ and using the same $k$ hash functions.. $B = B_1 \; AND \; B_2$ represents $S_1 \cap S_2$. However, the error rate will be higher than a BF built directly for $S_1 \cap S_2$. Some 1s in the new BF may be from elements that are not in the intersection but match in both BFs.\\
-        \end{itemize}
-    
-        
-        
-        \subsection{Properties}
+\subsection{Types of Bloom Filters}
 
-        \textbf{Advantages}:
-        \begin{itemize}
-            \item One-sided error (no false negatives)
-            \item Insertion time. $O(k)$ (independent from $n$) and can be made parallel.
-            \item Less required space than a hash table:
-                \begin{table}[H]
-                    \centering
-                    \begin{tabular}{|c |c | c|}
-                        \hline
-                         & \textbf{BF} & \textbf{HT}\\
-                         \hline
-                        item & $m$ bits & $m+n$ pointers $+ n$ integers\\
-                        \hline
-                    \end{tabular}
-                    \label{tab:my_label}
-                \end{table} 
-        \end{itemize}
-        
-        \textbf{Downsides}:
-        \begin{itemize}
-            \item Cannot delete items (because of collisions it might create false negatives).
-            \item Cannot store values with the keys,
-        \end{itemize}
-    
-    
-    
-        
-    
-    \section{Count-Min Sketch}
+\begin{itemize}
+    \item \bfit{1-binary array and 1-hash function.}
 
-    \textbf{Problem:} we have a stream $a_1,\dots, a_n$ of keys from a universe $\mathcal{U}$ of size $m$. Estimate the frequency of any queried item $x \in \mathcal{U}$.
-    \\
-    \\
-    A CMS (Count-Min Sketch) is essentially a matrix of counters (whose dimension is $w \times d$). Each row corresponds to a hash function and each cell is an integer $\geq 0$ (initially all 0). $h_i : \mathcal{U} \rightarrow [0, w-1] \forall i$.
-    \\
-    \\
+    We have an array $B$ of $m$ bits and a hash function $h: \mathcal{U} \rightarrow [0, m-1]$. For each key $k$ in the stream, set $B[h(k)] \leftarrow 1$. If the cell is already 1, do nothing. Collisions can cause errors: we may answer \emph{yes} to queries for which the real answer is \emph{no} (false positives), but never the opposite. The probability of a false positive is roughly $\frac{n}{m}$.
+
+    
+    \item \bfit{i-binary array and $k$-hash functions.}
+
+    In order to decrease the probability of error, we could store $i$ binary arrays of size $m$, such that for inserting an item $i$, we compute all its hash functions $B[h_i(k)] \leftarrow 1$. This way we can still have collisions but with a smaller probability. The probability of a false positive is:
+    \vspace{0.2em}
+    $$
+    \Pr(\mathrm{FP}) \leq P_1^i
+    $$
+
+    \vspace{-0.4em}
+
+    where $P_1$ denotes, among all the binary arrays used, the highest fraction of cells set to 1 ($\frac{\#1s}{m}$). 
+    
+    The probability of a false positive decreases exponentially as $i$ increases.
+    
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.8\linewidth]{assets/CMS.png}
-        \caption{$10 \times 4$ CMS example.}
+        \includegraphics[height=14em]{assets/BF-1-1.png}
+        \hspace{6em}
+        \includegraphics[height=14em]{assets/BF-i-i.png}
+        \caption{Bloom filters. 1-array and 1-hash functions (left) and $k$-array and $k$-hash functions (right).}
     \end{figure}
 
-    To \textbf{insert} an element $a_i$, we should apply all the hash functions (one per row) and increase by 1 the values of the corresponding cells.
-    \\
-    \\
-    When we \textbf{query} an item, we compute its hash functions to get the cells' values and return the minimum value, which is the maximum number of times we could have seen that element. Let's denote the counter an item $x$ is mapped to at row $i$ as $C_{i,h_i}(x)$. Then, $\tilde{f}(q) = \min_{i \in [0, d-1]} \{C_{i,h_i}(x)\}$. Let $f$ be the true frequency of $q$. Then, $\tilde{f} \geq f$ (it never underestimates the frequency but it might overestimate it).
-    \\
-    \\
-    \textbf{Property}: For any $q \in \mathcal{U}$, $\tilde{f}(q) = \min_{i \in [0, d-1]} \{C_{i,h_i}(x)\}$.  
-    \\
-    \\
-    \textbf{Claim}: If $w = \dfrac{2}{\varepsilon}$ and $d = \log_2 \delta^{-1}$, then 
+    \item \bfit{1-binary array and $k$-hash functions.}
+
+        Use one binary array of size $m$ and $k$ independent hash functions. To insert $k$, set $B[h_j(k)] \leftarrow 1$ for all $j = 1, \dots, k$. The probability that a bit is 0 or 1 after $n$ insertions is:
+            \begin{itemize}
+                \item With 1 hash function and $n=1$, it is $P_0 = \left(1-\frac{1}{m}\right)$, then $P_1 = 1 - P_0$.
+
+                \item With $k$ hash functions and $n$ insertions, it is $P_0 = (1 - \frac{1}{m})^{nk}$.
+            \end{itemize}
+
+        Then, the probability of getting a false positive is:
+        \small
+        $$
+            \Pr(\mathrm{FP}) = P_1^k = (1-P_0)^k = \left(1-\left(1-\dfrac{1}{m}\right)^{nk}\right)^k = f
+        \quad \Rightarrow \quad
+            \Pr(\mathrm{FP}) \sim \left( 1 - e^{-\frac{nk}{m}} \right)^k = \tilde{f}
+        $$
+        \normalsize
+        If $\frac{n}{m} = c$ is constant, the optimal number of hash functions is:
+        $$
+        k^* = \ln(2) \frac{m}{n}
+        $$
+
+        \vspace{-0.6em}
+
+        For example, if $\frac{m}{n} = 10$, $k^* \approx 7$.
+
+        The probability of reading a 0 in the Bloom filter is $\tilde{P}_0 = e^{-\frac{nk}{m}}$. With the optimal $k^* k = \ln(2) \frac{m}{n}$:
+        $$
+            \tilde{P}_0 = \frac{1}{2}
+        $$
+
+        \vspace{-1em}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[height=12em]{assets/BF-1-i.png}
+            \caption{Bloom filter with 1 array and $k$ hash functions.}
+        \end{figure}
+
+        \vspace{-1em}
+
+        \bfit{How many items can we insert before the Bloom filter is 50\% full?}
+
+        A natural question is to estimate the number of insertions required before the Bloom filter's bit array becomes substantially full, for instance, 50\%. Consider the process of setting bits in the $m$-bit array, and $k = 1$ hash function:
+        \begin{itemize}
+            \item \textbf{First insertion:} The probability that an attempt sets a new bit is $P_0 = \frac{m-0}{m} = 1$. The expected number of attempts is $1/P_0 = 1$.
+            \item \textbf{Second insertion:} The probability that an attempt sets a new bit (one of the $m-1$ remaining zero bits) is $P_1 = \frac{m-1}{m}$. The expected number of additional attempts is $1/P_1 = \frac{m}{m-1}$.
+            \item \textbf{General case:} The probability that an attempt sets a new bit is $P_j = \frac{m-j}{m}$. The expected number of additional attempts to achieve this is $1/P_j = \frac{m}{m-j}$.
+        \end{itemize}
+
+        \begin{warningblock}[Notation $P_j$]
+            Note that we're using $P_j$ here to represent the probability of setting a new bit during the $j$-th insertion. This is different from our earlier use of $P_0$, which represented the probability of finding a 0 in the Bloom filter after $n$ insertions.
+        \end{warningblock}
+
+        Let $X$ be the random variable representing the total number of such bit-setting attempts required to set exactly $m/2$ distinct bits in the Bloom filter to '1'. The expected value of $X$, $E[X]$, is the sum of the expected number of attempts needed to set each successive new bit, from the 1st bit up to the $(m/2)$-th bit:
+        $$
+            E[X] = \sum_{j=0}^{m/2-1} \frac{m}{m-j}
+        $$
+        This sum can be rewritten by letting $i' = m-j$. 
+        $$
+        \begin{cases}
+            i' = m & \text{if } j = 0 \\
+            i' = m/2+1 & \text{if } j = m/2-1 \\
+            i' = m-j & \text{otherwise}
+        \end{cases}
+        \quad \Rightarrow \quad
+        E[X] = m \sum_{i'=m/2+1}^{m} \frac{1}{i'}
+        $$
+        Using the Taylor approximation, we get:
+        $$
+            E[X] \approx m (\ln m - \ln(m/2)) = m \ln\left(\frac{m}{m/2}\right) = m \ln 2
+        $$
+        For example, if $m=100$, $E[X] \approx 100 \ln 2 \approx 69.3$. So, we expect to make around 69 "effective bit-setting attempts" before half the bits in the Bloom filter are set to 1.
+
+    \end{itemize}
+
+    \subsubsection{Set operations}    
+
+    Given $BF_1$ for $S_1$ and $BF_2$ for $S_2$ (same size $m$, same $k$ hash functions), we can compute:
     
-    $$ \Pr(\tilde{f}(x) \leq f(x) + n \varepsilon) \geq 1 - \delta, \quad \forall \varepsilon, \quad \delta \geq 0, \quad \forall x \in \mathcal{U} $$
+        \begin{itemize}
+            \item \textbf{Union:} $B = B_1 \; \mathrm{OR} \; B_2$ represents $S_1 \cup S_2$.
 
-    being $n$ the number of elements inserted in the CMS.
-    \\
-    \\
-    The probability that the estimated frequency is at most $n \times \epsilon$ larger than the true value is at least $1 - \delta$. In other words,
-
-    $$ \delta = \text{ probability by which } \tilde{f} \text{ overestimates } f \text{ by more than } n \epsilon$$
-    \\
-    With arbitrary high probability I can get arbitrarily accurate estimates for the frequency. If $\epsilon$ and $\delta$ are low, I must have more columns. Moreover, with more columns I get fewer collisions, therefore, with high probability the estimated value will be close to the real one.
-    \\
-    \\
-    \textbf{Proof}: 
-
-        \begin{enumerate}
-            \item Fix item $x \in S$
-
-            \item Define $d$ random variables $Z_1, \dots, Z_d$ s.t. $Z_i = C_{i,h(x)} - f(x)$
-
-            \item Define also random variables $Y_{i,y} = \begin{cases} 
-                                                1 & \text{if } h_i(x) = h_i(y) \\
-                                                0 & \text{otherwise} 
-                                            \end{cases} \qquad \forall y \neq x, y \in S$
-            
-            \item $$ Z_i = \sum_{y \neq x} (Y_{i,y} f(y))$$
-
-            \item $$ E(Z_i) = \sum_{x \neq y} E(Y_{i,y} f(y)) = \sum_{x \neq y} f(y) E(Y_{i,y}) = \sum_{x \neq y} f(y) \Pr(h_i(x) = h_i(y)) \leq \dfrac{n}{w}$$
-
-            \item $$ Z_i \geq 0 \Rightarrow \text{Markow's inequality} \qquad \Pr(Z_i \geq b \; E(Z)) \leq \dfrac{1}{b} \Rightarrow \Pr(Z_i \geq \dfrac{b\;n}{w}) \leq \dfrac{1}{b}$$
-
-            \item Let $b = w \; \varepsilon$
-
-            $$\Pr(Z_i \geq \varepsilon \; n) \leq \dfrac{1}{w \varepsilon} = \dfrac{1}{2}$$
+            \item \textbf{Intersection:} $B = B_1 \; \mathrm{AND} \; B_2$ represents $S_1 \cap S_2$. The error rate is higher than a Bloom filter built directly for $S_1 \cap S_2$. Some 1s in the new BF may be from elements that are not in the intersection but match in both BFs.
+        \end{itemize}
         
-            That bounds the probability of making an error greater than some quantity in a given row.
+    \subsubsection{Characteristics and Trade-offs}
 
-            \item $$ \Pr(Z_i + f(x) \geq f(x) + \varepsilon \; n) \leq \dfrac{1}{2}$$
+        Bloom filters have key characteristics that make them valuable. Their \textbf{one-sided error profile} ensures no false negatives, only false positives, making them ideal when missing a true positive is worse than occasional false ones.
+        
+        Performance-wise, \textbf{insertion and query operations are $O(k)$}, independent of the number of items. Hash operations can be parallelized for fast execution. Bloom filters are also \textbf{space-efficient} compared to traditional data structures, as shown in \cref{tab:bf-vs-ht}, making them perfect for large datasets or memory-constrained environments.
+                
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c |c | c|}
+                \hline
+                 & \textbf{BF} & \textbf{HT}\\
+                 \hline
+                item & $m$ bits & $m+n$ pointers $+ n$ integers\\
+                \hline
+            \end{tabular}
+            \caption{Simplified space comparison between Bloom filter and hash table.}
+            \label{tab:bf-vs-ht}
+        \end{table} 
 
-            \item $$ \Pr(\forall i \in [0, d-1], Z_i \geq \varepsilon \, n) \leq (\dfrac{1}{2})^d = (\dfrac{1}{2})^{\log_2 \dfrac{1}{\delta}} = 2^{-\log_2 \delta^{-1}} = \delta \Rightarrow \Pr(\exists i \in [0, d-1] \text{ s.t. } Z_i < \varepsilon \; n) \geq 1 - \delta$$
+        \vspace{-1em}
 
-            CMS of dimensions $O(\varepsilon^{-1} \log \delta^{-1})$ achieves performance $\forall \varepsilon, \delta$.
-        \end{enumerate}
+        However, these benefits come with certain \textbf{limitations}:
+        
+        \begin{itemize}
+            \item \textbf{do not support item deletion}: attempting to delete an item by clearing its corresponding bits could inadvertently affect other items that happen to hash to one or more of the same bits, potentially leading to false negatives—a violation of their core guarantee. 
 
-    \color{Sepia}
-    \noindent\rule{15cm}{0.4pt}\\
-        \textbf{\textit{Example:}}
-        \\
-        \\
-        Say $\varepsilon = 10\% = 0.1$ and $\delta = 0.1$. Then, $\sim 80$ counters are enough.
-        \\
-        \\
-        Say $\varepsilon = 1\% = 0.01$ and $\delta = 0.01$. Then, $\sim 1400$ counters are enough.
-        \\
-    \noindent\rule{15cm}{0.4pt}\\
-    \color{black}
+            \item \textbf{cannot store associated values with keys}: they are purely membership testing structures. If you need to retrieve data associated with an item, a Bloom filter can only serve as a preliminary check to avoid costly lookups for non-existent items.
+        \end{itemize}
+
+\section{Count-Min Sketch}
+
+While Bloom filters answer membership queries, the \textbf{Count-Min Sketch (CMS)} addresses a different problem in stream processing: estimating the \textbf{frequency} of items.
+
+\textbf{Problem:} Given a stream of items $a_1, \dots, a_N$ (where $N$ is the total count of items in the stream, including repetitions) drawn from a universe $\mathcal{U}$, we want to maintain a compact data structure that can estimate the frequency $f(x)$ of any queried item $x \in \mathcal{U}$. The frequency $f(x)$ is the number of times $x$ has appeared in the stream processed so far.
+
+A CMS consists of a $d \times w$ matrix of counters, denoted $C$. Initially, all $C[i][j]$ are set to 0. The structure uses $d$ independent hash functions $h_1, \dots, h_d$. Each hash function $h_j: \mathcal{U} \rightarrow [0, w-1]$ maps items to one of the $w$ columns in its respective row $j$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{assets/CMS.png}
+    \caption{A $d \times w$ Count-Min Sketch. Here, $d=4$ rows (hash functions) and $w=10$ columns.}
+    \label{fig:cms_structure}
+\end{figure}
+
+To \textbf{insert} an element $a_i$, we should apply all the hash functions (one per row) and increase by 1 the values of the corresponding cells.
+
+To \textbf{query} an item $x$ (estimate its frequency), denoted $\tilde{f}(x)$, we compute $h_j(x)$ for all $j=1, \dots, d$ and retrieve the values from the corresponding counters. The estimate is the minimum of these values:
+$$ \tilde{f}(x) = \min_{j \in [1,d]} \{C[j][h_j(x)]\} $$
+Let $f(x)$ be the true frequency of $x$. A key property of CMS is that it \textbf{never underestimates} the frequency: $\tilde{f}(x) \geq f(x)$. Taking the minimum across different hash functions attempts to find the row with the least "collision noise."
+
+\textbf{Accuracy Guarantee (Claim):}
+
+The power of CMS lies in its probabilistic accuracy guarantee. If we choose the width $w = \left\lceil \frac{2}{\varepsilon} \right\rceil$ and depth $d=\left\lceil \log_2 \delta^{-1} \right\rceil$, then for any item $x \in \mathcal{U}$:
+\vspace{0.4em}
+$$
+\Pr(\tilde{f}(x) \leq f(x) + \varepsilon n) \geq 1 - \delta
+$$
+
+\vspace{-0.6em}
+
+being $n$ the number of items in the stream.
+
+The parameters $\varepsilon > 0$ and $0 < \delta < 1$ control the trade-off between accuracy and space:
+\begin{itemize}
+    \item $\varepsilon$ determines the \textbf{error factor}: the overestimation is bounded by $\varepsilon N$. Smaller $\varepsilon$ requires larger $w$ (more columns).
+    \item $\delta$ determines the \textbf{failure probability}: the probability that the error bound is violated. Smaller $\delta$ requires larger $d$ (more rows/hash functions).
+\end{itemize}
+In simpler terms, with probability at least $1-\delta$, the estimated frequency $\tilde{f}(x)$ overestimates the true frequency $f(x)$ by at most $\varepsilon N$.
+
+\newpage
+
+\textbf{Proof}: 
+
+\begin{enumerate}
+    \item Fix item $x \in S$
+
+    \item For each row $i$, define $d$ random variables $Z_1, \dots, Z_d$ such that $Z_i = C_{i,h(x)} - f(x)$
+
+    \item Define also random variables $Y_{i,y} = \begin{cases} 
+                                        1 & \text{if } h_i(x) = h_i(y) \\
+                                        0 & \text{otherwise} 
+                                    \end{cases} \qquad \forall y \neq x, y \in S$
+    
+    \item The error $Z_i$ can be expressed as:
+    $$
+    Z_i = \sum_{y \neq x} (Y_{i,y} f(y))
+    $$
+
+    \item The expected value of $Z_i$ is bounded by:
+    $$
+    E(Z_i) = \sum_{x \neq y} E(Y_{i,y} f(y)) = \sum_{x \neq y} f(y) E(Y_{i,y}) = \sum_{x \neq y} f(y) \Pr(h_i(x) = h_i(y)) \leq \dfrac{n}{w}
+    $$
+
+    \item Since $Z_i \geq 0$, applying Markov's inequality yields:
+    $$
+    \Pr(Z_i \geq b \; E(Z)) \leq \dfrac{1}{b} \Rightarrow \Pr(Z_i \geq \dfrac{b\;n}{w}) \leq \dfrac{1}{b}
+    $$
+
+    \item Let $b = w \; \varepsilon$
+    $$
+    \Pr(Z_i \geq \varepsilon \; n) \leq \dfrac{1}{w \varepsilon} = \dfrac{1}{2}
+    $$
+
+    That bounds the probability of making an error greater than some quantity in a given row.
+
+    \item The probability of overestimation is bounded by:
+    $$
+    \Pr(Z_i + f(x) \geq f(x) + \varepsilon \; n) \leq \dfrac{1}{2}
+    $$
+
+    \item The final probability bound is:
+    $$
+    \Pr(\forall i \in [0, d-1], Z_i \geq \varepsilon \, n) \leq \left(\dfrac{1}{2}\right)^d = \left(\dfrac{1}{2}\right)^{\log_2 \delta^{-1}} = 2^{-\log_2 \delta^{-1}} = \delta
+    $$
+    $$
+    \Rightarrow \quad \Pr(\exists i \in [0, d-1] \text{ s.t. } Z_i < \varepsilon \; n) \geq 1 - \delta
+    $$
+
+    CMS of dimensions $O(\varepsilon^{-1} \log \delta^{-1})$ achieves performance $\forall \varepsilon, \delta$.
+\end{enumerate}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        $\varepsilon$ & $\delta$ & $\lceil 2/\varepsilon \rceil \cdot \lceil \log_2 \delta^{-1} \rceil$ \\
+        \hline
+        $10\%$ & $0.1$ & $80$ \\
+        $1\%$ & $0.01$ & $1,\!400$ \\
+        $0.1\%$ & $0.001$ & $20,\!000$ \\
+        $0.0001\%$ & $0.01$ & $1,\!400,\!000$ \\
+        \hline
+    \end{tabular}
+    \caption{Number of counters required for various error ($\varepsilon$) and failure probability ($\delta$) parameters.}
+\end{table}
+
+\vspace{-1em}
+
+Remember that $\varepsilon$ multiplies $m$, and a counter requires many (maybe 32 or 64) bits.
+
+\begin{tipsblock}[CMS use case - heavy hitters]
+    A common and important use of the Count-Min Sketch (CMS) is to identify \textbf{heavy hitters} (items whose frequency exceeds a given threshold). 
+\end{tipsblock}
+
