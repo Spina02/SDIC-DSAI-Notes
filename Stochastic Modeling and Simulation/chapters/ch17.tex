@@ -1,0 +1,133 @@
+\chapter{Lecture 30/05/2025}
+
+\section{Random Walks}
+
+Let's consider a particle that moves on a line.
+
+$$
+\rho(x,t) = \Pr[\text{Particle is at location } (x, x + \dd x) \text{ at time } t]
+$$
+
+we have:
+
+$$
+\dfrac {\partial \rho}{\partial t} = \int \left[ \rho(y, t) \Omega(y, x) - \rho(x, t) \Omega(x, y) \right] \dd y
+$$
+
+Let's consider now the probability that the particle just jumped in the location $(x, x + \dd x)$ at time $t$:
+
+$$
+p(x, t) = \Pr[\text{Particle just jumped in the location } (x, x + \dd x) \text{ at time } t]
+$$
+
+We define a jump weight as:
+$$
+\eta(y)
+$$
+so:
+$$
+p(x,t) = \int_0^t \int_{-\infty}^{+\infty} \dd y \eta(y) p(x-y, t-T) \omega(t) \dd t + \delta(x)\delta(t)
+$$
+
+\begin{definitionblock}[Fourier and Laplace Transforms]
+
+\begin{itemize}
+    
+    \item \textbf{Fourier transform}
+    
+    Let's recall the Fourier transform:
+
+    $$
+    \mathcal{F}_x[f(x)] = \int_{-\infty}^{+\infty} f(x) e^{-ikx} \dd x
+    $$
+
+    we have:
+
+    $$
+    \mathcal{F}_x[f(x) \star g(x)] = \hat f(k) \hat g(k)
+    $$
+
+    \item \textbf{Laplace transform}
+
+    Let's recall the Laplace transform:
+
+    $$
+    \mathcal{L}_x[f(x)] = \int_0^\infty f(x) e^{-st} \dd t
+    $$
+
+    we have:
+
+    $$
+    \mathcal{L}_x[f(t) \star g(t)] = \tilde f(s) \tilde g(s)
+    $$
+
+\end{itemize}
+\end{definitionblock}
+
+$$
+p(x,t) = [p(x,t) \star_s \eta(x)] \star_t \omega(t)
+$$
+
+Let's call $\bar p(k,s) = \hat{\tilde p}(x,t)$, then we can write:
+
+$$
+\bar p(k,s) = \hat \eta(k) \tilde \omega(s) \bar p(k,s) + 1
+\qquad \Rightarrow \qquad
+\bar p(k,s) \{1 - \hat \eta(k) \tilde \omega(s)\} = 1
+$$
+
+$$
+\bar p(k,s) = \dfrac{1}{1 - \hat \eta(k) \tilde \omega(s)}
+$$
+
+$$
+\Psi(T) = \int_T^{+\infty} \omega(q) \dd q = 1 - \int_0^T \omega(q) \dd q
+$$
+
+and we can rewrite $\rho(x,t)$ as:
+
+$$
+\rho(x,t) = \int_0^t p(x,t-T) \Psi(T) \dd T
+$$
+
+The Laplace transform of $\Psi(T)$ is:
+
+$$
+\mathcal L [\Psi(T)] = \mathcal L [1 - \int_0^T \omega(q) \dd q] = \dfrac{1}{s} - \dfrac{1}{s} \tilde \omega(s)
+$$
+
+$$
+\bar \rho(k,s) = \left(
+    \dfrac{1 - \tilde \omega(s)}{s}
+\right) \left(
+    \dfrac{1}{1 - \hat \eta(k) \tilde \omega(s)}
+\right)
+$$
+
+Cauchy distribution (???)
+
+$$
+\omega(T) \sim \dfrac 1{T^{1+\alpha}} \qquad T \gg 1
+$$
+
+$$
+\omega(T) = \dfrac A{1 + B\;T^2} 
+\qquad 
+T \gg 1 
+\qquad \Rightarrow \qquad
+\omega(T) \sim \dfrac A{B} \dfrac 1{T^2}
+$$
+
+Then its integral is infinite (cause compares a logarithm).
+
+$$
+\dfrac {\partial \rho}{\partial t} = D \dfrac{\partial^2 \rho}{\partial x^2}
+\qquad
+\dot x = c \xi(t)
+$$
+
+$$
+\langle x^2(t) \rangle \equiv t^\alpha
+$$
+
+for $0 < \alpha < 1$ we have subdiffusion, for $ 1 < \alpha < 2$ we have superdiffusion.
