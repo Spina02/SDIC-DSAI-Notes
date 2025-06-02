@@ -1,0 +1,206 @@
+\chapter{Binary Tree Networks}
+
+The \textbf{binary tree} is one of the most fundamental data structures in computer science, and it naturally lends itself to parallel computing as an interconnection network. In this architecture, each processing unit can have up to three connections: one to its parent (above), and potentially two to its children (left and right). The network topology can be characterized by the position of each processor within the tree structure. Leaf processors have only one link (to their parent), the root processor has two links (to its children), and all other inner nodes maintain three connections. This hierarchical organization is typically sufficient for algorithm design, making explicit processor indexing unnecessary in most cases.
+
+We focus on \textbf{complete} binary trees, where all levels are fully populated, ensuring uniform distance from the root to all leaves. This distance defines the tree's \textbf{height} $h$. For a binary tree with $P$ processing units, the height is given by $h = \log_2(P+1) - 1$. Conversely, a tree of height $h$ contains $P = 2^{h+1} - 1$ processors, with $2^h$ of these being leaf nodes. \cref{fig:binary-tree} illustrates a complete binary tree of height 3.
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[level distance=1.8cm,
+        level 1/.style={sibling distance=6cm},
+        level 2/.style={sibling distance=3cm},
+        level 3/.style={sibling distance=1.5cm},
+        every node/.style={draw, fill=white, shape=rectangle, minimum size=8mm, inner sep=0pt}
+        ]
+        % Root
+        \node (root) {}
+            child { node {}
+                child { node {}
+                    child { node {} }
+                    child { node {} }
+                }
+                child { node {}
+                    child { node {} }
+                    child { node {} }
+                }
+            }
+            child { node {}
+                child { node {}
+                    child { node {} }
+                    child { node {} }
+                }
+                child { node {}
+                    child { node {} }
+                    child { node {} }
+                }
+            };
+    \end{tikzpicture}
+    \caption{Binary tree of height 3 with $2^{3+1} - 1 = 15$ processing units.}
+    \label{fig:binary-tree}
+\end{figure}
+
+\subsubsection{Properties}
+
+A binary tree $B_P$ of height $h = \log_2(P+1) - 1$ with $P$ processing units and bidirectional links has the following properties:
+\begin{itemize}
+    \item \textbf{Diameter} $diam(B_P) = 2h$, i.e. the distance between any two leaves on opposite sides w.r.t. the root.
+    \item \textbf{Bisection bandwidth} $b(B_P) = 1$, independent of the number $P$ of processors.
+\end{itemize}
+
+\newpage
+
+\section{Associative Operations}
+
+The binary tree is especially suited for the computation of associative operations on some elements. Formally, this applies to any \emph{semigroup} $(S, \otimes)$, where $S$ is a set and $\otimes : (S \times S) \to S$ is an \emph{associative} binary operation, i.e.\ such that $(x \otimes y) \otimes z = x \otimes (y \otimes z)$ for all $x, y, z \in S$. Examples of such operations are addition, multiplication, maximum and minimum, logical operations AND and OR, and many others. The ``conquer'' phases of some divide-and-conquer procedures can also be expressed by associative operations.
+
+Consider a binary tree network of height $h = \log N$. This network can efficiently compute any associative operation $\otimes$ on $N$ elements in just $h = \log N$ steps, assuming the operation itself takes constant time. The algorithm proceeds as follows:
+
+\begin{enumerate}
+    \item Initially, each leaf processor receives one of the $N$ input elements. Given the tree's height $h$, there are exactly $2^h = N$ leaves and $P = 2N - 1$ total processing units.
+    
+    \item During computation, values propagate upward from children to parents. When an inner node receives values $x$ and $y$ from its children, it computes $x \otimes y$ and forwards the result to its parent.
+    
+    \item The root node, being the last to receive values, computes the final result and terminates the computation.
+\end{enumerate}
+
+\begin{warningblock}[Associativity does not imply commutativity]
+    Note that associativity does not imply commutativity. The operation $\otimes$ need not be commutative for this algorithm to work correctly.
+\end{warningblock}
+
+The algorithm effectively computes the sequence $x_0 \otimes x_1 \otimes \cdots \otimes x_{N-1}$ by combining adjacent sub-results. This approach preserves the order of operations, ensuring the final result matches the sequential computation. Each processing unit requires only constant memory, provided that elements of the semigroup $S$ have bounded size. \cref{fig:tree-assoc} illustrates this process for the addition.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/tree-sum.png}
+    \caption{Addition of 4 values on a binary tree of height 2.}
+    \label{fig:tree-assoc}
+\end{figure}
+
+\subsubsection{Performances}
+
+\begin{itemize}
+    \item The \textbf{parallel execution time} is $T_{2N-1}(N) = \Theta(\log N)$ since the procedure takes $h = \log N$ constant steps, then the work is $\mathcal{W} = \Theta(N \log N)$.
+    \item The \textbf{speedup} is $\mathcal{S} = \Theta(N)/\Theta(\log N) = \Theta(N/\log N)$ w.r.t.\ the sequential iteration of the $N-1$ binary operations, then the \textbf{efficiency} is $\mathcal{E} = \Theta\left(\frac{N/\log N}{2N-1}\right) = \Theta(1/\log N)$.
+\end{itemize}
+
+\newpage
+
+\section{Prefix Computation}
+
+Another common problem related to associative operations is to compute the \textbf{prefix operation} of a sequence of elements. Given an associative operation $\otimes$ and a sequence $x_0, x_1, \ldots, x_{N-1}$ of $N$ elements, we want to apply $\otimes$ to every prefix of the sequence to obtain another sequence of the same length:
+$$
+\begin{array}{rcl}
+    y_0 & = & x_0 \\
+    y_1 & = &x_0 \otimes x_1 \\
+    y_2 & = &x_0 \otimes x_1 \otimes x_2 \\
+    & \vdots &\\
+    y_{N-1} & = &x_0 \otimes x_1 \otimes \cdots \otimes x_{N-1}
+\end{array}
+$$
+
+We will again use a binary tree with $2N-1$ processing units with constant memory, of which $N$ are leaves where the input will initially be placed, one element in each leaf from left to right. The computation of the $N$ prefixes is performed in two phases, at the end of which each leaf of the binary tree will contain the corresponding prefix, i.e., the result of the operation $\otimes$ applied to the sequence of elements initially contained in that leaf and those to its left.
+
+The first phase is ascending, similar to the procedure described in the previous section, where all data is sent upwards and inner nodes forward the results $x_L \otimes x_R$ of the binary operation applied to the values $x_L$ and $x_R$ received from their children. However, in this case, inner nodes also store in their memory the value $x_L$ that they received from their left child, only the left one. Eventually, the root of the binary tree will receive from its left child the result of the operation $\otimes$ applied to the values initially contained in the leaves of the left subtree. The same will happen for the right subtree from the right child, although this value is actually useless to the root.
+
+At this point, the second phase begins, which, instead, is a descending one. First, every inner node will send its stored value only to its right child. Then, such values will be forwarded downwards to both children by every following node. Meanwhile, whenever a leaf receives a value $z$ from above, it updates $x_i := z \otimes x_i$, where $x_i$ initially was its given input.
+
+The evolution of the state of the network through the whole computation with 4 input values is graphically represented in \cref{fig:tree-prefix}, where $\otimes$ is the classical addition.
+
+\vspace{0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/tree-prefix.png}
+    \vspace{0.2em}
+    \caption{Prefix computation on a binary tree of height 2.}
+    \label{fig:tree-prefix}
+\end{figure}
+
+The two phases, described above as happening separately one after the other, actually can and should overlap as much as possible. This also makes sense with respect to the instructions assigned to the processing units of the network. Indeed, instead of globally separating the two phases, the algorithm/program would simply prescribe to act as follows. First, every leaf sends its input value $x_i$ upwards. Then, every processing unit just acts in response to receiving a value from some of its links.
+\begin{itemize}
+    \item The first time (and only one in fact) a processor receives values $x_L$ and $x_R$ from its left and right child, respectively, it forwards $x_L$ to its right child, computes $x_L \otimes x_R$ and forwards the result upwards to its parent (the root will ignore the latter operation).
+    \item Every time a processor receives a value $x$ from above, if it is a leaf it updates its $x_i := x \otimes x_i$, otherwise it forwards such a value $x$ to both its left and right children.
+\end{itemize}
+
+Since, at most, values will need to flow from the leaves up to the root and back, after $2h = 2\log N$ steps every leaf will have received all necessary values to compute the corresponding prefix.
+
+The correctness of the results can be proved by induction on the height $h$ of the binary tree. In the base case, when $h=1$, the root, which is the only inner node, will just receive $x_0$ from the left leaf (ignoring the value coming from the right) and forward $x_0$ to the right leaf, which then will compute $x_0 \otimes x_1$, as desired. Now, to prove the correctness for a tree of height $h = k+1$, assume that the algorithm produces the correct results on the left and right subtrees of height $k$, which would be
+
+$$
+\begin{array}{rcl}
+    y_0 & = & x_0 \\
+    y_1 & = & x_0 \otimes x_1 \\
+    & \vdots &\\
+    y_{N/2-1} & = &x_0 \otimes x_1 \otimes \cdots \otimes x_{N/2-1}
+\end{array}
+\text{ and }
+\begin{array}{rcl}
+    z_0 & = & x_{N/2} \\
+    z_1 & = & x_{N/2} \otimes x_{N/2+1} \\
+    & \vdots &\\
+    z_{N/2-1} & = & x_{N/2} \otimes x_{N/2+1} \otimes \cdots \otimes x_{N-1}
+\end{array}
+$$
+
+respectively, since $N = 2^{k+1}$. Furthermore, it is easy to see that the root will receive value $y_{N/2-1}$ from its left child, that is the root of the left subtree, since every inner node forwards upwards the result of the operation applied to the sequence of input values in the subtree rooted in such a node. Then, the root of the binary tree will forward the received value $y_{N/2-1}$ only to its right child. Such a value will be forwarded downwards to all descendants, and so all the leaves, in the right subtree. We conclude by observing that, after receiving such a value, every leaf in the right subtree will compute the corresponding $y_{N/2 + j} = x_0 \otimes \cdots \otimes x_{N/2-1} \otimes x_{N/2} \otimes \cdots \otimes x_{N/2 + j} = y_{N/2-1} \otimes z_j$, for $0 \leq j \leq N/2 - 1$. And so, each leaf in general will finally contain the corresponding prefix $y_j = x_0 \otimes x_1 \otimes \cdots \otimes x_j$, for all $0 \leq j \leq N-1$ starting from the leftmost leaf.
+
+\subsubsection{Performances}
+
+\begin{itemize}
+    \item The \textbf{parallel execution time} is $T_{2N-1}(N) = \Theta(\log N)$ since the procedure takes $2h = 2\log N$ constant steps, then the work is $W = \Theta(N \log N)$.
+    \item The \textbf{speedup} is $S = \Theta(N)/\Theta(\log N) = \Theta(N/\log N)$ w.r.t.\ the sequential iteration of the $N-1$ binary operations (recording every partial result corresponding to every prefix), then the efficiency is $\varepsilon = \Theta(1/\log N)$.
+\end{itemize}
+
+\newpage
+
+\section{Selection}
+
+The logarithmic-time computation of cumulative operations enables efficient solutions to many complex problems. A particularly important example is the \textbf{selection} problem: finding the $k$-th smallest element in a set, also known as the $k$-th \bfit{order statistic}. This generalizes finding the maximum, minimum, and especially the \bfit{median} of a set. The key insight is to use a divide-and-conquer approach: find a pivot element that partitions the set into two roughly equal parts, then recursively search only the relevant partition based on $k$ and the partition sizes.
+
+Consider a set of $N$ values, each represented as $B$-bit binary numbers. We use a binary tree with $N$ leaves (one per input value) and $2N-1$ total processors. The algorithm proceeds through $B$ iterations, examining one bit position at a time from most to least significant. Each leaf processor holds one input value and is initially "active". The root stores the current problem size $N$ and target index $k$.
+
+For each iteration $i$ (examining bit position $i$), the algorithm has two phases:
+
+\begin{enumerate}
+    \item \textbf{Ascending phase:} Active leaves send their $i$-th bit upward. Inner nodes compute the sum of received bits and forward to their parents. The root receives the total count $S$ of active values with bit $i$ equal to 1.
+    
+    \item \textbf{Descending phase:} The root determines whether the target element has bit $i$ equal to 0 or 1:
+    \begin{itemize}
+        \item If $k \leq N - S$: target has bit $i = 0$, update $N := N - S$
+        \item Otherwise: target has bit $i = 1$, update $k := k - (N - S)$ and $N := S$
+    \end{itemize}
+    The root broadcasts this decision downward. Leaves with mismatching bit $i$ deactivate.
+\end{enumerate}
+
+After $B$ iterations, all remaining active leaves contain the same value: the $k$-th smallest element.
+
+To prove its correctness, we partition the remaining values based on bit $i$, creating an implicit pivot of the form $b_1 2^{B-1} + \cdots + b_{i-1} 2^{B-i+1} + 2^{B-i}$ where $b_1, \ldots, b_{i-1}$ are the previously determined bits. The algorithm correctly identifies which partition contains the target element and eliminates the other partition.
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.98\textwidth]{assets/selection-tree.png}
+    \caption{First part of the selection of the 2nd smallest of 4 binary values with 2 bits.}
+    
+    \label{fig:selection-tree}
+\end{figure}
+
+\vspace{-0.8em}
+
+In general, the $i$-th iteration, for $1 \leq i \leq B$, works as follows. Assume that $N'$ leaves are still active and that their inputs have identical bits from the most significant one up to the $(i-1)$-th bit (this invariant holds initially and is maintained after each iteration).
+
+Let $N'$ and $k'$ be the values currently stored in the root. During the ascending phase, the $N'$ active leaves send upward the $i$-th bit of their input. The inner nodes perform cumulative sum operations on these bits, with the total reaching the root. The cumulative sum $S$ represents the exact number of remaining inputs with their $i$-th bit equal to $1$. Consequently, there are $N' - S$ inputs with $i$-th bit equal to $0$ and $S$ inputs with $i$-th bit equal to $1$. 
+
+Since all active values share the same $i-1$ leftmost bits $b_1, b_2, \ldots, b_{i-1}$, they can be partitioned by the pivot value $b_1 2^{B-1} + b_2 2^{B-2} + \cdots + b_{i-1} 2^{B-i+1} + 2^{B-i}$. The descending phase begins with the root determining whether the $i$-th bit of the target element is $0$ or $1$, based on the condition $k' \leq N' - S$. The root updates its stored values accordingly and broadcasts this decision to its children. 
+
+During the descending phase, the $N'$ active leaves receive the bit information and decide whether to deactivate or remain active based on their input's $i$-th bit. After the $i$-th iteration, only leaves containing inputs whose $i$ leftmost bits match exactly those of the target element (computed inductively during the previous $i$ iterations) remain active.
+
+Therefore, after all $B$ iterations complete, all remaining active leaves contain the same value: the target $k$-th smallest element. A final ascending phase collects this result, with any node (including the root) outputting the answer. Alternatively, any remaining active leaf can directly output the result, since all contain identical values.
+
+\subsubsection{Performances}
+
+\begin{itemize}
+    \item The \textbf{parallel execution time} is $T_{2N-1}(N) = \Theta(B \log N)$ since the algorithm performs $B$ iterations, each taking $\Theta(\log N)$ constant steps, and a final ascending phase for another $\log N$ steps, then the work is $W = \Theta(B N \log N)$.
+    \item The \textbf{speedup} is $S = O(N)/\Theta(B \log N) = O\left(\frac{N}{B \log N}\right)$ w.r.t.\ a general sequential selection algorithm, such as the \emph{median-of-medians} one, then the efficiency is $\varepsilon = O\left(\frac{1}{B \log N}\right)$.
+\end{itemize}
