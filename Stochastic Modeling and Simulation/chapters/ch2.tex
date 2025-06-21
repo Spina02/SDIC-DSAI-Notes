@@ -1,375 +1,581 @@
-\newpage
+\chapter{Stochastic Dynamics}
+\label{ch:from_deterministic_to_stochastic}
 
-\chapter{lecture 10/03/2025}
+In the previous chapter, we introduced the concept of modeling systems using differential equations. We begin our deeper exploration with \textbf{linear systems}. Many sophisticated systems, when analyzed locally around a point of equilibrium, can be effectively approximated by a linear model; this linearization is a cornerstone of dynamical systems theory.
 
-\section{Tumor Size over Time}
+\section{Linear Systems: The Foundation of Dynamics}
 
-Let's consider an example case of a tumor growth. Let's assume that $X(t)$ is the size of a tumor at time $t$.
+Linear Ordinary Differential Equations (ODEs) are characterized by equations where the dependent variable and its derivatives appear only to the first power. They are invaluable because they can often be solved analytically, providing clear insight into the system's behavior.
 
-The differential equation that describes the growth of the tumor is:
-
+Consider a simple electrical \textbf{RL circuit} consisting of a resistor (R) and an inductor (L) in series. Kirchhoff's voltage law gives:
 $$
-X(t + dt) = X(t) + \Phi X(t) - M X(t)
-$$
-
-where $\Phi$\ is the growth rate and $M$ is the decay rate.
-
-We can rewrite the equation as:
-
-$$
-\dfrac{X(t + dt) - X(t)}{dt} = X(t) \dfrac{(\Phi - M)}{dt}
+L \frac{di}{dt} + Ri = 0
 $$
 
-Let's rewrite \Phi\ and M as:
-
+This first-order linear homogeneous ODE has the solution:
 $$
-\begin{array}{l}
-\Phi = b dt + \cancel{O(dt^2)} \\
-M = m dt + \cancel{O(dt^2)}
-\end{array} \quad \text{(We neglect the higher order terms)}
+i(t) = i_0 e^{-\frac{R}{L}t}
 $$
+where $\tau = L/R$ is the \textit{time constant} characterizing the exponential decay.
 
-We obtain the following differential equation:
-
+Adding a capacitor creates the \textbf{RLC circuit}, a second-order system. Using the state vector $\mathbf{y} = [i, Q]^T$ where $Q$ is the charge, we obtain:
 $$
-\dfrac{X(t + dt) - X(t)}{dt} = X(t) (b - m) \quad \Rightarrow \quad \dfrac{dX}{dt} = X(b - m)
+L \frac{di}{dt} + Ri + \frac{1}{C}Q = 0
 $$
-
-Often we have a starting condition $X(0) = X_0$. Defining $a = b - m$, the sistem becomes:
-
+This is a second-order differential equation. To analyze it as a system, we can define a state vector $\mathbf{y} = [i, Q]^T$. The system of first-order equations is:
 $$
 \begin{cases}
-    \dfrac{dX}{dt} = aX \\
-    X(0) = X_0
+    \tfrac{di}{dt} = -\tfrac{R}{L}i - \tfrac{1}{L C}Q \\[0.3em]
+    \tfrac{dQ}{dt} = i
 \end{cases}
+\qquad \Rightarrow \qquad
+A = 
+\begin{bmatrix} -R/L & -1/(LC) \\ 1 & 0 \end{bmatrix}
+$$
+The behavior of this system (e.g., oscillations, decay) is entirely determined by the eigenvalues of the matrix $A$.
+
+\begin{observationblock}[The Ubiquity of the Linear Model]
+The same mathematical structure appears in completely different physical domains. Consider a damped harmonic oscillator, such as a mass on a spring moving through a viscous fluid. Newton's second law gives:
+$$
+m\ddot{x} = -k x - \gamma \dot{x}
+$$
+where $k$ is the spring constant and $\gamma$ is the damping coefficient. Rearranging gives:
+$$
+m\ddot{x} + \gamma\dot{x} + kx = 0
+$$
+This equation shares the same mathematical structure as the RLC circuit equation, illustrating how mathematical models can uncover similarities across entirely different physical systems.
+\end{observationblock}
+
+\section{The Need for Stochasticity: introducing noise}
+
+The deterministic models discussed so far are powerful idealizations, however, they assume that all parameters and forces are known and constant. In reality, systems are constantly subjected to small, unpredictable influences from their environment. The aggregate effect of these influences is termed \bfit{noise}. Modeling this randomness is crucial for creating realistic descriptions of the world.
+
+A classic illustration of this is the phenomenon of \textbf{Brownian motion}. In 1827, botanist Robert Brown observed the erratic, random motion of pollen grains suspended in water. A simple deterministic model for a particle in a fluid, incorporating only a drag force ($m\dot{v} = -kv$), predicts that the particle's velocity should decay to zero almost instantly. This prediction is in contradiction with Brown's empirical observations of perpetual, jittery motion.
+
+The solution to this paradox came from understanding what friction really is at the microscopic level. The drag force $-kv$ represents only the \textit{average} effect of countless molecular collisions with the particle. Einstein and Langevin realized that each individual collision is random and unpredictable, creating fluctuating forces that keep the particle in perpetual motion.
+
+In general, a particle moving through a fluid can experience three types of forces: the damping force we've already discussed, random collisions from molecules, and possibly some external deterministic force $F_d(x)$:
+$$
+m\ddot{x} = -k\dot{x} + F_d(x) + F_s(t)
 $$
 
-Since makes no sense to have a negative time or tumor size, we have the constraints:
-
+Let's consider the case where the particle is very light compared to the damping strength, meaning $m \ll k$. To make our notation cleaner, we can write $F_s(t) = k\xi(t)$ and $F_d(x) = kf(x)$:
 $$
-\begin{cases}
-    t \in \mathbb{R}^+ \cup \{0\} \\
-    X \in \mathbb{R}^+ \cup \{0\}
-\end{cases}
+m\ddot{x} = -k\dot{x} + kf(x) + k\xi(t)
 $$
 
-The solution is given by:
-
+When $m/k \ll 1$ (the so-called overdamped limit), the inertial term becomes negligible, and we arrive at:
 $$
-X(t) = X_0 e^{at}
-$$
-
-$$
-X(t + dt) = X(t) + b dt X - mdt X - \theta dt X
+\dot{x} = f(x) + \xi(t)
 $$
 
+This is the famous \textbf{Langevin equation}. It represents a fundamental shift in how we think about physical systems—moving from purely deterministic descriptions to ones that embrace randomness. The equation captures the idea that what we observe as smooth, deterministic forces are often just the averaged effects of chaotic microscopic processes.
+
+\begin{exampleblock}[Noise in a RLC circuit]
+In the previous example of the RLC circuit
 $$
-\begin{cases}
-\dot X = (a - \theta) X
-X(0) = X_0
-\end{cases}
+Ri = -\frac{d}{dt}\Phi(B_{self}) = -\frac{d}{dt}(Li)
 $$
+the derivation was incomplete! 
 
-dunque la soluzione è:
-
+Indeed, a circuit where a current $i$ is flowing is embedded not only in the magnetic field $B_{self}$ generated by $\Phi(Li)$ but also in other external random magnetic fields.
 $$
-X(t) = X_0 e^{(a - \theta)t}
+B_{total} = B_{self} + B_{external}
 $$
-
-In questo caso, per $a > \theta$, il tumore cresce esponenzialmente, mentre per $a < \theta$, il tumore decresce esponenzialmente.
-
-Nella realtà però il valore \theta \ non è costante nel tempo, ma varia nel tempo. In tal caso il sistema diventa:
-
 $$
-\begin{cases}
-\dot X = (a - \theta(t)) X \\
-X(0) = X_0
-\end{cases}
+\Phi(B_{total}) = Li + \Phi(B_{external}) = Li + KB_{external}
 $$
-
-e la soluzione è:
-
+with stochastic external disturbances reds as follows (by the current):
 $$
-X(t) = X_0 e^{\int_0^t (a - \theta(s)) ds}
+Ri = -L\frac{d}{dt}i - K\frac{d}{dt}B_{external}
 $$
-
-
-Più in generale, un sistema del tipo:
-
+which we may rewrite as
 $$
-z(y) = e^{G(y)} b
+L\frac{d}{dt}i = -Ri + K\zeta(t)
 $$
+\end{exampleblock}
 
-si ha
+\subsection{Modeling Impulsive Events: The Dirac Delta}
 
+Before we can properly define the stochastic force $F_s(t)$, we must first develop a mathematical tool to describe events that are instantaneous and intense. Consider the impact of a baseball bat on a ball. The force is immense but acts over a very short duration. We care about the net effect, the change in the ball's velocity, rather than the precise evolution of the force during the infinitesimal impact time. Let's model this using Newton's law, $m\dot{v} = F(t)$. The total change in momentum is the integral of the force over the impact interval, say from $t=0$ to $t=a$.
+
+The velocity after the impact is:
 $$
-\frac{dz}{dy} = \frac{d}{dy} e^{G(y)} b = e^{G(y)} b \frac{dG}{dy} = G'(y)z(y)
+v_{\text{after}} = \frac{1}{m} \int_0^a F(t) \, dt
 $$
+This integral, which represents the total impulse delivered, is finite. To model this, we introduce an idealized mathematical object known as the \textbf{Dirac delta function}, denoted $\delta(t)$. It is not a true function in the classical sense but a \textit{distribution} defined by its effect under an integral.
 
-Esempio:
+\begin{definitionblock}[The Dirac Delta Function]
+The Dirac delta function, $\delta(t)$, is a generalized function that describes an idealized impulse. Rather than being a function in the classical sense, $\delta(t)$ is a mathematical object with the following properties:
 
-$$
-\begin{cases}
-    Z'(t) = \sin(t) Z(t) \\
-    Z(0) = Z_0
-\end{cases}
-$$
-
-Si ha:
-
-$$
-\begin{cases}
-Z(t) = e^{-\cos(t)} B \\
-Z_0 = e^{-1} B
-\end{cases}
-\quad \Rightarrow \quad
-Z(t) = e^{1-\cos(t)} z_0
-$$
-
-\newpage
-
-\section{Stabily and Eq. Points}
-
-\subsection{Equilibrium Points}
-
-Given the system:
-
-$$
-\begin{cases}
-    \dot x = f(x) \\
-    x \in \mathbb{R}^n
-\end{cases}
-$$
-
-An equilibrium point is a point $x^*$ such that $f(x^*) = 0$.
-
-\begin{tipsblock}[Eq. points]
-A system can have multiple equilibrium points.
-\end{tipsblock}
-
-We have three kinds of equilibrium:
-
-\begin{itemize}
-    \item \textbf{Stable equilibrium}: if the system is in the neighborhood of the equilibrium point, it will remain there.
-    \item \textbf{Neutral equilibrium}: if the system is in the neighborhood of the equilibrium point, it will remain there, but it will not return to it.
-    \item \textbf{Unstable equilibrium}: if the system is in the neighborhood of the equilibrium point, it will move away from it.
-\end{itemize}
-
-\begin{figure}[H]
+\begin{minipage}{0.7\textwidth}
+\begin{enumerate}
+    \item There exists a "very small" interval $J = (-\epsilon/2, \epsilon/2)$ outside which $\delta(t) \approx 0$.
+    \item $\delta(t) > 0$ within this interval.
+    \item The integral of $\delta(t)$ over $J$ is equal to one:
+    $$
+    \int_J \delta(t) \, dt = 1
+    $$
+\end{enumerate}
+\end{minipage}%
+\begin{minipage}{0.3\textwidth}
     \centering
-    \includegraphics[width=0.65\textwidth]{assets/eq_points.png}
-    \caption{Stable, Natural and Unstable Equilibrium Points \cite{stability}}
-\end{figure}
+    \includegraphics[width=0.9\textwidth]{assets/dirak.png}
+\end{minipage}
 
-\subsection{Stability}
-
-We say that a system is \textbf{\textit{Globally Asymptotically Stable}} (or \textit{Globally Attractive}) if it is stable and if it converges to the equilibrium point from any initial condition.
-
-\newpage
-\section{Local Analysis Near the Equilibrium Point}
-
-In this section, we study the system in the neighborhood of the equilibrium point. Let the initial condition be a small perturbation around the equilibrium:
-
+The crucial consequence of these properties is the \bfit{sifting property}: for any function $f(t)$ that is continuous at $t=0$, the Dirac delta "sifts out" its value at that point:
 $$
-X(0) = X_e + \varepsilon.
+\int_{-\infty}^{\infty} f(t)\delta(t) \, dt = f(0)
 $$
-
-We introduce a deviation function $U(t)$ defined by
-
-$$
-X(t) = X_e + U(t),
-$$
-
-with the initial condition
-
-$$
-U(0) = \varepsilon.
-$$
-
-Thus, the evolution of the perturbation is governed by
-
-$$
-\begin{cases}
-\dot U = f(X_e + U), \\
-U(0) = \varepsilon.
-\end{cases}
-$$
-
-Assume that the dynamics of the system are given by
-
-$$
-\dot X = X(b(X) - m(X)).
-$$
-
-Then the perturbed system becomes
-
-$$
-\dot U = (b(X_e + U) - m(X_e + U))(X_e + U).
-$$
-
-Expanding $b(X_e + U)$ and $m(X_e + U)$ in a Taylor series around $X_e$, we have:
-
-$$
-b(X_e + U) \approx b(X_e) + b'(X_e)U,
-$$
-$$
-m(X_e + U) \approx m(X_e) + m'(X_e)U.
-$$
-
-Substituting these into the equation for $\dot U$, we get:
-
-$$
-\begin{array}{rl}
-\dot U & = \bigl[b(X_e) + b'(X_e)U\bigr] - \bigl[m(X_e) + m'(X_e)U\bigr](X_e + U) \\
-      & = \bigl[b(X_e) + b'(X_e)U\bigr] - \bigl[m(X_e)X_e + m(X_e)U + m'(X_e)X_eU + m'(X_e)U^2\bigr].
-\end{array}
-$$
-
-Since the equilibrium condition implies that
-
-$$
-(b(X_e) - m(X_e))X_e = 0,
-$$
-
-the above expression simplifies (neglecting the higher-order term $m'(X_e)U^2$) to:
-
-$$
-\dot U \approx \left[b'(X_e) - m(X_e) - m'(X_e)X_e\right] U.
-$$
-
-Under the assumption that $b'(X_e)$ is negative, we can express this as
-
-$$
-\dot U \approx -X_e\Bigl(|b'(X_e)| + m'(X_e)\Bigr)U.
-$$
-
-The solution of this linearized differential equation is given by:
-
-$$
-U(t) = U(0)\,e^{-X_e (|b'(X_e)| + m'(X_e))t}.
-$$
-
-Hence, we identify the decay rate (or the inverse of the characteristic time constant) as
-
-$$
-X_e\Bigl(|b'(X_e)| + m'(X_e)\Bigr),
-$$
-
-and the characteristic time $\tau$ is:
-
-$$
-\tau = \frac{1}{X_e \left(|b'(X_e)| + m'(X_e)\right)}.
-$$
-
-This time constant represents the rate at which perturbations decay in the vicinity of the equilibrium point.
-
-
-\newpage
-
-$$
-X(t) = X_e + U(t) \Rightarrow \dot U = f(X_e + U) = \underbrace{f(X_e)}_{=\ 0} + f'(X_e)U + O(U^2)
-$$
-
-$$
-\dot U = f'(X_e)U \Rightarrow U(t) = U(0) e^{f'(X_e)t}
-$$
-
-So we have:
-$$
-\begin{cases}
-f'(X_e) < 0 \quad \Rightarrow \quad X_e \text{ is Locally Asintotically stable } \\
-f'(X_e) > 0 \quad \Rightarrow \quad X_e \text{ is Unstable }
-\end{cases}
-$$
-
-\vspace{2em}
-
-\section{Non-scalar Systems}
-
-Consider the system:
-
-$$
-\begin{cases}
-    \dot x = f(x) \\
-    x \in \mathcal{f} \subseteq \mathbb{R}^n
-\end{cases}
-$$
-
-As in the scalar case, we can linearize the system around the equilibrium point $x_e$:
-
-$$
-f(X_e) = 0
-$$
-
-$$
-X = X_e + U, \quad \quad |U| \ll 1
-$$
-
-We have to consider the Jacobian matrix of $f$:
-
-\dots
-
-\newpage
-
-\section{Exponential of a Matrix}
-
-Let's consider a linear system of the form:
-
-$$
-\dot x = Ax
-$$
-
-where $A \in \mathbb{R}^{n \times n}$ is a matrix. The solution of this system is given by:
-
-$$
-x(t) = e^{At} x(0)
-$$
-
-where $e^{At}$ is the exponential of the matrix $A$.
-
-\begin{definitionblock}[Exponential of a Matrix]
-Given a matrix $A \in \mathbb{R}^{n \times n}$, the exponential of $A$ is defined as:
-
-$$
-e^A = I + A + \frac{A^2}{2!} + \frac{A^3}{3!} + \dots = \sum_{k=0}^{\infty} \frac{A^k}{k!}
-$$
-
-This comes from the Taylor series expansion of the exponential function.
 \end{definitionblock}
 
+To further illustrate the sifting property, consider a function $f(t)$ that is continuous and differentiable at $t=0$, with $f(0) < \infty$ and $f'(0) < \infty$. Expanding $f(t)$ in a Taylor series around $t=0$ gives:
 $$
-\dfrac d{dt} e^{At} = \sum_{m = 1}^\infty A^m m \dfrac{t^{m-1}}{m(m-1)!}
-= \sum_{k = 0}^\infty A A^k \dfrac{t^k}{k!}
-= A e^{At}
+f(t) = f(0) + f'(0)t + O(t^2)
+$$
+Integrating $f(t)$ against the Dirac delta over the real line, we have:
+$$
+\int_{-\infty}^{\infty} \delta(t) f(t) \, dt = \int_{-\infty}^{\infty} \delta(t) \left[ f(0) + f'(0)t \right] dt
+$$
+which can be split as:
+$$
+= \int_{-\infty}^{\infty} \delta(t) f(0) \, dt + \int_{-\infty}^{\infty} \delta(t) f'(0)t \, dt
 $$
 
+Now, recall the two fundamental properties of the Dirac delta: $\int_{-\infty}^{\infty} \delta(t) \, dt = 1$ and $\int_{-\infty}^{\infty} \delta(t) t \, dt = 0$ (since $t\delta(t)$ is an odd function). Applying these, we find:
 $$
-\begin{array}{lll}
-A & = & H \cdot \text{Diag}(\lambda_1, \lambda_2, \dots, \lambda_n) \cdot H^{-1} \\
-A^2 & = & H \cdot \text{Diag}(\lambda_1^2, \lambda_2^2, \dots, \lambda_n^2) \cdot H^{-1} \\
-A^m & = & H \cdot \text{Diag}(\lambda_1^m, \lambda_2^m, \dots, \lambda_n^m) \cdot H^{-1}
+\int_{-\infty}^{\infty} \delta(t) f(t) \, dt = f(0) \cdot 1 + f'(0) \cdot 0 = f(0)
+$$
+
+This demonstrates that the Dirac delta "picks out" the value of $f$ at $t=0$, regardless of the behavior of $f$ elsewhere.
+
+\subsubsection{Dirac Delta Classes of Functions}
+The Dirac delta function, being a mathematical idealization, can be approximated by various families of functions that become increasingly "spike-like" as a parameter grows large.
+
+For $N \gg 1$, the family of rectangular pulse functions
+$$
+\delta_N(t) = \begin{cases}
+N, & \text{if } t \in \left(-\frac{1}{2N}, \frac{1}{2N}\right) \\
+0, & \text{otherwise}
+\end{cases}
+$$
+provides an example of Dirac delta approximation. As $N$ increases, the function becomes taller and narrower while maintaining unit area, converging to the delta function in the distributional sense.
+
+Similarly, the exponential family
+$$
+\delta_\gamma(t) = \frac{\gamma}{2} e^{-\gamma |t|}
+$$
+for $\gamma \gg 1$ offers a smooth approximation that avoids the discontinuities of the rectangular pulse. This family has several advantages: it is infinitely differentiable, has exponentially decaying tails, and provides a more realistic model for physical phenomena.
+
+\begin{observationblock}[Verification of the Sifting Property]
+Let's verify that the rectangular pulse function $\delta_N(t)$ satisfies the sifting property in the limit as $N \to \infty$. For any continuous function $f(t)$:
+
+$$
+\int_{-\infty}^{\infty} f(t) \delta_N(t) dt = \int_{-1/(2N)}^{1/(2N)} f(t) \cdot N \, dt = N \int_{-1/(2N)}^{1/(2N)} f(t) \, dt
+$$
+
+Since $f(t)$ is continuous at $t = 0$, we can use the mean value theorem.
+
+There exists some $c \in [-1/(2N), 1/(2N)]$ such that:
+
+$$
+N \int_{-1/(2N)}^{1/(2N)} f(t) \, dt = N \cdot f(c) \cdot \frac{1}{N} = f(c)
+$$
+
+As $N \to \infty$, the interval shrinks to zero and $c \to 0$. By continuity of $f$, we have $f(c) \to f(0)$. Therefore:
+$$
+\lim_{N \to \infty} \int_{-\infty}^{\infty} f(t) \delta_N(t) dt = f(0)
+$$
+
+This confirms that $\delta_N(t)$ approaches the Dirac delta function in the distributional sense.
+\end{observationblock}
+
+\subsection{Defining the Stochastic Force: White Noise}
+
+The stochastic force in the Langevin equation, commonly denoted as $\xi(t)$ (or sometimes $F_s(t)$, after normalization by mass and other constants), models the cumulative effect of a huge number of independent, microscopic collisions. This motivates the following statistical properties, which define what is known as \textbf{Gaussian white noise}.
+
+\begin{enumerate}
+    \item \textbf{White Noise (Temporal Uncorrelation):} The values of $\xi(t)$ at different times are uncorrelated, reflecting the physical assumption that molecular collisions at different instants are independent. This is mathematically expressed as:
+    $$
+    \langle \xi(t)\xi(q) \rangle = 0 \qquad \text{for } t \neq q
+    $$
+    More generally, the autocorrelation function is given by the Dirac delta:
+    $$
+    \langle \xi(t)\xi(q) \rangle = \delta(t-q)
+    $$
+    where $\delta(t-q)$ is the Dirac delta function, indicating that the noise is only correlated with itself at the same instant.
+
+    \item \textbf{Gaussian Distribution:} By the central limit theorem, the sum of many independent random impacts leads to a Gaussian distribution for $\xi(t)$ at any fixed time $t$. This ensures that all finite-dimensional distributions of the process are Gaussian, making the process analytically tractable.
+
+    \item \textbf{Zero Mean:} The random molecular collisions are, on average, isotropic and unbiased, so the mean of the stochastic force vanishes:
+    $$
+    \langle \xi(t) \rangle = 0
+    $$
+    where $\langle \cdot \rangle$ denotes the ensemble average.
+
+    \item \textbf{Infinite Instantaneous Variance:} The idealized white noise process is so irregular that its variance at any fixed time is formally infinite:
+    $$
+    \langle \xi^2(t) \rangle \gg 1
+    $$
+    This reflects the mathematical abstraction of white noise, which is not a function in the usual sense but a generalized function (distribution).
+\end{enumerate}
+
+\begin{warningblock}[A Mathematical Abstraction]
+The concept of white noise, with its delta-correlated structure, is a powerful but physically unrealizable abstraction. It implies infinite variance ($\langle \xi(t)^2 \rangle \to \infty$) and infinite power. In any real system, correlations exist over some small but non-zero timescale. However, if this correlation time is much shorter than any other characteristic timescale of the system, modeling the noise as "white" is an excellent and mathematically convenient approximation.
+\end{warningblock}
+
+\subsubsection{Multiplicative Noise: The Case of the SIS Epidemic Model}
+
+Multiplicative noise arises when the amplitude of the noise depends on the state of the system itself. In the context of stochastic differential equations, this means the noise term is not simply additive, but is multiplied by a function of the state variable:
+$$
+\frac{dx}{dt} = f(x, t) + g(x, t)\,\xi(t)
+$$
+where $g(x, t)$ is not constant.
+
+A classic example is found in epidemiology, specifically in the \textbf{SIS epidemic model}. In this model, individuals can become infected, recover, and then become susceptible again (as opposed to the SIR model, where recovered individuals are removed from the susceptible pool). The deterministic SIS model is given by:
+\begin{align*}
+    \frac{dS}{dt} &= -\beta S I + \mu (N - S) \\
+    \frac{dI}{dt} &= \beta S I - \mu I
+\end{align*}
+where $S$ and $I$ are the numbers of susceptible and infected individuals, $\beta$ is the infection rate, $\mu$ is the recovery rate, and $N$ is the total population.
+
+\subsubsection{Incorporating Stochasticity}
+
+In reality, the contact rate $\beta$ is not perfectly constant: it fluctuates due to random factors such as social behavior, environmental changes, or other sources of randomness. To model this, we introduce a stochastic term:
+$$
+\beta \to \beta + \sigma\,\xi(t)
+$$
+where $\sigma$ quantifies the strength of the noise and $\xi(t)$ is Gaussian white noise.
+
+Substituting this into the SIS model, the equation for the number of infected individuals becomes:
+$$
+\frac{dI}{dt} = [\beta S I - \mu I] + \sigma S I\,\xi(t)
+$$
+Here, the noise term is \bfit{multiplicative}: its amplitude depends on both $S$ and $I$. This reflects the fact that random fluctuations in the infection rate have a larger effect when there are more susceptible and infected individuals interacting.
+
+\begin{observationblock}[Multiplicative vs. Additive Noise]
+Additive noise affects the system independently of its state, while multiplicative noise depends on the current state. In epidemic models, multiplicative noise is more realistic, as the impact of random fluctuations in transmission is naturally proportional to the number of possible contacts.
+\end{observationblock}
+
+\subsection{The Simplest Langevin Equation (SLAE)}
+
+To build a deeper intuition for the behavior of stochastic systems, we analyze the simplest possible Langevin equation, where the deterministic drift term is zero ($f(x) = 0$). This corresponds to a free particle subject only to random kicks from its environment:
+$$
+\dot{x} = \omega \xi(t)
+$$
+Here, $\omega$ is a constant representing the intensity of the noise $\xi(t)$. While this equation is ill-defined in its derivative form, we can formally integrate it to find the particle's position $x(t)$, assuming an initial position $x(0)$:
+$$
+x(t) = x(0) + \omega \int_0^t \xi(s) ds
+$$
+
+From this expression, we can derive the fundamental statistical properties of the process $x(t)$.
+
+\begin{enumerate}
+\item \textbf{Average Position}
+
+The average position, or the first moment of $x(t)$, is found by taking the ensemble average of the equation. Since the noise has zero mean, $\langle\xi(s)\rangle=0$, the integral of the average noise vanishes:
+$$
+\langle x(t) \rangle = \langle x(0) \rangle + \omega \int_0^t \langle\xi(s)\rangle ds = \langle x(0) \rangle
+$$
+If the initial position is deterministic, $\langle x(0) \rangle = x_0$, the average position of the particle does not change over time, since the particle is equally likely to be pushed in any direction.
+
+\item \textbf{Autocorrelation and "Memory"}
+
+To understand how the position at one time relates to the position at another, we compute the autocorrelation function, $\langle x(t)x(q) \rangle$.
+$$
+\langle x(t)x(q) \rangle = \left\langle \left( \omega \int_0^t \xi(s) ds \right) \left( \omega \int_0^q \xi(\theta) d\theta \right) \right\rangle 
+= \omega^2 \int_0^t \int_0^q \langle \xi(s) \xi(\theta) \rangle ds d\theta
+$$
+Using the white noise property $\langle \xi(s) \xi(\theta) \rangle = \delta(s-\theta)$, we get:
+$$
+\langle x(t)x(q) \rangle = \omega^2 \int_0^t \left( \int_0^q \delta(s-\theta) d\theta \right) ds
+$$
+The inner integral with respect to $\theta$ is 1 if $s$ is within the interval $[0, q]$, and 0 otherwise. This simplifies the double integral. Assuming, without loss of generality, that $t \leq q$, the condition $s \in [0, q]$ is always met for the outer integral's range $s \in [0, t]$. The integral thus becomes:
+$$
+\langle x(t)x(q) \rangle = 
+\begin{cases}
+    \omega^2 (t - q) & \text{if } t > q\\
+    \omega^2 (q - t) & \text{if } t < q
+\end{cases} 
+\quad = \quad 
+\omega^2 |t - q|
+$$
+We can combine these cases into a single elegant expression:
+$$
+\langle x(t)x(q) \rangle = \omega^2 \min(t, q)
+$$
+This result reveals that, unlike the driving noise $\xi(t)$, the position process $x(t)$ \bfit{does} have memory. Its position at time $t$ is correlated with its position at all other times.
+
+\item \textbf{Mean Squared Displacement and Variance}
+
+Setting $q=t$ gives the second moment, or \bfit{mean squared displacement} from the origin (assuming $x(0)=0$):
+$$
+\langle x^2(t) \rangle = \omega^2 t
+$$
+The \bfit{variance} of the process is then:
+$$
+\text{Var}[x(t)] = \langle x^2(t) \rangle - \langle x(t) \rangle^2 = \omega^2 t
+$$
+The variance grows linearly with time, a hallmark of diffusive processes. The particle, on average, wanders further and further from its starting point.
+
+\item \textbf{Mean Squared Increment and Non-Differentiability}
+
+Let's examine the behavior of the process over a small time increment. The mean squared change in position over an interval of length $|t-q|$ is:
+\vspace{0.4em}
+$$
+\begin{array}{rl}
+\langle (x(t) - x(q))^2 \rangle &= \langle x^2(t) \rangle + \langle x^2(q) \rangle - 2\langle x(t)x(q) \rangle \\
+&= \omega^2 t + \omega^2 q - 2\omega^2 \min(t, q) \\
+&= \omega^2 |t - q|
+\end{array}
+$$
+Now consider the incremental ratio, which approximates the derivative. Let $q = t+h$:
+$$
+\left\langle \left( \frac{x(t+h) - x(t)}{h} \right)^2 \right\rangle = \frac{\langle (x(t+h) - x(t))^2 \rangle}{h^2} = \frac{\omega^2 h}{h^2} = \frac{\omega^2}{h}
+$$
+In the limit as the interval $h$ shrinks to zero, this quantity diverges:
+$$
+\lim_{h \to 0^+} \left\langle \left( \frac{x(t+h) - x(t)}{h} \right)^2 \right\rangle = \lim_{h \to 0^+} \frac{\omega^2}{h} = +\infty
+$$
+The mean squared value of the derivative is infinite. This is a profound result: it is the first formal evidence that the path $x(t)$, while continuous, is \bfit{nowhere differentiable}. This highly irregular, "jagged" nature is a fundamental property of processes driven by white noise.
+
+\end{enumerate}
+
+\vspace{0.5em}
+
+We said that the measure of the memory of the white noise is represented by the following average:
+\begin{equation*}
+    \langle\, \xi(t)\xi(q) \,\rangle = \delta(qt)
+\end{equation*}
+
+and we showed some heuristic reasoning. However, for the sake of precision, the above formula is derived by a statistical concept that is very useful to verify the degree of similarity between two generic random variables: the \textbf{covariance}, which is defined as follows:
+\begin{equation*}
+    \mathrm{COV}(x, y) = \langle (x - \langle x \rangle)(y - \langle y \rangle) \rangle = \langle xy \rangle - \langle x \rangle \langle y \rangle
+\end{equation*}
+
+For the sake of precision, in the cases where $y$ is a temporal shift of $x$ (as in our case), we say that we are computing the \textbf{autocovariance} of $x$.
+
+\subsection{The Wiener Process and its Properties}
+
+The mathematical pathologies of white noise $\xi(t)$ and the resulting non-differentiability of its integral motivated the development of a more rigorous framework. Instead of focusing on the ill-defined derivative form $\dot{x} = \xi(t)$, we work directly with the integrated process. This process, which formalizes the concept of Brownian motion, is named in honor of Norbert Wiener.
+
+\begin{definitionblock}[The Wiener Process]
+The \textbf{Wiener process} $W(t)$ is a continuous-time stochastic process that is the solution to the SDE:
+$$
+\begin{cases}
+    \dfrac{dW}{dt} = \xi(t) \\
+    W(0) = 0
+\end{cases}
+$$
+where $\xi(t)$ is Gaussian white noise with unit variance. 
+
+\vspace{0.3em}
+\noindent\textbf{Note:} While this differential form is intuitive, it should be understood that $\xi(t)$ is not a function in the classical sense, and the equation is interpreted in the sense of stochastic integration.
+\end{definitionblock}
+
+The Wiener process is a Gaussian process with the following key properties:
+\begin{enumerate}
+    \item \textbf{Zero Mean:}
+    The expected value of the process is zero:
+    \vspace{0.4em}
+    $$
+    \langle W(t) \rangle = 0
+    $$
+    This property reflects the symmetric nature of the random fluctuations around the origin.
+
+    \item \textbf{Gaussian Distribution:}
+    For any fixed time $t$, $W(t)$ is normally distributed with mean zero and variance $t$:
+    \vspace{0.4em}
+    $$
+    W(t) \sim \mathcal{N}(0, t)
+    $$
+    This means the probability density function is given by:
+    \vspace{0.4em}
+    $$
+    p(W,t) = \frac{1}{\sqrt{2\pi t}} \exp\left(-\frac{W^2}{2t}\right)
+    $$
+
+    \vspace{0.5em}
+
+    \item \textbf{Autocorrelation:}
+    The autocorrelation function is given by
+    \vspace{0.4em}
+    $$
+    \langle W(t)W(s) \rangle = \min(t,s)
+    $$
+    This property captures the "memory" of the process.
+
+    \item \textbf{Independent Increments:}
+    The increments of the process are independent. In particular, for any collection of non-overlapping time intervals $[t_1, s_1], [t_2, s_2], \ldots, [t_n, s_n]$, the corresponding increments $W(s_1)-W(t_1), W(s_2)-W(t_2), \ldots, W(s_n)-W(t_n)$ are independent random variables. The mean of each increment is:
+    \vspace{0.4em}
+    $$
+    \langle W(s)-W(t) \rangle = 0
+    $$
+    and these increments are also Gaussian.
+
+    \vspace{0.5em}
+
+    \item \textbf{Increment Variance:}
+    
+    The variance of the increment over the interval $[t,s]$ is proportional to the time difference:
+    \vspace{0.4em}
+    $$
+    \langle (W(s)-W(t))^2 \rangle = |s-t|
+    $$
+    This scaling with time difference is a fundamental property that distinguishes diffusive processes from other types of motion.
+
+    \item \textbf{Increment Distribution:}
+    More precisely, for $s>t$, the increment is distributed as
+    \vspace{0.4em}
+    $$
+    W(s)-W(t) \sim \mathcal{N}\Bigl(0,\,|s-t|\Bigr)
+    $$
+    This means the increment has a normal distribution with zero mean and variance equal to the time difference. In particular, the distribution of $W(t)$ itself (starting from $W(0) = 0$) is:
+    \vspace{0.4em}
+    $$
+    W(t) \sim \mathcal{N}(0, t)
+    \qquad \Rightarrow \qquad
+    p(W,t) = \frac{1}{\sqrt{2\pi t}} \exp\left(-\frac{W^2}{2t}\right)
+    $$
+\end{enumerate}
+
+\vspace{0.3em}
+These properties completely characterize the Wiener process. Any continuous-time stochastic process satisfying these conditions is a Wiener process, making it a fundamental building block in the theory of stochastic processes and stochastic differential equations.
+
+\subsubsection{Increment Analysis and Non-Differentiability}
+
+The properties of the Wiener process's increments lead to one of its most counter-intuitive and important features: its paths are continuous but almost surely nowhere differentiable.
+Let's analyze an infinitesimal increment $dW_t = W(t+dt) - W(t)$ over a small time interval $dt > 0$. From the properties above, this increment is a Gaussian random variable with mean 0 and variance $dt$:
+$$
+dW_t \sim \mathcal{N}(0, dt)
+$$
+This implies that the standard deviation of the increment is $\sigma = \sqrt{dt}$. Now, consider the finite difference quotient used to define a derivative:
+$$
+\frac{dW_t}{dt} = \frac{W(t+dt) - W(t)}{dt}
+$$
+This new random variable is also Gaussian, but its variance is $\text{Var}\left(\frac{dW_t}{dt}\right) = \frac{1}{dt^2}\text{Var}(dW_t) = \frac{dt}{dt^2} = \frac{1}{dt}$. As $dt \to 0$, this variance diverges to infinity. The notion of a derivative in the classical sense is therefore problematic.
+
+We can investigate this further by considering the probability that the magnitude of the incremental ratio exceeds some large, arbitrary value $M$. Let $h$ be a small, finite time step. We are interested in:
+$$
+\text{Pr}\Biggl( \left|\frac{W(t+h)-W(t)}{h} \right| > M \Biggr)
+$$
+Since the increment $W(t+h) - W(t)$ follows a $\mathcal{N}(0,h)$ distribution, we can standardize it by dividing by its standard deviation, $\sqrt{h}$. Let $Z = \frac{W(t+h) - W(t)}{\sqrt{h}}$, where $Z \sim \mathcal{N}(0,1)$. The probability becomes:
+$$
+\text{Pr}\left( \left|\frac{Z\sqrt{h}}{h}\right| > M \right) = \text{Pr}\left( |Z| > M\sqrt{h} \right)
+$$
+As $h \to 0$, the threshold $M\sqrt{h}$ also goes to zero. The probability that a standard normal variable $Z$ has a magnitude greater than an infinitesimally small number approaches 1.
+$$
+\lim_{h \to 0} \text{Pr}\left( |Z| > M\sqrt{h} \right) = \text{Pr}(|Z|>0) = 1
+$$
+This means that for any large $M$, as we make the time interval smaller, it becomes a near certainty that the slope of the secant line will exceed $M$. This confirms that the path of a Wiener process is not differentiable at any point.
+
+\section{Stochastic Integration and Numerical Methods}
+
+The non-differentiability of the Wiener process path fundamentally breaks the foundation of classical calculus, rendering traditional analytical techniques inadequate for stochastic differential equations. This mathematical obstacle necessitates the development of an entirely new framework—stochastic calculus, with its own integration theory and differentiation rules. The irregular, fractal-like nature of Brownian paths means that conventional deterministic algorithms fail to capture the essential randomness, requiring specialized computational methods that properly handle the stochastic increments and their statistical properties.
+
+\subsection{The Differential Form of SDEs: Itô Equation}
+
+Let's reconsider Newton's second law. In its most common form, it is written as $F=ma$. However, its more fundamental statement relates force to the change in momentum $p=mv$, expressed in differential form as:
+$$
+dp = F dt
+$$
+This form is more general. For instance, consider the motion of a rocket, whose mass $m(t)$ changes as it consumes fuel. In this case, $F=ma$ is incorrect. The correct formulation must account for the change in mass:
+$$
+d(m(t)v(t)) = F dt
+$$
+This differential way of writing physical laws is powerful and provides the foundation for correctly interpreting stochastic equations. A Langevin equation written as $\dot{x} = f(x,t) + g(x,t)\xi(t)$ is mathematically problematic. The rigorous approach is to express it in its differential form using the Wiener process increment $dW_t$, which represents the integral of the white noise $\xi(t)$:
+$$
+dx = f(x,t)dt + g(x,t)dW_t
+$$
+This is a \textbf{Stochastic Differential Equation (SDE)}. Its solution is understood in an integral sense:
+$$
+x(t) = x_0 + \int_0^t f(x(\tau), \tau)d\tau + \int_0^t g(x(\tau), \tau)dW_\tau
+$$
+The second integral is a stochastic integral, an object whose properties are fundamentally different from the standard Riemann integral. The infinitesimal increment $dW_t$ is defined as $dW_t = W(t+dt) - W(t)$. As we have established, it is a Gaussian random variable with mean 0 and variance $dt$, so $dW_t \sim \mathcal{N}(0, dt)$. This can be expressed as:
+$$
+dW_t = G(t)\sqrt{dt}
+$$
+where $G(t)$ is a random variable drawn from the standard normal distribution, $\mathcal{N}(0,1)$.
+
+The stochastic integral $\int_0^t g(x(\tau), \tau)dW_\tau$ represents the cumulative effect of the random forcing over time. Unlike deterministic integrals, this integral cannot be evaluated using traditional calculus rules due to the irregular nature of the Wiener process paths. The integral must be understood in the sense of Itô or Stratonovich, with Itô integration being the more commonly used convention in stochastic differential equations.
+
+\begin{definitionblock}[Itô Equation]
+Given an SLAE, we can always rewrite it as an \textbf{Itô equation}, by defining $dW = G(t)\sqrt{dt}$:
+
+$$
+dx = f(x)dt + g(x)dW
+$$
+\vspace{-0.2em}
+\end{definitionblock}
+
+\subsection{The Euler-Maruyama Method}
+
+The Itô equation can be solved numerically using the Maruyama algorithm for stochastic differential equations. This is essentially the stochastic version of Euler's algorithm. Given a time interval $[0, T]$ and $h = T/N$, so that $t = jh$ for $j = 0, \ldots, N$. Suppose the Euler algorithm is:
+$$
+dx = x(t_j + h) - x(t_j) = x(t_{j+1}) - x(t_j)
+$$
+we can set $dt \approx h$ and write:
+$$
+x(t_{j+1}) = x(t_j) + f(x(t_j))h
+$$
+
+The Maruyama formula starts from this form by also considering the Gaussian effect, adding:
+$$
+x(t_{j+1}) = x(t_j) + f(x(t_j))h + G_j\sqrt{h}
+$$
+with $G_j \sim \mathcal{N}(0,1)$. Obviously, starting from this algorithm, more precise variants have been successively created.
+
+\begin{definitionblock}[The Euler-Maruyama Method]
+For the stochastic differential equation $dX_t = a(X_t, t)dt + b(X_t, t)dW_t$ with initial condition $X(0) = x_0$ and uniform time step $h$, the Euler-Maruyama approximation is given by:
+$$
+X_{j+1} = X_j + a(X_j, t_j)h + b(X_j, t_j)\sqrt{h}G_j
+$$
+where $t_j = jh$ and $\{G_j\}_{j=0}^{N-1}$ is a sequence of independent standard normal random variables.
+\end{definitionblock}
+
+This numerical scheme provides a practical foundation for simulating stochastic processes, though more sophisticated methods have been developed to improve accuracy and stability for specific applications.
+
+\subsection{Itô's Lemma: The Stochastic Chain Rule}
+
+Having established the framework of Itô equations, we now turn our attention to the fundamental problem of change of variables in stochastic calculus. When dealing with deterministic differential equations, the chain rule provides a straightforward mechanism for transforming variables. However, in the stochastic setting, the irregular nature of Brownian motion necessitates a more sophisticated approach.
+
+Consider an SDE in Itô form:
+$$
+dx = a(x)dt + b(x)dW
+$$
+Suppose we wish to perform a transformation from $x$ to $y$ defined by $y = \psi(x)$. Our objective is to derive an equation of similar form for the transformed variable $y$.
+
+Following the classical approach, we expand $dy$ in a Taylor series:
+$$
+\begin{array}{rl}
+dy & = \psi'(x)dx + \frac{1}{2}\psi''(x)(dx)^2 + \ldots \\
+& = \Psi'(x)[a(x)dt + b(x)dw] + \dfrac 12 \Psi''(x)
+\left[
+    b^2(x)(dw)^2 +
+    \underbrace{\cancel{a^2(x)(dt)^2}}_{O(dt^2)} +
+    \underbrace{\cancel{2a(x)b(x)dt dw}}_{O(dt^{3/2})}
+\right]
 \end{array}
 $$
 
-So we have:
+To derive a formula consistent with the Itô framework, we must carefully consider the order of magnitude of each term. Since $dW = O(\sqrt{dt})$, we can eliminate terms of order $(dt)^{3/2}$ and higher, including the mixed term $dt\,dW$ and $(dt)^2$. The remaining term $(dW)^2$ is of order $dt$, and by the fundamental property of Brownian motion, we have $(dW)^2 = dt$. Substituting this, we get:
+
+
 
 $$
-e^{At} = \sum_{m = 0} ^ \infty \dfrac{A^m t^m}{m!} = 
+dy = \psi'(x)a(x)dt + \psi'(x)b(x)dW + \frac{b(x)^2}{2}\psi''(x)dt
 $$
 
-\newpage
-
-An example of a matrix exponential is given by the Newton's law:
-
+Substituting this fundamental property of Brownian motion:
 $$
-m \ddot x = F
+dy = \left[\psi'(x)a(x) + \frac{b(x)^2}{2}\psi''(x)\right]dt + \psi'(x)b(x)dW
 $$
 
-Let's consider a more complex case with air resistance $\gamma$:
-
+\begin{definitionblock}[Itô's Lemma]
+Let $X_t$ be an Itô process that satisfies the SDE $dX_t = a(X_t, t)dt + b(X_t, t)dW_t$. Let $\psi(x,t)$ be a twice-differentiable scalar function. Then the process $Y_t = \psi(X_t, t)$ is also an Itô process, and its differential $dY_t$ is given by:
 $$
-m \ddot x = - \gamma \dot x - F(x)
+dY_t = \left[ \psi'(x)a(x) + \psi''(x)\frac{b(x)^2}{2} \right]dt + \psi'(x)b(x)dW_t
 $$
+\end{definitionblock}
 
-We can rewrite this system as:
-
+This fundamental result encompasses the classical chain rule terms, namely $\psi'a$ and $\psi'b$, augmented by an additional stochastic correction term, $\psi''\frac{b^2}{2}$, known as the \textbf{Itô correction}. This correction term arises directly from the non-vanishing quadratic variation of the Wiener process and represents the fundamental distinction between stochastic and deterministic calculus.
