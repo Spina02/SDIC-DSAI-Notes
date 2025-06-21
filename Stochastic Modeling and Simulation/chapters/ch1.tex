@@ -1,94 +1,67 @@
 \chapter{Introduction}
+\label{ch:introduction}
 
-Different fields as Epidemics spreading, Cancer growth, and many others, can be modeled using Stochastic Differential Equations (SDEs).
-
-An example is SIR model for epidemics spreading, formulized during a huge cholera infection in early 19th century. The model is based on three compartments: Susceptible, Infected, and Recovered individuals. This is modeled using a system of SDEs.
-
-Often stochastic models represents well the problem, but real data are noisy and chaotic. For instance often we have to deal with data varying spatially and temporally, and we have to deal with the problem of parameter estimation.
-
-Example: Oscillating chemical system
-
-$$
-A + Y \xrightarrow{k_1} X + P, \quad X \xrightarrow{k_2} 2P
-$$
-$$
-A + X \xrightarrow{k_3} 2Z, \quad X + Z \xrightarrow{k_4} 2A
-$$
-
-Other examples are preys and predators models, 
-
-\dots
-
-Renewable energies introduces a high volatility and unpredictability in energy production
-
-If the demand of energy exceedes the production, we need to activate standard plans, to reduce consumption by switching off devices (e.g. water boilers remotely controlled), or to activate additional production plants. All these scenarios are complex systems.
+A diverse array of fields, ranging from epidemiology and systems biology to finance and renewable energy, are fundamentally concerned with understanding systems that evolve over time. While simple, deterministic models can offer initial insights, many real-world phenomena are characterized by inherent randomness, uncertainty, and intricate interconnections. To capture this richness, we turn to the powerful framework of \textbf{Stochastic Modeling and Simulation}. Many systems we encounter are \bfit{complex}: disease spread modeled by the classic SIR (Susceptible, Infected, Recovered) framework, oscillating chemical reaction concentrations, or predator-prey ecosystem dynamics. In each case, the system's behavior emerges from interactions between countless individual components, that cannot be predicted from studying the parts in isolation.
 
 \begin{definitionblock}[Complex System]
-A \textbf{complex system} is a system composed of interconnected parts that as a whole exhibit one or more properties (behavior among the possible properties) not obvious from the properties of the individual parts.
+A \textbf{complex system} is a system composed of interconnected parts that, as a whole, exhibit one or more properties which are not obvious from the properties of individual parts alone.
 \end{definitionblock}
 
-Emergent behavior is a property of complex systems, and it is not predictable from the behavior of the individual parts.
+A key feature of complex systems is \textbf{emergent behavior}, where macroscopic patterns arise from the local interactions of microscopic agents. This is closely related to the concepts of adaptation and self-organization. \textbf{Adaptation} refers to the process by which a system achieves a better fit with its environment. \textbf{Self-organization} is the spontaneous process through which a system's internal structure changes, often to facilitate this adaptation, without external control. A classic example is the formation of a flock of birds: each bird follows simple rules based on its neighbors, yet the flock as a whole displays coordinated, complex flight patterns that no single bird orchestrates.
 
-
-
-\begin{definitionblock}[Adaptivity and self-organization]
-    \begin{itemize}
-        \item \textbf{Adaption} meand achieving a fit between the system and its environment.
-        \item \textbf{Self-organization} is the process where a system changes its structure spontaneously, in order to adapt to the environment.
-    \end{itemize}
-\end{definitionblock} 
-
-An instance of self-organization is the formation of a flock of birds, where each bird follows simple rules, but the flock as a whole exhibits a complex behavior.
-
-\begin{observationblock}[Noise and Nonlinearities]
-Noise and nonlinearities can (sometimes) favor the emergence of "order".
+\begin{observationblock}[The Constructive Role of Noise]
+When studying complex systems, we frequently discover that randomness, or \textit{noise}, serves a purpose beyond merely interfering with deterministic signals. Surprisingly, the presence of noise combined with nonlinear dynamics can actually promote the formation of ordered structures and novel, persistent patterns.
 \end{observationblock}
 
-\section{Modelling complex systems}
+\section{The Modeling Framework}
 
-\subsubsection{Math for quantitatve models}
-
-We will be interersted in the temporal behavior of the system, and we will use some key ingredients for the maths:
+To build quantitative models of complex systems, we require a clear mathematical framework. This involves defining several key ingredients that form the foundation of any dynamical model:
 
 \begin{itemize}
-    \item \textbf{Entities} can be modelled as \textit{discrete} objects or \textit{continuous} quantities.
-    \item \textbf{...} ...
-    \item \textbf{Time} can be \textit{discrete} or \textit{continuous}.
+    \item \textbf{Entities:} The fundamental components of the system. These can be modeled as \textit{discrete} objects (e.g. individuals in a population) or as \textit{continuous} quantities (e.g. the density of a population).
+    
+    \item \textbf{State:} A complete description of the system at a specific moment. The \textit{state space} is the set of all possible states the system can occupy.
+    
+    \item \textbf{Time:} The independent variable against which the system's state evolves. Time can be treated as \textit{discrete} (advancing in steps) or \textit{continuous}.
+    
+    \item \textbf{Evolution Rules:} The laws or functions that dictate how the system's state changes from one moment to the next. These rules are often expressed using mathematical equations.
 \end{itemize}
 
-\dots
+\subsubsection{The Role of Differential Equations}
 
-\subsubsection{Data-Based vs Model-Based Approaches}
-
-Will data approaches make the kind of modelling obsolete?
-
-
-
-Hybrid approacehs are possible: 
-
-\begin{enumerate}
-    \item Math models can be joined/hcybrized with machine learning models.
-    \item Deep Network to learn modules aor whole math models
-
-        An exampleis \textit{Physics-informed neural networks}: A deep learning framework for solving forward and inverse problems involving nonlinear partial differential equations
-
-    \item ...
-\end{enumerate}
-
-\begin{definitionblock}[Dynamical System]
-A \textbf{dynamical system} is a system whose state evolves over time according to a rule that depends on the current state.
-\end{definitionblock}
-
-[definition of differential equations]
+For systems where the state and time are treated as continuous, the evolution rules are most naturally expressed using differential equations.
 
 \begin{definitionblock}[Differential Equation]
-    A \textbf{differential equation} is an equation that relates one or more unknown functions and their derivatives.
+A \textbf{differential equation} is a mathematical equation that relates one or more unknown functions to their derivatives. In modeling, it describes the instantaneous rate of change of a system's state:
+$$
+\frac{dx}{dt} = f(x, t)
+$$
+where $x$ is the state variable and $f$ is a function that describes how $x$ changes over time.
 \end{definitionblock}
 
-In practice, differential equations are mathemathical instruments that describves the world around us. A note differential equation (maybe the first ever invented) is the Newton law:
+In essence, differential equations are the language we use to describe a changing world. Perhaps the most famous and foundational example is Newton's Second Law of Motion, which relates the force on an object to its acceleration (the second derivative of its position).
+$$ F = ma \quad \implies \quad m \frac{d^2x}{dt^2} = F(x(t), \dot{x}(t)) $$
+This single equation forms the basis of classical mechanics and is a prime example of a \textbf{dynamical system}: a system whose state evolves over time according to a deterministic rule.
 
-$$
-F = ma \quad \Rightarrow \quad m \frac{d^2x}{dt^2} = F(x(t))
-$$
+\section{Bridging Models and Data in the Modern Era}
+
+In our era of big data and machine learning, an important question emerges: will data-driven methods make traditional mathematical modeling redundant? The answer is both more complex and more promising: the path forward involves \textbf{hybrid approaches} that harness the complementary strengths of both methodologies. Although real-world datasets are frequently noisy and incomplete, while models necessarily simplify reality, their synergistic integration can unlock insights that neither approach could achieve alone.
+
+\vspace{0.5em}
+
+Hybrid strategies are rapidly becoming central to scientific discovery:
+\begin{enumerate}
+    \item \textbf{Physics-Informed Neural Networks (PINNs):}
+    
+    This is a cutting-edge deep learning framework for solving problems involving differential equations. A neural network is trained not only to fit observed data but also to obey the underlying physical laws of the system, encoded as differential equations. This helps the model generalize better from sparse or noisy data.
+
+    \item \textbf{Machine Learning for Parameter Estimation:}
+    
+    While a mathematical model may capture the structure of a system (e.g., the SIR model), the specific parameters (infection rate, recovery rate) must be estimated from real-world data. Machine learning and statistical inference techniques are essential tools for this task, especially when dealing with high-dimensional and complex models.
+
+    \item \textbf{Hybrid Modeling:}
+    
+    In some cases, parts of a system may be well-understood and easily described by equations, while other parts may be too complex. A hybrid model might use a traditional differential equation for the well-understood component and a neural network, trained on data, to represent the more complex, "black-box" component.
+\end{enumerate}
 
 \cleardoublepage

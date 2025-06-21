@@ -1,145 +1,226 @@
-\newpage
-\chapter{Lecture 10/03/2024}
+% \subsection{Stability and Equilibrium Points}
 
-Last lecture we saw that we can approximate a non-linear system with a linear one, locally in an equilibrium point.
+% \subsubsection{Equilibrium Points}
 
-Let's consider an electric circuit, if the elecrical field is not static, it generates a variable magnetic field and viceversa. 
+% Given the system:
 
-$$
-\begin{cases}
-\Phi = Li \\
-Ri = -\dfrac{d\Phi(\vec B)}{dt} = -\dfrac{d(Li)}{dt}
-\end{cases}
-$$
+% $$
+% \begin{cases}
+%     \dot x = f(x) \\
+%     x \in \mathbb{R}^n
+% \end{cases}
+% $$
 
-We can write this system in the cauchy form:
+% An equilibrium point is a point $x^*$ such that $f(x^*) = 0$.
 
-$$
-\begin{cases}
-\dfrac{di}{dt} = - \dfrac RL i \\
-i(0) = i_0
-\end{cases}
-$$
+% \begin{tipsblock}[Eq. points]
+% A system can have multiple equilibrium points.
+% \end{tipsblock}
 
-The solution is:
+% We have three kinds of equilibrium:
 
-$$
-i(t) = i_0 e^{-\frac Rt}
-$$
+% \begin{itemize}
+%     \item \textbf{Stable equilibrium}: if the system is in the neighborhood of the equilibrium point, it will remain there.
+%     \item \textbf{Neutral equilibrium}: if the system is in the neighborhood of the equilibrium point, it will remain there, but it will not return to it.
+%     \item \textbf{Unstable equilibrium}: if the system is in the neighborhood of the equilibrium point, it will move away from it.
+% \end{itemize}
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.65\textwidth]{assets/eq_points.png}
+%     \caption{Stable, Natural and Unstable Equilibrium Points \cite{stability}}
+% \end{figure}
+
+% \subsubsection{Stability}
+
+% We say that a system is \textbf{\textit{Globally Asymptotically Stable}} (or \textit{Globally Attractive}) if it is stable and if it converges to the equilibrium point from any initial condition.
+
+% \subsection{Local Analysis Near the Equilibrium Point}
+
+% In this section, we study the system in the neighborhood of the equilibrium point. Let the initial condition be a small perturbation around the equilibrium:
+
+% $$
+% X(0) = X_e + \varepsilon.
+% $$
+
+% We introduce a deviation function $U(t)$ defined by
+
+% $$
+% X(t) = X_e + U(t),
+% $$
+
+% with the initial condition
+
+% $$
+% U(0) = \varepsilon.
+% $$
+
+% Thus, the evolution of the perturbation is governed by
+
+% $$
+% \begin{cases}
+% \dot U = f(X_e + U), \\
+% U(0) = \varepsilon.
+% \end{cases}
+% $$
+
+% Assume that the dynamics of the system are given by
+
+% $$
+% \dot X = X(b(X) - m(X)).
+% $$
+
+% Then the perturbed system becomes
+
+% $$
+% \dot U = (b(X_e + U) - m(X_e + U))(X_e + U).
+% $$
+
+% Expanding $b(X_e + U)$ and $m(X_e + U)$ in a Taylor series around $X_e$, we have:
+
+% $$
+% b(X_e + U) \approx b(X_e) + b'(X_e)U,
+% $$
+% $$
+% m(X_e + U) \approx m(X_e) + m'(X_e)U.
+% $$
+
+% Substituting these into the equation for $\dot U$, we get:
+
+% $$
+% \begin{array}{rl}
+% \dot U & = \bigl[b(X_e) + b'(X_e)U\bigr] - \bigl[m(X_e) + m'(X_e)U\bigr](X_e + U) \\
+%       & = \bigl[b(X_e) + b'(X_e)U\bigr] - \bigl[m(X_e)X_e + m(X_e)U + m'(X_e)X_eU + m'(X_e)U^2\bigr].
+% \end{array}
+% $$
+
+% Since the equilibrium condition implies that
+
+% $$
+% (b(X_e) - m(X_e))X_e = 0,
+% $$
+
+% the above expression simplifies (neglecting the higher-order term $m'(X_e)U^2$) to:
+
+% $$
+% \dot U \approx \left[b'(X_e) - m(X_e) - m'(X_e)X_e\right] U.
+% $$
+
+% Under the assumption that $b'(X_e)$ is negative, we can express this as
+
+% $$
+% \dot U \approx -X_e\Bigl(|b'(X_e)| + m'(X_e)\Bigr)U.
+% $$
+
+% The solution of this linearized differential equation is given by:
+
+% $$
+% U(t) = U(0)\,e^{-X_e (|b'(X_e)| + m'(X_e))t}.
+% $$
+
+% Hence, we identify the decay rate (or the inverse of the characteristic time constant) as
+
+% $$
+% X_e\Bigl(|b'(X_e)| + m'(X_e)\Bigr),
+% $$
+
+% and the characteristic time $\tau$ is:
+
+% $$
+% \tau = \frac{1}{X_e \left(|b'(X_e)| + m'(X_e)\right)}.
+% $$
+
+% This time constant represents the rate at which perturbations decay in the vicinity of the equilibrium point.
 
 
+% \newpage
 
-$$
-L \dfrac{di}{dt} + Ri + V_c = 0
-$$
+% $$
+% X(t) = X_e + U(t) \Rightarrow \dot U = f(X_e + U) = \underbrace{f(X_e)}_{=\ 0} + f'(X_e)U + O(U^2)
+% $$
 
-$$
-VC = Q
-$$
+% $$
+% \dot U = f'(X_e)U \Rightarrow U(t) = U(0) e^{f'(X_e)t}
+% $$
 
-$$
-y = \begin{bmatrix} i \\ q \end{bmatrix},
-\quad
-A = \begin{bmatrix}
-    -\dfrac{R}{L} & -\dfrac{1}{LC} \\[10pt]
-    \phantom{-}1  & \phantom{-}0
-\end{bmatrix}
-$$
+% So we have:
+% $$
+% \begin{cases}
+% f'(X_e) < 0 \quad \Rightarrow \quad X_e \text{ is Locally Asintotically stable } \\
+% f'(X_e) > 0 \quad \Rightarrow \quad X_e \text{ is Unstable }
+% \end{cases}
+% $$
 
-$$
-m\ddot x = \gamma \dot x + kx
-$$
+% \vspace{2em}
 
-\newpage
+% \section{Non-scalar Systems}
 
-\section{Dirak Delta}
+% Consider the system:
 
-If ypu consider a foorball player that kicks a ball, the force is not constant, and it is not possible to model it with a constant force. We can model it with a Dirak Delta function.
+% $$
+% \begin{cases}
+%     \dot x = f(x) \\
+%     x \in \mathcal{f} \subseteq \mathbb{R}^n
+% \end{cases}
+% $$
 
-$$
-\begin{cases}
-m \ddot x = m \dot v = F(t) \\
-v(0) = 0
-\end{cases}
-\quad \Rightarrow \quad
-mv_{after} = \int_0^a F(t) dt \quad \Rightarrow \quad \boxed{v_{after} = \dfrac{1}{m} \int_0^a F(t) dt}
-$$
+% As in the scalar case, we can linearize the system around the equilibrium point $x_e$:
 
-So the Dirak Delta function is a function that is zero everywhere except in zero, where it is infinite. It is used to model impulses.
+% $$
+% f(X_e) = 0
+% $$
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{assets/dirak.png}
-    \caption{Dirak Delta Function} \label{fig:dirak}
-\end{figure}
+% $$
+% X = X_e + U, \quad \quad |U| \ll 1
+% $$
 
-\dots
+% We have to consider the Jacobian matrix of $f$:
 
-Let's consider a function $f(t)$ such that $f(0) < \infty$ and $f'(0) < \infty$. We can calculate:
+% \dots
 
-$$
-\int_{\mathbb R} \delta(t) f(t) dt = \int_{\mathbb R} \delta(t) [f(0) + f'(0)t] dt = \int_{\mathbb R} \delta(t) f(0) dt + \int_{\mathbb R} \delta(t) f'(0)t dt
-$$
+% \subsection{Exponential of a Matrix}
 
-Now, we use two key properties of the Dirac delta function:
-\begin{enumerate}
-    \item \textbf{Sifting Property:}
-    $$
-    \int_{\mathbb{R}} \delta(t) \, dt = 1.
-    $$
+% Let's consider a linear system of the form:
 
-    \item \textbf{First Moment:}
-    $$
-    \int_{\mathbb{R}} \delta(t)t \, dt = 0,
-    $$
+% $$
+% \dot x = Ax
+% $$
 
-    which follows because \( t\delta(t) \) is an odd function.
-\end{enumerate}
+% where $A \in \mathbb{R}^{n \times n}$ is a matrix. The solution of this system is given by:
 
-Substituting these results, we obtain:
+% $$
+% x(t) = e^{At} x(0)
+% $$
 
-$$
-\int_{\mathbb{R}} \delta(t) f(t) \, dt = f(0) \cdot 1 + f'(0) \cdot 0 = f(0).
-$$
+% where $e^{At}$ is the exponential of the matrix $A$.
 
-\dots
+% \begin{definitionblock}[Exponential of a Matrix]
+% Given a matrix $A \in \mathbb{R}^{n \times n}$, the exponential of $A$ is defined as:
 
-\section{Random Processes}
+% $$
+% e^A = I + A + \frac{A^2}{2!} + \frac{A^3}{3!} + \dots = \sum_{k=0}^{\infty} \frac{A^k}{k!}
+% $$
 
-$$
-<x(t)> = \dfrac 1N \sum_{i=1}^N {x_R}_i(t)
-$$
+% This comes from the Taylor series expansion of the exponential function.
+% \end{definitionblock}
 
-$$
-m_i \ddot x_i = - \gamma \dot x_i
-\quad \Rightarrow \quad
-m_i \dot v_i = - \gamma v_i 
-\quad \Rightarrow \quad
-\dot v_i = - \dfrac{\gamma}{m_i} v_i 
-\quad \Rightarrow \quad
-\boxed{
-v_i(t) = v_i(0) e^{-(\gamma / m_i) t}_{\phantom{-\frac 11}}
-}
-$$
+% $$
+% \dfrac d{dt} e^{At} = \sum_{m = 1}^\infty A^m m \dfrac{t^{m-1}}{m(m-1)!}
+% = \sum_{k = 0}^\infty A A^k \dfrac{t^k}{k!}
+% = A e^{At}
+% $$
 
-$$
-\boxed{
-m \dot v = - \gamma v + \hat F_s (t) 
-}
-$$
+% $$
+% \begin{array}{lll}
+% A & = & H \cdot \text{Diag}(\lambda_1, \lambda_2, \dots, \lambda_n) \cdot H^{-1} \\
+% A^2 & = & H \cdot \text{Diag}(\lambda_1^2, \lambda_2^2, \dots, \lambda_n^2) \cdot H^{-1} \\
+% A^m & = & H \cdot \text{Diag}(\lambda_1^m, \lambda_2^m, \dots, \lambda_n^m) \cdot H^{-1}
+% \end{array}
+% $$
 
-$$
-m \ddot x = -k\dot x + \hat F_p(x) + \hat F_s(t)
-$$
-$$
-m \ddot x = - k \dot x + k f(x) + k f_s (t)
-$$
-$$
-\dfrac mk \ddot x = - \dot x + f(x) + f_s(t)
-$$
-$$
-\dfrac mk \ddot x \ll 1 \quad \Rightarrow \quad \dfrac mk \ddot x \approx 0
-$$
-$$
-\dot x \simeq f(x) + f_s(t) = f(x) + \omega \xi (t)
-$$
+% So we have:
+
+% $$
+% e^{At} = \sum_{m = 0} ^ \infty \dfrac{A^m t^m}{m!} = 
+% $$
+
