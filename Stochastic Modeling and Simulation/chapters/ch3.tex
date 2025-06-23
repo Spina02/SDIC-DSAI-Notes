@@ -766,29 +766,29 @@ dx = a(x)dt + b(x)dW
 $$
 its associated Probability Density Function, $\rho(x,t)$, will solve the Fokker-Planck equation:
 $$
-\frac{\partial \rho}{\partial t} = -\frac{\partial}{\partial x}\left(a(x)\rho(x,t)\right) + \frac{\partial^2}{\partial x^2}\left(\frac{b(x)^2}{2}P(x,t)\right)
+\frac{\partial \rho}{\partial t} = -\frac{\partial}{\partial x}\left(a(x)\rho(x,t)\right) + \frac{\partial^2}{\partial x^2}\left(\frac{b(x)^2}{2}\rho(x,t)\right)
 $$
 This must, of course, be supplemented with boundary conditions (e.g., Dirichlet) and an initial condition $\rho(x,0)$ to obtain a unique solution. Note that imposing a specific initial state $x(0)$ actually yields the conditional PDF, $\rho(x,t|x(0))$.
 \end{definitionblock}
 
-In summary, the probability density function $P(x, t)$ associated with the stochastic process governed by the SDE above satisfies the celebrated \textbf{Fokker-Planck equation} (also known as the forward Kolmogorov equation):
+In summary, the probability density function $\rho(x, t)$ associated with the stochastic process governed by the SDE above satisfies the celebrated \textbf{Fokker-Planck equation} (also known as the forward Kolmogorov equation):
 $$
-\frac{\partial}{\partial t} P(x, t) = -\frac{\partial}{\partial x} \left[a(x) P(x, t)\right] + \frac{\partial^2}{\partial x^2} \left( \frac{b^2(x)}{2} P(x, t) \right)
+\frac{\partial}{\partial t} \rho(x, t) = -\frac{\partial}{\partial x} \left[a(x) \rho(x, t)\right] + \frac{\partial^2}{\partial x^2} \left( \frac{b^2(x)}{2} \rho(x, t) \right)
 $$
 
-This partial differential equation describes the time evolution of the probability density $P(x, t)$ for the random variable $x$.
+This partial differential equation describes the time evolution of the probability density $\rho(x, t)$ for the random variable $x$.
 
-Since $P(x, t)$ is a probability density function, it must always satisfy the \textbf{normalization constraint}:
+Since $\rho(x, t)$ is a probability density function, it must always satisfy the \textbf{normalization constraint}:
 
 $$
-\int_{-\infty}^{\infty} P(x, t) \, dx = 1
+\int_{-\infty}^{\infty} \rho(x, t) \, dx = 1
 $$
 This ensures that the total probability is conserved at all times.
 
 To uniquely determine the solution, we must also specify the \textbf{initial distribution} of $x$:
 
 $$
-P(x, 0) = \theta(x)
+\rho(x, 0) = \theta(x)
 $$
 where $\theta(x)$ is the given initial probability density function (for example, it could be a Dirac delta function if the initial state is known exactly, or a broader distribution if there is uncertainty).
 
