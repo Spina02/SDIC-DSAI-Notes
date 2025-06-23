@@ -937,3 +937,19 @@ $$
 J = -K \nabla P
 $$
 For this reason, $J$ in these cases is also known as the \textbf{current}.
+
+\subsubsection{Kac's Lemma}
+
+Kac's Lemma establishes a fundamental relationship between stationary probabilities and expected return times in ergodic stochastic processes. Consider a stationary Markov process with stationary distribution $\pi$ and let $A$ be a measurable subset of the state space. Define $T_A$ as the first return time to $A$ when starting from a point in $A$. Kac's Lemma states:
+
+$$
+\mathbb{E}[T_A | X_0 \in A] = \frac{1}{\pi(A)}
+$$
+
+where $\pi(A) = \int_A \pi(x) dx$ is the stationary measure of set $A$.
+
+This result provides a direct connection between the equilibrium properties of the system (captured by $\pi$) and its dynamical properties (captured by return times). States or regions with low stationary probability have correspondingly long expected return times.
+
+The lemma follows from the ergodic theorem: for an ergodic process, the long-run proportion of time spent in any set equals its stationary probability. Since visits to $A$ occur approximately every $\mathbb{E}[T_A]$ time units, we have $\pi(A) \approx 1/\mathbb{E}[T_A]$.
+
+This relationship has important applications in population dynamics, where rare population states correspond to long recovery times, and in statistical mechanics, where it connects equilibrium distributions to relaxation timescales near phase transitions.
