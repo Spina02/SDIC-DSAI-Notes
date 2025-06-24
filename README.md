@@ -40,7 +40,7 @@
     <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Programming/main.pdf">Advanced Programming</a></td>
       <td><strong><span style="color: lime;">[DONE]</span></strong></td>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Stochastic%20Modeling%20and%20Simulation/main.pdf">Stochastic Modeling and Simulation</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Stochastic%20Modeling%20and%20Simulation/main.pdf">Stochastic Modeling and Simulation</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
     <tr>
