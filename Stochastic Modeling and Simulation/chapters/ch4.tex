@@ -737,3 +737,324 @@ Let us also consider two special cases:
 
 
 Furthermore, it can be shown that the stationary distribution $P_s(x)$ is normalizable (i.e., its total probability integrates to 1) only if $\omega^2 < 2r$. This is consistent with the more general result discussed in the previous section.
+
+\section{From Discrete Jumps to Continuous Diffusion}
+
+In the previous sections, we modeled stochastic systems using Stochastic Differential Equations (SDEs), which describe the infinitesimal evolution of processes with continuous paths, like the Ornstein-Uhlenbeck process. However, many systems in physics, chemistry, and biology are more naturally described by discrete "jumps" between states. Examples include a molecule switching between chemical species, an ion channel opening or closing, or a population changing by single-birth or death events.
+
+These phenomena are governed by \textbf{jump processes}, where the system remains in a given state for a random period before instantaneously jumping to a new state. The evolution of the probability distribution for such a process is not described by a Fokker-Planck equation but by a more general framework: the \textbf{Master Equation}.
+
+\subsection{The Master Equation}
+Let's consider a process where the state variable $x$ can take any value in a continuous state space. The core of a jump process is the \textbf{transition rate} (or jump kernel) $\Omega(y,x)$, which defines the probability per unit time of a jump occurring \textit{from} state $y$ \textit{to} state $x$.
+
+The probability of a system in state $y$ jumping to any state within a small region around $x$ in an infinitesimal time interval $dt$ is given by:
+$$
+\text{Prob}(\text{jump } y \to x \text{ in } dt) = \Omega(y,x)dt
+$$
+Conversely, the probability that the system, currently in state $x$, does \bfit{not} jump to any other state during $dt$ is one minus the total probability of jumping \textit{out} of $x$:
+$$
+\text{Prob}(\text{no jump from } x \text{ in } dt) = 1 - \left( \int \Omega(x,s)ds \right)dt
+$$
+The Master Equation describes the time evolution of the probability density $P(x,t)$ by balancing the probability flows into and out of state $x$. The rate of change of $P(x,t)$ is the sum of all probability flowing \textit{in} from other states $s$ (the gain term) minus the total probability flowing \textit{out} to all other states $s$ (the loss term). This balance gives the integro-differential Master Equation:
+$$
+\boxed{
+\frac{\partial P(x,t)}{\partial t} = \underbrace{\int P(s,t)\Omega(s,x)ds}_{\text{Gain: Jumps from } s \text{ to } x} - \underbrace{P(x,t) \int \Omega(x,s)ds}_{\text{Loss: Jumps from } x \text{ to } s}
+}
+$$
+
+\subsection{Deriving the Diffusion Equation}
+A profound connection exists between discrete jump processes and continuous diffusion processes. Under the right conditions, a process consisting of many small, frequent jumps becomes indistinguishable from a continuous process described by a Fokker-Planck equation. We can demonstrate this by considering two simple jump models.
+
+\begin{exampleblock}[The Uniform Jump Process]
+Consider a particle that performs random jumps where the jump destination is uniformly distributed within a small interval of length $2\epsilon$ around its current position. If the particle is at $s$, it can jump to any $x \in [s-\epsilon, s+\epsilon]$. The jump kernel can be written as:
+$$
+\Omega(s,x) = C \cdot \mathbb{I}_{[s-\epsilon, s+\epsilon]}(x)
+$$
+where $C$ is a constant representing the overall jump frequency and $\mathbb{I}$ is the indicator function, therefore $\mathbb{I}$ will be $1$ in the set and $0$ outside. Thus I have the Master Equation:
+$$
+\partial_t P = -2\epsilon C P(x, y) + \int_{x-\epsilon}^{x+\epsilon} P(y, t) dy
+$$
+Now define $y = z + x$, then
+$$
+\int_{x-\epsilon}^{x+\epsilon} P(y, t) dy = \int_{-\epsilon}^{\epsilon} P(x + z, t) dz
+$$
+Since $\epsilon$ is small, I can Taylor expand
+$$
+P(x + z, t) = P(x, t) + z \partial_x P(x, t) + \frac{z^2}{2} \partial_x^2 P(x, t) + \ldots
+$$
+Therefore
+$$
+\begin{array}{rl}
+    \displaystyle C \int_{-\epsilon}^{\epsilon} P(x + z, t) dz & \displaystyle= C \left[ 2\epsilon + 0 \cdot \partial_x  + \frac{1}{2}\frac{1}{3} 2\epsilon^3 \partial_x^2  \right]P(x, t)\\[0.8em]
+    &\displaystyle= C \left[ 2\epsilon + \frac{1}{3} \epsilon^3 \partial_x^2 \right]P(x, t)
+\end{array}
+$$
+Putting everything together, we obtain
+$$
+\partial_t P(x, t) = \frac{C \epsilon^3}{3} \partial_x^2 P(x, t)
+$$
+To have $\frac{C \epsilon^3}{3} = O(1)$, we need $C \propto 1/\epsilon^3$, which is actially a huge jump rate.
+
+\vspace{0.5em}
+
+Note that this is the formula for the PDF associated with a Wiener process, so a random walk process as described is described by a Wiener process.
+\end{exampleblock}
+
+\begin{exampleblock}[The Fixed-Step Random Walk]
+Now consider a different model where jumps are of a fixed size $\pm\epsilon$. The transition rate is described by Dirac delta functions:
+$$
+\Omega(y,x) = C \cdot \delta(|x-y| - \epsilon)
+$$
+Therefore,
+$$
+\partial_t P = \int \left( P(y, t) \Omega(y, x) - P(x, t) \Omega(x, y) \right) dy
+$$
+As before,
+$$
+\partial_t P = C \left[ P(x - \epsilon, t) + P(x + \epsilon, t) - 2P(x, t) \right]
+$$
+and thus
+$$
+\partial_t P = C \left( P(x + \epsilon, t) - P(x, t) + P(x - \epsilon, t) - P(x, t) \right)
+$$
+
+We can now divide above and below by $\epsilon^2$ and take the incremental ratio as $\epsilon \to 0$, obtaining
+$$
+\partial_t P = \epsilon^2C \frac{P(x + \epsilon, t) - 2P(x, t) + P(x - \epsilon, t)}{\epsilon^2} = C \epsilon^2 \partial_x^2 P(x, t)
+$$
+Even for this discrete case, we obtain again the equation for the PDF of a Wiener process. However, there is something subtle: if $C$ is finite, the process does not diffuse in the limit $\epsilon \to 0$. To have a finite rate of change of probability, the diffusion coefficient must be defined as
+$$
+\lim_{\epsilon \to 0} C \epsilon^2 = O(1)
+$$
+So we must have $C \propto 1/\epsilon^2$.
+
+\end{exampleblock}
+
+\subsubsection{The Diffusion Limit and the Wiener Process}
+In both examples, we found that a process of discrete jumps can be described by a diffusion equation in the limit of small jump sizes ($\epsilon \to 0$). However, for the diffusion coefficient $D$ to remain finite and non-zero in this limit, the jump rate $C$ must scale appropriately:
+\begin{itemize}
+    \item For uniform jumps: $D = C\epsilon^3/3 \implies C \propto 1/\epsilon^3$.
+    \item For fixed-step jumps: $D = C\epsilon^2 \implies C \propto 1/\epsilon^2$.
+\end{itemize}
+In both cases, the jump rate must diverge as the jump size shrinks. This is the \textbf{diffusion limit}: a macroscopic diffusion process emerges from an infinite number of infinitesimally small, infinitely frequent jumps.
+
+The resulting equation,
+$$
+\frac{\partial P}{\partial t} = D \frac{\partial^2 P}{\partial x^2}
+$$
+is precisely the Fokker-Planck equation for a scaled \textbf{Wiener process} described by the SDE $dx = \sqrt{2D}dW_t$. This provides a powerful microscopic justification for the SDE framework: continuous diffusion models can be viewed as the large-scale limit of underlying discrete jump phenomena.
+
+
+% \subsection{The Discrete-Space Limit: Continuous-Time Markov Chains}
+% What happens if we keep the state space discrete? Consider a random walk on the integers, $x(t) \in \mathbb{Z}$, where jumps only occur to adjacent sites with rate $A$. The transition rate is:
+% $$
+% \Omega(s,a) = A(\delta_{a,s+1} + \delta_{a,s-1})
+% $$
+% where $\delta_{i,j}$ is the Kronecker delta. Since the state space is discrete, we use sums instead of integrals in the Master Equation, and the probability is a function $P_n(t) = \text{Prob}(x(t)=n)$. The equation becomes:
+% $$
+% \frac{d P_n(t)}{dt} = \sum_{m \in \mathbb{Z}} [P_m(t)\Omega(m,n) - P_n(t)\Omega(n,m)]
+% $$
+% Substituting the kernel, the sum only has contributions from $m = n\pm 1$:
+% $$
+% \frac{d P_n(t)}{dt} = A[P_{n-1}(t) + P_{n+1}(t)] - 2AP_n(t)
+% $$
+% This is the master equation for a \textbf{Continuous-Time Markov Chain (CTMC)}. It describes a system that evolves in continuous time but jumps between discrete states. It does not become a diffusion equation unless a continuous limit is taken on the state space itself.
+
+\newpage
+
+\section{The Stratonovich Integral}
+
+We started with the Itô formula, which arises from discretizing an SDE of the form $dx = a(x)dt + b(x)dW_t$ as:
+$$
+x(t+dt) - x(t) = a(x(t))dt + b(x(t))dW_t
+$$
+Here, the diffusion term $b(x)$ is evaluated at the beginning of the time interval, $t$. This choice is mathematically convenient because it ensures that the integrand is independent of the future increment $dW_t$, which makes the resulting stochastic integral a martingale.
+
+However, this is not the only possible choice. An alternative, proposed by Ruslan Stratonovich, evaluates the diffusion term at the midpoint of the time interval, $t+dt/2$. This gives rise to the \textbf{Stratonovich SDE}, denoted with a $\circ$:
+$$
+dx = a(x)dt + b(x) \circ dW_t
+$$
+Its discretized form is:
+$$
+x(t+dt) - x(t) = a(x(t))dt + b\left(x\left(t+\frac{dt}{2}\right)\right)dW_t
+$$
+This subtle difference in the evaluation point has profound consequences, leading to a different set of calculus rules. While the Itô integral is a martingale, the Stratonovich integral is not. However, the Stratonovich chain rule follows the rules of ordinary calculus, which can make it more intuitive for physicists and engineers modeling systems derived from physical principles.
+
+\subsubsection{Connecting the Itô and Stratonovich SDEs}
+We can find a direct relationship between the two formalisms by expanding the midpoint term in the Stratonovich definition.
+First, we approximate the state at the midpoint:
+$$
+x\left(t+\frac{dt}{2}\right) \approx x(t) + a(x(t))\frac{dt}{2} + b(x(t))\left(W\left(t+\frac{dt}{2}\right) - W(t)\right)
+$$
+Next, we expand the function $b$ around $x(t)$:
+$$
+b\left(x\left(t+\frac{dt}{2}\right)\right) \approx b(x(t)) + b'(x(t)) \left( x\left(t+\frac{dt}{2}\right) - x(t) \right)
+$$
+Substituting the first expression into the second gives:
+$$
+b\left(x\left(t+\frac{dt}{2}\right)\right) \approx b(x(t)) + b'(x(t))\left[ a(x(t))\frac{dt}{2} + b(x(t))\hat{dW} \right]
+$$
+where $\hat{dW} = W(t+\frac{dt}{2}) - W(t)$. Now we substitute this back into the Stratonovich SDE definition:
+$$
+dx = a(x)dt + \left( b(x) + b'(x)\left[ a(x)\frac{dt}{2} + b(x)\hat{dW} \right] \right) dW_t
+$$
+Expanding this, we get three terms involving $dW_t$:
+$$
+dx = a(x)dt + b(x)dW_t + a(x)b'(x)\frac{dt}{2}dW_t + b(x)b'(x)\hat{dW}dW_t
+$$
+The term $dt\,dW_t$ is of order $O(dt^{3/2})$ and can be neglected. The final term requires us to evaluate the expectation $\langle\hat{dW}dW_t\rangle$.
+$$
+\langle \hat{dW}dW_t \rangle = \left\langle \left(W(t+\frac{dt}{2}) - W(t)\right)\left(W(t+dt) - W(t)\right) \right\rangle = \min\left(t+\frac{dt}{2}, t+dt\right) - t = \frac{dt}{2}
+$$
+where the minimum comes from the autocorrelation of the Wiener process $\langle W(t)W(s) \rangle = \min(t, s)$.
+
+\vspace{0.5em}
+
+Therefore, the term $b(x)b'(x)\hat{dW}dW_t$ contributes a drift of $\frac{1}{2}b(x)b'(x)dt$.
+Combining all terms, the Stratonovich SDE is equivalent to the following Itô SDE:
+$$
+dx = \left( a(x) + \frac{1}{2}b(x)b'(x) \right)dt + b(x)dW_t
+$$
+
+\begin{definitionblock}[Stratonovich-to-Itô Conversion]
+A Stratonovich SDE
+$$
+dx = a(x)dt + b(x)\circ dW_t
+$$
+is equivalent to an Itô SDE with a modified drift term:
+$$
+dx = \left( a(x) + \frac{1}{2}b(x)b'(x) \right)dt + b(x)dW_t
+$$
+This conversion formula allows us to switch between the two calculi, leveraging the strengths of each. The extra drift term $\frac{1}{2}b(x)b'(x)$ is often called the "noise-induced drift" or "spurious drift."
+\end{definitionblock}
+
+\subsection{Fokker-Planck Equation for Stratonovich SDEs}
+
+Given the conversion formula, we can easily find the Fokker-Planck equation for a Stratonovich SDE. We simply take the Fokker-Planck equation for an Itô SDE and replace the drift $a(x)$ with the effective drift $a(x) + \frac{1}{2}b(x)b'(x)$.
+
+$$
+\frac{\partial \rho}{\partial t} = - \frac{\partial}{\partial x} \left[ \left(a(x) + \frac{1}{2}b(x)b'(x)\right)\rho \right] + \frac{1}{2} \frac{\partial^2}{\partial x^2} \left[ b(x)^2 \rho \right]
+$$
+
+This equation can be rewritten in a more compact and elegant form. Noting that $b(x)b'(x) = \frac{1}{2}\frac{d}{dx}(b(x)^2)$, we can combine the terms:
+
+$$
+\frac{\partial \rho}{\partial t} = - \frac{\partial}{\partial x} [a(x)\rho] + \frac{1}{2} \left( -\frac{\partial}{\partial x}\left[\frac{d(b^2)}{dx}\rho\right] + \frac{\partial^2}{\partial x^2}[b^2\rho] \right)
+$$
+
+Let us use the product rule on the second derivative:
+
+$$
+\frac{\partial^2}{\partial x^2} [b^2 \rho] = \frac{\partial}{\partial x} \left( \frac{\partial (b^2)}{\partial x} \rho + b^2 \frac{\partial \rho}{\partial x} \right) = \frac{\partial^2 (b^2)}{\partial x^2} \rho + 2 \frac{\partial (b^2)}{\partial x} \frac{\partial \rho}{\partial x} + b^2 \frac{\partial^2 \rho}{\partial x^2}
+$$
+Now, consider the term
+
+$$
+- \frac{\partial}{\partial x} \left[ \frac{\partial (b^2)}{\partial x} \rho \right] + \frac{\partial^2}{\partial x^2} [b^2 \rho]
+$$
+
+Substituting the expanded form, we get:
+
+$$
+\frac{\partial \rho}{\partial t} = - \left( \frac{\partial^2 (b^2)}{\partial x^2} \rho + \frac{\partial (b^2)}{\partial x} \frac{\partial \rho}{\partial x} \right) + \left( \frac{\partial^2 (b^2)}{\partial x^2} \rho + 2 \frac{\partial (b^2)}{\partial x} \frac{\partial \rho}{\partial x} + b^2 \frac{\partial^2 \rho}{\partial x^2} \right)
+$$
+
+Canceling the common terms, we are left with:
+
+$$
+\frac{\partial \rho}{\partial t} = \frac{\partial (b^2)}{\partial x} \frac{\partial \rho}{\partial x} + b^2 \frac{\partial^2 \rho}{\partial x^2} = \frac{\partial}{\partial x} \left[ b \frac{\partial}{\partial x} (b \rho) \right]
+$$
+
+Therefore, the equation becomes:
+
+$$
+\frac{\partial \rho}{\partial t} = - \frac{\partial}{\partial x} [a(x)\rho] + \frac{1}{2} \frac{\partial}{\partial x} \left[ b(x) \frac{\partial}{\partial x} (b(x)\rho) \right]
+$$
+
+This is the common form of the Fokker-Planck equation found in many physics textbooks. It highlights that in the Stratonovich interpretation, the diffusion term has a simpler structure.
+
+\subsubsection{The Stationary Distribution for Stratonovich SDEs}
+
+The Stratonovich form turns out to be quite convenient when dealing with the stationary distribution $P_s$, since
+
+$$
+0 = -\frac{d}{dx}\left[a(x)P_s\right] + \frac{1}{2} \frac{d}{dx} \left[ b(x) \frac{d}{dx} (b(x)P_s) \right]
+$$
+
+By simplifying and rearranging, we easily obtain
+
+$$
+\frac{b(x)}{2} \frac{d}{dx} [b(x)P_s] = a(x)P_s
+$$
+
+Now, define $\mathcal{H} = b(x)P_s$ so that
+
+$$
+\frac{d\mathcal{H}}{dx} = \frac{2a(x)}{b(x)^2} \mathcal{H}
+\implies
+\mathcal{H} = C \exp\left[ \int_{x} \frac{2a(z)}{b(z)^2} dz \right]
+$$
+
+Therefore,
+
+$$
+P_s(x) = \frac{C}{b(x)} \exp\left[ \int_{x} \frac{2a(z)}{b(z)^2} dz \right]
+= C \exp\left[ -\log(b(x)) + \int_{x} \frac{2a(z)}{b(z)^2} dz \right]
+$$
+
+Once again, we want a formula that allows us to calculate the stationary points, so we can verify that it is sufficient to consider the stationary points of the exponent:
+
+$$
+\frac{2a(x)}{b(x)^2} - \frac{b'(x)}{b(x)} \ge 0
+\implies
+a(x) \ge \frac{1}{2} b(x) b'(x)
+$$
+
+The only difference compared to the Itô formulation is the factor $1/2$. The difference is therefore only quantitative, not qualitative. We have seen that the transitions due to noise can emerge in a new way that depends on the parameterization, even if the positions of the maxima and minima and their values change by different factors.
+
+
+\subsubsection{Applications of SSDEs}
+
+Let us revisit the Malthusian growth model, which is described by
+$$
+\dot{x} = r x
+$$
+where $r$ is the growth rate.
+
+Suppose now that the growth rate is subject to random fluctuations, so that $r \to r + \alpha \xi(t)$, where $\xi(t)$ is white noise. 
+
+Now, let us assume that the noise is such that it is described in the Stratonovich sense. The equation becomes
+$$
+dx = r x dt + \alpha x \circ dW
+$$
+where $\circ$ denotes the Stratonovich integral. The corresponding Ito version of this formula is
+$$
+dx = \left(r x + \frac{\alpha^2}{2} x\right) dt + \alpha x dW
+$$
+
+If we now apply the logarithmic transformation $y = \ln x$, we obtain
+$$
+dy = \left(r + \cancel{\frac{\alpha^2}{2}} - \cancel{\frac{\alpha^2}{2}}\right) dt + \alpha dW = r dt + \alpha dW
+$$
+
+However, if we instead use the Ito interpretation from the start, the equation for $x$ is
+$$
+dx = r x dt + \alpha x dW
+$$
+which, under the transformation $y = \ln x$, gives
+$$
+dy = \left(r - \frac{\alpha^2}{2}\right) dt + \alpha dW
+$$
+
+This leads to a crucial difference between the two interpretations. 
+
+\begin{itemize}
+    \item \textbf{Itô case:} If $\frac{\alpha^2}{2} > r$, then the drift term in the equation for $y = \ln x$ becomes negative, so $y(t) \to -\infty$ as $t \to \infty$. This means $x(t) \to 0$, and the population will eventually go extinct even if $r > 0$.
+    \item \textbf{Stratonovich case:} The noise-induced drift term cancels out, so extinction only occurs if $r < 0$. In other words, the population persists as long as the deterministic growth rate $r$ is positive, regardless of the noise strength.
+\end{itemize}
+
+This difference is significant: in the Itô interpretation, strong enough noise can drive the population extinct even when the average growth rate is positive, while in the Stratonovich interpretation, only a negative growth rate leads to extinction.
+
+Which interpretation should be used? The answer depends on the nature of the noise and the modeling context. The Itô calculus is appropriate when the noise is idealized as perfectly white and uncorrelated in time. The Stratonovich calculus is more suitable when the noise has a finite correlation time or comes from a smooth, physical process. In real-world applications, the correct choice depends on the details of the system being modeled.
+
+In summary, the choice between Itô and Stratonovich calculus is not just a technicality: it can fundamentally change the predicted behavior of stochastic models, especially for questions like extinction thresholds and long-term outcomes.
