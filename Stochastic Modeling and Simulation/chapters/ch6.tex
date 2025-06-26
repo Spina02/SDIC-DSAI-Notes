@@ -1,7 +1,7 @@
 \chapter{Discrete-Time Markov Chains}
 \label{ch:dtmc}
 
-We now transition from continuous-time stochastic processes to their discrete-time counterparts. While physical systems evolve continuously, many models in fields like biology, economics, and computer science are more naturally described at discrete time steps. This leads us to the study of \textbf{Discrete-Time Markov Chains (DTMCs)}, which provide a powerful framework for modeling systems that transition between a set of discrete states over time.
+We now transition from continuous-time stochastic processes to their discrete-time counterparts. While physical systems evolve continuously, many models are more naturally described at discrete time steps. This leads us to the study of \textbf{Discrete-Time Markov Chains (DTMCs)}.
 
 \section{Fundamental Properties}
 
@@ -24,7 +24,7 @@ This "memoryless" property is the cornerstone of Markov chain theory. It allows 
     No; in physics, it is common to work with infinite-dimensional (countable or even uncountable) state spaces and infinite matrices without difficulty.
 \end{tipsblock}
 
-\subsubsection{The Evolution of the Probability Distribution}
+\subsubsection{The Evolution of the Probability Distribution and the Master Equation}
 
 Let $P_\sigma(t)$ be the probability that the system is in state $\sigma \in S$ at time $t$. To find the probability of being in state $\sigma$ at the next time step, $t+1$, we can sum over all possible states $\delta$ the system could have been in at time $t$. Using the law of total probability:
 $$
@@ -38,16 +38,35 @@ If we organize the state probabilities into a row vector $P(t) = [P_{s_1}(t), P_
 $$
 P(t+1) = P(t) \Theta(t)
 $$
+We may rewrite the above equation as
+$$
+P_\alpha(t+1) = P_\alpha(t)\theta_{\alpha\alpha} + \sum_{\sigma \ne \alpha} P_\sigma(t)\theta_{\sigma\alpha}
+$$
+
+\vspace{-0.5em}
+
+Since $\theta_{\alpha\alpha} = 1 - \sum_{\omega \ne \alpha} \theta_{\alpha\omega}$, we get the \textbf{Master Equation}:
+$$
+\boxed{
+P_\alpha(t+1) = P_\alpha(t) + \sum_{\sigma \ne \alpha} P_\sigma(t)\theta_{\sigma\alpha} - \sum_{\omega \ne \alpha} P_\alpha(t)\theta_{\alpha\omega}
+}
+$$
+
 
 \subsection{The Time-Homogeneous Case}
 
 In many applications, the transition probabilities do not depend on time. Such a chain is called \textbf{time-homogeneous}. In this case, the transition matrix $\Theta$ is constant. The evolution of the probability distribution over multiple steps is then found by repeatedly applying the matrix:
+
+\vspace{-1.5em}
+
+\small
 \begin{align*}
     P(1) &= P(0)\Theta \\
-    P(2) &= P(1)\Theta = P(0)\Theta^2 \\
-    &\vdots \\
+    P(2) &= P(1)\Theta = P(0)\Theta^2 \\[-0.5em]
+    &\vdots \\[-0.4em]
     P(t) &= P(0)\Theta^t
 \end{align*}
+\normalsize
 The state of the system at any future time $t$ is completely determined by the initial probability distribution $P(0)$ and the $t$-th power of the transition matrix.
 
 \begin{definitionblock}[Stochastic Matrix]
@@ -61,7 +80,7 @@ The transition matrix $\Theta$ of a time-homogeneous DTMC has two fundamental pr
 \end{enumerate}
 \end{definitionblock}
 
-A noteworthy consequence of the structure of the transition matrix $\Theta$ is that if $P(t)$ is a probability distribution, i.e.,
+A consequence of the structure of the transition matrix $\Theta$ is that if $P(t)$ is a probability distribution:
 $$
 \sum_{\sigma \in S} P_\sigma(t) = 1 \qquad \text{and} \qquad P_\sigma(t) \in [0,1]
 $$
@@ -317,6 +336,61 @@ A particularly illustrative example is the discrete-time SIR (Susceptible-Infect
 
 \newpage
 
+\subsection{The Chapman-Kolmogorov Equations}
+
+The \textbf{Chapman-Kolmogorov equations} are a fundamental tool in the analysis of Markov chains, providing a recursive relationship for multi-step transition probabilities. They allow us to compute the probability of transitioning from one state to another in a given number of steps, by considering all possible intermediate states.
+
+Suppose a Markov process starts in state $S_i$ at time $0$. We are interested in the probability that the process is in state $S_j$ after $n$ transitions, regardless of the specific path taken. This probability is denoted as:
+$$
+P(X_n = S_j \mid X_0 = S_i) = (\Theta^{(n)})_{ij}
+$$
+where $(\Theta^{(n)})_{ij}$ is the $(i,j)$-th entry of the $n$-step transition matrix $\Theta^{(n)}$.
+
+To compute this probability, we can sum over all possible states $S_k$ that the process could occupy at the previous time step $(n-1)$:
+$$
+P(X_n = S_j \mid X_0 = S_i) = \sum_{k} P(X_n = S_j, X_{n-1} = S_k \mid X_0 = S_i)
+$$
+By the definition of conditional probability and the Markov property, this can be rewritten as:
+$$
+P(X_n = S_j \mid X_0 = S_i) = \sum_{k} P(X_n = S_j \mid X_{n-1} = S_k) \, P(X_{n-1} = S_k \mid X_0 = S_i)
+$$
+Here, $P(X_n = S_j \mid X_{n-1} = S_k) = \theta_{kj}$ is the one-step transition probability from $S_k$ to $S_j$, and $P(X_{n-1} = S_k \mid X_0 = S_i) = (\Theta^{(n-1)})_{ik}$ is the probability of being in $S_k$ after $n-1$ steps starting from $S_i$.
+
+Therefore, the Chapman-Kolmogorov equation for the $n$-step transition probability is:
+$$
+(\Theta^{(n)})_{ij} = \sum_{k} (\Theta^{(n-1)})_{ik} \, \theta_{kj}
+$$
+or, equivalently, in matrix notation:
+$$
+\Theta^{(n)} = \Theta^{(n-1)} \cdot \Theta
+$$
+By repeated application, we obtain:
+$$
+\Theta^{(n)} = \Theta^n
+$$
+That is, the $n$-step transition matrix is simply the $n$-th power of the one-step transition matrix.
+
+\paragraph{Iterative Evolution of the State Distribution}
+
+If $P(0)$ is the initial probability distribution over states (a row vector), then the distribution after $n$ steps is given by:
+$$
+P(n) = P(0) \cdot \Theta^n
+$$
+Alternatively, the distribution evolves step by step as:
+$$
+P(n) = P(n-1) \cdot \Theta
+$$
+
+\paragraph{General Formulation}
+
+More generally, the Chapman-Kolmogorov equations state that for any $0 \leq k \leq n$,
+$$
+P(X_n = S_j \mid X_0 = S_i) = \sum_{S_k} P(X_n = S_j \mid X_k = S_k) \, P(X_k = S_k \mid X_0 = S_i)
+$$
+It expresses the $n$-step transition probability as a sum over all possible intermediate states at time $k$.
+
+\newpage
+
 \section{Structural Properties of DTMCs}
 We have so far informally used graphs to represent DTMCs, as they provide valuable insight into the internal structure and dynamics of the chain. We now give a formal definition:
 
@@ -524,7 +598,72 @@ $$
 $$
 This means we can estimate the stationary probability of a state by simply measuring how often it occurs in a long simulation.
 
+% \subsubsection{Apparent Paradox}
+\subsection{An Apparent Contradiction}
+
+In Markov chains with multiple absorbing states, an apparent paradox arises regarding the steady-state behavior. On one hand, the steady-state probability vector $P_{eq}$ must be an eigenvector of the transition matrix $W$ with eigenvalue 1, suggesting a unique equilibrium. On the other hand, when diagonalizing $W$, the general solution for $P(t)$ shows that the asymptotic distribution can depend on the initial condition $P(0)$. A classic example is the \textbf{Gambler's Ruin}.
+
+\begin{exampleblock}[The Gambler's Ruin]
+    A gambler starts with $i$ euros and, at each round, wins 1 euro with probability $p$ or loses 1 euro with probability $q=1-p$. The game ends when the fortune reaches 0 or $N$ euros (the absorbing states); states $1$ to $N-1$ are transient.
+
+    \vspace{-1.5em}
+    
+    \begin{figure}[H]
+        \centering
+        \begingroup
+        \small % or \footnotesize or \scriptsize for even smaller
+        \begin{tikzpicture}[scale=0.7, every node/.style={minimum size=0.9cm}]
+            \node[circle,draw] (s1) at (0, 0) {$0$};
+            \node[circle,draw] (s2) at (2, 0) {$1$};
+            \node[circle,draw] (s3) at (4, 0) {$2$};
+            \node[circle,draw] (s4) at (6, 0) {$3$};
+            \node[circle,draw, inner sep=2pt] (s5) at (8, 0) {\footnotesize $N\!-\!1$};
+            \node[circle,draw] (s6) at (10, 0) {$N$};
+            \draw[->] (s1) to[loop left] (s1);
+            \draw[->] (s2) to node[above] {$L$} (s1);
+            \draw[->] (s2) to[bend left=30] node[above] {$W$} (s3);
+            \draw[->] (s3) to[bend left=30] node[below] {$L$} (s2);
+            \draw[->] (s3) to[bend left=30] node[above] {$W$} (s4);
+            \draw[->] (s4) to[bend left=30] node[below] {$L$} (s3);
+            \draw[->, dashed] (s4) to[bend left=30] node[above] {$W$} (s5);
+            \draw[->, dashed] (s5) to[bend left=30] node[below] {$L$} (s4);
+            \draw[->] (s5) to node[above] {$W$} (s6);
+            \draw[->] (s6) to[loop right] (s6);
+        \end{tikzpicture}
+        \endgroup
+    \end{figure}
+    
+    \vspace{-1.5em}
+
+    For the specific case where $N=4$, the transition matrix (using $W=\Theta^T$) is:
+    $$
+    W = \begin{pmatrix}
+    1 & q & 0 & 0 & 0 \\
+    0 & 0 & q & 0 & 0 \\
+    0 & p & 0 & q & 0 \\
+    0 & 0 & p & 0 & 0 \\
+    0 & 0 & 0 & p & 1
+    \end{pmatrix}
+    $$
+    The spectrum of $W$ can be computed and is $\sigma(W) = \{1, 1, \sqrt{pq}, -\sqrt{pq}, 0\}$. The eigenvalue $\lambda=1$ has a geometric multiplicity of 2, which corresponds to the two absorbing states. The eigenvectors for $\lambda=1$ are $v_1 = (1,0,0,0,0)^T$ (ruin) and $v_2 = (0,0,0,0,1)^T$ (win). Since the system has two absorbing states, the long-term outcome depends on the initial state $P(0)$. \textit{The final probability distribution will be a linear combination of the two absorbing states}:
+    $$
+    P(t) \xrightarrow{t\to\infty} c_1 v_1 + c_2 v_2
+    $$
+    where the coefficients $c_1$ and $c_2$ represent the probabilities of being absorbed at 0 and N, respectively, and depend on the initial capital $P(0)$.
+    \end{exampleblock}
+
+    This dependence on initial conditions seems to create a paradox. On one hand, the steady-state probability $P_{eq}$ must be an eigenvector of $W$, satisfying $P_{eq} = W P_{eq}$. On the other hand, the general solution using diagonalization is:
+    $$
+    P_{eq} = \lim_{t\to\infty} W^t P(0) = V \text{Diag}(\lambda_1^t, \ldots, \lambda_N^t) V^{-1} P(0) = V \text{Diag}(1,1,0,\ldots,0) V^{-1} P(0)
+    $$
+    which explicitly depends on $P(0)$.
+    
+    The resolution to this apparent paradox lies in the special properties of stochastic matrices. For a matrix with an eigenvalue $\lambda=1$ of multiplicity one, the corresponding coefficient $c_1$ in the eigenvector expansion of $P(0)$ is independent of $P(0)$, guaranteeing a unique steady state.
+
+    However, in this case, the eigenvalue $\lambda=1$ has a geometric multiplicity of two. This means the system is not ergodic, and the coefficients $c_1$ and $c_2$ that determine the final mixture of absorbing states \textit{do} depend on the initial condition $P(0)$. There is no single steady state; rather, there is a different asymptotic outcome for each starting capital.
+
 \subsection{The Kac Lemma: Return Times}
+
 We have already encountered the \textbf{Kac Lemma} in \cref{sec:kac}, where it was discussed in the context of continuous-time Markov processes. The result applies equally to DTMCs: it provides a direct link between the stationary probability of a state and the expected time to return to it.
 
 Let $T_s$ be the random variable representing the \textbf{first return time} to state $s$, given that the process starts in state $s$. The Kac Lemma states that the expected value of this return time is the reciprocal of the stationary probability of that state:
@@ -536,25 +675,3 @@ This relationship is highly intuitive:
     \item If a state $s$ is rarely visited, its stationary probability $\pi_s$ is small. Consequently, the mean return time $\mathbb{E}[T_s]$ will be very long.
     \item If a state $s$ is frequently visited, its probability $\pi_s$ is close to one. The mean return time will be minimal, i.e., slightly larger than one.
 \end{itemize}
-
-\section{Kolmogorov Equations}
-
-...
-
-% \subsubsection{Apparent Paradox}
-
-% \begin{exampleblock}[The Gambler's Ruin]
-%     A classic example of a system with multiple absorbing states is the \textbf{Gambler's Ruin}. A gambler starts with an initial capital of $i$ dollars and repeatedly plays a game, winning \$1 with probability $p$ and losing \$1 with probability $q=1-p$. The game ends when the gambler is either ruined (capital reaches \$0) or wins a target amount of $N$ dollars.
-    
-%     The states are the gambler's capital, $S = \{0, 1, \ldots, N\}$. The states $0$ and $N$ are absorbing states. The transition matrix for $N=4$ is:
-%     $$
-%     \Theta = \begin{pmatrix}
-%     1 & 0 & 0 & 0 & 0 \\
-%     q & 0 & p & 0 & 0 \\
-%     0 & q & 0 & p & 0 \\
-%     0 & 0 & q & 0 & p \\
-%     0 & 0 & 0 & 0 & 1
-%     \end{pmatrix}
-%     $$
-%     The system must eventually end up in state 0 or N. The probability of being ruined (reaching state 0) starting from state $i$ is a classic result in probability theory.
-% \end{exampleblock}
