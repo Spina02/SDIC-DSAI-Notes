@@ -21,7 +21,7 @@ This process iterates for a predefined number of generations or until a stopping
     \includegraphics[width=0.45\textwidth]{assets/cycle.png}
     \hfill
     \includegraphics[width=0.54\textwidth]{assets/ga_example.png}
-    \caption{\small Left: Diagram showing the main components and their interactions in the evolutionary process. Right: Example of genetic operators (selection, crossover, mutation) acting on binary strings.}
+    \caption{\centering \small Left: Diagram showing the main components and their interactions in the evolutionary process. Right: Example of genetic operators (selection, crossover, mutation) acting on binary strings.}
     \label{fig:ga_cycle}
 \end{figure}
 
@@ -66,7 +66,7 @@ Several strategies exist for parent selection, each with different characteristi
 \begin{itemize}
     \item \bfit{Roulette Wheel Selection:}
     
-    Each individual's probability of being selected is proportional to its fitness:
+    Each individual's probability of being selected is proportional to its fitness $f(x)$:
     \vspace{0.2em}
     $$
         P_{x,P} = \frac{f(x)}{\sum_{y \in P} f(y)}
@@ -216,11 +216,15 @@ PMX is a sophisticated crossover operator that preserves permutation validity th
 \end{minipage}%
 \hfill
 \begin{minipage}{0.55\textwidth}
-\vspace{-1em}
+
+\vspace{-2.5em}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.98\textwidth]{assets/PMX.png}
-    \caption{Partially Mapped Crossover \cite{Tenemaza2020}.}
+
+    \vspace{-0.5em}
+    \caption{\centering Partially Mapped Crossover \cite{Tenemaza2020}.}
     \label{fig:pmx}
 \end{figure}
 \end{minipage}
@@ -233,7 +237,7 @@ Cycle crossover provides an alternative approach that preserves absolute positio
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{assets/CX.png}
-    \caption{Cycle Crossover. \cite{Tenemaza2020}}
+    \caption{\centering Cycle Crossover. \cite{Tenemaza2020}}
     \label{fig:cx}
 \end{figure}
 
@@ -310,14 +314,14 @@ For example, Kitano's graph generation system uses production rules of the form:
 $$
 \begin{array}{lllll}
 S \to \begin{bmatrix} A & B \\ C & D \end{bmatrix}, \\[0.9em]
-A \to \begin{bmatrix} c & P \\ a & c \end{bmatrix}, & 
+A \to \begin{bmatrix} c & d \\ a & c \end{bmatrix}, & 
 B \to \begin{bmatrix} a & a \\ a & e \end{bmatrix}, &
 C \to \begin{bmatrix} a & a \\ a & a \end{bmatrix}, &
 D \to \begin{bmatrix} a & a \\ a & b \end{bmatrix} \\[0.9em]
 a \to \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}, &
 b \to \begin{bmatrix} 0 & 0 \\ 0 & 1 \end{bmatrix}, &
 c \to \begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix}, &
-P \to \begin{bmatrix} 0 & 1 \\ 0 & 1 \end{bmatrix}, &
+d \to \begin{bmatrix} 0 & 1 \\ 0 & 1 \end{bmatrix}, &
 e \to \begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix}
 \end{array}
 $$
@@ -329,7 +333,7 @@ S \longrightarrow
 \begin{bmatrix} A & B \\ C & D \end{bmatrix} 
 \longrightarrow 
 \left[\begin{matrix}\\[-0.9em]
-    \color{red!70!black}\begin{bmatrix} c & P \\ a & c \end{bmatrix} & 
+    \color{red!70!black}\begin{bmatrix} c & d \\ a & c \end{bmatrix} & 
     \color{green!60!black}\begin{bmatrix} a & a \\ a & e \end{bmatrix} \\[0.9em]
     \color{blue!80!black}\begin{bmatrix} a & a \\ a & a \end{bmatrix} & 
     \color{purple!80!black}\begin{bmatrix} a & a \\ a & b \end{bmatrix}\\[0.9em]
@@ -341,13 +345,13 @@ This process continues until we reach a final $8 \times 8$ binary matrix represe
 $$
 \begin{bmatrix}\\[-0.9em]
     \color{red!70!black}\begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
-    \color{red!70!black}\begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{red!70!black}\begin{bmatrix} 0 & 1 \\ 0 & 1 \end{bmatrix} & \hspace{-0.5em}
     \color{green!60!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
     \color{green!60!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} \\[0.9em]
     \color{red!70!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
-    \color{red!70!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
+    \color{red!70!black}\begin{bmatrix} 1 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
     \color{green!60!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
-    \color{green!60!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} \\[0.9em]
+    \color{green!60!black}\begin{bmatrix} 1 & 1 \\ 1 & 1 \end{bmatrix} \\[0.9em]
     \color{blue!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
     \color{blue!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
     \color{purple!80!black}\begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix} & \hspace{-0.5em}
@@ -360,4 +364,4 @@ $$
 $$
 \end{exampleblock}
 
-Production rules in indirect encoding systems can typically be represented as fixed-length vectors or strings, making them amenable to traditional genetic algorithm operators. For example, in Kitano's system, the first element represents the head (non-terminal symbol) and the remaining elements represent the body (the matrix elements). For instance, the rule $\scriptsize S \to \begin{bmatrix} A & B \\ C & D \end{bmatrix}$ can be encoded as the vector $[S, A, B, C, D]$. 
+Production rules in indirect encoding systems can typically be represented as fixed-length vectors or strings, making them amenable to traditional genetic algorithm operators. For example, in Kitano's system, the first element represents the head (non-terminal symbol) and the remaining elements represent the body (the matrix elements). For instance, the rule \scriptsize$S \to \begin{bmatrix} A & B \\ C & D \end{bmatrix}$ \normalsize can be encoded as the vector $[S, A, B, C, D]$. 
