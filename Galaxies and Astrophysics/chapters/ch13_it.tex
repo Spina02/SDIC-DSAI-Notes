@@ -1,0 +1,391 @@
+\chapter{Distanza Comovente Radiale}
+
+Una grandezza fondamentale, come vedremo, per il confronto tra modelli cosmologici ed osservazioni è la coordinata co-movente radiale $r$. In particolare, è essenziale la sua dipendenza dal redshift $z$:
+$$
+\dfrac{a_0 \dd r}{\sqrt{1 - k r^2}} = -c \dd t = - c \dfrac{\dd a}{\dot a} = -c{\dd a}{aH}
+$$
+
+$$
+\begin{cases}
+a = \dfrac{a_0}{1+z}
+\dd a = - \dfrac{a_0}{(1+z)^2}\dd z
+\end{cases}
+$$
+
+dunque:
+
+$$
+\dfrac{a_0 \dd r}{\sqrt{1 - k r^2}} =  \dfrac{c}{H(z)} \dd z
+$$
+con $H(z) = H_0 E(z)$.
+
+$$
+\int_0^t \dfrac{c \dd t'}{a(t')} = \int_0^r \dfrac{\dd r'}{\sqrt{1 - k r'^2}}
+= 
+f_k(r) = \text{Distanza comovente}
+$$
+
+$$
+f_k(r) = \int_0^r \dfrac{\dd r'}{\sqrt{1 - k r'^2}}
+=
+\dfrac c{a_oH_0} \int_0^z \dfrac{\dd z'}{E(z')}
+= 
+\begin{cases}
+    \arcsin(r) & \text{se } k = 1 \\
+    r & \text{se } k = 0 \\
+    \text{arcsinh}(r) & \text{se } k = -1
+\end{cases}
+$$
+
+Se ricordiamo che:
+
+$$
+a_0 = \dfrac{c}{H_0 \sqrt{|\Omega_0 - 1|}}
+$$
+
+e, definendo:
+$$
+sinn(x) = \begin{cases}
+    \sin(x) & \text{se } k = 1 \ \ (\Omega_0 > 1)\\
+    \sinh(x) & \text{se } k = -1 \ \ (\Omega_0 < 1)\\
+\end{cases}
+$$
+
+Otteniamo, Per $k = \pm 1$:
+
+$$
+a_0 r(z) = \dfrac c{H_0 \sqrt{|\Omega_0 - 1|}} sinn\left[
+    \sqrt{|\Omega_0 - 1|} \int_0^z \dfrac{\dd z'}{E(z')}
+\right]
+$$
+
+mentre, per $k = 0$ $(\Omega_0 = 1)$:
+$$
+a_0 r(z) = \dfrac c{H_0} \int_0^z \dfrac{\dd z'}{E(z')}
+$$
+
+\dots
+
+\section{Test osservativi dei modelli cosmologici}
+
+Abbiamo definito $q_0 = - \dfrac{\ddot a(t_0) a_0}{\dot a(t_0)^2}$ e, usando $H_0 = \dfrac{\dot a(t_0)}{a(t_0)}$, $a(t)$ si può riscrivere pertanto come:
+
+$$
+a(t) = a_0 \left[ 1 + H_0 (t - t_0) - \dfrac 12 q_0 H_0^2 (t - t_0)^2 + \dots \right]
+$$
+
+Usando il redshift $z$ tale che $1+z = \dfrac{a_0}{a(t)}$, otteniamo:
+
+$$
+\begin{array}{rcl}
+1+z & = & \left[ 1 + H_0 (t - t_0) - \dfrac 12 q_0 H_0^2 (t - t_0)^2 + \dots \right]^{-1}\\
+& \simeq & 1 - H_0 (t - t_0) + \dfrac 12 q_0 H_0^2 (t - t_0)^2 + \dots + \dfrac{-1 (-1 -1)}2 \left[H_0^2(t - t_0)^2 + \dots\right]
+\end{array}
+$$
+
+da cui:
+
+$$
+z \simeq H_0(t_0 - t) + (1 + \dfrac {q_0}2) H_0^2 (t_0 - t)^2 + \dots
+$$
+
+\missing{calcoli}
+
+\dots
+
+$$
+r \simeq \dfrac c{a_0} \left[ (t_0 - t) + \dfrac 12 H_0(t_0 - t)^2 + \dots \right]
+$$
+
+\subsubsection{Distanza di luminosità}
+
+La distanza propria non è calcolabile, ma si può definire la \bfit{distanza di luminosità}.
+
+Possiamo definire l'energia irradiata dalla una sorgente di Luminosità $L$, per unità di tempo $\dd \lambda$, in funzione della lunghezza d'onda $\lambda$ come:
+
+$$
+\dd L = L \cdot \rho(\lambda) \dd \lambda
+$$
+
+\dots
+
+$$
+\rho(\nu)  = \lambda^2 \rho(\lambda)
+$$
+
+\dots
+
+possiamo scrivere che:
+
+$$
+\dd s^2 = - r^2 a_0^2 \underbrace{\dd \Omega^2}_{= \dd \theta^2 + \sin^2 \theta \dd \phi^2}
+$$
+
+$$
+\dd A = r^2a_0^2 \sin \theta \dd \theta \dd \phi
+$$
+
+Vogliamo osservare quanta energia arruva nell'intervallo di tempo, perpendicolarmente alla linea di vista, sull'unità di superficie e nella banda $a_0, a_0 + \dd a_0$. Questo è il flusso $F(\lambda_0)$ per l'ampiezza $\dd \lambda_0$ della banda:
+
+\dots
+
+$$
+E_\lambda^{em} = \dfrac{hc}{\lambda_{em}} = \dfrac{hc}{\lambda_0} (1 + z)
+$$
+
+$$
+\delta N = \dfrac{\dd E^{em}_{\lambda_{em}}}{\dd \lambda_{em}} \dd \lambda_{em}
+=
+L q\left(\dfrac{\lambda_{em}}{1 + z}\right) \dd t_1 \dfrac{\dd \lambda_{0}}{hc(1+z)}
+$$
+
+
+Calcoliamo il numero di fotoni $\gamma$ ricevuti con $\lambda_0$ per unità di tempo $\dd t_0$ e area $4 \pi r_1^2a_0^2$:
+
+$$
+\dfrac{L \lambda_0}{ch} \dfrac 1{(1+z)^2} \phi \left(\dfrac{\lambda_0}{1+z}\right) \dd \lambda_0 \dfrac{\dd t_1}{\dd t_0} \dfrac 1{4 \pi r_1^2 a_0^2}
+$$
+
+Il flusso è dato dal numero di fotoni per l'energia di ogni fotone:
+
+$$
+F(\lambda_0) = \delta N \cdot E_\gamma = \dfrac{L}{1+z} \phi \left( \dfrac{\lambda_0}{1+z}\right) \dfrac 1{4 \pi r_1^2 a_0^2}
+$$
+
+possiamo riscriverlo in funzione della frequenza
+
+$$
+\tilde F(\nu_0) = \dfrac{\lambda_0^2}{c} F(\lambda_0) = (1+z^2) \dfrac{\lambda_{em}^2}{c} F(\lambda_0) = \dfrac{L}{1+z} \dfrac{\dfrac{\lambda_{em}^2}{c} \phi (\lambda_{em})}{4 \pi r_1^2 a_0^2}
+$$
+$$
+= \dfrac{L}{1+z} \dfrac{\tilde \phi(\nu_0(1+z))}{4 \pi r_1^2 a_0^2}
+$$
+
+dunque, il \bfit{flusso bolometrico} è:
+
+$$
+\tilde F_{bol} = \dfrac{L}{4 \pi r_1^2 a_0^2}
+$$
+
+\dots
+
+$$
+F_{bol} = \int_0^\infty F(\lambda_0) \dd \lambda_0 = \dfrac{L}{(1+z)^2 4 \pi r^2a^2} \int_0^\infty \phi\left(\dfrac{\lambda_0}{1+z}\right) \dfrac{\dd \lambda_0}{1 + z} (1+z) = \dfrac{L}{(1+z)^2 4 \pi r^2a^2}
+$$
+
+Nello spazio euclideo:
+
+$$
+F = \dfrac{L}{4 \pi d^2} \quad \Rightarrow \quad d = \left(\dfrac{L}{4 \pi F}\right)^{1/2}
+$$
+
+Distanza di luminosità:
+
+$$
+d_L = \left(\dfrac{L}{4 \pi F}\right)^{1/2} = r a_0 (1+z) = \dfrac {r a_0}{a}
+$$
+
+
+
+\newpage
+
+\dots
+
+notes on notebook
+
+\dots
+
+\newpage
+
+\section{Cosmologia Osservativa (Lezione: 30/05/2025)}
+
+Nei primissimi istanti di vita dell'universo, questo era soggetto ad una fase di \bfit{inflazione}, in cui l'universo si espandeva esponenzialmente.
+
+ca. 100 secondi dopo il big bang, l'universo si è raffreddato abbastanza da permettere la formazione delle prime particelle.
+
+ca. 380.000 anni dopo il big bang, i fotoni si sono disaccoppiati dalla materia e hanno iniziato a viaggiare liberi nell'universo, formando il cosiddetto \bfit{fondo di microonde cosmico} (CMB).
+
+ca. 9 miliardi di anni dopo il big bang, la costante cosmologica inizia a dominare l'universo, fino ad oggi.
+
+\begin{definitionblock}[Principio Cosmologico]
+L'universo è isotropo e omogeneo su larga scala ($\sim 100$ Mpc).
+\end{definitionblock}
+
+Osservativamente, l'universo appare omogeneo (sempre su larga scala), infatti non è possibile distinguere tra le direzioni del cielo.
+
+Se assumiamo, per il principio copernicano, che non ci troviamo in un sistema privilegiato, allora l'universo deve essere anche isotropo.
+
+L'inflazione risolve il problema della \bfit{piattezza} (\textit{flatness}). Infatti, indipendentemente dal valore iniziale della curvatura dell'universo, la fase di inflazione ha portato l'universo a diventare piatto.
+
+Un altro problema che l'inflazione risolve è quello dei monopoli magnetici. L'inflazione aumenta di così tanto le dimensioni dell'universo che ... (boh)
+
+La materia oscura ha creato delle buche di potenziale, nel quale sono caaduti i barioni, accelerando la formazione delle strutture.
+
+Che l'universo fosse in espansione era già stato osservato da Hubble, ma il fatto che si trattasse di un'espansione accelerata è stato confermato nel 2011 (...).
+
+\subsubsection{Parametri cosmologici}
+
+I parametri del nostro modello cosmologico ($\Lambda CDM$) sono:
+
+\begin{itemize}
+    \item $\Omega_m$ (materia ordinaria)
+    \item $\Omega_b$ (barioni)
+    \item $\Omega_\nu$ (neutrini)
+    \item $\sigma_8$ (ampiezza delle fluttuazioni di materia)
+    \item $H_0$ (costante di Hubble)
+    \item $\tau$ (profondità ottica)
+    \item $n_s$ (indice spettrale)
+\end{itemize}
+
+È possibile ricavare altri parametri da quelli sopra elencati, tra cui la costante cosmologica stessa e $\Omega_k$.
+
+---
+
+Tuttavia, ancora
+
+Ci sono delle discordanze tra i parametri che otteniamo: La stessa costante di Hubble, $H_0$, è stata misurata in modo differente da due diverse tecniche, ottenendo due valori differenti. La loro differenza è chiamata \bfit{tensione di Hubble}.
+
+Allo stesso modo, diverse sonde hanno misurato $s_8$ in modo differente, ottenendo due valori differenti.
+
+Abbiamo fondamentalmente due modi per studiare l'universo:
+
+\begin{itemize}
+    \item studiare la storia dell'espansione dell'universo:
+
+    \item misurare il tasso di crescita delle strutture:
+        
+    studiare a livello statistico come tali strutture si sono formate in funzione del redshift.
+\end{itemize}
+
+\section{Sonde cosmologiche}
+
+\subsection{Big Bang Nucleosynthesis}
+
+Nei primi 3 minuti di vita dell'universo è avvenuta la fase di \bfit{nucleosintesi primordiale}. Per temperature di $kT > 1 MeV$, il tasso di interazioni deboli è molto più grande del tasso di espansione dell'universo, e quindi le reazioni nucleari possono avvenire.
+
+Allo scendere della temperatura, le reazioni nucleari si fermano. I neutroni iniziano a decadere in protoni fino a raggiungere un rapporto $n_n/n_p = 1/7$.
+
+Da neutroni e protoni si formano i nuclei di deuterio, trizio, elio-3 ed elio-4.
+
+... cose ...
+
+Dunque, l'abbondanza di elio-4 è dovuta alla temperatura di disaccoppiamento dei neutrini, che a sua volta dipende dal numero totale di specie di neutrini. Dipende dalla vita media dei neutroni, e dal rapporto di densità tra barioni e fotoni.
+
+Ulteriori reazioni portano alla formazione del litio-7.
+
+Per la formazioen di oggetti più pesanti, è necessario aspettare la formazione di strutture come le stelle, nei quali avvengono processi termonucleari.
+
+Non ci sono processi all'interno delle stelle che portano alla formazione di deuterio; dunque i deuterio osservato nell'universo fornisce un limite inferiore all'abbondanza primordiale di deuterio.
+
+\dots
+
+Elio-3 ed elio-4 invece sono prodotti nelle stelle, e quindi non è possibile determinarne l'abbondanza primordiale.
+
+Possiamo introdurre il \bfit{problema del litio-7}: l'abbondanza di litio-7 osservata differisce di un fattore di $10^3$ dall'abbondanza primordiale\dots
+
+\subsubsection{Standard Candle}
+
+Le candele standard sono oggetti astronomici per i quali è nota la magnitudine assoluta (dunque la luminosità intrinseca). Misurandone la loro magnitudine apparente, possiamo determinare la distanza (di luminosità). Studiando la variazione di magnitudine con il redshift, possiamo determinare la costante di Hubble.
+
+La differenza tra magnitudine apparente e quella assoluta ci permette di calcolare il \bfit{modulo di distanza}.
+
+I primi esempi di candele standard sono le \bfit{cepheidi}, che sono stelle pulsanti, con una relazione periodo-luminosità ben definita.
+
+Supernove Ia, si formano da nane bianche in che si trovano in un sistema binario con altre stelle (e.g. giganti rosse), a distanze ridotte. Le nane bianche accrescono la loro massa (assorbendo materia dalle altre stelle) fino a raggiungere il limite di Chandrasekhar ($M_{ch} = 1.44 M_{\odot}$).
+
+\subsubsection{Cluster number counts}
+
+Nello scenario LCDM, le strutture cosmiche si formano e crescono in modo gerarchico, partendo dalle perturbazioni primordiali. Quando queste perturbazioni superano una soglia critica di densità, iniziano a collassare gravitazionalmente, formando aloni di materia oscura che fungono da "impalcatura" per la formazione delle strutture visibili.
+
+\dots
+
+Se immaginiamo la rete cosmica come un reticolo di fili, ogni filo rappresenta una struttura. Le strutture più grandi, che corrispondono a dove tali filamenti si intersecano, sono gli \bfit{ammassi di galassie}.
+
+L'abbondanza (e distribuzione spaziale) di tali ammassi di galassie è in funzione del tasso di espansione delle strutture, e della storia di espansione dell'universo.
+
+Studiando la densità di tali oggetti è possibile ottenere informazioni come il parametro d'ampiezza delle fluttuazioni di materia $s_8$.
+
+La "Halo Mass Function" è la funzione che descrive la distribuzione di massa in funzione della massa di un ammasso di galassie:
+
+% $$
+% n(z,M) = \dfrac{\rho}
+% $$
+
+\dots
+
+Tramite i neutrini massivi, è possibile definire delle modifiche alla relatività generale. In particolare, è possibile incrementare l'azione della gravità in zone dell'universo ad altà densità.
+
+A seconda del modello di inflazione che scegliamo, la distribuzione di densità sarà differente. Il modello più semplice è quello costituito da un campo gaussiano, con perturbazioni primordiali quasi puramente adiabatiche, con uno spettro di potenza quasi invariante alla scala.
+
+Dopo che tali perturbazioni sono state create, queste evolvono nel tempo, mosse dalla gravità. Per il modello CDM, possimao distinguere due tempi diversi:
+
+\begin{center}
+\begin{tabular}{|c||c|c|}
+    \hline
+    & $z > z_{eq}$ & $z < z_{eq}$ \\
+    \hline
+    \hline
+    $R > R_H$ & $\delta_r \propto \delta_m \propto a^2$ & $\delta_r \propto \delta_m \propto a$ \\
+    \hline
+    $R < R_H$ & $\delta_{cdm} \sim cost$ & $\delta_{cdm} \propto a$ \\
+    & $\delta_{b +\gamma}\ oscillations$ & $z < z_{rec}: \delta_{b} \to \delta_{cdm}$\\
+    \hline
+\end{tabular}
+\end{center}
+
+\dots
+
+\subsubsection{Baryon Acoustic Oscillations}
+
+Agli albori dell'universo, quando le temperature erano molto alte, i barioni e i fotoni erano accoppiati nel cosiddetto \bfit{fluido di fotoni-barioni}, dove le forze in competizione della pressione di radiazione e della gravità generavano oscillazioni. Col passare del tempo, i barioni si sono disaccoppiati dai fotoni, lasciando i barioni in una configurazione a guscio con raggio approssimativamente uguale all'orizzonte sonoro al momento del disaccoppiamento. Da quel momento in poi, rimane solo l'interazione gravitazionale tra la materia oscura e la materia barionica. Tale raggio caratteristico rimane impresso come una sovradensità e lo spettro di potenza mostra un eccesso di potenza su questa scala.
+
+\dots
+
+Possiamo calcolare la distanza di questo BAO come:
+
+$$
+r_d = \int_{z_d}^\infty \dfrac{c_s(z)}{H(z)} \dd z \qquad \text{con } c_s(z) = \dfrac{c}{\sqrt{3(1 + \dfrac{3}{4} \Omega_b(z) + \Omega_\gamma(z))}}
+$$
+
+Possiamo distinguere due direzioni:
+\begin{itemize}
+    \item \bfit{perpendicolare}: 
+    $$
+    \theta = \dfrac{r_d(z)}{(1+z)d_A(z)}
+    $$
+    dove $\theta$ è la separazione angolare preferenziale tra le galassie
+
+    \item \bfit{parallelo}:
+    $$
+    \Delta z = \dfrac{H(z)R_d}{c}
+    $$
+    dove $\Delta z$ è la variazione di redshift preferenziale tra le galassie
+\end{itemize}
+
+Per un universo piatto, LCDM, possiamo calcolare il diametro angolare:
+
+$$
+d_A(z) = \dfrac{c}{H_0} \dfrac{1}{(1+z)} \int_0^z \dfrac{\dd z}{[\Omega_{m,0}(1+z)^3 + \Omega_{\Lambda,0}]^{1/2}}
+$$
+
+Il parametro di hubble è:
+
+$$
+H(z) = H_0 \sqrt{\Omega_{m,0}(1+z)^3 + \Omega_{\Lambda,0}}
+$$
+
+\dots
+
+\subsubsection{Redshift Space Distortions}
+
+Le velocità peculiari delle galassie fanno sì che i redshift misurati nei survey di redshift galattici devino dalle vere distanze proprie. Questo risulta in distorsioni dello spazio dei redshift nelle misure di clustering.
+
+\dots
+
+\begin{itemize}
+    \item \bfit{Kaiser Effect}: Su larga scala, le velocità peculiari riflettono i moti (lineari) verso sovraddensità, facendo in modo che un cerchio nello spazio reale appaia "schiacciato" nello spazio dei redshift.
+
+    \item \bfit{Finger of God Effect}: Su piccola scala, le velocità peculiari (non lineari) fanno sì che un cerchio nello spazio reale appaia come un "allungato" nello spazio dei redshift.
+\end{itemize}
+
+Queste distorsioni non sono isotropiche (agiscono solo in direzione radiale).
