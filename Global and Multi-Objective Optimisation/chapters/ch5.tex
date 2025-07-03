@@ -1,0 +1,240 @@
+\chapter{Other Bio-Inspired Metaheuristics}\label{ch:other_metaheuristics}
+
+Beyond Genetic Algorithms, Evolution Strategies, and Genetic Programming, the field of bio-inspired computation offers a rich landscape of other powerful metaheuristics. This chapter introduces three prominent algorithms: Differential Evolution, a simple yet powerful method for real-valued optimization; Particle Swarm Optimization, which models the collective intelligence of social swarms; and Ant Colony Optimization, which mimics the foraging behavior of ants via indirect communication.
+
+\section{Differential Evolution (DE)}
+
+\bfit{Differential Evolution (DE)}, introduced by Storn and Price in 1997, is a population-based stochastic optimization algorithm designed primarily for real-valued optimization problems in $\mathbb{R}^m$. While it follows a general evolutionary pattern, DE distinguishes itself from canonical Genetic Algorithms in two fundamental ways:
+\begin{enumerate}
+    \item \textbf{Generation of New Solutions}: DE creates new candidate solutions by combining existing ones in a unique way, using vector differences to guide the search direction and step size. This "differential mutation" is the hallmark of the algorithm.
+    \item \textbf{Selection Process}: The selection mechanism is typically a simple one-to-one competition, where a newly created "trial" vector replaces its parent in the next generation only if it has better or equal fitness.
+\end{enumerate}
+These characteristics make DE a remarkably simple, robust, and effective algorithm for continuous optimization tasks.
+
+\subsection{The DE/rand/1 Algorithm}
+
+The most fundamental DE variant is known as \texttt{DE/rand/1}. The algorithm iterates through each individual in the population (the "target vector") and applies differential mutation, crossover, and selection to generate a corresponding individual for the next generation's population.
+
+\subsubsection{Differential Mutation}
+For each target vector $\mathbf{x}_i$ in the current population, a "donor" vector $\mathbf{v}_i$ is created. This is the core of DE's search mechanism. The process is as follows:
+\begin{enumerate}
+    \item Select three other vectors ($a$, $b$, and $c$) at random from the current population, ensuring they are distinct from each other and from the target vector $x_i$.
+    \item Compute the \bfit{donor vector} $v_i$ using the formula:
+    $$
+        v_i = a + F \cdot (b - c)
+    $$
+    where $F \in [0, 2]$ is a crucial hyperparameter called \bfit{mutation factor} or \bfit{differential weight}. It scales the difference vector $(b - c)$, controlling the amplification of the differential variation.
+\end{enumerate}
+
+\begin{observationblock}[The Role of the Difference Vector]
+The vector difference $(b - c)$ represents a random direction and magnitude derived from the population's current diversity. By adding this scaled difference to another vector $a$, DE creates a new trial point, effectively "perturbing" an existing solution with a vector that reflects the population's current spatial distribution.
+\end{observationblock}
+
+\subsubsection{Binomial Crossover}
+After creating the donor vector $\mathbf{v}_i$, it is combined with the original target vector $\mathbf{x}_i$ to create a \bfit{trial vector} $\mathbf{u}_i$. This step, analogous to crossover in GAs, introduces genetic material from the parent into the mutated vector. In DE, this is typically done via \bfit{binomial crossover}:
+For each coordinate $j \in \{1, \ldots, m\}$ of the trial vector, a new value is chosen:
+$$
+    u_{i,j} = 
+    \begin{cases} 
+        v_{i,j} & \text{if } \text{rnd}_{i,j} \le p_{CR} \text{ or } j = j_{rand} \\
+        x_{i,j} & \text{otherwise}
+    \end{cases}
+$$
+Here, $p_{CR} \in [0, 1]$ is the \bfit{crossover probability}, $\text{rnd}_{i,j}$ is a uniform random number in $[0,1]$ drawn for each component, and $j_{rand}$ is a randomly chosen index from $\{1, \ldots, m\}$. The $j=j_{rand}$ condition ensures that the trial vector $\mathbf{u}_i$ receives at least one component from the donor vector $\mathbf{v}_i$.
+
+\subsubsection{Selection}
+The final step is a one-to-one competition between the trial vector $\mathbf{u}_i$ and its parent target vector $\mathbf{x}_i$. The winner, which is the vector with the better fitness, survives to become part of the population for the next generation. For a minimization problem:
+$$
+    \mathbf{x}_i^{\text{next gen}} =
+    \begin{cases}
+        \mathbf{u}_i & \text{if } f(\mathbf{u}_i) \le f(\mathbf{x}_i) \\
+        \mathbf{x}_i & \text{otherwise}
+    \end{cases}
+$$
+This entire process (mutation, crossover, selection) is repeated for every individual in the population to form the next generation.
+
+\subsubsection{Graphical Representation}
+In DE, creating a trial vector can be visualized as vector arithmetic in the search space:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/de-graphical.png}
+    \caption{\centering A graphical representation of the DE operators.}
+    \label{fig:de_graphical}
+\end{figure}
+
+\subsection{DE Variants and Taxonomy}
+
+\subsubsection{Taxonomy of DE Strategies}
+The \texttt{DE/rand/1} scheme is just one of many possible DE strategies. A standard taxonomy, \texttt{DE/x/y}, is used to describe them:
+\begin{itemize}
+    \item \texttt{x} specifies how the base vector for the mutation is chosen (e.g., \texttt{rand} for a random vector, \texttt{best} for the best individual in the population).
+    \item \texttt{y} is the number of difference vectors used.
+\end{itemize}
+The most common variants alter the differential mutation formula to change the balance between exploration and exploitation.
+
+\begin{advancedblock}[Common DE Mutation Strategies]
+    Here are some popular mutation strategies beyond the basic \plaintt{DE/rand/1}:
+
+    \vspace{0.5cm}
+
+    \begin{itemize}
+        \item \textbf{DE/best/1}: Uses the best individual found so far, $\mathbf{x}_{\text{best}}$, as the base vector. This increases exploitation and convergence speed, but may lead to premature convergence.
+        $$ v_i = \mathbf{x}_{\text{best}} + F \cdot (\mathbf{b} - \mathbf{c}) $$
+        
+        \item \textbf{DE/current-to-best/1}: A hybrid strategy that includes both the current individual and the best individual, providing a good balance.
+        $$ v_i = \mathbf{x}_i + F \cdot (\mathbf{x}_{\text{best}} - \mathbf{x}_i) + F \cdot (\mathbf{b} - \mathbf{c}) $$
+        
+        \item \textbf{DE/rand/2}: Uses two different difference vectors, increasing the potential for exploration.
+        $$ v_i = \mathbf{a} + F \cdot (\mathbf{b} - \mathbf{c}) + F \cdot (\mathbf{d} - \mathbf{e}) $$
+        
+        \item \textbf{DE/rand-to-best/1}: Perturbs a random vector with a vector pointing towards the best solution.
+        $$ v_i = \mathbf{a} + F \cdot (\mathbf{x}_{\text{best}} - \mathbf{a}) + F \cdot (\mathbf{b} - \mathbf{c}) $$
+    \end{itemize}
+\end{advancedblock}
+
+\subsubsection{Adaptive Differential Evolution (JADE)}
+\bfit{JADE (Adaptive DE with Optional External Archive)} is a powerful adaptive variant of Differential Evolution, introduced in 2009 by Zhang and Sanderson~\cite{zhang2009jade}. JADE enhances the standard DE algorithm with several key innovations:
+\begin{itemize}
+    \item \textbf{New Mutation Strategy:} JADE introduces the \texttt{DE/current-to-pbest} mutation scheme, which improves the balance between exploration and exploitation by guiding individuals toward the best solutions found so far.
+    \item \textbf{External Archive:} An external archive of sub-optimal (recently replaced) solutions is maintained. This archive is used during mutation to increase population diversity and help escape local optima.
+    \item \textbf{Dynamic Hyper-parameter Update:} JADE adaptively updates its control parameters ($F$ and $p_{CR}$) during the run, allowing the algorithm to self-tune and respond to the problem landscape.
+\end{itemize}
+
+\section{Particle Swarm Optimization (PSO)}
+
+\subsection{Introduction}
+\bfit{Particle Swarm Optimization (PSO)} is a population-based metaheuristic belonging to the family of \bfit{swarm intelligence} algorithms. Swarm intelligence is inspired by the collective behavior of decentralized, self-organized systems, such as flocks of birds, schools of fish, or colonies of ants.
+The core idea is that complex, global, and intelligent behavior can emerge from the interactions of many simple agents, each with very limited capabilities and no centralized control. These agents follow simple rules, and their collective action solves complex problems. In PSO, the individuals are called \bfit{particles} and the population is called a \bfit{swarm}.
+
+\subsection{The PSO Algorithm}
+
+PSO models a swarm moving through an $m$-dimensional problem search space. Each particle represents a candidate solution and has two main properties:
+\begin{itemize}
+    \item a \bfit{position} $\mathbf{x}_i(t)$, which is the point in the search space the particle currently occupies.
+    \item a \bfit{velocity} $\mathbf{v}_i(t)$, which determines its direction and speed of movement.
+\end{itemize}
+At each discrete time step $t$, a particle's position is updated based on its velocity:
+$$ \mathbf{x}_i(t+1) = \mathbf{x}_i(t) + \mathbf{v}_i(t+1) $$
+
+\subsubsection{The Velocity Update Rule}
+The velocity update is the heart of the PSO algorithm. It models the social and cognitive forces that guide a particle's movement. The new velocity $\mathbf{v}_i(t+1)$ is a combination of three components:
+\begin{enumerate}
+    \item \bfit{Inertia:} The tendency of the particle to continue moving in its current direction.
+    \item \bfit{Cognitive Attraction:} The particle's memory of its own personal best position found so far, denoted $b_i$. This represents the particle's individual experience.
+    \item \bfit{Social Attraction:} The attraction towards the global best position found so far by any particle in the entire swarm, denoted $g$. This represents the collective experience of the group.
+\end{enumerate}
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/pso-velocity.png}
+    \caption{\centering The three components influencing a particle's new velocity.}
+    \label{fig:pso_velocity}
+\end{figure}
+
+\vspace{-1em}
+
+The full velocity update formula combines these influences ($\odot$ denotes the element-wise product):
+$$
+\mathbf{v}_i(t+1) = w \cdot \mathbf{v}_i(t) + c_{c} \cdot \mathbf{r}_1 \odot (\mathbf{b}_i - \mathbf{x}_i(t)) + c_{s} \cdot \mathbf{r}_2 \odot (\mathbf{g} - \mathbf{x}_i(t))
+$$
+Where:
+\begin{itemize}
+    \item $w$ is the \bfit{inertia weight}, balancing global and local exploration.
+    \item $c_{c}$ and $c_{s}$ are the \bfit{cognitive} and \bfit{social factors}, controlling attraction to personal and global best.
+    \item $\mathbf{r}_1, \mathbf{r}_2$ are vectors of random numbers in $[0,1]^m$ that introduce stochasticity.
+\end{itemize}
+
+\begin{tipsblock}[PSO Parameters]
+    The algorithm's behavior is sensitive to its parameters. Commonly used default values have been established through empirical studies:
+    \begin{itemize}
+        \item \textbf{Cognitive and Social Factors}: $c_{c}$ and $c_{s}$ are often both set to approximately 1.49445.
+        \item \textbf{Inertia Weight}: $w$ is often decreased linearly during the run, for example from 0.9 to 0.4. A higher initial value encourages global exploration, while a lower final value allows for fine-tuning around the best-found solutions.
+    \end{itemize}
+\end{tipsblock}
+
+\subsubsection{Boundary Conditions}
+When a particle moves beyond the limits of the search space, it is necessary to apply a boundary handling strategy to determine how its position and velocity should be managed.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/pso-boundary.png}
+    \caption{\centering Boundary handling strategies.}
+    \label{fig:pso_boundary}
+\end{figure}
+
+There are several widely used approaches for dealing with particles that cross the boundaries:
+\begin{itemize}
+    \item \textbf{Absorbing:} The particle is halted at the boundary, and its velocity component perpendicular to the boundary is set to zero.
+    \item \textbf{Reflecting:} The particle rebounds off the boundary, reversing the relevant component of its velocity.
+    \item \textbf{Damping:} Similar to reflecting, but the velocity is also multiplied by a damping factor $r_\text{damp}$, which reduces its magnitude.
+    \item \textbf{Invisible:} The particle is permitted to move outside the boundary, but its position is not evaluated or updated until it returns to the feasible region.
+    \item \textbf{Invisible/Reflecting:} The particle remains invisible while outside the boundary, but if it tries to re-enter, it is reflected back.
+    \item \textbf{Invisible/Damping:} The particle is invisible outside the boundary, and when it re-enters, its velocity is damped.
+\end{itemize}
+The choice of boundary handling strategy can have a substantial impact on how the swarm explores the search space and converges to solutions.
+
+\section{Ant Colony Optimization (ACO)}
+
+\bfit{Ant Colony Optimization (ACO)} is another major paradigm of swarm intelligence, primarily used to solve combinatorial optimization problems on graphs (e.g., the Traveling Salesperson Problem). The core inspiration for ACO is the foraging behavior of ants, which exhibit complex collective problem-solving capabilities despite being individually simple.
+
+This behavior is coordinated through \bfit{stigmergy}, a mechanism of indirect communication where individuals interact by modifying their local environment. Ants deposit a chemical substance called a \textbf{pheromone} as they travel. Other ants can sense this pheromone and are more likely to follow paths with higher concentrations. Because pheromone evaporates over time, shorter paths, which can be traversed more frequently in a given time period, accumulate stronger pheromone trails. This creates a feedback loop that guides the colony to find the shortest paths between nest and food.
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/aco-bridge.png}
+    \caption{\centering The Double Bridge Experiment, a classic illustration of stigmergy. Ants initially explore both paths randomly. Because the shorter path is traversed more quickly, its pheromone trail is reinforced faster than the longer path's trail, eventually attracting the entire colony.}
+    \label{fig:aco_bridge}
+\end{figure}
+
+\vspace{-2em}
+
+\subsection{The ACO Algorithm for the TSP}
+
+Let's illustrate ACO with its most famous application: the Traveling Salesperson Problem (TSP). The goal is to find the shortest Hamiltonian circuit in a complete graph of $m$ cities.
+
+The ACO algorithm follows a general cycle:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Initialize} pheromone trails on the graph edges.
+    \item \textbf{Construct Solutions}: A colony of artificial ants construct tours (solutions) probabilistically.
+    \item \textbf{Update Pheromones}: Pheromone trails are updated based on quality of the solutions found.
+    \item \textbf{Repeat} until a termination criterion is met.
+\end{enumerate}
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/aco-cycle.png}
+    \caption{\centering The ACO cycle.}
+    \label{fig:aco_cycle}
+\end{figure}
+
+\subsubsection{Solution Construction}
+Each ant begins at a randomly selected city and incrementally constructs a tour by selecting the next city to visit from the set of unvisited cities, denoted $N_i^k$ for ant $k$ currently at city $i$. The selection of the next city $j \in N_i^k$ is governed by a probabilistic rule that incorporates two factors:
+\begin{itemize}
+    \item \bfit{Pheromone Trails} ($\tau_{ij}$): The current amount of pheromone on edge $(i, j)$, representing the collective learning of the colony.
+    \item \bfit{Heuristic Information} ($\eta_{ij}$): A problem-specific value, which for the TSP is typically $\eta_{ij} = 1/d_{ij}$, where $d_{ij}$ is the distance between cities $i$ and $j$.
+\end{itemize}
+The probability that ant $k$ in city $i$ moves to city $j$ at time $t$ is defined as:
+$$
+p_{ij}^k(t) = \frac{[\tau_{ij}(t)]^\alpha [\eta_{ij}]^\beta}{\sum_{l \in N_i^k} [\tau_{il}(t)]^\alpha [\eta_{il}]^\beta}, \quad j \in N_i^k
+$$
+where $\alpha$ and $\beta$ are parameters that determine the relative importance of pheromone trails and heuristic information, respectively.
+
+\subsubsection{Pheromone Update}
+Once all ants have completed their tours, the pheromone levels on all edges are updated according to two mechanisms:
+\begin{enumerate}
+    \item \textbf{Evaporation:} Each pheromone value is decreased by a factor $\rho \in [0, 1]$, known as the evaporation rate.
+    \item \textbf{Deposition:} Each ant $k$ deposits an amount of pheromone $\Delta \tau_{ij}^k$ on every edge $(i, j)$ it traversed in its tour. Typically, $\Delta \tau_{ij}^k = 1/L_k$ if ant $k$ used edge $(i, j)$ in its tour, where $L_k$ is the total length of the tour constructed by ant $k$; otherwise, $\Delta \tau_{ij}^k = 0$.
+\end{enumerate}
+The pheromone update rule for each edge $(i, j)$ is given by:
+$$
+\tau_{ij}(t+1) = (1 - \rho)\tau_{ij}(t) + \sum_{k=1}^{n} \Delta \tau_{ij}^k
+$$
+
+Edges that are part of better solutions, specifically those that contribute to shorter tours, receive larger amounts of pheromone during the update phase. Additionally, edges that are included in the tours of more ants accumulate even more pheromone over time. As a result, these edges become increasingly attractive to subsequent ants constructing their own solutions. The desirability of an edge, as reflected by its pheromone level, directly influences the probability that it will be selected in the future. This mechanism allows the algorithm to reinforce promising regions of the search space, gradually biasing the collective search toward optimal or near-optimal solutions.
