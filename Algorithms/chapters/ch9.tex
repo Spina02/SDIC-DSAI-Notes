@@ -1,0 +1,82 @@
+\chapter{Cardinality Estimation}
+
+The problem of \textbf{cardinality estimation} (also known as \textbf{distinct count}) in a stream model is to determine the number of \textit{distinct} elements that have appeared in a sequence of items.
+
+\textbf{Problem:} Given a stream of items $S = a_1, a_2, \dots, a_M$, where $M$ is the total number of items seen, count $N$, the number of unique items in $S$.
+
+\begin{exampleblock}[Cardinality of a set]
+    Let's consider the following set:
+    $$
+    S = x\;y\;x\;y\;z\;x\;z\;y\;z\;x\;z\;z\;y\;x \qquad x \neq y \neq z
+    $$
+
+    The cardinality of $S$ is 3.
+\end{exampleblock}
+
+A common probabilistic approach relies on hashing items to a uniform distribution and observing properties of the resulting hash values.
+
+\bfit{Toy Problem (Hat Problem):} Imagine a universe $\mathcal{U}$ of integers, say from $1$ to $1000$. Someone secretly selects a random subset of $N$ distinct integers from $\mathcal{U}$ and hides them in a hat. Your task is to estimate $N$ by observing only \textit{one} representative value from the hidden set (e.g., its minimum, maximum, median).
+
+If we choose to observe the \textbf{minimum} value, say $m_{obs}$, from the subset, we can intuitively reason about $N$. If the $N$ numbers are uniformly and randomly scattered in the range $[1, 1000]$, they divide the range into approximately $N+1$ segments. The average length of such a segment would be $1000/(N+1)$. If $m_{obs}$ is the minimum, it represents the length of the first segment (from $0$ to $m_{obs}$).
+So, we can estimate:
+$$
+m_{obs} \approx \frac{1000}{N+1} \implies N+1 \approx \frac{1000}{m_{obs}} \implies N \approx \frac{1000}{m_{obs}} - 1
+$$
+For example, if the minimum observed is $95$, then $N \approx \frac{1000}{95} - 1 \approx 10.52 - 1 \approx 9.5$.
+
+To formalize this and make it general, we typically hash items to the real interval $[0,1]$ using a good hash function $h: \mathcal{U} \rightarrow [0,1]$ that distributes items uniformly. Let $x_1, x_2, \dots, x_N$ be the hash values of the $N$ distinct items seen in the stream. Let $M_{min}$ be the minimum of these hash values: $M_{min} = \min\{h(a) \mid a \text{ is a distinct item in } S\}$.
+Our estimation equation becomes:
+
+$$
+M_{min} \approx \frac{1}{N+1} \implies N \approx \frac{1}{M_{min}} - 1
+$$
+
+Let $X_1, \dots, X_N$ be $N$ independent random variables drawn uniformly from $[0,1]$ which model the hash values for the $N$ items. Let $M = \min(X_1, \dots, X_N)$. Then, we desire that:
+
+$$
+E[M] = \frac{1}{N+1}
+$$
+
+Let's define an indicator variable $I_i$ that captures whether $x_i$ is the minimum value:
+
+$$
+I_i = \begin{cases}
+    1 & \text{if } x_i < \min_{j \neq i} x_j \\
+    0 & \text{otherwise}
+\end{cases}
+$$
+
+The expected value of each indicator is $\frac{1}{N+1}$ since each value has equal probability of being the minimum. This leads to:
+$$
+E(I_i) = \frac{1}{N+1} \quad \forall i
+$$
+
+Therefore, for a new value $X_{N+1}$:
+$$
+E(I_{N+1}) = \frac{1}{N+1} = \Pr(X_{N+1} < \min_{1 \leq i \leq N} X_i) = E(M)
+$$
+
+However, this approach has a drawback: if any value is very close to 0, the estimator can have high variance and potentially overestimate the true cardinality.
+
+To improve robustness, we can use the k-th order statistic instead of just the minimum. Let $M_k$ denote the k-th smallest value among the hash values. Then:
+
+$$
+E(M_k) = \frac{k}{N+1} \implies \frac{M_k}{k} = \frac{1}{N+1}
+$$
+
+Another effective strategy is to partition the $[0,1]$ interval into $k$ equal subintervals and track the minimum value in each partition. For each new element:
+
+\begin{enumerate}
+    \item Determine its partition in $\Theta(1)$ time
+    \item Compare with the current minimum of that partition in $\Theta(1)$ time
+    \item Update the minimum if necessary
+\end{enumerate}
+
+The final cardinality estimate is obtained by:
+
+\begin{itemize}
+    \item Computing separate estimates of $N$ for each of the $k$ partitions
+    \item Taking the average of these estimates
+\end{itemize}
+
+Taking the average of the estimates helps reduce variance and improve accuracy.

@@ -17,8 +17,8 @@
 \faculty{Data Science and Artificial Intelligence/Scientific Computing}
 \department{mathematics informatics and geosciences}
 \title{Algorithmic Design}
-\author{Christian Faccio}
-\lecturer{Prof. Bernardini Giulia}
+\authors{Christian Faccio \\\vspace{-0.2em} Carlos Velázquez \\ Andrea Spinelli}
+\lecturers{Prof. Bernardini Giulia\\Prof. Padoan Tommaso}
 \date{\today}
 \githublink{christianfaccio}
 \email{christianfaccio@outlook.it}
@@ -27,6 +27,24 @@
 %%%%%%%%%%%%
 % document %
 %%%%%%%%%%%%
+
+\AtBeginDocument{
+  \setlength{\parskip}{0.4em}
+
+  \crefformat{chapter}{#2Chapter~#1#3}
+  \crefname{chapter}{Chapter}{Chapters}
+
+  \crefformat{section}{#2Section~#1#3}
+  \crefname{section}{Section}{Sections}
+
+  \crefformat{figure}{#2Figure~#1#3}
+  \crefname{figure}{Figure}{Figures}
+
+  \crefformat{table}{#2Table~#1#3}
+  \crefname{table}{Table}{Tables}
+
+  \usetikzlibrary{automata,arrows.meta,positioning,quotes,shapes.geometric, calc}
+}
 
 \addbibresource{references.bib}
 
@@ -43,8 +61,6 @@
 
 % Chapters
 \includechapters
-%\include{chapters/searching}
-%\include{chapters/graphs}
 
 % Bibliography
 \printbibliography

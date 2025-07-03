@@ -1,0 +1,52 @@
+\chapter*{Parallel Computing - Key concepts}
+
+The following table summarizes the primary metrics used in parallel algorithm analysis:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{Metric} & \textbf{Definition} & \textbf{Meaning or Impact} \\
+\hline
+$N$ & Problem size & \begin{tabular}[c]{@{}l@{}}Number of elements in the input \\ of the problem\end{tabular} \\
+\hline
+$P$ & Number of processors & \begin{tabular}[c]{@{}l@{}}Number of processors used to \\ solve the problem\end{tabular} \\
+\hline
+$T = T_p(n)$ & Time complexity & \begin{tabular}[c]{@{}l@{}}Execution time by each task\\or best parallel execution time\end{tabular} \\
+\hline
+$M$ & Space complexity & \begin{tabular}[c]{@{}l@{}}Memory requirements for\\the parallel algorithm\end{tabular} \\
+\hline
+$W = T_p \cdot P$ & Work & \begin{tabular}[c]{@{}l@{}}Total operations in a\\task/analysis\end{tabular} \\
+\hline
+$S = O(f(n))$ & Space complexity & \begin{tabular}[c]{@{}l@{}}Memory requirements for\\the parallel algorithm\end{tabular} \\
+\hline
+$W^c$ & Communication cost & \begin{tabular}[c]{@{}l@{}}Cost of data transfer\\between processors\end{tabular} \\
+\hline
+$C = \frac{W^c}{W}$ & Communication overhead & \begin{tabular}[c]{@{}l@{}}Ratio of communication work\\to computational work\end{tabular} \\
+\hline
+$\Gamma$ & \begin{tabular}[c]{@{}l@{}}Sequential\\execution time\end{tabular} & \begin{tabular}[c]{@{}l@{}}Execution time of the\\best sequential algorithm\end{tabular} \\
+\hline
+$S = \frac{\Gamma}{T}$ & Speedup & \begin{tabular}[c]{@{}l@{}}Ratio between sequential time\\and parallel time\end{tabular} \\
+\hline
+$\varepsilon = \frac{S}{P}$ & Efficiency & \begin{tabular}[c]{@{}l@{}}Measure of processor utilization\\(how effectively processors are used)\end{tabular} \\
+\hline
+$S = \frac{T_1(n)}{T_p(n)} \leq \frac{W}{T_p(n)}$ & Work-span formula & \begin{tabular}[c]{@{}l@{}}Theoretical bound relating\\work and parallel time\end{tabular} \\
+\hline
+\end{tabular}
+% \caption{Summary of parallel algorithm analysis metrics}
+\label{tab:metrics-summary}
+\end{table}
+
+\vspace{-1em}
+
+The fundamental relationship between these metrics can be expressed as:
+\vspace{0.2em}
+$$S \quad = \quad \dfrac{\Gamma}{T} \quad \leq \quad \dfrac{T_1(n)}{T} \quad \leq \quad \dfrac{W}{T} \quad = \quad P$$
+
+This inequality establishes the theoretical limits of parallel performance by showing that speedup is bounded by the ratio of work to parallel time. The efficiency metric follows directly:
+\vspace{0.2em}
+$$\varepsilon \quad = \quad \dfrac{S}{P} \quad = \quad \dfrac{\Gamma}{T} \cdot \dfrac {T}{W}\quad = \quad \dfrac{\Gamma}{W} \quad \le \quad 1$$
+
+The bound $S \leq P$ holds because any $P$-processor algorithm running in $T$ steps can be simulated sequentially in $T \cdot P$ steps by executing each parallel step serially. Therefore, $\Gamma \leq T \cdot P = W$, which establishes the fundamental work-time relationship in parallel computing.
+
+The primary optimization goals in parallel algorithm design are to minimize execution time $T$ (fast) while maximizing efficiency $\varepsilon$ (efficient). These objectives often present trade-offs, as adding more processors may reduce $T$ but can decrease $\varepsilon$ due to increased communication costs and diminishing returns from parallelization.

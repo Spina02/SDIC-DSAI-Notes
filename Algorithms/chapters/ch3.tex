@@ -29,6 +29,8 @@ point to the nodes corresponding to its left child, its right child, and its par
     \caption{Binary Search Tree}
 \end{figure}
 
+\vspace{-1em}
+
 The keys in a binary search tree are always stored in such a way as to satisfy the
 \textbf{binary-search-tree property}:
 
@@ -280,25 +282,22 @@ It is a BST that enjoys the following properties:
 \end{theorem}
 \begin{proof}
     We start by showing that the subtree rooted at any node $x$ contains at least $2^{\text{bh}(x)} - 1$ internal nodes. We prove this claim by induction on the height of $x$. If the height of $x$ is $0$, then $x$ must be a leaf ($T.\text{nil}$), and the subtree rooted at $x$ indeed contains at least 
-
+    \vspace{0.2em}
     $$
     2^{\text{bh}(x)} - 1 = 2^0 - 1 = 0
     $$
-
     internal nodes.
 
     For the inductive step, consider a node $x$ that has positive height and is an internal node with two children. Each child has a black-height of either $\text{bh}(x)$ or $\text{bh}(x) - 1$, depending on whether its color is red or black, respectively. Since the height of a child of $x$ is less than the height of $x$ itself, we can apply the inductive hypothesis to conclude that each child has at least 
-
+    \vspace{0.2em}
     $$
     2^{\text{bh}(x)-1} - 1
     $$ 
-
     internal nodes. Thus, the subtree rooted at $x$ contains at least 
-
+    \vspace{0.2em}
     $$
     \left(2^{\text{bh}(x)-1} - 1\right) + \left(2^{\text{bh}(x)-1} - 1\right) + 1 = 2^{\text{bh}(x)} - 1
     $$ 
-
     internal nodes, which proves the claim.
 \end{proof}
 
@@ -337,13 +336,15 @@ The operations TREE-INSERT and TREE-DELETE can violate the properties of a red-b
     \caption{Left Rotation}
 \end{figure}
 
+\vspace{-2em}
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{assets/rotation_example_rbt.png}
     \caption{Example of rotation in a Red-Black Tree}
 \end{figure}
 
-\vspace{-1em}
+\vspace{-2em}
 
 \subsection*{Insertion}
 
@@ -426,6 +427,8 @@ The \texttt{RB-INSERT-FIXUP} algorithm corrects any violations of these properti
     \includegraphics[width=\textwidth]{assets/insertion_rbt.png}
     \captionof{figure}{Insertion in a Red-Black Tree}
 \end{minipage}
+
+\vspace{1em}
 
 \subsubsection*{Explanation of RB-INSERT-FIXUP Algorithm}
 
