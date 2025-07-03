@@ -1,0 +1,184 @@
+\chapter{Parallel Computation}
+
+\section{Introduction and Notation}
+
+The design and efficacy of \textbf{parallel algorithms} are intrinsically linked to the underlying computational architecture. When devising a parallel program, one must consider not only the availability of multiple processing resources but also their ability to communicate and synchronize, if required.
+
+\begin{definitionblock}[Parallelize a Program]
+    To \textbf{parallelize a program} means to structure its operations such that they can be carried out simultaneously, or concurrently, on multiple processing units.
+\end{definitionblock}
+
+The extent to which a program can be parallelized, its \textbf{parallelizability}, is a characteristic determined by both the intrinsic nature of the problem being solved and the specific design of the program itself. A program that is inherently sequential, where each step depends on the completion of the preceding one, offers little to no opportunity for parallelization.
+
+A program is deemed \textbf{sequential} if there exists a strict dependence between its execution steps, mandating a specific order. The process of \textbf{dependence analysis} is crucial for identifying these ordering constraints. Dependencies can be broadly categorized into two types:
+
+\begin{itemize}
+    \item \textbf{Data dependency:} Occurs when an instruction refers to data that has been accessed or modified by a previous instruction.
+    \item \textbf{Control dependency:} Occurs when the execution or non-execution of an instruction is contingent upon the outcome of a preceding instruction, often a conditional branch.
+\end{itemize}
+
+Parallelism can be exploited in different ways. \textbf{Data parallelism} involves distributing distinct data elements across multiple processing units, where each unit performs similar operations on its assigned data subset. Conversely, \textbf{instruction parallelism} (or task parallelism) focuses on executing different operations or instructions concurrently on multiple processing units.
+
+Flynn's taxonomy provides a classical categorization of parallel computer architectures based on instruction and data streams:
+\begin{itemize}
+    \item \textbf{SISD} \bfit{(Single Instruction, Single Data):} Traditional sequential von Neumann architecture.
+    \item \textbf{SIMD} \bfit{(Single Instruction, Multiple Data):} A single instruction is executed synchronously by multiple processors operating on different data elements. Commonly used for data parallelism.
+    \item \textbf{MISD} \bfit{(Multiple Instruction, Single Data):} Multiple instructions operate on a single data stream. This architecture is rare in practice.
+    \item \textbf{MIMD} \bfit{(Multiple Instruction, Multiple Data):} Multiple processors execute different instruction streams on different data streams. This is the most general and flexible parallel architecture, encompassing multi-core processors and distributed systems.
+\end{itemize}
+For the algorithms discussed subsequently, we will often assume a \textbf{SIMD-like model} or a model where processing units can execute local programs, often synchronized at a high level.
+
+\subsubsection{Memory Architectures: Shared vs. Distributed}
+
+The organization of memory within a parallel computing system fundamentally shapes both the interaction patterns between processing units and the architectural decisions underlying parallel program design, with implications for performance, scalability, and programming complexity.
+
+\begin{multicols}{2}
+\begin{center}
+    \textbf{Shared Memory}
+\end{center}
+In a \textbf{shared memory} architecture, all processing units have access to a common, global memory.
+\begin{itemize}[noitemsep]
+    \item Communication between processing units is implicitly achieved by reading from/writing to shared variables in this common memory.
+    \item This model can simplify programming as data does not need to be explicitly sent between processing units.
+    \item However, simultaneous access to shared data requires careful synchronization mechanisms (e.g., locks, semaphores) to prevent \textbf{race conditions} (where the outcome depends on the non-deterministic order of access) and ensure data consistency.
+\end{itemize}
+
+\columnbreak
+
+\begin{center}
+    \textbf{Distributed Memory}
+\end{center}
+In a \textbf{distributed memory} architecture, each processing unit has its own private, local memory.
+\begin{itemize}[noitemsep]
+    \item A processing unit can only directly operate on data residing in its local memory.
+    \item Communication and data sharing between processing units must be explicit, typically achieved through \textbf{message passing} over an interconnection network.
+    \item While this model can be more complex to program due to the need for explicit communication, it often scales better to a very large number of processors as memory bandwidth is not a central bottleneck.
+\end{itemize}
+\end{multicols}
+
+\subsubsection{Key Architectural Characteristics for Algorithm Design}
+
+When designing a parallel algorithm, key characteristics of the architecture must be considered:
+\begin{itemize}
+    \item \bfit{Number of processing units ($P$):} Influences the degree of parallelism achievable.
+    \item \bfit{Memory space organization:} Whether memory is shared or distributed.
+    \item \bfit{IPC mechanisms:} How PUs exchange data (e.g., shared variables, message passing).
+    \item \bfit{Control mechanism:} Whether control is centralized (e.g., a global controller issuing instructions in SIMD) or distributed (each PU executes its own program, as in MIMD). This relates to instruction parallelism.
+    \item \bfit{Interconnection network topology:} The physical organization and connections between processors (e.g., linear array, ring, mesh, hypercube). This dictates communication patterns, latency, and bandwidth.
+\end{itemize}
+
+\begin{tipsblock}[Standard Notation]
+Throughout our discussion of parallel algorithms, we will use the following notation:
+\begin{itemize}[noitemsep]
+    \item $P$: The number of processing units available.
+    \item $N$: The size of the input problem (e.g., \# elements in a vector, \# nodes in a graph).
+    \item $M$: The size of the local memory available to each processing unit. Unless otherwise specified, we will often assume $M=O(1)$, meaning each processor has a constant amount of local storage.
+\end{itemize}
+\end{tipsblock}
+
+\newpage
+
+\subsubsection{Input Distribution}
+
+The distribution of input data across processing units represents a fundamental design decision in parallel algorithms. This choice is influenced by several critical factors:
+
+\begin{itemize}
+    \item \bfit{Problem characteristics:} The inherent nature of the problem and its computational demands, including data dependencies and access patterns
+    \item \bfit{Communication-computation tradeoff:} The delicate balance between data replication and inter-processor communication costs, considering both bandwidth and latency constraints
+    \item \bfit{Implementation complexity:} The need to maintain algorithm clarity, maintainability, and computational efficiency while managing synchronization overhead
+    \item \bfit{Load balancing:} The distribution of computational work across processing units to maximize resource utilization
+\end{itemize}
+
+An alternative paradigm to static input distribution is \textbf{systolic computation}, characterized by streaming data through the system during execution. This approach is defined by a synchronized global clock that divides time into discrete \textbf{time steps}, with predictable data flow patterns through processor interconnections at each cycle. Each processing unit executes three fundamental operations per cycle, and consistent operations are performed synchronously across all units at each time step. This regular, rhythmic pattern of computation and communication enables efficient implementation of algorithms with regular data dependencies.
+
+\begin{itemize}
+    \item Data reception from connected units, ensuring proper synchronization and data integrity.
+    \item Local processing of received data, applying the algorithm's core computation
+    \item Result transmission to subsequent units, maintaining the systolic flow pattern
+\end{itemize}
+
+\begin{exampleblock}[Matrix Distribution]
+For distributing an $N \times N$ matrix across $P$ processing units, two common approaches are:
+
+\begin{itemize}
+    \item \textbf{Block distribution:}
+    
+    The matrix is partitioned into contiguous blocks of size $\frac{N}{P} \times N$, with each processing unit receiving one complete block.
+    
+    This approach:
+    \begin{itemize}
+        \item Minimizes communication for operations on local data
+        \item May lead to load imbalance if computation is not uniform
+    \end{itemize}
+    
+    \item \textbf{Cyclic distribution:}
+    
+    Matrix elements are assigned one at a time cyclically across all processing units.
+    
+    This approach:
+    \begin{itemize}
+        \item Promotes better load balancing
+        \item May increase communication overhead for operations requiring neighboring elements
+    \end{itemize}
+\end{itemize}
+\end{exampleblock}
+
+\newpage
+
+\section{Performance Analysis}
+
+In parallel computing, we analyze algorithms through several key metrics. The space complexity is determined by the local memory size $M$ required per processing unit, while the parallel execution time $T = T_P(N)$ measures how long it takes to process $N$ elements using $P$ processors. The total work $W$ captures all computational effort, including both active processing and overhead costs like processor idle time and communication.
+
+To understand the efficiency of data exchange, we examine the communication overhead ratio:
+$$
+c = \dfrac{W^c}{W} \qquad \text{where } W^c = \text{total number of communications}
+$$
+
+We assume that each physical connection can handle exactly one communication per time step. The speedup $S$ tells us how much faster our parallel solution is compared to the sequential version:
+$$
+S = \dfrac{\Gamma}{T} \le \dfrac{T_1(N)}{T(N)} \le \dfrac{W}{T} = P
+$$
+
+where $\Gamma$ represents the execution time of the fastest possible sequential algorithm. We can further measure how effectively we're using our processors through the parallel efficiency:
+$$
+\varepsilon = \dfrac{S}{P} = \dfrac{\Gamma}{W} \le 1
+$$
+
+The goal is to design algorithms that achieve both minimal execution time and high efficiency - meaning we want $T$ to be as small as possible while keeping $\varepsilon$ close to 1.
+
+\begin{tipsblock}[Asymptotic notation]
+
+    Let's remark the asymptotic notation, for sufficiently large $n$:
+
+    \begin{itemize}
+        \item $f(n) = O(g(n))$ means that $f(n)$ is bounded above by a multiple of $g(n)$:
+        $$
+        f(n) = O(g(n)) \text{ if } \exists c \in R^+, n_0 \in \mathbb{N} \text{ s.t. } \forall n \ge n_0, f(n) \le c g(n)
+        $$
+        \item $f(n) = \Omega(g(n))$ means that $f(n)$ is bounded below by a multiple of $g(n)$:
+        $$
+        f(n) = \Omega(g(n)) \text{ if } \exists c \in R^+, n_0 \in \mathbb{N} \text{ s.t. } \forall n \ge n_0, f(n) \ge c g(n)
+        $$
+        \item $f(n) = \Theta(g(n))$ means that $f(n)$ is bounded above and below by a multiple of $g(n)$:
+        $$
+        f(n) = \Theta(g(n)) \text{ if } \exists c_1, c_2 \in R^+, n_0 \in \mathbb{N} \text{ s.t. } \forall n \ge n_0, c_1 g(n) \le f(n) \le c_2 g(n)
+        $$
+    \end{itemize}
+\end{tipsblock}
+
+\subsubsection{Networks of Processors}
+
+Processing units are physically organized in an interconnection network. Each unit is linked to a (susally small) subset of other units. Links can be unidirectional or bidirectional and are used by units to pass messages or data.
+
+We can use graphs metrics to describe the network:
+
+\begin{itemize}
+    \item \textbf{Distance:} $dist_G(u,v)$ of two nodes $u$ and $v$ is the length of the shortest path from $u$ to $v$.
+    \item \textbf{Diameter:} $diam(G)$ is the maximum distance between any two nodes.
+    \item \textbf{Bandwidth:} $\delta_G(S)$ of a subset $S$ of nodes is the maximum number of edges connecting the partitions $S$ and $G \setminus S$.
+    $$
+    \delta_G(S) = |\{ e \in E \text{ s.t. } e \in S \times (G \setminus S) \}|
+    $$
+    it provides an upper bound on the communications that can occur simultaneously between two subsets of nodes. The bandwidth of the entire network is given by its bisection bandwidth.
+\end{itemize}
+

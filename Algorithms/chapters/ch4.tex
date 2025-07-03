@@ -110,7 +110,9 @@ After initialization, breadth-first search never whitens a vertex, and thus the 
     vertex. Then, for any edge $(u, v) \in E$, $\delta(s, v) \leq \delta(s, u) + 1$.
 \end{theorem}
 
-\begin{proof}
+\vspace{-0.8em}
+
+\begin{proof}[\textbf{Proof}]
     If $u$ is reachable from $s$, then so is $v$. In this case, the shortest path from $s$
     to $v$ cannot be longer than the shortest path from $s$ to $u$ followed by the edge $(u,v)$,
     and thus the inequality holds. If $u$ is not reachable from $s$, then $\delta(s,v) = \infty$, and
@@ -123,7 +125,10 @@ After initialization, breadth-first search never whitens a vertex, and thus the 
     from a given source $s \in V$. Then upon termination, for each vertex $v \in V$, 
     the value $v.d$ computed by the BFS satisfies $v.d \geq \delta(s, v)$.
 \end{theorem}
-\begin{proof}
+
+\vspace{-0.8em}
+
+\begin{proof}[\textbf{Proof}]
     We prove this theorem by induction on the number of vertices in the breadth-first tree.
 
     \textbf{Base case:} The base case is the source vertex $s$. Initially, $s.d = 0$ and $\delta(s, s) = 0$. Therefore, $s.d = \delta(s, s)$, and the base case holds.
@@ -143,7 +148,10 @@ After initialization, breadth-first search never whitens a vertex, and thus the 
     Moreover, for any vertex $v \neq s$ that is reachable from s, one of the shortest paths 
     from $s$ to $v$ is a shortest path from $s$ to $v.\pi$ followed by the edge $(v.\pi, v)$.
 \end{theorem}
-\begin{proof}
+
+\vspace{-0.8em}
+
+\begin{proof}[\textbf{Proof}]
     Assume, for the purpose of contradiction, that some vertex $v$ receives a $d$-value not equal to its shortest-path distance $\delta(s, v)$. Let $v$ be the vertex with the minimum $\delta(s, v)$ that receives such an incorrect $d$-value. Clearly, $v \neq s$. Since 
     $v.d \geq \delta(s, v)$, 
     we have 
@@ -209,7 +217,7 @@ BFS is used to compute shortest paths in unweighted graphs. In weighted graphs, 
 \begin{theorem}
     Given a weighted, directed graph $G = (V, E)$ with weight function $w : E \to \mathbb{R}$, let $p = \langle v_0, v_1, \dots, v_k \rangle$ be a shortest path from vertex $v_0$ to vertex $v_k$. For any $i$ and $j$ such that $0 \leq i \leq j \leq k$, let $p_{ij} = \langle v_i, v_{i+1}, \dots, v_j \rangle$ be the subpath of $p$ from vertex $v_i$ to vertex $v_j$. Then, $p_{ij}$ is a shortest path from $v_i$ to $v_j$.
 \end{theorem}
-\begin{proof}
+\begin{proof}[\textbf{Proof}]
     Decompose the path $p$ into three segments: $p_{0i}$ from $v_0$ to $v_i$, $p_{ij}$ from $v_i$ to $v_j$, and $p_{jk}$ from $v_j$ to $v_k$. Then, the weight of $p$ is given by:
     $$
     w(p) = w(p_{0i}) + w(p_{ij}) + w(p_{jk}).
@@ -291,6 +299,8 @@ For each vertex $v \in V$, we maintain an attribute $v.d$ that is an upper bound
 The process of \textbf{relaxing} an edge $(u, v)$ consists of testing whether we can improve the shortest path to found so far by going through u and, if so, updating $v.d$ and $v.\pi$.
 A relaxation step may decrease the value of $v.d$ and update $v.\pi$. The following code performs a relaxation step on edge $(u, v)$:
 
+\vspace{-0.5em}
+
 \begin{algorithm}[H]
     \caption{RELAX(u, v, w)}
     \begin{algorithmic}[1]
@@ -310,7 +320,7 @@ A relaxation step may decrease the value of $v.d$ and update $v.\pi$. The follow
     \label{fig:relaxation}
 \end{figure}
 
-\vspace{-1em}
+\vspace{-2em}
 
 \subsection*{Bellman-Ford Algorithm}
 
@@ -416,7 +426,7 @@ Because it always chooses the "lightest" or "closest" vertex in $V - S$ to add t
 \begin{theorem}
     Dijkstra’s algorithm, run on a weighted, directed graph $G = (V, E)$ with non-negative weight function w and source s, terminates with $u.d = \delta(s, u) \forall u \in V$.
 \end{theorem}
-\begin{proof}
+\begin{proof}[\textbf{Proof}]
     We prove this theorem by induction on the number of vertices in the set $S$.
 
     \textbf{Base case:} Initially, $S = \emptyset$ and $s.d = 0 = \delta(s, s)$. For all other vertices $v \in V \setminus \{s\}$, $v.d = \infty \geq \delta(s, v)$. Thus, the base case holds.

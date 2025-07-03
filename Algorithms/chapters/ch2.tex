@@ -7,7 +7,9 @@
 \subsubsection*{Comparison-based vs Non-comparison-based}
 
 \begin{itemize}
-    \item \textbf{Comparison-based} algorithms are algorithms that sort a list by comparing elements of the list. These algorithms generally have lower bounds of O(n log n). The most common comparison-based sorting algorithms are:
+    \item \textbf{Comparison-based} algorithms are algorithms that sort a list by comparing elements of the list. These algorithms generally have lower bounds of $O(n \log n)$ due to the fundamental limitations of comparison-based sorting. 
+    
+    The most common comparison-based sorting algorithms are:
     \begin{itemize}
         \item Bubble Sort
         \item Selection Sort
@@ -16,7 +18,9 @@
         \item Quick Sort
         \item Heap Sort
     \end{itemize}
-    \item \textbf{Non-comparison-based} don’t rely on comparisons but instead use counting, hashing, or other methods to determine the order. They can sometimes achieve better time complexity (e.g., O(n)). The most common non-comparison-based sorting algorithms are:
+    \item \textbf{Non-comparison-based} algorithms don't rely on comparisons but instead use counting, hashing, or other methods to determine the order. They can sometimes achieve better time complexity (e.g., $O(n)$) by exploiting special properties of the input data. 
+    
+    The most common non-comparison-based sorting algorithms are:
     \begin{itemize}
         \item Counting Sort
         \item Radix Sort
@@ -26,11 +30,13 @@
 
 \subsubsection*{Space Complexity}
 
-How much extra memory is required by the algorithm relative to the size of the input. For example, an algorithm that requires O(n) extra space is less efficient in terms of memory usage than one that requires only O(1) space.
+How much extra memory is required by the algorithm relative to the size of the input. For example, an algorithm that requires $O(n)$ extra space is less efficient in terms of memory usage than one that requires only $O(1)$ space. The space complexity is particularly important when dealing with large datasets or memory-constrained environments.
 
 \subsubsection*{Stability}
 
-A sorting algorithm is \textbf{stable} if it preserves the relative order of records with equal keys (i.e., elements that compare equal will retain their original order). The most common stable sorting algorithms are:
+A sorting algorithm is \textbf{stable} if it preserves the relative order of records with equal keys (i.e., elements that compare equal will retain their original order). This property is crucial when sorting records with multiple fields, where secondary ordering needs to be maintained.
+
+The most common stable sorting algorithms are:
 \begin{itemize}
     \item Bubble Sort
     \item Insertion Sort
@@ -40,7 +46,7 @@ A sorting algorithm is \textbf{stable} if it preserves the relative order of rec
 \subsubsection*{In-place vs Out-of-place}
 
 \begin{itemize}
-    \item \textbf{In-place}: The algorithm sorts the elements by modifying the input array directly, using only a constant amount of extra space (O(1) space complexity). The most common in-place sorting algorithms are:
+    \item \textbf{In-place}: The algorithm sorts the elements by modifying the input array directly, using only a constant amount of extra space (O(1) space complexity). This makes them memory efficient and suitable for large datasets. The most common in-place sorting algorithms are:
     \begin{itemize}
         \item Bubble Sort
         \item Selection Sort
@@ -48,34 +54,34 @@ A sorting algorithm is \textbf{stable} if it preserves the relative order of rec
         \item Quick Sort
         \item Heap Sort
     \end{itemize}
-    \item \textbf{Out-of-place}: The algorithm requires additional space to hold a separate copy of the data (e.g., merge sort uses extra space for merging).
+    \item \textbf{Out-of-place}: The algorithm requires additional space proportional to the input size to hold a separate copy of the data (e.g., merge sort uses extra space for merging). While these algorithms may use more memory, they often offer other advantages like stability or better time complexity.
 \end{itemize}
 
 \subsubsection*{Online vs Offline}
 
 \begin{itemize}
-    \item \textbf{Online}: These algorithms can process the input in a piece-by-piece manner without needing the entire dataset upfront (e.g., insertion sort).
-    \item \textbf{Offline}: These algorithms require the entire dataset to be available before they can start sorting (e.g., merge sort).
+    \item \textbf{Online}: These algorithms can process the input in a piece-by-piece manner without needing the entire dataset upfront (e.g., insertion sort). This makes them suitable for streaming data or real-time applications.
+    \item \textbf{Offline}: These algorithms require the entire dataset to be available before they can start sorting (e.g., merge sort). While this may be a limitation in some scenarios, offline algorithms often achieve better overall performance.
 \end{itemize}
 
 \subsubsection*{Divide and Conquer}
 
-Algorithms that use the divide-and-conquer paradigm divide the problem into smaller subproblems, solve each subproblem recursively, and then combine the results (e.g., merge sort, quicksort).
+Algorithms that use the divide-and-conquer paradigm divide the problem into smaller subproblems, solve each subproblem recursively, and then combine the results (e.g., merge sort, quicksort). This approach often leads to efficient algorithms with good time complexity.
 \begin{itemize}
-    \item \textbf{Divide}: The algorithm divides the input into smaller subproblems.
+    \item \textbf{Divide}: The algorithm divides the input into smaller, manageable subproblems.
     \item \textbf{Conquer}: The algorithm solves the subproblems recursively.
     \item \textbf{Combine}: The algorithm combines the solutions of the subproblems to solve the original problem.
 \end{itemize}
 
 \subsubsection*{Parallelism}
 
-Some sorting algorithms can take advantage of parallelism to speed up the sorting process. For example, merge sort can be parallelized by dividing the input into smaller subproblems and sorting them in parallel.
+Some sorting algorithms can take advantage of parallelism to speed up the sorting process. For example, merge sort can be parallelized by dividing the input into smaller subproblems and sorting them in parallel. This property becomes increasingly important with modern multi-core processors and distributed systems.
 
 \subsubsection*{Recursive vs Iterative}
 
 \begin{itemize}
-    \item \textbf{Recursive}: Algorithms like quicksort and merge sort use recursion to break down the problem into smaller subproblems.
-    \item \textbf{Iterative}: Algorithms like bubble sort and insertion sort use loops and iteration to solve the problem without recursion.
+    \item \textbf{Recursive}: Algorithms like quicksort and merge sort use recursion to break down the problem into smaller subproblems. While recursive implementations can be more elegant and easier to understand, they may have additional overhead due to function call stack.
+    \item \textbf{Iterative}: Algorithms like bubble sort and insertion sort use loops and iteration to solve the problem without recursion. These implementations often have better space efficiency and may perform better in practice for small inputs.
 \end{itemize}
 
 \newpage
@@ -123,6 +129,8 @@ Here's a step-by-step explanation:
     \caption{Insertion Sort \cite{cormen2022introduction}}
 \end{figure}
 
+\vspace{-1em}
+
 \subsubsection*{Characteristics}
 
 \begin{multicols}{2}
@@ -157,6 +165,8 @@ Here's a step-by-step explanation:
     Time complexity: $\theta(n \log n)$
 \end{algorithm}
 
+\vspace{-1em}
+
 The MERGE-SORT procedure splits the array into two halves, recursively sorts each half, and then merges the two sorted halves. The base case of the recursion occurs when the array to be sorted has length 1, in which case there is no work to be done, since every array of length 1 is already sorted. 
 
 \begin{observationblock}[Stopping condition]
@@ -168,16 +178,14 @@ The MERGE-SORT procedure splits the array into two halves, recursively sorts eac
     \begin{algorithmic}[1]
         \State $n_1 \gets q-p+1$
         \State $n_2 \gets r-q$
-        \For{i = 1 \textbf{ to } n1} \Comment{Copy the new portions of the array into two new arrays}
+        \For{$i = 1$ \textbf{ to } $n_1$} \Comment{Copy the new portions of the array into two new arrays}
             \State L[i] $\gets$ A[p+i-1]
         \EndFor
-        \For{j = 1 \textbf{ to } n2}
+        \For{$j = 1$ \textbf{ to } $n_2$}
             \State R[j] $\gets$ A[q+j]
         \EndFor
-        \State L[n1+1] $\gets \infty$
-        \State R[n2+1] $\gets \infty$
-        \State i $\gets$ 1
-        \State j $\gets$ 1
+        \State L[n1+1] $\gets \infty$, $\ $ R[n2+1] $\gets \infty$
+        \State i $\gets$ 1, $\ $ j $\gets$ 1
         \For{k = p \textbf{ to } r} \Comment{Two-fingers merge algorithm}
             \If{L[i] $\leq$ R[j]}
                 \State A[k] $\gets$ L[i]
@@ -191,6 +199,8 @@ The MERGE-SORT procedure splits the array into two halves, recursively sorts eac
     \hl
     Time complexity: $\theta(n)$
 \end{algorithm}
+
+\vspace{-1em}
 
 \begin{definitionblock}[Merge Sort]
 This algorithm is a \textbf{divide-and-conquer} algorithm that divides the input array into two halves, recursively sorts the two halves, and then merges the sorted halves. The merge operation combines two sorted arrays into a single sorted array. It is also \textbf{recursive} in its structure since it calls itself on subproblems.
@@ -211,6 +221,8 @@ that replaces the current subarray $A[p \dots r]$.
     \includegraphics[width=0.65\textwidth]{assets/merge_sort.png}
     \caption{Merge Sort \cite{cormen2022introduction}}
 \end{figure}
+
+\vspace{-1em}
 
 \subsubsection*{Time complexity analysis}
 
@@ -255,7 +267,7 @@ The \textbf{(binary) heap} data structure is an array object that we can view as
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{assets/heap.png}
+    \includegraphics[width=0.9\textwidth]{assets/heap.png}
     \caption{A max-heap viewed as a Binary Tree (a) and an array (b) \cite{cormen2022introduction}}
 \end{figure}
 
@@ -272,12 +284,36 @@ There are two kinds of binary heaps: max-heaps and min-heaps. In both kinds,
 the values in the nodes satisfy a \textbf{heap property}, the specifics of which depend on
 the kind of heap.
 
-\begin{definitionblock}[Max-heap property]
-The \textbf{max-heap property} is that for every node i other than the root, $A[PARENT(i)] \geq A[i]$. That is, the value of a node is at most the value of its parent.
-\end{definitionblock}
+\begin{definitionblock}[Heap property]
+    \begin{itemize}
+        \item A \textbf{max-heap property} requires that for every node i other than the root:
+        \vspace{0.2em}
+        $$A[PARENT(i)] \geq A[i]$$
+        
+        \vspace{-0.6em}
 
-\begin{definitionblock}[Min-heap property]
-The \textbf{min-heap property} is that for every node i other than the root, $A[PARENT(i)] \leq A[i]$. That is, the value of a node is at least the value of its parent.
+        This means that:
+        \begin{itemize}
+            \item The value of a node is at most the value of its parent
+            \item The root contains the maximum element
+            \item Any subtree is also a max-heap
+        \end{itemize}
+
+        \item A \textbf{min-heap property} requires that for every node i other than the root:
+        \vspace{0.2em}
+        $$A[PARENT(i)] \leq A[i]$$
+
+        \vspace{-0.6em}
+
+        This means that:
+        \begin{itemize}
+            \item The value of a node is at least the value of its parent
+            \item The root contains the minimum element  
+            \item Any subtree is also a min-heap
+        \end{itemize}
+    \end{itemize}
+
+    These properties ensure that a path from any node to the root is sorted (non-increasing for max-heap, non-decreasing for min-heap).
 \end{definitionblock}
 
 \begin{algorithm}[H]
@@ -387,11 +423,7 @@ to the height of the tree and thus take $O(\log n)$ time.
 
     Despite this slow worst-case running time, quicksort is often the best practical choice for sorting because it is remarkably efficient on the average: its expected running time is $\theta (n\log n)$, and the constant factors hidden in the $\theta (n\log n)$ notation are quite small. It also has the advantage of sorting in place.
 
-    \vspace{0.5em}
-
     It uses the divide-and-conquer paradigm. Here is the basic idea:
-
-    \vspace{0.5em}
 
     \begin{itemize}
         \item \textbf{Divide}: Partition (rearrange) the array $A[p\dots r]$ into two (possibly empty) subarrays $A[p\dots q-1]$ and $A[q+1\dots r]$ such that each element of $A[p\dots q-e]$ is less than or equal to A[q] , which is, in turn, less than or equal to each element of $A[q+1\dots r]$ . Compute the index q as part of this partitioning procedure.
@@ -406,7 +438,7 @@ to the height of the tree and thus take $O(\log n)$ time.
     \captionof{figure}{Quicksort \cite{cormen2022introduction}}
 \end{minipage}
 
-\cite{cormen2022introduction}
+\vspace{0.5em}
 
 \begin{algorithm}[H]
     \caption{Quicksort (A, p, r)}
@@ -422,11 +454,11 @@ to the height of the tree and thus take $O(\log n)$ time.
     \textbf{Worst case}: $\theta(n^2)$
 \end{algorithm}
 
-\vspace{-1em}
+\vspace{-1.5em}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{assets/quicksort_areas.png}
+    \includegraphics[width=0.5\textwidth]{assets/quicksort_areas.png}
     \caption{Regions maintained by PARTITION  \cite{cormen2022introduction}}
 \end{figure}
 
@@ -449,6 +481,8 @@ to the height of the tree and thus take $O(\log n)$ time.
     \hl
     Repeat n times
 \end{algorithm}
+
+
 
 \begin{observationblock}[i, j values]
 The indices i and j are used to keep track of the elements in the array. The index i is used to keep track of the elements that are less than or equal to the pivot element, while the index j is used to iterate through the array.
@@ -479,15 +513,15 @@ as insertion sort.
     T(n) = T(n-1) + \theta(n)
     $$
 
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.65\textwidth]{assets/quicksort_avg_case.png}
-        \caption{PARTITION always of 9 to 1 \cite{cormen2022introduction}}
-    \end{figure}
-
     \item \textbf{Average case}: $\theta(n\log n)$ \newline 
     When we run quicksort on a random input array, the partitioning is highly unlikely to happen in the same way at every level, we expect that some of the splits will be reasonably well balanced and that some will be fairly unbalanced. The average-case running time of quicksort is much closer to the best case than to the worst case. The total cost of quicksort is therefore $O(n\log n)$.
 \end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/quicksort_avg_case.png}
+    \caption{PARTITION always of 9 to 1 \cite{cormen2022introduction}}
+\end{figure}
 
 \subsubsection*{Characteristics}
 
@@ -543,11 +577,15 @@ Counting sort determines, for each input element x, the number of elements less 
 
 In the code for counting sort, we assume that the input is an array $A[1,\dots,n]$ , and thus A:lengthDn. We require two other arrays: the array $B[1,\dots,n]$ holds the sorted output, and the array $C[1,\dots,k]$ provides temporary working storage.
 
+\vspace{-1em}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{assets/countingsort.png}
+    \includegraphics[width=0.85\textwidth]{assets/countingsort.png}
     \caption{Counting Sort \cite{cormen2022introduction}}
 \end{figure}
+
+\vspace{-1.5em}
 
 \begin{algorithm}[H]
     \caption{Counting Sort (A, B, k)}
@@ -573,18 +611,24 @@ In the code for counting sort, we assume that the input is an array $A[1,\dots,n
     Thus, the time complexity is $\theta(n)$ if $k = O(n)$
 \end{algorithm}
 
+\vspace{-1em}
+
 \begin{observationblock}[k]
 \textbf{Counting sort} assumes that each of the $n$ input elements is an integer in the range $0$ to $k$, for some integer $k$. When $k = O(n)$, the sort runs in $\theta(n)$ time.
 \end{observationblock}
 
 The array B holds the sorted output, and the array C is used for temporary working storage for the number of elements encountered. 
 
-An important property of counting sort is that it is \textbf{stable}: numbers with the same value appear in the output array in the same order as they do in the input array. That is, it breaks ties between two numbers by the rule that whichever number appears first in the input array appears first in the output array. Normally, the property of stability is important only when satellite data are carried around with the element being sorted. Counting sort’s stability is important for another reason: counting sort is often used as a subroutine in radix sort. For radix sort to work correctly, counting sort must be stable.
+An important property of counting sort is that it is \textbf{stable}: numbers with the same value appear in the output array in the same order as they do in the input array. That is, it breaks ties between two numbers by the rule that whichever number appears first in the input array appears first in the output array. Normally, the property of stability is important only when satellite data are carried around with the element being sorted. Counting sort's stability is important for another reason: counting sort is often used as a subroutine in radix sort. For radix sort to work correctly, counting sort must be stable.
+
+\vspace{-0.8em}
 
 \subsubsection*{Characteristics}
 
+\vspace{-1em}
+
 \begin{multicols}{2}
-    \begin{itemize}
+    \begin{itemize}[noitemsep]
         \item \textbf{Stable}: Yes
         \item \textbf{In-place}: No
         \item \textbf{Online}: No
@@ -596,17 +640,23 @@ An important property of counting sort is that it is \textbf{stable}: numbers wi
     \end{itemize}
 \end{multicols}
 
+\vspace{-1em}
+
 \subsection{Radix Sort}
 
-Radix sort is a non-comparison-based sorting algorithm that sorts integers by grouping them by individual digits. The idea is to sort the input numbers by their least significant digit, then by the next least significant digit, and so on, until the most significant digit. When k in in the range $1 \leq k \leq d$, where d is the number of digits in the input numbers, the time complexity of radix sort is $\theta(n)$.
+Radix sort processes numbers digit by digit without direct number comparisons. It sorts numbers by repeatedly ordering them based on each digit position, starting from the least significant digit and moving towards the most significant one. For d-digit numbers where each digit has k possible values ($1 \leq k \leq d$), radix sort achieves a time complexity of $\theta(n)$.
 
 Intuitively, radix sort breaks down each input integer into "columns" when they are written in some base b. Here d is the number of columns, and each column is a digit in the base-b representation of the number.In order for radix sort to work correctly, the digit sorts must be \textbf{stable}.
 
+\vspace{-0.8em}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{assets/radixsort.png}
+    \includegraphics[width=0.4\textwidth]{assets/radixsort.png}
     \caption{Radix Sort \cite{cormen2022introduction}}
 \end{figure}
+
+\vspace{-2em}
 
 \begin{algorithm}[H]
     \caption{Radix Sort (A, d)}
@@ -618,13 +668,13 @@ Intuitively, radix sort breaks down each input integer into "columns" when they 
     \end{algorithmic}
 \end{algorithm}
 
-\newpage
+\vspace{-1em}
 
 \newtheorem{Lemma}{Lemma}
 \begin{Lemma}
     Given n d-digit numbers in which each digit can take on up to k possible values,
-    RADIX-SORT correctly sorts these numbers in $\theta(d(n+k))$ time if the stable sort
-    it uses takes $\theta(n+k)$ time.\end{Lemma}
+    RADIX-SORT correctly sorts them in $\theta(d(n+k))$ time if the stable sort it uses takes $\theta(n+k)$.
+\end{Lemma}
 \begin{proof}
     The analysis of the running time depends on the stable
     sort used as the intermediate sorting algorithm. When each digit is in the range 0
@@ -633,10 +683,14 @@ Intuitively, radix sort breaks down each input integer into "columns" when they 
     There are d passes, and so the total time for radix sort is $\theta(d(n+k))$.
 \end{proof}
 
+\vspace{-1em}
+
 \subsubsection*{Characteristics}
 
+\vspace{-0.8em}
+
 \begin{multicols}{2}
-    \begin{itemize}
+    \begin{itemize}[noitemsep]
         \item \textbf{Stable}: Yes
         \item \textbf{In-place}: No
         \item \textbf{Online}: No
