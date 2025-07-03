@@ -1,0 +1,919 @@
+\chapter{Modelli cosmologici (Lecture: 13/05/2025)}
+\dots
+% take a look at:
+% https://people.smp.uq.edu.au/TamaraDavis/scienceimages/Spacetime_diagrams.pdf
+
+\section{Equazioni di Friedmann}
+
+Possiamo, a questo punto, ricavare le equazioni che regolano il comportamento del fattore di scala $a(t)$ in un universo con la metrica di Robertson-Walker e con un tensore energia-impulso proprio di un fluido perfetto.
+
+Partiamo con lo scrivere il tensor metrico; le coordinate sono $(x^0, x^1, x^2, x^3) = (ct, r, \theta, \phi)$:
+\small
+$$
+g_{\alpha \beta} = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & -\frac{a^2}{1-Kr^2} & 0 & 0 \\
+    0 & 0 & -a^2 r^2 & 0 \\
+    0 & 0 & 0 & -a^2 r^2 \sin^2 \theta
+\end{pmatrix},
+\quad \ \ 
+\ ^4g = - \frac{a^6r^4\sin^2\theta}{1-Kr^2},
+\quad \ \ 
+g^{\alpha \beta} = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & -\frac{1-Kr^2}{a^2} & 0 & 0 \\
+    0 & 0 & -\frac{1}{a^2 r^2} & 0 \\
+    0 & 0 & 0 & -\frac{1}{a^2 r^2 \sin^2 \theta}
+\end{pmatrix}
+$$
+\normalsize
+Passiamo poi a calcolare le connessioni affni. Molte di queste sono nulle; quelle diverse da zero sono le seguenti:
+
+$$
+\Gamma_{ij}^0 = \dfrac{\dot a}{a} \dfrac{g_{ij}}{c}
+$$
+
+$$
+\Gamma_{0j}^i = \dfrac{\dot a}{a} \dfrac {\delta^i_j}{c}
+$$
+
+con i, j = 1, 2, 3, mentre i termini del tipo $\Gamma^i_{jk}$ sono gli stessi già calcolati per definire la metrica di R\&W (i fattori $-1$ presenti in $g_{ij}$ e $g^{ij}$ si elidono): basta sostituire, al posto della funzione $f (r)$ incognita, l'espressione: $\dfrac{1}{1-kr^2}$ ad esempio: $\Gamma^1_{11} = \dfrac{kr}{1-kr^2}$.
+
+Occorre poi passare dalle $\Gamma^\alpha_{\beta \gamma}$ al tensore di Ricci $R_{\alpha\beta} = R^\gamma_{\alpha \gamma \beta}$; con un po' di pazienza risulta che le componenti diverse da zero sono:
+
+$$
+R_{00} = - \dfrac 3{c^2} \dfrac{\ddot a}{a}
+\qquad \qquad
+\underbrace{R_{ij} = \dfrac{g_{ij}}{c^2} \left[
+    \dfrac{\ddot a}{a} + \dfrac{\dot a^2}{a^2} + \dfrac{2kc^2}{a^2}
+\right]}_{\text{(3 componenti $\not = 0$: $R_{11}, R_{22}, R_{33}$)}}
+$$
+
+e lo scalare di Ricci è:
+
+$$
+R = g^{\alpha\beta} R_{\alpha\beta} = - \dfrac{6}{c^2} \left[ \dfrac{\ddot a}{a} + \dfrac{\dot a^2}{a^2} + \dfrac{K}{a^2} \right]
+$$
+
+\dots
+
+Per la componente $R_{00}$ si ha la \bfit{prima equazione di Friedmann}:
+
+$$
+\boxed{\dot a^2 + kc^2 = \dfrac{8\pi G}{3c^2} \rho a^2 + \dfrac13 a^2 c^2 \Lambda}
+$$
+
+\begin{observationblock}[Prima equazione di Friedmann]
+    Se leviamo la costante cosmologica dall'equazione, possiamo osservare che $\ddot a$ è sempre negativo. Tale costante è ciò che invece permette all'universo di espandersi in modo accelerato.
+\end{observationblock}
+
+Da una qualunque delle tre componenti $R_{11}, R_{22}, R_{33}$ si ottiene la \bfit{seconda equazione di Friedmann}:
+
+$$
+\boxed{\ddot a + \dfrac 1{2a}(\dot a^2 + kc^2) = \dfrac{4\pi G}{c^2}p\,a + \dfrac12 \Lambda c^2 a}
+$$
+
+e, sostituendo in questa la prima equazione di Friedmann, otteniamo:
+
+$$
+\ddot a = - \dfrac{4\pi G}{3} (\rho + \dfrac{3p}{c^2}) a + \dfrac13 \Lambda c^2 a
+$$
+
+Le due equazioni di Friedmann non sono indipendenti: se esplicitiamo $\rho$ dalla prima e derivando rispetto al tempo, otteniamo la \bfit{terza equazione di Friedmann}:
+
+$$
+\boxed{\dot \rho + 3\dfrac{\dot a}{a} \left( \rho + \dfrac{p}{c^2} \right) = 0}
+$$
+
+Ma una relazione di questo tipo (con lo spigolo L di uno spazio cubico al posto del fattore di scala a) l'avevamo già vista derivare dalla conservazione dell'entropia e dal 1º Principio della Termodinamica, parlando del tensore energia-impulso di un gas ideale, ed è quindi legata alla quadridivergenza di $T^{\alpha \beta}$ uguale a zero: $T^{\alpha \beta}_{;\beta} = 0$ (il termine con la costante cosmologica soddisfa automaticamente questa relazione, essendo $g^{\alpha \beta}_{;\beta} \equiv 0$ e non altera quindi con la sua presenza il risultato). La si può considerare come un'equazione di continuità.
+
+
+La terza equazione di Friedmann si può porre in forme analoghe del tipo $dQ = dU + dL = 0$, infatti:
+
+$$
+\dfrac{\dd}{\dd t} ( \rho c^2 a^3) + p \dfrac{\dd}{\dd t} (a^3) = 0
+\qquad \to \qquad
+\dd(\rho c^2 a^3) + p \dd(a^3) = 0
+$$
+
+\section{La densità dell'universo}
+
+Come si vede esaminando le equazioni di Friedmann, uno dei parametri fondamentali è la densità dell'Universo, per cui cercheremo di valutarne il valore. È utile definire anzitutto il parametro, detto \bfit{densità critica} $\rho_{cr}$, come:
+
+$$
+\rho_{cr} = \dfrac{3H^2}{8\pi G}
+$$
+
+che, dipendendo da $H$, dipende da $t$. Il valore attuale, usando $H_0 = h \cdot 100 km\, s^{-1}\,Mpc^{-1} = h \cdot 3.241 \cdot 10^{-18} s^{-1} = (h/3.086\cdot 10^{17})s^{-1}$ fornisce una $\rho_{cr} \simeq 1.879 \cdot 10^{-26} h^2 g\,cm^{-3}$.
+
+Si usa esprimere la densità $\rho$ in funzione di $\rho_{cr}$ usando il parametro di densità $\Omega$:
+
+$$
+\Omega = \dfrac{\rho}{\rho_{cr}}
+$$
+
+Poiché vi sono, come vedremo subito, vari contributi alla densità dell'Universo, avremo un valore particolare di $\Omega$ per ognuno di questi. Vediamo quindi il contributo alla densità totale delle varie componenti dell'universo.
+
+\subsubsection{Materia luminosa}
+
+Un'altra radiazone da tenere in considerazione è quella derivata dai neutrini, calcolabile dai fotoni. Si ha però che i neutrini hanno una massa, possiamo quindi calcolare la loro densità di energia come:
+
+La densità $\rho_{lum}$ della materia luminosa, essenzialmente stelle, si può ottenere dalla densità di luminosità $\rho_L$ dell'universo ($\rho_L \sim 2 \cdot 10^8 h L_{\odot} M pc^{-3}$), e assumendo un rapporto massa-luminosità $\langle M/L \rangle \sim 1 M_{\odot}/L_{\odot}$ ($L_{\odot}$ è la "luminosità solare"). Si ottiene $\Omega_{lum} \equiv \rho_{lum}/\rho_{cr}$:
+
+$$
+\Omega_{lum} h \simeq 0.002 - 0.006
+$$
+
+\dots
+
+\subsubsection{Nucleosintesi primordiale}
+
+\missing{rivedere registrazione -> slides}
+
+\subsubsection{Catastrofe barionica}
+
+Possiamo utilizzare gli ammassi di galassie come "oggetto astrofisico" per misurare il rapporto $\Omega_b/\Omega_M$.
+
+Possiamo calcolare la "quantità di massa visibile" (stelle, gas) come:
+
+$$
+\Omega_b/\Omega_M \ge 0.006\, h^{-3/2} + 0.02 \to \Omega_{M} \le \dfrac{0.002 h^{-2}}{0.006 h^{-3/2} + 0.02} \le 0.33
+$$
+
+se assumiamo $h \sim 0.7$. Il termine catastrofe barionica risale all'inizio degli anni novanta, quando si riteneva che $\Omega_M \simeq 1$; la catastrofe era rappresentata dall'impossibilità di avere un valore di $\Omega_M$ prossimo all'unità.
+
+\subsubsection{Materia oscura}
+
+Curve di rotazione delle galassie -> misurare la velocità con cui ruotano gli oggetti nella galassia man mano che ci si allontana dal centro. Applicando la fisica newtoniana, considerando solo la materia visibile, si ottiene che la velocità di rotazione dovrebbe diminuire al crescere della distanza dal centro, mentre invece si mantiene costante.
+
+Sempre più evidenze sperimentali indicano che la materia oscura è presente nell'universo.
+
+Un'altra evidenza sperimentale è il "lensing": Possiamo ricostruire la massa dell'oggetto che causa il lensing osservando la deformazione che l'oggetto provoca sulla luce che lo attraversa. Quello che possiamo notare vedendo alcuni esempi (e.g. "bullet cluster") è che è presente una sfasatura tra la massa dei due oggetti.
+
+\todo{risistemare quanto riportato sopra}
+
+Tutte queste evidenze ci portano a concludere che nel nostro universo è presente una componente di materia oscura, con le seguenti caratteristiche:
+
+\begin{itemize}
+    \item elettricamente neutra
+    \item incolore (neutral color change)
+    \item interazioni deboli (no collisioni, no pressione)
+    \item stabile (si è originata agli albori dell'universo)
+    \item velocità trascurabile (cold)
+\end{itemize}
+
+Le teorie più accreditate per la materia oscura prevedono che essa componga circa il 25\% della densità totale dell'universo.
+
+Abbiamo:
+
+\begin{itemize}
+    \item cold dark matter (CDM):
+        particelle non interagenti, non relativistiche, con massa non troppo elevata
+    \item warm dark matter (WDM):
+        particelle non interagenti, non relativistiche, con massa elevata
+    \item hot dark matter (HDM):
+        particelle interagenti, relativistiche, con massa non troppo elevata
+\end{itemize}
+
+Lo scenario preferito al momento è quello della cold dark matter, in quanto la hot dark matter rallenta la formazione delle strutture, e la warm dark matter ha bisogno di una quantità di energia maggiore per formare strutture.
+
+\subsubsection{dark matter detection}
+
+Esperimenti diretti:
+
+La materia oscura interagisce con la materia ordinaria ...
+
+Esperimenti indiretti:
+
+Misurare 
+
+\dots
+
+Un tentativo di dimostrare l'esistenza della materia oscura è stato effettuato nel laboratorio del Gran Sasso, con l'esperimento "DAMA/LIBRA".
+
+L'idea è che la Terra, girando intorno al sole, dovrebbe passare periodi dell'anno in cui avrà una velocità relativa rispetto alla materia oscura maggiore, e quindi dovrebbe interagire di più con essa, ed altri in cui avrà una velocità minore, e quindi dovrebbe interagire di meno.
+
+Quindi, misurando il flusso di eventi in un laboratorio, dovremmo essere in grado di misurare l'interazione della materia oscura con la materia ordinaria.
+
+Lo scetticismo dei risultati ottenuti è che non è stato possibile riprodurli con esperimenti
+
+\chapter{Lecture: 16/05/2025}
+
+...
+
+\section{Moti peculiari}
+
+Prima di proseguire nello studio dei modelli, consideriamo, usando le $\Gamma$ calcolate, il problema dei cosiddetti moti peculiari. Definiamo come velocità peculiare $u^\alpha$ (4-velocità) la velocità di una particella rispetto al sistema co-movente del punto in cui essa si trova. L'equazione del moto secondo la geodetica sarà, come al solito:
+\vspace{0.4em}
+$$
+\dfrac{\dd u^\alpha}{\dd s} + \Gamma^\alpha_{\beta \gamma} u^\beta u^\gamma = 0
+\qquad \quad \text{(ricordando che $u^\alpha = \dfrac{\dd x^\alpha}{\dd s}$)}
+$$
+Per la componente $\alpha = 0$ si ha:
+\vspace{0.4em}
+$$
+\dfrac{\dd u^0}{\dd s} + \Gamma^0_{\beta \gamma} u^\beta u^\gamma = 0
+$$
+Ma per la metrica di Robertson-Walker, l'unica componente non nulla di $\Gamma^0_{\beta \gamma}$ è $\Gamma^0_{ij} = - \frac{\dot a}{a} \frac{g_{ij}}{c}$, con $i, j = 1, 2, 3$. Ricordiamo inoltre che $1 = g_{\alpha\beta} u^\alpha u^\beta = (u^0)^2 + g_{ij} u^i u^j = (u^0)^2 - |\bar u|^2$, essendo $\bar u$ la parte spaziale del quadrivettore. Quindi:
+\vspace{0.4em}
+$$
+\dfrac{\dd u^0}{\dd s} = + \dfrac{\dot a}{a} \dfrac{g_{ij}}c u^i u^j = - \dfrac{\dot a}{a} \dfrac{|\bar u|^2}{c}
+$$
+Differenziando $1 = (u^0)^2 - |\bar u|^2$ ottengo $u^0 \dd u^0 = |\bar u | \dd |\bar u |$, ed essendo $u^0 = \dfrac {\dd c^0}{\dd s} = c \dfrac {\dd t}{\dd s}$, si ottiene:
+\vspace{0.4em}
+$$
+\dfrac{|\bar u|}{u^0} \dfrac{\dd |\bar u|}{\dd s} = - \dfrac{\dot a}{a} \dfrac{|\bar u|^2}{c}
+\qquad \Rightarrow \qquad
+\dfrac{\dd |\bar u|}{\dd t} = - \dfrac{\dot a}{a} |\bar u|
+\qquad \Rightarrow \qquad
+\dfrac{|\dot{\bar u}|}{|\bar u|} = - \dfrac{\dot a}{a}
+$$
+
+Questo significa che $|\bar u| \propto 1/a$, ed essendo $p^\alpha = m_0 u^\alpha$, anche $|p| \propto 1/a$.
+
+Vediamo di nuovo che il sistema co-movente è quello più naturale. Infatti in un universo in espansione La velocità peculiare (3-velocità) cala al crescere dell'espansione: le particelle tendono a portarsi in quiete rispetto agli osservatori co-moventi. Posso cercare di vedere la cosa in modo intuitivo pensando che se una particella si allontana da un punto con una certa velocità essa passerà per osservatori in moto rispetto al primo, per i quali la velocità peculiare della particella risulterà minore.
+\vspace{0.4em}
+$$
+D = v_p \cdot \Delta t
+\qquad \quad
+v_0' = H_0 D = H_0 v_p \Delta t
+\qquad \quad
+v_p' = v_p - v_0'
+$$
+$$
+\Rightarrow \qquad
+\Delta v_p = v_p' - v_p = - v_0' = - H_0 v_p \Delta t
+\qquad \Rightarrow \qquad
+\dfrac{1}{v_p}\dfrac{\dd v_p}{\dd t} = - H_0 = - \dfrac{\dot a_0}{a_0}
+$$
+
+Osserviamo che, poichè la temperatura di un gas ideale è proporzionale al modulo quadrato della velocità media delle particelle: $T_{gas} \propto |\bar u|^2 \propto 1/a^2$ (Trad ∝ 1/a) consistente con l'espasione adiabatica di un gas perfetto: $pV^\gamma = cost \Rightarrow T V^{\gamma-1} = cost \gamma = 5/3, V \propto a^3 \Rightarrow T a^2 = cost$
+
+\section{Equazione di stato}
+
+Nelle equazioni di Friedmann, oltre alla densità ed alla costante cosmologica, compare anche la pressione $p$. Esprimeremo la pressione per mezzo di un'equazione di stato del tipo $p = w \rho c^2$ con $w = cost$, $0 \le w \le 1$.
+
+Come abbiamo già visto, il caso $w = 0$ è il caso "polvere" in cui, anche se $p = w(T )\rho  c^2$ è diverso da zero, essendo il gas non-relativistico, risulta $p \ll \rho c^2$ e quindi $w ' 0$. Per un "fluido non degenere ultrarelativistico in equilibrio termico" l'equazione di stato è del tipo $p = 1/3 \rho  c^2$ con $w = 1/3$, valida anche per un gas di fotoni.
+
+La grandezza $w$ è anche legata alla velocità del suono adiabatica (a entropia costante):
+\vspace{0.4em}
+$$
+c_s = \left( \dfrac{\partial p}{\partial \rho} \right)_S^{1/2}
+\qquad \Rightarrow \qquad
+c_s = c \sqrt w
+$$
+
+Se $w = 0$, allora $c_s = 0$; se $w = 1/3$ allora $c_s = c/\sqrt{3}$; se fosse $w > 1$ avremmo $c_s > c$, mentre se fosse invece $w < 0$, $c_s$ sarebbe immaginario.
+
+In queste condizioni abbiamo già visto che $\rho_w V^{1+w} = cost$, ma $V \propto a^3 \quad \to \quad \rho_w a^{3(1+w)} = cost = \rho_{0w} a_0^{3(1+w)}$ da cui (il suffisso $0$ implica $t = t_0$):
+\vspace{0.4em}
+$$
+\rho_w = \rho_{0w} \left( \dfrac{a}{a_0} \right)^{-3(1+w)}
+$$
+
+\begin{itemize}
+    \item $w = 0$: $\quad \, \qquad \to \qquad$ 
+        $ \rho_M a^3 = cost = \rho_{0M}a^3_0;
+        \qquad
+        \dfrac{a_0}{a} = 1 + z
+        \qquad \Rightarrow \qquad
+        \rho_M = \rho_{0M} (1+z)^3$
+    \item $w = 1/3$: $\qquad \to \qquad$
+        $\rho_{R} a^4 = \rho_{0R} a_0^4
+        \qquad \qquad \qquad \qquad \qquad \qquad \, \Rightarrow \qquad
+        \rho_{R} = \rho_{0R} (1+z)^4$
+\end{itemize}
+
+Per quanto riguarda il comportamento della costante cosmologica, riprendiamo la pressione e la densità efficaci definite poco sopra. Se immaginiamo che pressione e densità di materia e radiazione siano trascurabili, otteniamo:
+\vspace{0.4em}
+$$
+\bar p \equiv p_{\Lambda} = - \dfrac{\Lambda c^4}{8\pi G}
+\qquad \text{e} \qquad
+\bar \rho \equiv \rho_{\Lambda} = + \dfrac{\Lambda c^2}{8\pi G}
+$$
+che ci fornisce:
+\vspace{0.4em}
+$$
+p_{\Lambda} = - \rho_{\Lambda} c^2 \qquad \Rightarrow \qquad
+w_{\Lambda} = -1
+$$
+
+Vediamo quindi che la costante cosmologica è caratterizzata da un'equazione di stato con $w = w_{\Lambda} = -1$. Un caso analogo si ha, come vedremo, per la fase di \bfit{inflazione} che si verifica nell'Universo primordiale. Se $w = -1$ l'equazione che esprime $\rho_w$ (che in questo caso sarà $\rho_{\Lambda}$) mi mostra che $\rho_{\Lambda} = cost$: la densità di massa-energia non muta con l'espansione.
+
+Alle equazioni di cui sopra si può arrivare anche partendo dalla terza equazione di Friedmann nella forma già scritta sopra:
+\vspace{0.4em}
+$$
+\dd (\rho c^2 a^3) + p \dd (a^3) = 0
+$$
+Infatti, posto $p = w \rho c^2$, si ha:
+$$
+\dd (\rho c^2 a^3) + w \rho c^2 \dd (a^3) = 0
+\quad \Rightarrow \quad
+a^3 \dd(\rho c^2) + \rho c^2(1+w) 3a^2 \dd a = 0
+\quad \Rightarrow \quad
+\dfrac{\dd \rho}{\rho} = -3(1+w) \dfrac{\dd a}{a}
+$$
+che, integrando con $w = cost$, fornisce appunto:
+$$
+\int_{\rho}^{\rho_0} \dd \ln \rho = -3(1+w) \int_{a}^{a_0} \dd \ln a
+\qquad \Rightarrow \qquad
+\rho = \rho_0 \left( \dfrac{a}{a_0} \right)^{-3(1+w)}
+$$
+Nel caso in cui $w$ non sia costante (come accade in alcune teorie che, al posto della costante cosmologica, considerano un campo scalare variabile nel tempo per spiegare l'origine della cosiddetta dark energy) nell'integrale qui sopra il fattore $1 + w$ non si può portare fuori dall'integrale e la soluzione formale si scrive:
+$$
+\rho(a) = \rho_0 \exp \left\{3 \int_{a}^{a_0} [1+w(a)] \dd \ln a \right\}
+$$
+Se invece del fattore di scala $a$ si vuole usare il redshift $z$ ricordiamo che $a = a_0/(1+z)$ da cui $da = -a_0/(1+z)^2 dz$ per cui:
+$$
+\rho(z) = \rho_0 \exp \left\{3 \int_{z}^{0} [1+w(z)] \dfrac{- a_0}{(1+z)^2} \dfrac{1+z}{a_0} \dd z \right\}
+\qquad \Rightarrow \qquad
+\rho(z) = \rho_0 \exp \left\{3 \int_{0}^{z} \dfrac{[1+w(z)]}{1+z} \dd z \right\}
+$$
+
+\section{Relazioni tra i parametri cosmologici}
+
+\dots
+
+$$
+\Omega_{tot} = 1 \qquad \Leftrightarrow \qquad \rho_{tot} = \rho_{cr}
+$$
+
+\dots
+
+\section{Il parametro di Hubble}
+
+Consideriamo nuovamente la prima equazione di Friedmann e dividiamola per $a_0^2$, ricordando anche che $kc_0^2/a_0^2 = H_0^2 [1 - \Omega_0]$, e che $\Omega_0 = \sum_w \Omega_{0w}$; inglobiamo anche la costante cosmologica nella densità tramite la $\rho_{\Lambda} = \Lambda c^2/8\pi G$.
+\vspace{0.4em}
+$$
+\dot a^2 + kc^2 = \dfrac{8\pi G}{3} \rho a^2
+$$
+dividendo per $a_0^2$ otteniamo:
+$$
+\dfrac{\dot a^2}{a_0^2} - \underbrace{\dfrac{8 \pi G}{3 H_0^2}}_{=\,\rho_{0\,cr}} \rho \left( \dfrac{a}{a_0} \right)^2 = - \dfrac{kc^2}{a_0^2}
+$$
+
+dove $\rho = \sum_w \rho_w = \sum_w \rho_{0w} \left( \frac{a}{a_0} \right)^{3(1+w)} = \rho_{0\,cr} \sum_w \Omega_{0w} \left( \frac{a_0}{a} \right)^{3(1+w)}$. Allora:
+\vspace{0.4em}
+$$
+\dfrac{\dot a^2}{a_0^2} - H_0^2 \sum_w \Omega_{0w} \left( \dfrac{a_0}{a} \right)^{3(1+w)} \left( \dfrac{a}{a_0} \right)^2 = - H_0^2 \left[\sum_w \Omega_{0w} - 1 \right]
+$$
+$$
+\dfrac{\dot a^2}{a_0^2} = H_0^2 \left[\sum_w \Omega_{0w} \left( \dfrac{a_0}{a} \right)^{1 + 3w} + \left( 1 - \sum_w \Omega_{0w} \right) \right]
+$$
+che si può scrivere, ricordando che $H(t) \equiv \dot a/a_0$, e moltiplicando per $(a_0/a)^2$:
+\vspace{0.4em}
+$$
+H^2 = H_0^2 \left(\dfrac{a_0}{a}\right)^2 \left[\sum_w \Omega_{0w} \left( \dfrac{a_0}{a} \right)^{1 + 3w} + \left( 1 - \sum_w \Omega_{0w} \right) \right]
+$$
+Ricordando che $a_0/a = 1 + z$ possiamo ricavare $H(z)$ dalla formula sopra.
+$$
+H^2(z) = H_0^2 (1+z)^2 \left[\sum_w \Omega_{0w} (1+z)^{1 + 3w} + \left( 1 - \sum_w \Omega_{0w} \right) \right]
+$$
+che, esplicitando le varie componenti, fornisce:
+$$
+H^2(z) = H^2_0 (1 + z)^2 \left[ \Omega_R (1 + z)^2 + \Omega_M (1 + z) + \Omega_\Lambda (1 + z)^{-2} + 1 - (\Omega_R + \Omega_M + \Omega_\Lambda) \right]
+$$
+
+\section{Le tre epoche dell'Universo}
+
+Nell'equazione appena scritta, che descrive l'evoluzione di $H(z)$, e quindi anche del fattore di scala, vediamo che ci sono tre contributi, legati ad $\Omega_R$, $\Omega_M$, $\Omega_\Lambda$, che variano in modo diverso con il redshift.
+
+A $z$ elevato il termine in $\Omega_\Lambda$ conta poco, come pure il termine $1 - (\Omega_R + \Omega_M + \Omega_\Lambda)$ che è dell'ordine dell'unità, mentre gli altri due crescono; ma quello in $\Omega_R$ cresce più rapidamente e, anche se oggi $\Omega_R \ll \Omega_M$, la materia relativistica domina prima dell'epoca cosiddetta dell'equivalenza, corrispondente a
+\vspace{0.4em}
+$$
+1 + z_{eq} = \dfrac{\Omega_M}{\Omega_R} \simeq 23800 \Omega_M h^2
+$$
+che, per $\Omega_M \simeq 0.3$ e $h \simeq 0.7$, fornisce $z_{eq} \simeq 3700$. Quindi prima dell'equivalenza la dinamica dell'Universo è dominata dalla materia relativistica, poi dalla materia non relativistica, no a quando non entra in gioco la costante cosmologica, cioè quando
+$$
+\Omega_M(1 + z_\Lambda) = \Omega_\Lambda(1 + z)_\Lambda^{-2}
+$$
+che, se $\Omega_\Lambda = 0.7$ ed $\Omega_M = 0.3$ corrisponde a $z_\Lambda = 0.33$.
+
+Abbiamo quindi le \bfit{tre fasi di evoluzione dell'Universo}: una prima fase dominata dinamicamente dalla materia relativistica (radiazione) ($RD$), una seconda dominata dalla materia ($MD$), una terza, quella attuale, dominata dal vuoto ($VD$), intendendo dominata dalla costante cosmologica (o da una forma di dark energy).
+
+\section{Il tempo di Hubble}
+
+Supponendo che ad un certo istante (ad esempio $t = t_0$) sia $\dot a > 0$ (espansione), dalla seconda equazione di Friedmann si vede che, se $\rho + 3p/c^2 > 0$ (cioè se $(1 + 3w)\rho > 0$, $w > -1/3$), allora $\ddot a$ è sempre $< 0$ e il grafico di $a(t)$ ha la concavità rivolta verso il basso, quindi $a(t)$ deve essere nulla ad un certo istante, che possiamo prendere come $t = 0$.
+
+A $t = 0$, $\rho$ ed $H$ divergono, e abbiamo una singolarità, il cosiddetto \textit{Big Bang}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{assets/tempo_hubble.png}
+    \caption{Il tempo di Hubble}
+    \label{fig:tempo_hubble}
+\end{figure}
+
+\vspace{-1em}
+
+Vediamo anche che $a_0/T_H = \dot a_0 \Rightarrow 1/T_H = H_0$ e $T_H > t_0$ cioè $H_0 t_0 \leq 1$: l'inverso di $H_0$ dà un limite superiore all'età dell'Universo ($T_H$ è il cosiddetto tempo di Hubble = $1/H_0$).
+
+Il Big Bang è inevitabile se valgono le ipotesi che abbiamo introdotto: il principio cosmologico, la legge di gravitazione di Einstein, $p = w\rho c^2$ con $w > -1/3$. Potrebbe entrare in gioco qualcosa che agisce come una costante cosmologica, e/o fattori che coinvolgono la meccanica quantistica (quantum gravity). 
+
+\begin{observationblock}[Il Big Crunch]
+    Se in qualche istante risultasse $\dot a < 0$, la concavità di $a(t)$ implicherebbe che nel futuro ci sia un collasso inarrestabile: il \bfit{Big Crunch}. Notiamo che l'effetto di espansione non è dovuto in alcun modo alla pressione, che agisce sempre nel senso di decelerare l'espansione, se $w > -1/3$.
+\end{observationblock}
+
+\section{L'evoluzione del parametro di densità $\Omega$}
+
+Se dividiamo membro a membro la relazione, relativa ad un istante generico,
+\vspace{0.4em}
+$$
+\dfrac{kc^2}{a^2} = H^2(\Omega - 1)
+$$
+con la relazione analoga che vale a $t = t_0$ si ha
+\vspace{0.4em}
+$$
+\dfrac{a^2_0}{a^2} = H^2_0(\Omega_0 - 1)
+$$
+da cui
+$$
+\Omega - 1 = (\Omega_0 - 1) H^2_0/H^2
+$$
+e dall'evoluzione di $H$ si ha:
+$$
+\Omega - 1 = \dfrac{\Omega_0 - 1}{1 - \Omega_0 + \sum_w \Omega_{0w}(1 + z)^{1 + 3w}}
+$$
+Esplicitando le 3 componenti $R$, $M$, $\Lambda$:
+$$
+\Omega - 1 = \dfrac{\Omega_0 - 1}{\Omega_R (1+z)^2 + \Omega_M (1+z) + \Omega_\Lambda (1+z)^{-2} + 1 - \Omega_0}
+$$
+che mi fornisce l'evoluzione di $\Omega(z)$. Vedo anzitutto che, essendo il denominatore della parte destra della relazione sempre positivo (si veda la relazione che esprime $H(z)$), il segno di $\Omega(z) - 1$ non cambia durante l'evoluzione.
+Quindi se $\Omega_0 > 1$, $\Omega(z)$ rimane sempre maggiore di uno attraverso la storia cosmica. Analogamente se $\Omega_0 < 1$; se $\Omega_0 = 1$ così rimane in tutti i tempi.
+
+Andando indietro nel tempo, per $z \to \infty$, vedo che $\Omega - 1 \to 0$, cioè $\Omega \to 1$: risalendo nel passato l'Universo somiglia sempre più a quello con $k = 0$ e gli effetti della curvatura sono trascurabili nelle prime fasi dell'evoluzione
+cosmica.
+
+Il fatto che $\Omega$ tenda a divergere da 1 al passare del tempo, mentre in realtà oggi sembra essere molto prossimo ad 1, richiede che nel lontano passato $\Omega$ sia stato in realtà estremamente prossimo ad 1, con notevole "fine tuning" tra densità e tasso di espansione. Questo è il cosiddetto \bfit{problema della piattezza} (\textit{flatness problem}), che viene risolto dal paradigma dell'inflazione. L'esistenza di una fase di inflazione, dominata cioè dalla densità di energia di un falso vuoto che mima gli effetti di una costante cosmologica, fornisce il meccanismo attraverso il quale $\Omega$ viene talmente forzato verso l'unità, da rimanere fino ad oggi non molto diverso da 1.
+
+\section{Evoluzione del parametro di decellerazione $q(z)$}
+
+$$
+a \equiv - \dfrac{\ddot a a}{\dot a^2} = \dfrac{\ddot a}{a} \dfrac{a^2}{a H^2}
+$$
+$$
+\dot a^2 = H_0^2 a_0^2 \left[ \sum_w \Omega_{0w} (1+z)^{1+3w} + \left( 1 - \sum_w \Omega_{0w} \right) \right]
+$$
+derivando rispetto al tempo:
+$$
+2 \dot a \ddot a = H_0^2 a_0^2 \left[ \sum_w \Omega_{0w} (1+3w) \left( \dfrac{a_0}{a} \right)^{3w} \left( - \dfrac{a_0}{a^2} \right) \dot a\right]
+$$
+dunque:
+$$
+\ddot a = - \dfrac{H_0^2 a_0^3}{2 a^2} \left[
+    \sum_w \Omega_{0w} \left( \dfrac{a_0}{a} \right)^{3w} + 3 \sum_w \Omega_{0w} \left( \dfrac{a_0}{a} \right)^{3w} 
+\right]
+$$
+$$
+q = \dfrac {H_0^2 a_0^3}{a^3 H^2} \left[
+    \dfrac 12 \sum_w \Omega_{0w} \left( \dfrac{a_0}{a} \right)^{3w} + \dfrac 32 \sum_w \Omega_{0w} \left( \dfrac{a_0}{a} \right)^{3w}
+\right]
+$$
+$$
+q(z) = \dfrac 12 \Omega_{tot}(z) + \dfrac 32 \sum_w w \Omega_{w} (z)
+$$
+
+Se $\Omega_{tot} = \Omega_M \quad (\Omega_\Lambda = \Omega_R = 0)$ si ha:
+\vspace{0.4em}
+$$
+q(z) = \dfrac 12 \Omega_M(z) \quad \to \quad \ddot a < 0
+$$
+
+Questo caso sarebbe vero nell'epoca intermedia (dominata dalla materia). Prendendo una sitazione invece simile a quella attuale, con $\Omega_{tot} = 1$, si ha:
+\vspace{0.4em}
+$$
+k = 0, \qquad \Omega_{tot} =  \Omega_M + \Omega_\Lambda  = 1, \qquad (\Omega_R = 0)
+$$
+$$
+q(z) = \dfrac 12 - \dfrac 32 \Omega_\Lambda (z)
+$$
+
+Ricordando che, im questo caso $(\Omega_0 = 1, \Omega_{tot} = 1 sempre)$:
+\vspace{0.4em}
+$$
+H^2(z) = H_0^2 (1+z)^2 \left[ \Omega_{0M} (1+z) + \Omega_{\Lambda} (1+z)^{-2}\right]
+= H_0^2 (1+z)^3 \left[ \Omega_{M} + \dfrac{\Omega_{\Lambda}}{(1+z)^3}\right]
+$$
+
+\dots
+
+guardando "indietro nel tempo", nel caso $MD$ - Matter Dominated (considerando dunque la radiazione trascurabile):
+\vspace{0.4em}
+$$
+z \to \infty \quad \Rightarrow \quad q(z) \to \dfrac 12
+$$
+
+mentre il valore attuale è, nel caso $\Lambda D$ - $\Lambda$ Dominated:
+\vspace{0.4em}
+$$
+z = 0 \quad \Rightarrow \quad q_0 = \dfrac 12 - \dfrac 32 \underbrace{\Omega_\Lambda}_{= 0.7} \simeq - \dfrac 12
+$$
+Dunque $\ddot a > 0$ e abbiamo un'espansione accelerata.
+
+\chapter{Lezione: 20/05/2025}
+
+\section{Modelli cosmoogici}
+
+$$
+F1: \qquad \dot a^2 + kc^2 = \dfrac{8\pi G}{3} \rho a^2 + \dfrac 13 \Lambda c^2 a^2
+$$
+
+$$
+F2: \qquad \ddot a = - \dfrac{4\pi G}{3} (\rho + \dfrac {3p}{c^2}) a + \dfrac 13 \Lambda c^2 a
+$$
+
+In $F2$, poniamo il lato destro uguale a zero:
+$$
+\ddot a = 0 
+\quad \Rightarrow \quad 
+\dfrac 13 \Lambda c^2 \cancel{a}= \dfrac{4\pi G}{3} (\rho + \dfrac {3p}{c^2})\cancel{a}
+\quad \Rightarrow \quad 
+\Lambda(a) = \dfrac{4\pi G}{c^2} \rho_{m,0} \dfrac{a_0^3}{a^3} = \dfrac {B}{2a^3}
+$$
+
+Facendo lo stesso per $F1$:
+$$
+\dot a = 0
+\quad \Rightarrow \quad 
+\dfrac 13 \Lambda c^2 a^2 = k c^2 - \dfrac {8\pi G}{c^2} \rho a^2
+\quad \Rightarrow \quad 
+\Lambda(a) = \dfrac{3k}{a^2} - \dfrac{8\pi G}{3c^2} \rho_{m,0} \dfrac{a_0^3}{a^3} = \dfrac A{a^2} - \dfrac B{a^3}
+$$
+
+\missing{qualcosa}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/modelli_cosmici.png}
+    \label{fig:modelli_cosmici}
+\end{figure}
+
+
+\begin{itemize}
+    \item Consideriamo prima il caso $\Lambda < 0$:
+    \vspace{0.4em}
+    $$
+    \dot a^2 = \dfrac {8 \pi G}{3} \rho_{m,0} \dfrac{a_0^3}{a^3} - \dfrac 13 | \Lambda | c^2 a^2 - k c^2
+    $$
+
+    abbiamo che:
+    \vspace{0.4em}
+    $$
+    \exists a\ :\ a^2 = 0
+    \qquad \Rightarrow \qquad
+    \text{Universo ricollassa}
+    $$
+
+    \item Consideriamo ora il caso $\Lambda > 0$, 
+    
+    \begin{itemize}
+        \item $k = 0, -1$
+
+        Abbiamo che l'universo è in espansione, con $\ddot a < 0$, per $a \ll a_0$, $\ddot a > 0$ per $a \gg$.
+
+        \item $k = 1$:
+
+        $$
+        \begin{array}{lcl}
+        \Lambda > \Lambda_E & \Rightarrow & \text{Universo in espansione}
+        \\[1.5em]
+        \Lambda = \Lambda_E (1+\varepsilon) \quad \varepsilon \ll 1 & \Rightarrow & \text{Modello di Lemaître}
+        \\[1em]
+        0 < \Lambda < \Lambda_E & \Rightarrow & \begin{cases}
+            \text{Universo ricollassa} \\
+            \text{Universo in \textit{bouncing}}
+        \end{cases}
+        \end{array}
+        $$
+        
+    \end{itemize}
+    
+    \item Se $\Lambda = 0$ ($\forall k$):
+    
+    L'universo è sempre in espansione decelerata, dove, se $k = 1$:
+
+    $$
+    \dot a^2 = \dfrac{8 \pi G}{3} \rho \dfrac{a_0^3}{a^3} - k c^2
+    \quad \Rightarrow \quad \text{Ricollasso}
+    $$
+\end{itemize}
+
+\subsection{Modello di Einstein (Universo statico)}
+
+$$
+\tilde \rho = \rho - \dfrac {\Lambda c^2}{8 \pi G} \qquad \tilde p = p + \dfrac {\Lambda c^4}{8 \pi G}
+$$
+
+Poichè Einstein supponeva che l'universo fosse statico, cioè $\dot a = 0, \ddot a = 0$, allora:
+
+$$
+\begin{cases}
+    \dot a^2 + k c^2 = \dfrac{8 \pi G}{3} \tilde \rho a^2 = 0
+    \\[1em]
+    \ddot a = - \dfrac{4 \pi G}{3} \left(\tilde \rho + \dfrac {3p}{c^2}\right) a = 0
+\end{cases}
+$$
+
+dunque:
+
+$$
+\begin{cases}
+    F1 = 0 \quad \Rightarrow \quad \tilde \rho = \dfrac {3kc^2}{8 \pi G a^2}
+    \\[1em]
+    F2 = 0 \quad \Rightarrow \quad \tilde \rho = - \dfrac {3p}{c^2}
+\end{cases}
+\quad \Rightarrow \quad 
+\dfrac {3kc^2}{8 \pi G a^2} = - \dfrac {3p}{c^2}
+$$
+
+Se $p \approx 0, \rho \approx \rho_m$:
+
+$$
+- \dfrac {3p}{c^2} = - \dfrac {3}{c^2} \left( - \dfrac{\Lambda c^4}{8 \pi G} \right) = \dfrac {3 k}{8 \pi G a^2}
+$$
+
+\dots
+
+$$
+a = cost = a_e = \dfrac c{\sqrt{4 \pi G \rho}}
+$$
+
+$$
+\Lambda_E = \dfrac{k}{a^2_E} = \dfrac{4 \pi G}{c^2} \rho
+$$
+
+Questo modello è altamente instabile, basta una piccola variazione di $a_E$ per avere un'espansione o un ricollasso.
+
+\subsection{Modello di de Sitter (Universo vuoto e piatto)}
+
+Un universo vuoto e piatto è un universo in cui la densità di energia è nulla.
+
+$$
+\rho = 0 \quad p = 0, \quad k = 0
+$$
+
+Abbiamo che:
+
+$$
+\dot a^2 = \dfrac{\Lambda}3 c^2 a^2
+\quad \Rightarrow \quad
+\dfrac {\dd a}a = \sqrt{\dfrac{\Lambda}3} c \dd t
+\quad \Rightarrow \quad
+a(t) = A e^{\sqrt{\frac{\Lambda}3} c t} = A e^{H t}
+$$
+
+con $H = \sqrt{\frac{\Lambda}3} c = cost$.
+
+Questo modello è ragionevole nel caso in cui nel modello domina la costante cosmologica:
+
+\missing{conclusioni}
+
+\subsection{Modello di Einstein-de Sitter}
+
+In questo modello (EdS) si trascura la costante cosmologica e si assume che la dinamica sia dominata da una componente sola (radiazione o materia) e sia $\Omega_{0w} \equiv 1$ (questo, come visto sopra, implica che $\Omega_w(z) \equiv 1$ sempre); cioè $k = 0$. Per la precisione, il modello con $k = 0$ e $w = 0$ è detto di Einstein-de Sitter, ma chiamiamo in generale con questo nome anche i modelli con $w \neq 0$. Sia allora $\Lambda = 0$. Avremo, dalla (F1), nella fase dominata dalla componente $w$:
+$$
+\Lambda \approx 0, \quad \Omega_M \approx 1, \quad \Omega_R \approx 1, \quad k = 0
+$$
+$$
+\dfrac{\dot a^2}{a_0^2} = H_0^2 \left( \dfrac{a_0}{a} \right)^{1+3w} = H_0^2 (1+z)^{1+3w}
+$$
+cioè, moltiplicando per $a^2$ ed effettuando la radice:
+$$
+\dd a = a_0 H_0 \left(\dfrac{a_0}a\right)^{\frac{1+3w}{2}} \dd t
+\quad \Rightarrow \quad
+a^{\frac{1+3w}{2}} \dd a = C \dd t
+\quad \Rightarrow \quad
+a^{\frac{3(1+w)}{2}} = C' \cdot t
+$$
+
+e riferendosi ad $a_0$ e $t_0$:
+$$
+a(t) = a_0 \left( \dfrac{t}{t_0} \right)^{\frac{2}{3(1+w)}}
+$$
+cioè l'universo si espande per sempre. Possiamo anche scrivere l'ultima formula in funzione di $z$, come:
+$$
+t = t_0 (1 + z)^{-\frac{3(1+w)}{2}}
+$$
+
+Abbiamo che:
+
+$$
+H \equiv \dfrac{\dot a}{a} = \dfrac{2}{3(1+w) t}
+\quad \Rightarrow \quad
+Ht = cost
+\quad \Rightarrow \quad
+H = \dfrac{H_0 t_0}{t} = H_0 (1+z)^{\frac{3(1+w)}{2}}
+$$
+
+Possiamo ricavare l'età dell'universo:
+
+$$
+t_0 = \dfrac{2}{3(1+w) H_0}
+$$
+
+$$
+\rho_w a^{3(1+w)} = cost
+\quad \Rightarrow \quad
+\dfrac{\rho_w}{\rho_{0w}} = \left( \dfrac{a}{a_0} \right)^{-3(1+w)} = \left( \dfrac{t}{t_0} \right)^{-2}
+\quad \Rightarrow \quad
+\rho_w = \dfrac{\rho_{0w} t_0^2}{t^2}
+$$
+
+Ma dire che $\Omega_{0w} = \Omega_{w} = 1$ significa che $\rho_{cr} = \dfrac{3H^2}{8 \pi G}$, e quindi:
+
+$$
+\rho_w = \dfrac{3H^2}{8 \pi G} \left( \dfrac{2}{3(1+w) H_0} \right)^2 \dfrac{1}{t^2} = \dfrac 1{6 \pi G (1+w)^2 t^2}
+$$
+
+Risulta utile scrivere esplicitamente queste relazioni nei casi:
+
+\begin{itemize}
+    \item $w = 0$: "polvere", universo dominato dalla materia (= fluido non relativistico)
+    $$
+    a(t) = a_0 \left( \dfrac{t}{t_0} \right)^{\frac{2}{3}} 
+    \qquad
+    t = t_0 (1+z)^{-\frac{3}{2}}
+    \qquad
+    H = \dfrac{2}{3 t} = H_0 (1+z)^{\frac{3}{2}}
+    $$
+    
+    \dots
+    
+\end{itemize}
+
+\dots
+
+\subsection{Modelli con radiazione e materia}
+
+Se curvatura e costante cosmologica sono trascurabili è possibile trovare una soluzione analitica esatta.
+\vspace{0.4em}
+$$
+k = 0, \quad \Lambda = 0, \quad \Omega_{0M} + \Omega_{0R} = 1
+$$
+
+Possiamo scrivere:
+$$
+\dot a^2 = H_0^2 a_0^2 \left[\Omega_R \left(\dfrac{a_0}{a}\right)^4 + \Omega_M \left(\dfrac{a_0}{a}\right)\right]
+$$
+Che può essere integrata. Se ne facciamo la radice quadrata e separiamo le variabili:
+$$
+H_0 \dd t = \dfrac{\dd (a/a_0)}{\left[ \Omega_R \left(\dfrac{a_0}{a}\right)^2 + \Omega_M \left(\dfrac{a_0}{a}\right) \right]^{\frac{1}{2}}}
+$$
+
+posto $x = a/a_0$ ed integrando:
+
+$$
+\int_0^t H_0 \dd t' 
+= 
+\int_0^{\frac{a}{a_0}} \dfrac{\dd x}{\left[ \frac{\Omega_M}{x} + \frac{\Omega_R}{x^2} \right]^{\frac{1}{2}}} 
+=
+\int_0^{\frac{a}{a_0}} \dfrac{\dd x}{\left[ \frac{\Omega_M x + \Omega_R}{x^2} \right]^{\frac{1}{2}}} 
+=
+\int_0^{\frac{a}{a_0}} \dfrac{x \dd x}{\left[ \Omega_M x + \Omega_R \right]^{\frac{1}{2}}} 
+$$
+
+Questo integrale è noto, e fornisce la seguente soluzione:
+
+$$
+H_0t = \dfrac 2{3 \Omega_M^2} \left[ \left( \Omega_R + \dfrac a{a_0} \Omega_M \right)^{\frac12} \left( \dfrac a{a_0} \Omega_M - 2 \Omega_R \right) + 2 \Omega_R^{\frac 32}\right]
+$$
+
+Da questa, ricordando che $1 + z_{eq} \simeq 2.4 \cdot 10^4 \Omega_M h^2$, otteniamo l'età dell'Universo all'epoca dell'equivalenza:
+$$
+t_{eq} = \dfrac{2(2 - \sqrt{2})}{3H_0 \sqrt{\Omega_M} (1 + z_{eq})^3} \simeq 1.032 \cdot 10^3 (h^2 \Omega_M)^{-2} \text{anni}
+$$
+
+corrispondente, per $\Omega_M \simeq 0.3$ e $h \simeq 0.7$, a $t_{eq} \simeq 5 \cdot 10^4$ anni (teq = 5.66 · 104anni se $\Omega_M h^2 = 0.135$, come ricavato dai dati di $WMAP$ sul $CMB$). Se faccio un confronto con la penultima formula del paragrafo precedente, che è un'approssimazione, vedo che la stima più precisa di $t_{eq}$ differisce per il semplice fattore $2 - \sqrt{2} \simeq 0.59$
+
+\subsection{Modelli dominati da materia}
+
+Come abbiamo appena visto, l'epoca dell'equivalenza corrisponde ad un'età dell'Universo di soli 50−60000 anni, molto minori dei circa 13.5 miliardi di anni (vedi oltre) di vita del cosmo in cui vicviamo. Se trascuro questo piccolo lasso di tempo rispetto alla durata totale, e suppongo che la costante cosmologica sia nulla o comunque trascurabile, ottengo i classici modelli cosmologici riportati in tutti i testi, divulgativi e non, di qualche decina di anni fa. Vediamo quindi in dettaglio questi modelli, ricordando che il modello di EdS dominato da materia è già uno di questi casi, quello con $\Omega \equiv \Omega_M = 1$.
+
+L'equazione (F1) diventa, in questo caso:
+
+$$
+\left(
+    \dfrac{\dot a}{a}
+\right)^2 \simeq H_0^2 \left[\Omega_M \dfrac{a_0}{a} + 1 - \Omega_M\right]
+$$
+
+Se prendiamo la radice positiva, corrispondente ad un modello in espansione, avremo:
+
+$$
+\dfrac{\dd a}{\dd t} = a_0 H_0 \left[\Omega_M \dfrac{a_0}{a} + 1 - \Omega_M\right]^{\frac12} = a_0 H_0 \Omega_m^{\frac 12} \left( \dfrac{a_0}{a} \right)^{\frac 12} \left[1 + \dfrac{1 - \Omega_M}{\Omega_M} \dfrac{a_0}{a}\right]^{\frac 12}
+$$
+da cui:
+$$
+\int_0^{a/a_0} \dfrac{\dd \left(\frac{a}{a_0}\right)\left(\frac{a}{a_0}\right)^{\frac 12}}{\sqrt{1 + \frac{1 - \Omega_M}{\Omega_M} \frac{a_0}{a}}} = H_0 \Omega_M^{\frac 12} \int_0^t \dd t'
+$$
+
+\dots
+
+Questo modello non è utile per descrivere il nostro universo in generale, ma può tornare utile per descrivere zone dell'universo ad alta densità (l'universo è isotropo su larga scala, ma localmente può non esserlo).
+
+\newpage
+
+\subsection{Modelli con $\Lambda \neq 0$ (Lecture: 23/05/2025)}
+
+\dots
+
+\subsection{Il nostro Universo}
+
+Come abbiamo visto, il nostro universo, dopo l'equivalenza, è stato dominato prima dalla materia e poi dal vuoto. Esiste una soluzione analitica per un universo con \textit{materia + costantecosmologica} e piatto ($\Omega_M + \Omega_\Lambda = 1$).
+
+Dalla (F1) scritta, in questo caso, nella forma:
+\vspace{0.4em}
+$$
+\left(
+    \dfrac{\dot a}{a_0}
+\right)^2 = H_0^2 \left[\Omega_M \left(\dfrac{a_0}{a}\right) + \Omega_\Lambda \left(\dfrac{a_0}{a}\right)^{-2}\right]
+$$
+
+si ha, ponendo $R \equiv a/a_0$, che:
+\vspace{0.4em}
+$$
+\dfrac{\dd R}{\dd t} = H_0 \left[ \dfrac{\Omega_M}{R} + \Omega_\Lambda R^2\right]^{\frac 12}
+$$
+
+che può essere integrata.
+
+\dots
+
+Posto $a/a_0 = (1+z)^{-1}$, questa relazione fornisce, per questo modello, l'età dell'universo in funzione del redshift. Nel grafico seguente è riportato l'andamento del fattore di scala in funzione del tempo per il nostro modello di universo ($\Omega_M = 0.27$, $\Omega_\Lambda = 0.73$, e $h = 0.71$, come dalle osservazioni di WMAP ). Si noti come la linea tratteggiata, tangente alla curva al tempo attuale, passi con ottima approssimazione per l'origine: con questi parametri cosmologici il tempo di Hubble coincide praticamente con l'età attuale dell'Universo!
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/eta_redshift.png}
+    \label{fig:eta_redshift}
+\end{figure}
+
+Nel grafico seguente vediamo sempre, con gli stessi parametri cosmologici, il legame tra età dell'Universo (in miliardi di anni) ed il redshift.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/eta_universo.png}
+    \label{fig:eta_universo}
+\end{figure}
+
+\subsection{L'età dell'Universo}
+
+Abbiamo finora visto l'età dell'Universo in funzione del redshift per alcuni modelli particolari. Vediamo ora una formulazione generale. Dalla stessa definizione del parametro di Hubble abbiamo:
+\vspace{0.4em}
+$$
+H = \dfrac{\dot a}{a} = \dfrac 1a \dfrac{\dd a}{\dd t}
+\qquad \Rightarrow \qquad
+\dd t = \dfrac{\dd a}{a \cdot H} = \dfrac{\dd(a/a_0)}{(a/a_0) \cdot H(a)}
+$$
+
+da cui, posto $a/a_0 = u$, otteniamo:
+\vspace{0.4em}
+$$
+t(a/a_0) = \int_0^{a/a_0} \dfrac{\dd u}{u \cdot H(u)}
+$$
+
+integrabile data la dipendenza di $H$ da $a/a0$ e dai parametri cosmologici. Più pratico è usare il redshift, ricordando che $a/a_0 = 1/(1 + z)$ e che quindi:
+\vspace{0.4em}
+$$
+\dd a = - \dfrac{a_0}{(1 + z)^2} \dd z
+\qquad \Rightarrow \qquad
+\dd t = - \dfrac{a_0}{(1 + z)^2 a H} \dd z = - \dfrac{\dd z}{(1+z) H(z)}
+$$
+
+dove si è inserito a0/a = 1 + z. Si ottiene quindi la formula generale:
+\vspace{0.4em}
+$$
+t(z) = \int_0^z \dfrac{\dd z'}{(1 + z') H(z')}
+$$
+
+dove,
+$$
+H(z) = H_0(1+z)[\Omega_R(1+z)^2 + \Omega_M(1+z) + \Omega_\Lambda (1+z)^{-2}+ 1 - \Omega_0]^{\frac 12}
+$$
+
+\dots
+
+
+\subsection{Ancora orizzonti}
+
+Vediamo di calcolare l'orizzonte delle particelle in un modello di Einstein-de Sitter:
+
+$$
+\begin{array}{rl}
+d_H(t) & = a(t) \int_0^t \dfrac{c \dd t'}{a(t')} = a(t) \int^{t/t_0}_0 \dfrac{c \dd \left(\dfrac{t}{t_0}\right)}{a_0\left(\dfrac{t'}{t_0}\right)^{\frac{2}{3(1+w)}}} = \dfrac {a(t)}{a_0} c t_0 \int_0^{t/t_0} \dfrac{\dd x}{x^{\frac{2}{3(1+w)}}}\\
+& = \dfrac {a(t)}{a_0} c t_0 \dfrac{3(1+w)}{1 + 3w} \left( \dfrac{t}{t_0} \right)^{\frac{1 + 3w}{3(1+w)}} = \dfrac{3(1+w)}{1 + 3w} ct \\
+& = \dfrac{3(1+w)}{1 + 3w} ct_0 \left( \dfrac{t}{t_0} \right) = \dfrac{2c}{H_0 (1+3w)} \left( \dfrac{a}{a_0} \right)^{\frac{3(1+w)}{2}}
+\qquad \text{dato che } t_0 = \dfrac{2}{3(1+w) H_0}
+\end{array}
+$$
+
+Se esiste una fase inflattiva:
+
+$$
+a(t) = A e^{H_0 t}
+$$
+
+e quindi:
+
+$$
+d_H(t) = a(c) \int_0^t \dfrac{c \dd t'}{a(t')} = e^{H_0 t} \dfrac{c}{H_0} \left[ -e^{-H_0 t} \right] = \dfrac{c}{H_0} e^{H_0 t} \dfrac{c}{H_0} = R_H (e^{H_0 t} - 1)
+> R_H
+$$

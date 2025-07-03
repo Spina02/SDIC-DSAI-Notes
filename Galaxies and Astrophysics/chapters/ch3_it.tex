@@ -1,0 +1,572 @@
+\chapter{Relatività Generale}
+
+La relatività generale è una teoria fisica che descrive la gravità come una manifestazione della curvatura dello spazio-tempo causata dalla presenza di massa ed energia. Sviluppata da Albert Einstein tra il 1907 e il 1915, questa teoria rappresenta una generalizzazione della relatività speciale e della legge di gravitazione universale di Newton.
+
+A differenza della relatività speciale, che si occupa di sistemi di riferimento inerziali in assenza di gravità, la relatività generale estende questi concetti a sistemi di riferimento accelerati e include gli effetti gravitazionali. La teoria si basa sul principio di equivalenza, secondo il quale gli effetti della gravità sono localmente indistinguibili da quelli di un'accelerazione.
+
+La relatività generale ha avuto un impatto profondo sulla nostra comprensione dell'universo, permettendo di spiegare fenomeni come la precessione dell'orbita di Mercurio, la deflessione della luce da parte di corpi massivi e il redshift gravitazionale. La teoria ha anche portato alla predizione di oggetti esotici come i buchi neri e le onde gravitazionali, quest'ultime osservate per la prima volta nel 2015.
+
+\begin{tipsblock}[Convenzioni sugli indici]
+    Nel seguito useremo, per convenzione, gli indici greci $\alpha, \beta, \gamma, \dots$
+    se questi variano da 0 a 3, mentre useremo gli indici italici $i, j, k, \dots$ se questi variano da 1 a 3.
+    \end{tipsblock}
+
+\section{Lo spazio di Minkovski}
+
+Nella relatività speciale, la distanza infinitesima tra due eventi è data da:
+\vspace{0.4em}
+$$
+ds^2 = -c^2 dt^2 + (dx^2 + dy^2 + dz^2)
+$$
+
+Se definiamo $x^0 = ct; x^1 = x; x^2 = y; x^3 = z$, si può riscrivere l'espressione come:
+\vspace{0.4em}
+$$
+ds^2 = \eta_{\alpha \beta} dx^\alpha dx^\beta
+\qquad \text{con} \qquad
+\eta_{\alpha \beta} = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & -1 & 0 & 0 \\
+    0 & 0 & -1 & 0 \\
+    0 & 0 & 0 & -1
+\end{pmatrix}
+$$
+
+Dove $\eta_{\alpha \beta}$ è il \bfit{tensore metrico dello spazio di Minkoswki}, che è "pseudo-euclideo", ma è comunque piatto: infatti gli $\eta_{\alpha \beta}$
+sono costanti e quindi i $\Gamma^i_{jk}$ e $R^i_{jkl}$ sono nulli.
+
+\begin{warningblock}[Attenzione ai segni]
+    In letteratura si trova anche la convenzione opposta. Anche $\eta_{\alpha \beta}$ è definito spesso con i segni opposti, cioè con
+    la segnatura $(-1, 1, 1, 1)$ invece di $(1, -1, -1, -1)$.
+\end{warningblock}
+
+Diciamo anche che l'intervallo $ds^2$ è:
+\begin{itemize}
+    \item di \textbf{tipo tempo} se $ds^2 > 0$ (corrispondente ad una traiettoria fisica con $v < c$)
+    \item di \textbf{tipo spazio} se $ds^2 < 0$
+    \item di \textbf{tipo luce} o \textbf{nulla} se $ds^2 = 0$ (corrispondente al moto di particelle, come i fotoni, con velocità $c$)
+\end{itemize}
+
+Se rappresenta lo spazio-tempo (eliminando una delle coordinate spaziali) attorno ad un evento preso come origine, si può dividerlo in tre zone definite dal cono in \cref{fig:cono-luce}:
+
+\begin{center}
+\begin{minipage}{0.6\textwidth}
+\begin{itemize}
+    \item \textbf{Futuro}: tutti i punti con cui l'evento in O può interagire tramite corpi che seguono una traiettoria fisica, cioè la regione che può essere raggiunta da segnali emessi dall'origine.
+    \vspace{0.8em}
+    \item \textbf{Passato}: tutti i punti da cui l'evento in O può essere influenzato, cioè la regione da cui possono provenire segnali che raggiungono l'origine.
+    \vspace{0.8em}
+    \item \textbf{Altrove}: tutti i punti che non possono né influenzare né essere influenzati dall'evento in O, poiché richiederebbero segnali con velocità maggiore di c. Un osservatore in moto relativo può vedere O e un punto in questa regione come eventi simultanei.
+\end{itemize}
+\end{minipage}
+\hspace{1em}
+\begin{minipage}{0.3\textwidth}
+\vspace{-1.8em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/cono-luce.png}
+
+    \vspace{-0.3em}
+    \caption{Cono di luce}
+    \label{fig:cono-luce}
+\end{figure}
+\end{minipage}
+\end{center}
+
+\vspace{0.5em}
+
+Consideriamo ora un osservatore con un regolo (per misurare le distanze $\dd l$) e un orologio (pendolo, per misurare i tempi $\dd \tau$), il tempo scandito da questo orologio è detto \bfit{tempo proprio}. Consideriamo due eventi $A$ e $B$ che si verificano in tempi diversi ma nello stesso luogo ($dx = dy = dz = 0$). Si ha che tra $\dd s$ e $\dd t$ vale la relazione: $\dd s^2 = c^2 \dd t^2$.
+
+La distanza $\dd s$ tra due medesimi eventi, per un osservatore per cui avvengono nello stesso punto, e per un altro osservatore per cui avvengono a distanza $\dd l$, sarà la stessa:
+\vspace{0.4em}
+$$
+\dd s^2 = c^2 \dd \tau^2 = c^2 \dd t^2 - |\dd \bar l^2|
+\qquad \to \qquad
+\dd \tau^2 = \dd t^2 \left(
+    1 - \dfrac 1{c^2} \dfrac{|\dd \bar l|}{\dd t} \cdot \dfrac{|\dd \bar l|}{\dd t}
+\right) = \dd t^2 \left(
+    1 - \dfrac {v^2}{c^2}
+\right)
+$$
+
+dove $v$ è la velocità della particella per l'osservatore che la vede in moto, ed anche la velocità relativa dei due osservatori. Detto $\beta \equiv v/c$ e $\gamma \equiv 1/\sqrt{1 - \beta^2}$ si ha che $\dd t = \gamma \dd \tau$. Poichè $\gamma \geq 1$ allora $\dd t \geq \dd \tau$.
+
+\begin{itemize}
+
+\item Definiamo la \bfit{quadrivelocità} come $u^\alpha \equiv \frac{\dd x^\alpha}{\dd s}$; è un vettore poichè $\dd x^\alpha$ è un vettore e $\dd s$ è uno scalare.
+
+In un sistema generico, non in quiete con la particella la quale ha una velocità $\bar v \equiv \dfrac{\dd \bar x}{\dd t}$, sarà:
+
+$$
+\begin{array}{l}
+    u^0 = \dfrac{\dd x^0}{\dd s} = \dfrac{\dd(ct)}{c \dd \tau} = \gamma \\[0.6em]
+    u^i = \dfrac{\dd x^i}{\dd s} = \dfrac{\dd x^i}{\dd t} \cdot \dfrac{\dd t}{\dd s} = \dfrac{v^i}{\gamma}
+\end{array}
+$$
+
+per cui si può scrivere che $u^\alpha = \gamma (1, \bar \beta)$. Se la particella è in quiete, allora $u^\alpha = (1, 0, 0, 0)$.
+
+La quantità $u^\alpha u_\alpha$ è invariante: $u^\alpha u_\alpha = \eta_{\alpha \beta} u^\alpha u^\beta = u^0u^0 - (u^1 u^1 + u^2 u^2 + u^3 u^3) = \gamma^2 - (\gamma^2 v^2/c^2) = 1$. $u^\alpha$ rappresenta il vettore (versore) tangente alla traiettoria della particella (nello spazio-tempo 4-D).
+\vspace{0.5em}
+\item Definiamo ora il \bfit{quadrimomento} $P^\alpha \equiv m u^\alpha$, dove $m_0$ è la massa a riposo della particella. Se si ricorda che $\bar P = m \bar v = \gamma m_0 \bar v$ e che $E = mc^2 = m_0c^2\gamma$, si ha:
+
+$$
+P^0 = \gamma m_0 = \dfrac{E}{c^2} \qquad \qquad P^i = \gamma m_0 \dfrac{v^i}{c} = m \dfrac{v^i}{c}
+$$
+
+$$
+p^\alpha P_\alpha = \gamma^2 m_0^2 - \gamma^2 m_0^2 \dfrac{v^2}{c^2} = \gamma^2 m_0^2 \left(1 - \dfrac{v^2}{c^2}\right) = m_0^2
+$$
+
+$$
+P^\alpha P_\alpha = m_0^2 = \dfrac{E^2}{c^4} - \dfrac{1}{c^2} \bar P \cdot \bar P
+\qquad \to \qquad
+m_0^2 c^2 = \dfrac{E^2}{c^2} - |\bar P|^2
+$$
+
+Possiamo quindi scrivere che $P^\alpha = cost$ e dunque $E = cost, \bar P = cost$: è la conservazione dell'energia e del momento (quantità di moto).
+\vspace{0.5em}
+
+\item Definiamo la \bfit{quadriaccelerazione} come $\dfrac{\dd^2 x^\alpha}{\dd s^2} = \dfrac{\dd u^\alpha}{\dd s}$. Nella relatività ristretta, mentre posizione, velocità e tempi sono relativi, l'accelerazione è assoluta: se è zero in un sistema di riferimento, lo è in qualsiasi altro sistema di riferimento inerziale (legato al primo da una trasformazione di Lorentz); questo perchè la quadriaccelerazione è un tensore, come $u^\alpha$.
+
+\end{itemize}
+
+\vspace{0.5em}
+
+L'equazione per le \bfit{geodetiche} è sempre:
+\vspace{0.4em}
+$$
+\dfrac{\dd^2 x^\alpha}{\dd s^2} + \Gamma^\alpha_{\beta \gamma} \dfrac{\dd x^\beta}{\dd s} \dfrac{\dd x^\gamma}{\dd s} = 0
+$$
+
+se la metrica è data da $\eta_{\alpha \beta}$, allora i $\Gamma^\alpha_{\beta \gamma}$ osno nulli e resta $d^2x^\alpha/ds^2 = 0$, cioè $x^\alpha = a^\alpha \cdot s + b^\alpha$, ovvero:
+
+$$
+\begin{cases}
+    ct = a^0 \cdot s + b^0\\
+    \bar x = \bar a \cdot s + \bar b
+\end{cases}
+$$
+
+e la traiettoria è una retta percorsa di moto rettilineo uniforme.
+
+Se si utilizza un altro tensore metrico, espresso ad esempio in coordinate polari sul piano (per semplicità): $ds^2 = c^2 dt^2 - (dr^2 + r^2 d\theta^2)$, i $\Gamma^\alpha_{\beta \gamma}$ non sono tutti nulli, ma si ottiene sempre come traiettoria una retta (ma ora in coordinate polari).
+
+\begin{tipsblock}[Geodetiche nella Relatività]
+    Mentre nello spazio 3-D Euclideo la geodetica tra due punti è un segmento di retta, quindi è la distanza minima tra due punti, nella Relatività la quantità $\int_B^A ds$ è massimo rispetto a variazioni di percorso con gli estremi fissi. È $\Delta \tau = \Delta s/c$, e si pensi al paradosso dei gemelli, nel quale il tempo è massimo per il gemello che è rimasto fermo.
+\end{tipsblock}
+
+\subsection{Tensore energia-impulso}
+
+Per affrontare la Relatività Generale e la Cosmologia, abbiamo bisogno di un oggetto matematico che descriva le proprietà di un mezzo continuo, come densità e velocità, e che le colleghi alla conservazione dell'energia e della quantità di moto. Consideriamo inizialmente un fluido in cui l'unica forza presente è quella gravitazionale, chiamato "polvere" (dust), le cui particelle non interagiscono tra loro.
+
+Il campo di materia sarà descritto in ogni punto dalla quadrivelocità $u^\alpha = \gamma(1, \bar v/c)$ e dalla densità propria $\rho_0(x)$, cioè quella misurata da un osservatore che segue il fluido. Con queste grandezze possiamo formare il \bfit{tensore energia-impulso}, che è il tensore più semplice che possiamo costruire per descrivere tali quantità:
+\vspace{0.4em}
+$$
+T^{\alpha \beta} = \rho_0 c^2 u^\alpha u^\beta
+$$
+Nel dettaglio abbiamo:
+\vspace{0.4em}
+$$
+T^{00} = \rho_0 c^2 \gamma^2 = \gamma^2 \rho_0 c^2 = \rho c^2 \qquad \text{posto } \rho = \gamma^2 \rho_0
+$$
+Per interpretare questo risultato si ricorda che la massa è $m = \gamma m_0$ (con $m_0$ massa a riposo) e che un elemento di volume in moto appare contratto di un fattore $1/\gamma$, per cui la densità cresce di un ulteriore fattore $\gamma$. Perciò, se la densità propria è $\rho_0$, un osservatore rispetto al quale il fluido ha velocità $\bar v$ misurerà una densità $\gamma^2 \rho_0$. $T^{00}$ misura quindi la \textbf{densità di massa-energia} (qui l'unico contributo all'energia viene dal moto della materia).
+
+Le componenti del tensore energia-impulso $T^{\alpha \beta}$ possono essere espresse in forma matriciale come:
+
+$$
+T^{\alpha \beta} =
+\rho c^2 \cdot
+\begin{pmatrix}
+    1 & v_x/c & v_y/c & v_z/c\\
+    v_x/c & v_x^2/c^2 & v_x v_y/c^2 & v_x v_z/c^2\\
+    v_y/c & v_x v_y/c^2 & v_y^2/c^2 & v_y v_z/c^2\\
+    v_z/c & v_x v_z/c^2 & v_y v_z/c^2 & v_z^2/c^2
+\end{pmatrix}
+\qquad \text{(**)}
+$$
+
+Dalla conservazione del tensore energia-impulso, $\partial_\beta T^{\alpha \beta} = 0$ (o più in generale $T^{\alpha \beta}_{;\beta} = 0$ in presenza di gravità), possiamo ricavare le equazioni del moto del fluido. Analizziamo separatamente i casi $\alpha = 0$ e $\alpha = 1,2,3$:
+
+\begin{itemize}
+    \item Per $\bm{\alpha}\mathbf{= 0}$ si ha $\ \ \partial_\beta T^{0 \beta} = 0 \ \  \Leftrightarrow \ \ \frac {\partial T^{0\beta}}{\partial x^\beta} = 0\ \ $, che scritta per esteso:
+    \vspace{0.4em}
+    $$
+    \dfrac 1c \dfrac {\partial(\rho c^2)}{\partial x} + \dfrac{\partial(\rho c v_x)}{\partial x} + \dfrac{\partial(\rho c v_y)}{\partial y} + \dfrac{\partial(\rho c v_z)}{\partial z} = 0
+    $$
+    Semplificando e dividendo per $c$, si ottiene l'\bfit{equazione di continuità}:
+    $$
+    \dfrac {\partial \rho}{\partial t} + \nabla \cdot (\rho \bar v) = 0
+    $$
+    dove $\bar v$ è la velocità totale. Questa equazione esprime la conservazione della massa-energia nel fluido.
+
+    \item Per $\bm{\alpha} \mathbf{= 1, 2, 3}$ otteniamo le tre equazioni della quantità di moto:
+
+    $$
+    \begin{cases}
+        \dfrac 1c \dfrac{\partial(\rho c v_x)}{\partial t} + \dfrac{\partial(\rho c v_x v_x)}{\partial x} + \dfrac{\partial(\rho c v_x v_y)}{\partial y} + \dfrac{\partial(\rho c v_x v_z)}{\partial z} = 0 \quad (\alpha = 1)
+        \\[0.5em]
+        \dfrac 1c \dfrac{\partial(\rho c v_y)}{\partial t} + \dfrac{\partial(\rho c v_y v_x)}{\partial x} + \dfrac{\partial(\rho c v_y v_y)}{\partial y} + \dfrac{\partial(\rho c v_y v_z)}{\partial z} = 0 \quad (\alpha = 2)
+        \\[0.5em]
+        \dfrac 1c \dfrac{\partial(\rho c v_z)}{\partial t} + \dfrac{\partial(\rho c v_z v_x)}{\partial x} + \dfrac{\partial(\rho c v_z v_y)}{\partial y} + \dfrac{\partial(\rho c v_z v_z)}{\partial z} = 0 \quad (\alpha = 3)
+    \end{cases}
+    $$  
+\end{itemize}
+
+Moltiplicando queste tre equazioni rispettivamente per i versori $\hat i, \hat j, \hat k$ e sommando membro a membro, otteniamo:
+$$
+\dfrac \partial {\partial t}(\rho \bar v) + \dfrac \partial {\partial x}(\rho v_x \bar v) + \dfrac \partial {\partial y}(\rho v_y \bar v) + \dfrac \partial {\partial z}(\rho v_z \bar v) = 0
+$$
+Sviluppando questa espressione e utilizzando l'equazione di continuità, si arriva a:
+\vspace{0.4em}
+$$
+\rho \dfrac {\partial \bar v}{\partial t} + \bar v \left[
+    \dfrac {\partial \rho}{\partial t} + \nabla \cdot (\rho \bar v)
+\right] + 
+\rho v_x \dfrac {\partial \bar v}{\partial x} +
+\rho v_y \dfrac {\partial \bar v}{\partial y} +
+\rho v_z \dfrac {\partial \bar v}{\partial z} = 0
+$$
+che può essere riscritta in due forme equivalenti:
+\vspace{0.4em}
+$$
+\underbrace{\rho \left[
+    \dfrac {\partial \bar v}{\partial t} + (\bar v \cdot \nabla) \bar v
+\right] = 0}_{(I)}
+\qquad \Leftrightarrow \qquad 
+\underbrace{\rho \dfrac {d \bar v}{d t} = 0}_{(II)}
+$$
+
+\vspace{-0.5em}
+Queste equazioni rappresentano il moto di un fluido ideale (senza pressione, viscosità e forze esterne) e esprimono la conservazione della quantità di moto.
+
+\begin{tipsblock}[Equazione di continuità]
+    La forma (I) corrisponde al punto di vista \bfit{Euleriano}, in cui si osserva il fluido da un punto fisso nello spazio, mentre la forma (II) corrisponde al punto di vista \bfit{Lagrangiano}, in cui si segue il moto delle singole particelle di fluido.
+\end{tipsblock}
+
+Vediamo quindi che il tensore $T^{\alpha \beta}$ esprime tutte le proprietà energetiche e dinamiche del fluido (polvere, non collisionale) in questione. $T^{\alpha \beta}$ è il \bfit{tensore energia-impulso}.
+
+In un \textit{sistema inerziale localmente in quiete} (SILQ) rispetto al fluido, nel quale quindi $u^\alpha = (1, 0, 0, 0)$, $T^{\alpha \beta}$ ha la forma particolarmente semplice:
+$$
+T^{\alpha \beta}_{SILQ} =
+\begin{pmatrix}
+    \rho_0 c^2 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0 \\
+    0 & 0 & 0 & 0
+\end{pmatrix}
+$$
+Veniamo adesso a considerare il caso in cui le particelle interagiscono nel modo più semplice, cioè attraverso urti dovuti all'agitazione termica: è presente una \textit{pressione} del fluido. Assumiamo che non vi sia trasporto di energia per conduzione o irraggiamento e non vi sia viscosità. Il \textbf{fluido} così definito è detto \textbf{perfetto}.
+
+Se si è nel SILQ, ora $T^{\alpha \beta}$ non sarà più come quello scritto appena sopra, con solo $T^{00} \neq 0$. Le particelle avranno dei moti casuali attorno allo zero delle posizioni e delle velocità. Si deve rifare quindi alla forma precedente (**) di $T^{\alpha \beta}$, in cui però i termini che compaiono andranno mediati sul tempo e sulla distribuzione delle velocità delle particelle.
+
+Questo però mi dà subito un'informazione importante: tutti i termini al di fuori della diagonale contengono elementi come $v_x, v_y$ o $v_z$ o loro prodotti; quando medio $\langle v_x \rangle = 0$ ed anche $\langle v_x v_y \rangle = \langle v_x \rangle \langle v_y \rangle = 0$ (assumendo $v_x$ e $v_y$ scorrelate). Quindi $T^{\alpha \beta}$ è diagonale in SILQ.
+
+$T^{00}$ è il solo termine non nullo, e sarà quindi: SILQ (che esprime la densità di massa-energia) non sarà più semplicemente $\rho_0 c^2$, ma piuttosto un $\rho c^2$ con $\rho > \rho_0$ per tener conto del fatto che le particelle hanno velocità diverse da zero anche in SILQ e la loro densità di massa-energia è maggiore che nel caso della pura polvere. Per gli altri termini diagonali avremo $\langle \rho v_x^2 \rangle, \langle \rho v_y^2 \rangle, \langle \rho v_z^2 \rangle$.
+
+Per interpretare questi termini facciamo una piccola digressione sulla teoria cinetica dei gas. 
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.39\textwidth]{assets/gas_perfetto.png}
+    \caption{Forza esercitata da una particella su una superficie}
+    \label{fig:gas-perfetto}
+\end{figure}
+
+\vspace{-1em}
+
+Siano $v$ e $P$ la velocità e la quantità di moto di una particella, ed $f_z$ la forza media esercitata da questa particella perpendicolarmente alla superficie $A$ (vedi \cref{fig:gas-perfetto}):
+\vspace{0.4em}
+$$
+\bar v = (v_x, v_y, v_z) 
+\qquad
+\bar P = (P_x, P_y, P_z)
+\qquad
+f_z = \dfrac{\Delta P_z}{\Delta t} = \dfrac{2P_z}{2L / v_z} = \dfrac{P_z v_z}{L}
+$$
+per una particella.
+
+Per N particelle la forza sarà (indichiamo con p la pressione):
+\vspace{0.4em}
+$$
+f_z = \dfrac N L P_z v_z = \dfrac N {L^3} P_z v_z L^2= p \cdot A
+$$
+
+per cui, facendo in realtà la media sulla distribuzione delle velocità, sarà (A = L$^2$):
+\vspace{0.4em}
+$$
+\begin{array}{rcl}
+ & p = \dfrac N{L^3} \langle P_z v_z\rangle = n\langle P_z v_z \rangle &
+\\
+& P \cdot v = P_x v_x + P_y v_y + P_z v_z = 3P_z v_z & \text{(per simmetria)}
+\\
+\text{e quindi} & p = \dfrac n3 \langle \bar P \cdot \bar v \rangle &
+\end{array}
+$$
+
+che vale anche per un gas degenere e relativistico. 
+
+Possiamo riscrivere questa relazione come $p = \dfrac n3 \langle \bar P \cdot \bar v \rangle = \langle n P_x v_x \rangle = \langle n m v_x^2 \rangle = \langle \rho v_x^2 \rangle$. Quindi, per un \bfit{fluido perfetto} ($\langle v_x \rangle = 0 \ \ \to \ \ \langle v_x v_y \rangle = \langle v_x \rangle \langle v_y \rangle = 0$), sarà:
+\vspace{0.4em}
+$$
+T_{SILQ}^{\alpha\beta} = 
+\begin{pmatrix}
+    \rho c^2 & 0 & 0 & 0 \\
+    0 & p & 0 & 0 \\
+    0 & 0 & p & 0 \\
+    0 & 0 & 0 & p
+\end{pmatrix}
+$$
+dove $\rho$ tiene conto anche della massa-energia dovuta all'agitazione termica.
+
+È facile verificare che in SILQ, si può sintetizzare il tutto con:
+\vspace{0.5em}
+$$
+\phantom{\text{equazione tensoriale \quad}}
+T_{SILQ}^{\alpha\beta} = (\rho + \rho c^2)u^\alpha u^\beta - p \eta^{\alpha\beta}
+\quad
+\text{(equazione tensoriale)}
+$$
+
+Infatti, ad esempio, per $T^{00}$, essendo $u^0=1$ e $\eta^{00}=1$, si ha $T^{00} = p + \rho c^2 - p = \rho c^2$.
+
+Essendo quest'espressione tensoriale, essa \textbf{è valida in qualsiasi sistema di riferimento}, con $u^\alpha \not = (1, 0, 0, 0)$ ed eventualmente l'opportuno tensore metrico al posto di $\eta^{\alpha\beta}$. Scritta con gli indici covarianti sarà quindi:
+\vspace{0.5em}
+$$
+\boxed{T_{\alpha\beta} = (\rho + \rho c^2)u_\alpha u_\beta - p g_{\alpha\beta}}
+$$
+
+\begin{exampleblock}[Equazioni dell'idrodinamica relativistica]
+    Per soddisfare le equazioni dell'idrodinamica, deve valere:
+    \vspace{0.4em}
+    $$
+    \partial_\beta T^{\alpha\beta}  = T^{\alpha\beta}_{;\beta} = 0
+    $$
+    Sostituendo l'espressione tensoriale di $T^{\alpha\beta}$ e sfruttando la conservazione del tensore energia-impulso, si ottiene:
+    $$
+    \partial_\beta T^{\alpha\beta} = \partial_\beta \left[ (\rho + \rho c^2)u^\alpha u^\beta - p \eta^{\alpha\beta} \right] = 0
+    $$
+    $$
+    \dfrac{\partial_\beta}{\partial x^\beta} \left[ (\rho + \rho c^2)u^\alpha u^\beta \right] - \dfrac{\partial_\beta}{\partial x^\beta} (p \eta^{\alpha\beta}) = 0
+    $$
+    
+    Questa equazione esprime la conservazione dell'energia e dell'impulso in un fluido perfetto relativistico. Nel limite non relativistico, si recupera la nota equazione di continuità $\partial_t \rho + \nabla \cdot (\rho \vec{v}) = 0$.
+\end{exampleblock}
+
+\begin{exampleblock}[Conservazione dell'entropia per particella]
+
+    Vediamo ora di ricavare una relazione scalare dalla $\partial _\beta  T^{\alpha \beta }$ (rango 1, controvariante); per fare questo la moltiplicheremo per $u_\alpha $ (rango 1, covariante): Abbiamo che $u_\alpha T^{\alpha\beta}_{;\beta}$ è uno scalare!
+    
+    Partiamo dal fatto che, come abbiamo già visto, $u^\alpha u_\alpha  = 1$. Sarà quindi:
+    \vspace{0.5em}
+    $$
+    \begin{array}{rcl}
+    \dfrac{\partial}{\partial x^\beta} (u^\alpha u_\alpha) 
+    & = & 
+    u^\alpha \dfrac{\partial u_\alpha}{\partial x^\beta} + u_\alpha \dfrac{\partial u^\alpha}{\partial x^\beta}\\
+    & = &
+    \eta^{\alpha\gamma} u_\gamma \dfrac{\partial u_\alpha}{\partial x^\beta} + u_\alpha \dfrac {\partial u^\alpha}{\partial x^\beta}\\
+    & = &
+    u_\gamma \dfrac{\partial u^\gamma}{\partial x^\beta} + u_\alpha \dfrac{\partial u^\alpha}{\partial x^\beta}\\
+    & = &
+    2 u_\alpha \dfrac{\partial u^\alpha}{\partial x^\beta} = 0
+    \end{array}
+    $$
+
+    \vspace{-0.5em}
+
+    da cui $\frac {\partial u^\alpha}{\partial x^\beta} = 0$ (abbiamo sfruttato il fatto che $\alpha$ e $\gamma$ sono indici muti).
+    
+    Se riprendiamo l'equazione che esprime la divergenza di $T^{\alpha \beta}$ e la moltiplichiamo per $u_\alpha$ otteniamo:
+    \vspace{0.5em}
+    $$
+    u_\alpha \dfrac{\partial}{\partial x^\beta} \big[(p + \rho c^2)u\alpha  u^\beta \big] - \dfrac {\partial p} {\partial x^\beta}  \eta^{\alpha \beta} u_\alpha   = 0
+    $$
+
+    e, sviluppando la derivata del primo termine, abbiamo:
+    \vspace{0.4em}
+    $$
+    u_\alpha
+    \left\{
+        u^\alpha \dfrac {\partial} {\partial x^\beta} 
+        [(p + \rho c^2)u^\beta  ] + (p + \rho c^2)u^\beta \cancelto{0}{\dfrac {\partial u^\alpha} {\partial x^\beta} }\ \ \ 
+    \right\}
+    - \dfrac{\partial p} {\partial x^\beta}  u^\beta  = 0
+    $$
+
+    \vspace{-0.7em}
+
+    Se ricordiamo che $u^\alpha u_\alpha  = 1$ e che $\frac {\partial u^\alpha}{\partial x^\beta}  = 0$ possiamo scrivere:
+    \vspace{0.4em}
+    $$
+    \begin{array}{l}
+    \dfrac \partial {\partial x^\beta} 
+    [(p + \rho c^2)u^\beta  ] - u^\beta \dfrac {\partial p}
+    {\partial x^\beta}  = 0
+    \\[1em]
+    (p + \rho c^2) \underbrace{\dfrac {\partial u^\beta}{\partial x^\beta}}  + u^\beta  \dfrac \partial {\partial x^\beta}  (p + \rho c^2) - u^\beta \dfrac {\partial p} {\partial x^\beta}  = 0
+    \end{array}
+    $$
+    Dalla \textit{conservazione del numero di particelle} abbiamo:
+    \vspace{0.4em}
+    $$
+    \dfrac {\partial  (n u^\beta)}{\partial x^\beta}  = 0 
+    \quad \Rightarrow \quad
+    n \dfrac {\partial u^\beta}{\partial x^\beta}  + u^\beta \dfrac {\partial n} {\partial x^\beta}  = 0
+    \qquad \Rightarrow \qquad
+    \dfrac {\partial u^\beta }{\partial x^\beta}  = - \dfrac {u^\beta}n
+    \dfrac {\partial n}{\partial x^\beta}
+    $$
+    Sostituendo quest'ultimo risultato nella precedente relazione e raccogliendo $u^\beta$  abbiamo:
+    \vspace{0.4em}
+    $$
+    u^\beta \left\{ \underbrace{\dfrac {\partial (p + \rho c^2)}
+    {\partial x^\beta} - \dfrac {p + \rho c^2}n
+    \dfrac {\partial n}{\partial x^\beta}} - \dfrac {\partial p}{\partial x^\beta} 
+    \right\}
+    = 0
+    $$
+
+    \vspace{-0.5em}
+
+    Osserviamo ora che:
+    \vspace{0.4em}
+    $$
+    \dfrac{\partial}{\partial x^\beta} \left( \dfrac{p + \rho c^2}n \right) = \dfrac 1{n^2} \left[
+        \dfrac{\partial(p + \rho c^2)}{\partial x^\beta}n - (p + \rho c^2) \dfrac{\partial n}{\partial x^\beta}
+    \right] = \dfrac 1n \left[
+        \dfrac{\partial (p + \rho c^2)}{\partial x^\beta} - \dfrac{p + \rho c^2}n \dfrac{\partial n}{\partial x^\beta}
+    \right]
+    $$
+    Sostituendo questo risultato nella precedente relazione, otteniamo:
+    \vspace{0.4em}
+    $$
+    u^\beta \left\{
+        n\dfrac{\partial}{\partial x^\beta} \left(\dfrac pn \right) + \dfrac{\partial}{\partial x^\beta}\left(\dfrac{\rho c^2}n\right)
+    \right\} = 0
+    $$
+    $$
+    \Rightarrow \quad
+    u^\beta \left\{
+        np\dfrac{\partial}{\partial x^\beta} \left(\dfrac 1n \right) + \cancel{\dfrac nn \dfrac{\partial p}{\partial x^\beta}} + \dfrac{\partial}{\partial x^\beta}\left(\dfrac{\rho c^2}n\right)
+        - \cancel{\dfrac{\partial p}{\partial x^\beta}}
+    \right\} = 0
+    $$
+    $$
+    \Rightarrow \quad
+    n u^\beta \left\{
+        p\dfrac{\partial}{\partial x^\beta} \left(\dfrac 1n \right) + \dfrac{\partial}{\partial x^\beta}\left(\dfrac{\rho c^2}n\right)
+    \right\} = 0
+    $$
+    Ricordiamo ora il primo principio della termodinamica: $dU = dQ - dL$; se introduciamo l'entropia $S$ (con $dQ = TdS$ e $dL = pdV$) possiamo scrivere: $TdS = dU + pdV$, dove l'energia interna è $U = \rho c^2$. Se lo riscrivo riferendomi ad una particella, avrò $n = \frac{\#part}{V} = \frac{1}{V}$ e $Td\sigma = d \left(\frac{\rho c^2}n \right) + pd\left(\frac 1n \right)$, con $\sigma$ \textit{entropia per particella}. Sviluppando i differenziali si ha:
+    \vspace{0.4em}
+    $$
+    Td\sigma = \dfrac {\partial \sigma}{\partial x^\beta}dx^\beta =
+    \dfrac {\partial}{\partial x^\beta} \left(\dfrac{\rho c^2}n \right) dx^\beta + p \dfrac {\partial}{\partial x^\beta} \left( \dfrac 1n \right) dx^\beta \qquad / \cdot \dfrac 1{ds}
+    $$
+    Se ricordiamo che $\frac {d x^\beta}{ds} \equiv u^\beta$ e confrontiamo questa relazione con la precedente, otteniamo:
+    \vspace{0.4em}
+    $$
+    u^\beta \dfrac {\partial \sigma}{\partial x^\beta} = 0
+    $$
+    che, sviluppando, diventa:
+    $$
+    \gamma \dfrac 1c \dfrac {\partial \sigma}{\partial t} + \gamma \dfrac {v_x}c \dfrac {\partial \sigma}{\partial x} + \gamma \dfrac {v_y}c \dfrac {\partial \sigma}{\partial y} + \gamma \dfrac {v_z}c \dfrac {\partial \sigma}{\partial z} = 0
+    $$
+    $$
+    \dfrac{\partial\sigma}{\partial t} + (\bar v \cdot \nabla) \sigma = 0
+    \qquad \Leftrightarrow \qquad
+    \underbrace{\dfrac{d\sigma}{dt} = 0}_{\text{conservazione dell'entropia per particella}}
+    $$
+
+    dunque l'entropia si conserva se il numero di particelle non varia.
+    
+    \end{exampleblock}
+    
+    Si ha come risultato che, nel sistema in cui il fluido è in quiete, l'entropia per particella (o, se preferiamo, l'entropia per un certo numero $N$ di particelle contenute in un volume cubico $V$ di spigolo $L$, che può variare mantenendo però sempre al suo interno lo stesso numero di particelle) è costante. Questo è legato al fatto che, nel fluido ideale, non c'è scambio di energia per conduzione (o irraggiamento), né vi è dissipazione. Dal $1^{\circ}$ principio della termodinamica, nel sistema che segue il fluido, $dQ = dU + pdV$ e $U = \rho c^2 \cdot V$, per cui:
+    \vspace{0.4em}
+    $$
+    dQ = \rho c^2 dV + Vd(\rho c^2) + pdV = (p + \rho c^2)dV + Vd(\rho c^2) = TdS
+    $$
+    Poichè $dQ = 0 \rightarrow dS = 0$, cioè l'entropia totale (o per particella) si conserva durante l'espansione adiabatica del fluido ideale.
+    
+    Se si scrive $p = w \rho c^2$ (con $w$ costante, anche se, più in generale, potrà dipendere dalla temperatura $w = w(T)$), si ottiene:
+    $$
+    (1 + w) \rho c^2 dV = - V d(\rho c^2)
+    $$
+    Dividendo entrambi i membri per $\rho c^2 V$ e integrando, si trova:
+    $$
+    \frac{d\rho}{\rho} = - (1 + w) \frac{dV}{V} \qquad \Rightarrow \qquad \rho V^{1 + w} = \text{costante}
+    $$
+    Questa relazione esprime come varia la densità di energia del fluido al variare del volume, a seconda del valore di $w$.
+    
+    Incontreremo tre casi interessanti in cosmologia:
+    
+    \begin{enumerate}
+        \item Per un \textbf{gas non-relativistico} ($p \ll \rho_0 c^2$, quindi $\rho \approx \rho_0$), si ha $w \approx 0$ e quindi $\rho_0 V \approx \text{costante}$. Detto $L$ lo spigolo di un volume cubico $V = L^3$, si ottiene:
+        $$
+        \rho \propto \frac{1}{L^3}
+        $$
+        In questo caso, la densità di energia (che coincide praticamente con la densità di massa) diminuisce semplicemente perché il numero di particelle rimane costante mentre il volume aumenta. Questo è il comportamento tipico della materia ordinaria (polvere cosmica).
+    
+        \item Per un \textbf{gas di fotoni} (radiazione), la densità di energia è legata alla temperatura dalla legge di Stefan-Boltzmann: $\rho_{\text{rad}} \propto aT^4$, e la pressione è $p = \frac{1}{3} \rho c^2$, quindi $w = \frac{1}{3}$:
+        $$
+        T^4 V^{4/3} = \text{costante}
+        \quad\Rightarrow\quad
+        T \cdot V^{1/3} = \text{costante}
+        \quad\Rightarrow\quad
+        V \propto L^3
+        \quad\Rightarrow\quad
+        T \propto \frac{1}{L}
+        $$
+        Quindi, se il volume aumenta, la temperatura diminuisce come l'inverso della lunghezza caratteristica del sistema.  
+        Inoltre:
+        $$
+        \rho_{\text{rad}} V^{4/3} = \text{costante}
+        \quad\Rightarrow\quad
+        V^{4/3} \propto L^4
+        \quad\Rightarrow\quad
+        \rho_{\text{rad}} \propto \frac{1}{L^4}
+        $$
+        Questo riflette il fatto che, oltre alla diluizione dovuta all'espansione del volume, l'energia dei fotoni diminuisce anche a causa del redshift cosmologico (allungamento della lunghezza d'onda).
+    
+        \item Se $p = - \rho c^2 \quad (w = -1)$, si ha:
+        \vspace{0.4em}
+        $$
+        \rho V^0 = \text{costante} \qquad \Rightarrow \qquad \rho = \text{costante}
+        $$
+        In questo caso, la densità di energia non dipende dal volume: anche se l'universo si espande, la densità di energia rimane costante. Questo è il comportamento tipico dell'energia oscura (costante cosmologica).
+    \end{enumerate}
+    
+    Possiamo riscrivere il primo principio in un'altra forma utile, ponendo $V \propto L^3$:
+    \vspace{0.4em}
+    $$
+    \left( \rho + \frac{p}{c^2} \right) dV + V d\rho = 0 \qquad \rightarrow \qquad \left(\rho + \frac{p}{c^2}\right) \cdot 3L^2 dL + L^3 d\rho = 0
+    $$
+    da cui:
+    $$
+    3 \left(
+        \rho + \frac{p}{c^2}
+    \right) \frac{dL}{L} + d\rho = 0
+    $$
+    e, tenendo conto di una dipendenza di $L$ dal tempo:
+    \vspace{0.4em}
+    $$
+    3 \left(
+        \rho + \frac{p}{c^2}
+    \right) \frac{dL}{dt} + \frac{d\rho}{dt} = 0
+    $$
+    Queste relazioni sono fondamentali in cosmologia per descrivere l'evoluzione della densità di energia dei diversi componenti dell'universo durante l'espansione.
+    
+    Abbiamo scritto $\partial_\alpha T^{\beta \alpha} = 0$ nello spazio di Minkowski; se però $\Gamma^\alpha_{\beta\gamma}$ non sono tutti nulli (cioè in uno spazio-tempo curvo), al posto della derivata parziale semplice si deve utilizzare la derivata covariante:
+    \vspace{0.4em}
+    $$
+    T^{\alpha\beta}_{;\beta} = 0
+    $$
+    che esprime le leggi di conservazione in un sistema di riferimento generico.
+
+
+
+
