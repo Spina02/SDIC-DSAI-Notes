@@ -1,0 +1,100 @@
+\chapter{Covariance Matrix Adaptation ES}\label{ch:cma-es}
+
+The primary limitation of univariate Estimation of Distribution Algorithms (EDAs) is their inability to model dependencies between variables. To address this, multivariate EDAs were developed. The \bfit{Covariance Matrix Adaptation Evolution Strategy (CMA-ES)} stands as arguably the most successful and widely used multivariate EDA, representing the state of the art for optimization in continuous domains.
+
+CMA-ES blends concepts from both Evolution Strategies and EDAs. At its core, it is an EDA that uses a full multivariate Gaussian distribution to model the population of promising solutions. At each generation, it adapts all the parameters of this distribution:
+\begin{itemize}
+    \item The \bfit{mean vector} $\vec{m}$, which represents the center of the search distribution (the current best guess).
+    \item The \bfit{covariance matrix} $C$, which models the pairwise dependencies between variables and determines the shape and orientation of the distribution's contour lines (isodensity ellipses).
+    \item A global \bfit{step-size} $\sigma$, which controls the overall scale of the distribution.
+\end{itemize}
+By adapting the full covariance matrix, CMA-ES can learn complex, non-axis-parallel relationships between variables, making it exceptionally powerful on difficult, non-separable, and ill-conditioned optimization problems.
+
+\begin{tipsblock}[Further Reading]
+    The definitive guide to CMA-ES is the tutorial by Nikolaus Hansen. It provides a comprehensive, in-depth explanation of the algorithm's mechanics and rationale.
+    \begin{center}
+        Hansen, Nikolaus. "The CMA evolution strategy: A tutorial." arXiv preprint arXiv:1604.00772 (2016).
+        
+        \url{https://arxiv.org/abs/1604.00772}
+    \end{center}
+\end{tipsblock}
+
+\section{The \texorpdfstring{$(\mu/\mu_w, \lambda)$}{mu/mu\_w, lambda}-CMA-ES Algorithm}
+
+The standard CMA-ES algorithm follows a procedure analogous to a $(\mu, \lambda)$-ES, but with weighted recombination of the selected parents. The main cycle is as follows:
+\begin{enumerate}
+    \item \textbf{Sample:} Generate a population of $\lambda$ new candidate solutions by sampling from the current multivariate normal distribution, $\mathcal{N}(\vec{m}, \sigma^2 C)$.
+    \item \textbf{Evaluate:} Assess the fitness of each of the $\lambda$ new solutions.
+    \item \textbf{Select and Recombine:} Select the $\mu$ best individuals from the population and compute a new mean vector $\vec{m}$ as their weighted average.
+    \item \textbf{Update Strategy Parameters:} Use the selected $\mu$ individuals to update the covariance matrix $C$ and the step-size $\sigma$.
+\end{enumerate}
+
+Repeat this process until a termination criterion is met.
+
+\subsubsection{Sampling New Individuals}
+
+New candidate solutions (individuals) $x_k$ are not sampled directly. Instead, they are generated in a two-step process that decouples the mean, step-size, and covariance:
+\begin{enumerate}
+    \item A point $y_k$ is sampled from a standard multivariate normal distribution with zero mean and covariance matrix $C$: $y_k \sim \mathcal{N}(\vec{0}, C)$.
+    \item This point is then scaled by the step-size $\sigma$ and shifted by the mean vector $\vec{m}$:
+    $$ x_k = \vec{m} + \sigma y_k $$
+\end{enumerate}
+The fitness is evaluated for the point $x_k$. The step-size $\sigma$ controls the scale of the distribution; larger values lead to a wider spread of sampled individuals, encouraging exploration.
+
+\begin{observationblock}[Efficient Sampling via Eigendecomposition]
+    To sample efficiently from $\mathcal{N}(\vec{0}, C)$, CMA-ES uses the eigendecomposition of the covariance matrix. Since $C$ is symmetric and positive-definite, it can be written as $C = B D^2 B^T$, where $B$ is an orthogonal matrix whose columns are the eigenvectors of $C$, and $D$ is a diagonal matrix with the square roots of the corresponding eigenvalues.
+    
+    A sample $y_k$ can then be generated as $y_k = B D z_k$, where $z_k \sim \mathcal{N}(\vec{0}, I)$ is a sample from a standard normal distribution with an identity covariance matrix, which is trivial to generate. This decomposition is also key to efficiently updating $C$.
+\end{observationblock}
+
+
+\section{Updating the Distribution Parameters}
+
+\subsubsection{Updating the Mean Vector}
+
+After selecting the $\mu$ best individuals, the new mean vector $\vec{m}$ is computed as their weighted average. Let the selected individuals, ordered by fitness, be $x_{1:\lambda}, \ldots, x_{\mu:\lambda}$. The new mean is:
+$$ \vec{m} \leftarrow \sum_{i=1}^{\mu} w_i x_{i:\lambda} $$
+The weights $w_i$ are predefined, positive, and sum to one ($\sum w_i = 1$). They are chosen to give more influence to the better individuals (e.g., $w_1 > w_2 > \ldots > w_\mu$). A common choice is:
+$$
+w_i = \dfrac{\ln(\frac{\lambda+1}{2i})}{\sum_{j=1}^{\mu} \ln(\frac{\lambda+1}{2j})}
+$$
+
+\subsubsection{Updating the Covariance Matrix C}
+The adaptation of the covariance matrix is the most sophisticated part of CMA-ES. A naive approach would be to simply re-estimate the covariance from the selected points at each generation. However, this can lead to premature convergence. Instead, CMA-ES uses two separate, gradual update mechanisms: the \textbf{rank-$\mu$ update} and the \textbf{rank-one update}.
+
+\begin{itemize}
+\item \textbf{The Rank-$\mu$ Update}
+
+The rank-$\mu$ update incorporates the variance information from the current generation's selected steps. To avoid premature shrinkage of the distribution, it crucially uses the \textbf{old mean vector} $\vec{m}_{\text{old}}$ as its reference. The update rule is a gradual one:
+$$ C \leftarrow (1-c_\mu) C + c_\mu \sum_{i=1}^{\mu} w_i \mathbf{y}_{i:\lambda} (\mathbf{y}_{i:\lambda})^T $$
+where $c_\mu$ is the learning rate for this update. The term $\sum w_i y_{i:\lambda} (y_{i:\lambda})^T$ is the weighted covariance of the selected steps $y_i = (x_i - \vec{m}_{\text{old}})/\sigma$, and is a matrix of rank (at most) $\mu$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/cma-es-mean-update.png}
+    \caption{\centering Covariance matrix update}
+    \label{fig:cma-es-mean-update}
+\end{figure}
+
+\item \textbf{The Rank-One Update and the Evolution Path}
+
+The rank-$\mu$ update only uses information from the current generation. To incorporate information about the correlation of successful steps \textit{over time}, CMA-ES uses an \bfit{evolution path}, $\vec{p}$. This vector is an exponentially fading record of the average direction the mean vector has been moving:
+$$ \vec{p} \leftarrow (1-c_c)\vec{p} + c_c \frac{\vec{m} - \vec{m}_{\text{old}}}{\sigma} $$
+where $c_c$ is a learning rate.
+
+The evolution path $\vec{p}$ indicates if successive steps are correlated. The outer product $\vec{p} (\vec{p})^T$ is a rank-one matrix that captures this directional information. It is used to update the covariance matrix in what is called the \bfit{rank-one update}.
+
+\item \textbf{The Combined Covariance Matrix Update}
+
+The final update rule for $C$ combines the gradual decay of the old matrix, the rank-one update (from the evolution path), and the rank-$\mu$ update (from the current generation):
+$$ C \leftarrow (1 - c_1 - c_\mu)C + c_1 \vec{p} (\vec{p})^T + c_\mu \sum_{i=1}^{\mu} w_i y_{i:\lambda} (y_{i:\lambda})^T $$
+where $c_1$ and $c_\mu$ are learning rates for the rank-one and rank-$\mu$ updates, respectively.
+\end{itemize}
+
+\subsubsection{Step-Size Adaptation}
+The step-size $\sigma$ is also adapted automatically. This adaptation uses a separate evolution path, $\vec{p}_\sigma$, to determine whether the search is making directional progress or just moving randomly.
+\begin{itemize}
+    \item If the evolution path is consistently long, it means successive steps are not canceling each other out, indicating persistent directional movement. In this case, the step-size $\sigma$ should be \textbf{increased} to move faster in that direction.
+    \item If the evolution path is short, it means successive steps are uncorrelated and tend to cancel each other out, similar to random noise. This suggests the algorithm may be close to an optimum, so $\sigma$ should be \textbf{decreased} to allow for finer-grained local search.
+\end{itemize}
+This compares the length of the evolution path to its expected length under random selection and adjusts $\sigma$ accordingly, providing a parameter-free way to control the scale of the search.
