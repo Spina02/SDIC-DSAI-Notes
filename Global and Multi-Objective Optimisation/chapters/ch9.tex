@@ -179,55 +179,66 @@ SAMUEL supports several strategies for creating the initial population of rule s
 \end{enumerate}
 
 \subsection{The Michigan Approach}
-In the Michigan approach, the paradigm shifts: each individual in the evolving population is a \textit{single rule}, and the policy is represented by the \textit{entire population of rules}. This setup is a form of cooperative coevolution, where rules must collaborate and compete to form an effective global solution. We will examine two seminal Michigan-style systems: ZCS and its powerful successor, XCS.
+In the Michigan approach, the paradigm shifts: each individual in the evolving population is a \textit{single rule}, and the policy is represented by the \textit{entire population of rules}. This setup is a form of cooperative coevolution, where rules must collaborate and compete to form an effective global solution. We will examine two Michigan-style systems: ZCS and its powerful successor, XCS.
 
 \subsubsection{The Zeroth-Level Classifier System (ZCS)}
 ZCS is an early, influential Michigan-style LCS. It maintains a population of \texttt{IF...THEN...} rules and uses a steady-state Genetic Algorithm to evolve them.
 
-\paragraph{Core Concepts}
-\begin{itemize}
-    \item The population is a single set of rules.
+\begin{itemize}[noitemsep]
+    \item The population is a \bfit{single set of rules} (each individual is a rule).
     \item The fitness of a rule is directly tied to its \bfit{utility} (its predicted payoff).
     \item ZCS requires an \bfit{exact match} for a rule's condition to be satisfied.
-    \item It includes a \bfit{covering} mechanism: if the agent encounters a state $s$ for which no rule matches, a new rule is created that covers $s$ (with a random action). This new rule replaces an existing, low-fitness rule in the population.
+    \item It includes a \bfit{covering} mechanism: if the agent encounters a state $s$ for which no rule matches, a new rule that covers $s$ is created and replaces an existing, low-fitness one in the population.
 \end{itemize}
 
-\paragraph{ZCS Algorithm Cycle}
 ZCS operates as a steady-state system. The inner loop consists of agent interaction with the environment and fitness updates. The outer, evolutionary loop is triggered periodically.
+
+\vspace{-1em}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.65\textwidth]{assets/zcs-cycle.png}
+    \includegraphics[width=0.6\textwidth]{assets/zcs-cycle.png}
     \caption{\centering The steady-state cycle of the ZCS algorithm.}
     \label{fig:zcs_cycle}
 \end{figure}
 
 \vspace{-1.5em}
 
-\paragraph{Fitness Update Mechanism}
-The fitness update in ZCS is inspired by the bucket-brigade algorithm, a precursor to Q-learning.
-\begin{enumerate}
+The \textbf{fitness update} in ZCS is inspired by the bucket-brigade algorithm, a precursor to Q-learning.
+\begin{enumerate}[noitemsep]
     \item For the current state $s$, find the \bfit{match set} $M$ of all rules whose conditions match $s$.
-    \item Select one rule from $M$ to apply (e.g., via fitness-proportional selection) and extract its action $a$.
+    \item Select one rule from $M$ to apply (e.g. fitness-proportional selection) and extract its action $a$.
     \item Identify the \bfit{action set} $A \subseteq M$ of all rules in $M$ that also propose action $a$.
     \item Perform action $a$, receive reward $r$, and transition to the next state $s'$.
-    \item The fitness of each rule $A_i \in A$ is updated by redistributing payoff. Each rule gives a fraction of its fitness to the rules in the *previous* action set, and in return receives a share of the external reward $r$ plus the discounted value of the next action set $A'$:
-    $$ \text{Fitness}(A_i) \leftarrow (1-\alpha)\text{Fitness}(A_i) + \alpha \frac{1}{|A|} \left( r + \gamma \sum_{A'_j \in A'} \text{Fitness}(A'_j) \right) $$
-    \item Additionally, rules in $M$ that proposed different actions ($B=M-A$) are penalized by having their fitness reduced: $\text{Fitness}(B_i) \leftarrow \beta \cdot \text{Fitness}(B_i)$, with $\beta \in [0,1]$.
+    \item Each rule $A_i \in A$ updates its fitness by sharing some with the previous action set and receiving a portion of the reward $r$ plus discounted future value from $A'$:
+    \vspace{-0.5em}
+    \small
+    $$ \text{Fitness}(A_i) \leftarrow (1-\alpha)\text{Fitness}(A_i) + \alpha \frac{1}{|A|} \bigg( r + \gamma \sum_{A'_j \in A'} \text{Fitness}(A'_j) \bigg) $$
+    \normalsize
+    \item Additionally, rules in $M$ that proposed different actions ($B=M-A$) are penalized: 
+    \vspace{-0.5em}
+    \small
+    $$ \text{Fitness}(B_i) \leftarrow \beta \cdot \text{Fitness}(B_i), \quad \text{with } \beta \in [0,1] $$
+    \normalsize
 \end{enumerate}
 
-\paragraph{Fitness Redistribution in the GA}
-When the GA is triggered, two parent rules $P_1, P_2$ are selected. To conserve fitness within the system:
-\begin{itemize}
-    \item If no crossover occurs, the parents and children ($C_1, C_2$) share fitness: $\text{Fitness}(C_i) \leftarrow \frac{1}{2}\text{Fitness}(P_i)$ and $\text{Fitness}(P_i) \leftarrow \frac{1}{2}\text{Fitness}(P_i)$.
-    \item If crossover occurs, children receive a portion of the parents' average fitness, and the parents' fitness is halved: $\text{Fitness}(C_i) \leftarrow \frac{1}{4}(\text{Fitness}(P_1) + \text{Fitness}(P_2))$.
+When the GA is triggered, two parents $P_1, P_2$ are selected for \textbf{fitness redistribution}:
+\begin{itemize}[noitemsep]
+    \item If no crossover occurs, the parents and children ($C_1, C_2$) share fitness: 
+    \small
+    $$ \text{Fitness}(C_i) \leftarrow \frac{1}{2}\text{Fitness}(P_i) \quad \text{and} \quad \text{Fitness}(P_i) \leftarrow \frac{1}{2}\text{Fitness}(P_i) $$
+    \normalsize
+    \item If crossover occurs, children receive a portion of the parents' fitness, the parents' fitness is halved: 
+    \small
+    $$ \text{Fitness}(C_i) \leftarrow \frac{1}{4}(\text{Fitness}(P_1) + \text{Fitness}(P_2)) \quad \text{and} \quad \text{Fitness}(P_i) \leftarrow \frac{1}{2}\text{Fitness}(P_i) $$
+    \normalsize
 \end{itemize}
 
 
 \subsubsection{The XCS Algorithm}
 \bfit{XCS} is a landmark LCS that builds upon ZCS and introduces several major improvements, most notably the decoupling of a rule's fitness from its predicted utility. This fundamental change transforms the objective of the system.
 
-\paragraph{Accuracy-Based Fitness}
-The central innovation in XCS is that a rule's fitness is based on the \bfit{accuracy} of its prediction, not the magnitude of the prediction itself. This encourages the system to form a complete and accurate map of the entire state-action-payoff landscape, rewarding rules that are reliable predictors, even if they predict low payoffs. XCS maintains several distinct measures for each rule:
+The central innovation in XCS is the \textbf{accuracy-based fitness}: a rule's fitness is based on the \bfit{accuracy} of its prediction, not the magnitude of the prediction itself. This encourages the system to form a complete and accurate map of the entire state-action-payoff landscape, rewarding rules that are reliable predictors, even if they predict low payoffs. XCS maintains several distinct measures for each rule:
 \begin{enumerate}
     \item \bfit{Rule Utility (Prediction)}: An estimate of the expected payoff if the rule is applied. This is kept separate from fitness.
     \item \bfit{Utility Error}: An estimate of the mean absolute error in the utility prediction.
@@ -235,7 +246,6 @@ The central innovation in XCS is that a rule's fitness is based on the \bfit{acc
     \item \bfit{Fitness}: A function of the rule's accuracy. This value is used for selection in the genetic algorithm.
 \end{enumerate}
 
-\paragraph{XCS Mechanisms}
 XCS differs from ZCS in four key ways:
 \begin{itemize}
     \item \textbf{Action Selection}: XCS makes a more informed decision by considering all rules in the match set $M$. It first calculates a \textit{system prediction} for each possible action $a$ by taking a fitness-weighted average of the utility predictions of all rules in $M$ that propose action $a$. The action with the highest system prediction is then chosen (often with an $\epsilon$-greedy strategy).
