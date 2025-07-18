@@ -619,29 +619,407 @@ This result provides a direct connection between the equilibrium properties of t
 
 The lemma follows from the ergodic theorem: for an ergodic process, the long-run proportion of time spent in any set equals its stationary probability. Since visits to $A$ occur approximately every $\mathbb{E}[T_A]$ time units, we have $\pi(A) \approx 1/\mathbb{E}[T_A]$.
 
-This relationship has important applications in population dynamics, where rare population states correspond to long recovery times, and in statistical mechanics, where it connects equilibrium distributions to relaxation timescales near phase transitions.
+\subsection{Multiple Independent Noises}
 
-\section{The Stratonovich Integral}
+Consider the following Itô stochastic differential equation (SDE) with two independent noise sources:
+$$
+dx = a(x)\,dt + b_1(x)\,dW_1 + b_2(x)\,dW_2
+$$
+where $dW_1$ and $dW_2$ are independent Wiener processes (i.e., uncorrelated Brownian motions).
 
-Let us recall that the Itô formula arises from discretizing a stochastic differential equation (SDE) of the form $dx = a(x)dt + b(x)dW_t$ as follows:
+The associated Fokker-Planck equation (FPE) for the probability density $P(x,t)$ is obtained by extending the standard procedure for a single noise term. The result is:
 $$
-x(t+dt) - x(t) = a(x(t))dt + b(x(t))dW_t
+\partial_t P(x, t) = -\partial_x \left( a(x) P(x, t) \right)
++ \partial_{xx}^2 \left( \frac{b_1^2(x) + b_2^2(x)}{2} P(x, t) \right)
 $$
-In this scheme, the diffusion term $b(x)$ is evaluated at the \emph{start} of the time interval, $t$. This choice is mathematically convenient: it ensures that the integrand does not depend on the future increment $dW_t$, making the resulting stochastic integral a martingale.
+In other words, the diffusion coefficients from each independent noise source add together in the FPE. This generalizes immediately to any number of independent noises: the total diffusion is the sum of the squared amplitudes of each noise term.
 
-However, this is not the only possible convention. An important alternative, introduced by Ruslan Stratonovich, evaluates the diffusion term at the \emph{midpoint} of the interval, $t + dt/2$. This leads to the \textbf{Stratonovich SDE}, which is denoted with a $\circ$:
+\begin{exampleblock}[RL Circuit with Multiple Noise Sources]
+Consider an RL circuit where both the external magnetic field and the resistance fluctuate independently. We start with a circuit perturbed by fluctuating external magnetic fields $\Phi_{ext}$ such that $(d/dt)\Phi_{ext}$ is white noise:
 $$
-dx = a(x)dt + b(x) \circ dW_t
+\frac{dI}{dt} = -\frac{R}{L}I + \omega_1\xi_1(t)
 $$
-The corresponding discretized form is:
+
+However, the resistance is not constant; it fluctuates due to thermal agitation, which we model as white noise:
 $$
-x(t+dt) - x(t) = a(x(t))dt + b\left(x\left(t+\frac{dt}{2}\right)\right)dW_t
+R \to R + K\xi_2(t)
 $$
-Although this change in the evaluation point may seem minor, it has significant consequences. The Stratonovich and Itô integrals obey different calculus rules. In particular, while the Itô integral is a martingale, the Stratonovich integral is not. On the other hand, the Stratonovich chain rule matches the familiar rules of ordinary calculus, which often makes it more natural and intuitive for physicists and engineers, especially when modeling systems based on physical laws.
+
+This yields the following model:
+$$
+\frac{dI}{dt} = -\frac{R + K\xi_2(t)}{L}I + \omega_1\xi_1(t)
+$$
+
+Expanding this expression:
+$$
+\frac{dI}{dt} = -\frac{R}{L}I - \frac{K}{L}I\xi_2(t) + \omega_1\xi_1(t)
+$$
+
+In this model, the noise is not only additive but also multiplicative. We have two independent noise sources: $\xi_1(t)$ (additive) from the magnetic field fluctuations and $\xi_2(t)$ (multiplicative) from the resistance fluctuations. The total noise contribution combines both effects according to the rules we have established for multiple independent noises.
+\end{exampleblock}
 
 \newpage
 
-\subsubsection{Connecting the Itô and Stratonovich SDEs}
+\section{Multiplicative Noise}
+
+While additive noise provides a good model for systems perturbed by external forces, many real-world systems feature fluctuations whose intensity depends on the state of the system itself. This leads to the concept of \textbf{multiplicative noise}, which can induce much richer and more complex behaviors than its additive counterpart.
+
+Consider a system governed by a parameter $p$. The simplest case is when it is possible to write the field in the form
+$$
+\dot{x} = b(x) + p \hat{g}(x)
+$$
+that is, with linear dependence on the parameter considered. The parameter $p$ is usually influenced by the external world, so in some cases it is possible for it to become stochastic. We can then describe a stochastic $p$ as
+$$
+p \to p + \alpha \xi(t)
+$$
+Substituting, we obtain
+$$
+\dot{x} = b(x) + p \hat{g}(x) + \hat{g}(x) \alpha \xi(t)
+$$
+We can then group the stochastic terms, obtaining
+$$
+\dot{x} = f(x) + g(x) \xi(t)
+$$
+The \textbf{Fokker-Planck equation} for the general case is:
+$$
+\frac{\partial \rho}{\partial t} = - \frac{\partial}{\partial x} [f(x) \rho] + \frac{\partial^2}{\partial x^2} \left[ \frac{g(x)^2}{2} \rho \right]
+$$
+So far, we have only considered cases where $g(x)$ is constant. Here, however, we are dealing with the most general version of what we have seen so far. The boundary conditions remain the same as before, and as usual, we analyze the stationary case. We have:
+$$
+\frac{d}{dx} \left[ \frac{g(x)^2}{2} P_s(x) \right] = f(x)P_s(x)
+$$
+This is a first-order ODE that can be solved for $P_s(x)$. 
+
+Let's define an auxiliary function $Q(x) = \frac{g(x)^2}{2} P_s(x)$. The equation becomes:
+$$
+\frac{dQ}{dx} = f(x) \frac{2}{g(x)^2} Q(x)
+$$
+This is a standard linear ODE of the form $Q'(x) = a(x)Q(x)$, whose solution is $Q(x) = C e^{A(x)}$, where $A(x) = \int a(s)ds$. Applying this, we find:
+$$
+Q(x) = C \exp\left( \int \frac{2f(s)}{g(s)^2} ds \right)
+$$
+Substituting back $P_s(x) = \frac{2}{g(x)^2}Q(x)$, we arrive at the general solution for the stationary PDF:
+$$
+P_s(x) = \frac{C'}{g(x)^2} \exp\left( \int^x \frac{2f(z)}{g(z)^2} dz \right)
+$$
+where $C'$ is a normalization constant. Let's remark that, being a probability density, the integral of $P_s(x)$ over the entire state space must be equal to one.
+
+We can distinguish two cases:
+\begin{itemize}
+    \item If the integral exists (is finite), then everything is fine and we can calculate $C$ to normalize $P_s(x)$.
+    \item If instead the integral is infinite, we can only find a formal solution that has no physical meaning: in this case it is necessary to study the steady state directly starting from the SDE (\cref{sec:nit}). 
+\end{itemize}
+
+\section{Multiplicative Noise: Noise-Induced Transitions} \label{sec:nit}
+
+In the case of additive noise ($g(x) = \text{const}$), the extrema of the stationary PDF $P_s(x)$ coincide with the equilibria of the deterministic system (where $f(x)=0$). With multiplicative noise, this simple correspondence breaks down. Recalling the following identity:
+$$
+\dfrac 1{g^2(x)} = e^{-\ln g^2(x)} = e^{-2 \ln g(x)}
+$$
+We can rewrite the stationary probability density function in a more transparent exponentialform:
+$$
+P_s(x) = 2 C \exp \left\{
+    - 2 \log (g(x)) + \int_\alpha^x \dfrac{2 f(s)}{g^2(s)} ds
+\right\}
+$$
+This highlights how both the noise amplitude $g(x)$ and the drift $f(x)$ contribute to shaping the stationary distribution. To investigate the location of the extrema of $P_s(x)$, we differentiate with respect to $x$. Applying the chain rule to the exponent, we obtain:
+$$
+P_s'(x) = 2 C \exp \left\{
+    - 2 \dfrac{g'(x)}{g(x)} + \dfrac{2 f(x)}{g^2(x)}
+    \right\}
+$$
+This expression will allow us to determine where the stationary distribution attains its maxima and minima, as these correspond to the points where $P_s'(x) = 0$.
+
+To find the extrema of $P_s(x)$, we must find where its derivative is zero, $P_s'(x)=0$. After some algebraic manipulation of the general solution, this condition simplifies to:
+$$
+f(x) \ge g(x)g'(x)
+$$
+Of course, if $g(x)$ is constant, then $g'(x) = 0$ and the condition reduces to $f(x) \geq 0$. This immediately recovers the familiar property that stable equilibria correspond to modes of the PDF, and unstable equilibria correspond to antimodes.
+
+Instead, the most interesting case is when $g(x)$ is not constant. In this case, the condition $f(x) \ge g(x)g'(x)$ is a non-linear inequality that can have multiple solutions. This means that by simply varying a parameter that controls the noise intensity, new extrema can appear in the PDF that were completely absent in the unperturbed deterministic system. This phenomenon, discovered by Horsthemke and Lefever in the 1970s, is called a \textbf{Noise-Induced Transition (NIT)}.
+
+Before the discovery of NITs, it was commonly believed that noise could only act in two ways:
+\begin{itemize}
+    \item In unimodal systems, it creates a "cloud" of fluctuations around a single deterministic equilibrium.
+    \item In multimodal systems, it can cause "jumps" between the existing deterministic equilibria.
+\end{itemize}
+NITs showed that noise can play a much more constructive role, inducing oscillations and creating entirely new states that are not present in the unperturbed deterministic system.
+
+\begin{observationblock}[Extrema vs. Equilibria]
+    Even if solving
+    $$f(x) = g'(x,q)g(x,q)$$
+    one does find as extrema for the stochastic model as the equilibria for the deterministic system, the extrema of the stationary PDF do not correspond to equilibrium points of the deterministic equation, which solved a different equilibrium equation, namely:
+    $$f(x) = 0$$
+    \end{observationblock}
+
+\begin{exampleblock}[Noise-Induced Bifurcation in Gene Expression]
+Consider a simple model for protein production, where a protein X acts as its own transcription factor. The production rate is $Q(x)$ and the degradation rate is $dx$.
+$$
+\dot{x} = Q(x) - dx
+$$
+A common form for $Q(x)$ that models self-regulation is:
+$$
+Q(x) = R + K\frac{x^2}{K_d + x^2}
+$$
+where $R$ is a basal production rate and the second term is a Hill function describing feedback. The deterministic system is:
+$$
+\dot{x} = \underbrace{R + K\frac{x^2}{K_d + x^2} - dx}_{f(x)}
+$$
+For small degradation rates $d$, this system has a single, globally stable equilibrium point.
+
+Now, suppose the degradation rate $d$ is subject to stochastic fluctuations: $d \to d + \alpha\xi(t)$. The SDE becomes:
+$$
+dx = \left(R + K\frac{x^2}{K_d + x^2} - dx\right)dt - \alpha x dW_t
+$$
+Here, the noise is multiplicative, with $g(x) = -\alpha x$, so $g'(x) = -\alpha$. The condition for the extrema of the stationary PDF, $f(x) \ge g(x)g'(x)$, is:
+$$
+R + K\frac{x^2}{K_d + x^2} - dx \ge (-\alpha x)(-\alpha) = \alpha^2 x
+$$
+Rearranging gives:
+$$
+R + K\frac{x^2}{K_d + x^2} \ge (d + \alpha^2)x
+$$
+Depending on the value of the noise parameter $\alpha$, this algebraic equation can have one or three solutions. This means that by changing the noise intensity, the stationary PDF can transition from being unimodal (with one peak) to bimodal (with two peaks), even though the underlying deterministic system only had one equilibrium point. This is a classic example of a noise-induced transition: the noise itself creates new, stable macroscopic states for the system.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{assets/nit-1.png}
+    \includegraphics[width=0.45\textwidth]{assets/nit-2.png}
+    \caption{Left: Unimodal stationary PDF for null noise intensity $\alpha = 0$. Right: Bimodal stationary PDF emerging for higher noise intensity $\alpha$, demonstrating a noise-induced transition where new stable states appear that are absent in the deterministic system.}
+\end{figure}
+
+\end{exampleblock}
+
+\newpage
+
+\subsection{Perturbation of the Logistic Growth Model}
+Let's revisit the logistic growth model, which serves as another prime example of how multiplicative noise can fundamentally alter a system's behavior. We start with the deterministic logistic equation:
+$$
+\dot{z} = r_1 z - r_2 z^2
+$$
+Through a linear change of variables $x = r_2 z$, we can adimensionalize the equation to a simpler form:
+$$
+\dot{x} = r x - x^2
+$$
+Now, we introduce stochasticity by perturbing the intrinsic growth rate, $r \to r + \omega\xi(t)$. This leads to the corresponding Itô equation with multiplicative noise:
+$$
+dx = (r x - x^2)dt + \omega x dW_t
+$$
+This defines our drift and diffusion coefficients as $f(x) = r x - x^2$ and $g(x) = \omega x$.
+
+The stationary Fokker-Planck equation for this system is:
+$$
+\frac{d}{dx} \left[ \frac{g(x)^2}{2} P_s(x) \right] = f(x)P_s(x)
+$$
+Substituting our specific $f(x)$ and $g(x)$ gives:
+$$
+\frac{d}{dx} \left[ \frac{\omega^2 x^2}{2} P_s(x) \right] = (r x - x^2)P_s(x)
+$$
+
+To solve this differential equation, we can use the substitution method. Let $Q = x^2 P_s$, then:
+$$
+Q' = \frac{2r-x}{\omega^2 x} Q
+$$
+This can be rewritten as:
+$$
+\frac{dQ}{Q} = \frac{2r-x}{\omega^2 x} dx = \left[\frac{2r}{\omega^2 x} - \frac{1}{\omega^2}\right] dx
+$$
+Integrating both sides:
+$$
+\ln Q = \frac{2r}{\omega^2} \ln x - \frac{x}{\omega^2} + C
+$$
+Taking the exponential:
+$$
+Q(x) = A \exp\left[\frac{2r}{\omega^2} \ln x - \frac{x}{\omega^2}\right] = A x^{\frac{2r}{\omega^2}} e^{-\frac{x}{\omega^2}}
+$$
+Since $Q = x^2 P_s$, we obtain:
+$$
+P_s(x) = \frac{Q(x)}{x^2} = A x^{\frac{2r}{\omega^2}-2} e^{-\frac{x}{\omega^2}}
+$$
+where $A$ is a normalization constant.
+
+
+A crucial step is to check whether this candidate solution is a valid, normalizable probability distribution. The integral $\int_0^\infty P_s(x) dx$ must be finite.
+$$
+\int_0^\infty x^{\frac{2r}{\omega^2}-2} e^{-\frac{2}{\omega^2}x} dx
+$$
+This is a form of the Gamma function integral, $\int_0^\infty t^{k-1}e^{-t}dt$. For this integral to converge at the lower bound ($x \to 0$), the exponent of $x$ must be greater than -1.
+$$
+\frac{2r}{\omega^2}-2 > -1 \quad \implies \quad \frac{2r}{\omega^2} > 1 \quad \implies \quad r > \frac{\omega^2}{2}
+$$
+
+This is valid only if $r > \omega^2/2$ as we have already seen in the past. If this does not hold, we cannot integrate but what does this actually mean? To understand this, let's return to the SDE:
+$$
+dx = x(r - x)dt + \omega x dW
+$$
+
+Applying now the transformation $y = \psi(x) = \log x$, then $\psi'(x) = x^{-1}$ and $\psi''(x) = -x^{-2}$. Therefore:
+$$
+dy = \left[\frac{1}{\cancel{x}}x(r - x) - \frac{1}{\cancel{x^2}} \frac{\omega^2 \cancel{x^2}}{2}\right]dt + \omega dW
+$$
+
+Therefore, substituting in $y$:
+$$
+dy = \left[r - \frac{\omega^2}{2} - e^y\right]dt + \omega dW
+$$
+
+Integrating then:
+$$
+y(t) = y_0 + \left(r - \frac{\omega^2}{2}\right)t - \int_0^t e^{y(s)}ds + \omega[W(t) - W(0)]
+$$
+
+Notice that the integral term, $-\int_0^t e^{y(s)}ds$, is always negative (since $e^{y(s)} > 0$ for all $s$). 
+
+\begin{itemize}
+
+    \item \textbf{Case 1:} $r < \omega^2/2$
+
+    If $r < \omega^2/2$, the drift term $\left(r - \frac{\omega^2}{2}\right)t$ is negative and dominates for large $t$, while the stochastic term becomes negligible in comparison. As a result, $y(t) \to -\infty$ as $t \to \infty$, which means $x(t) = e^{y(t)} \to 0^+$. In this regime, the probability distribution $P(x, t)$ collapses to a delta function at zero:
+$$
+    \lim_{t \to \infty} P(x, t) = \delta(x)
+$$
+This shows that, in this case, the Fokker-Planck equation predicts a stationary solution, but in reality, all probability accumulates at extinction ($x=0$). Thus, the Fokker-Planck approach alone can be misleading for this parameter regime.
+
+    \item \textbf{Case 2:} $r > \omega^2/2$
+
+    On the other hand, when $r > \omega^2/2$, the stationary solution is normalizable and given by:
+    $$
+        P_s(x) = A x^{\frac{2r}{\omega^2}-2} e^{-\frac{2}{\omega^2}x}
+    $$
+
+\end{itemize}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            scale=0.9,
+            width=10cm,
+            height=5cm,
+            axis lines=left,
+            xlabel={$x$},
+            ylabel={$P_s(x)$},
+            xmin=0.01, xmax=10,
+            ymin=0, ymax=2.5,
+            legend pos=north east,
+            legend style={draw=none, fill=none, xshift=1.5cm},
+        ]
+        % Case 1: Unimodal PDF (r1 > omega^2)
+        \addplot[domain=0.1:10, samples=100, color=blue, thick, smooth] {x^(2*4/1-2)*exp(-2/1*x)};
+        \addlegendentry{$\omega^2 < r$ (Unimodal)};
+        
+        % Case 2: Decreasing PDF (r1 <= omega^2 < 2r1)
+        \addplot[domain=0.1:10, samples=100, color=red, thick, smooth, dashed] {x^(2*4/16-2)*exp(-2/16*x)};
+        \addlegendentry{$r \le \omega^2 < 2r$ (Decreasing)};
+        
+        % Case 3: Extinction (delta function, illustrative) - invisible plot for legend
+        \addplot[draw=none, color=green!60!black] coordinates {(0,0)};
+        \addlegendentry{$\omega^2 \ge 2r$ (Extinction)};
+        
+        % Case 3: Extinction (delta function, illustrative) - visual representation
+        \draw[->, ultra thick, green!60!black] (0.01,0) -- (0.01,1);
+        \node[green!60!black, right] at (0, 0.5) {$\delta(x)$};
+        
+        \end{axis}
+    \end{tikzpicture}
+    \caption{Noise-Induced Transition in the logistic model.}
+\end{figure}
+
+
+Let us also consider two special cases:
+\begin{itemize}
+    \item If $\omega^2 = 2r$ (i.e., $2r/\omega^2 = 1$), the stationary distribution simplifies to:
+    $$
+        P_s(x) = A x^{-1} e^{-\frac{x}{r}}
+    $$
+    \item If there is no noise, $\omega^2 = 0$, the stationary distribution becomes:
+    $$
+        P_s(x) = A e^{-\frac{x}{r}}
+    $$
+    This change has a significant effect on the shape of the stationary distribution. Specifically, when the parameters satisfy
+    $$
+        \frac{2r}{\omega^2} < 2 \qquad \text{or equivalently} \qquad r < \frac{\omega^2}{2}
+    $$
+    the distribution $P_s(x)$ is no longer unimodal (with a peak at some $x > 0$), but instead becomes a monotonically decreasing function of $x$. In this regime, the probability density is highest near $x=0$ and decreases for larger $x$, so the system is most likely to be found close to $x=0$.
+\end{itemize}
+
+
+Furthermore, it can be shown that the stationary distribution $P_s(x)$ is normalizable (i.e., its total probability integrates to 1) only if $\omega^2 < 2r$. This is consistent with the more general result discussed in the previous section.
+
+\section{The Stratonovich Integral}
+
+The Langevin equation, $\dot{x} = a(x,t) +b(x,t) \xi(t)$, provides an intuitive starting point, but its rigorous interpretation requires us to define the stochastic integral $\int b(x,t)dW_t$. This is best understood by rewriting the SDE in its formal integral form:
+$$
+x(t) = x(0) + \int_0^t a(x(\theta),\theta) d\theta + \int_0^t b(x(\theta),\theta) dW(\theta)
+$$
+As we will see, the very definition of the final term, the stochastic integral, is ambiguous and has led to two major, distinct formulations of stochastic calculus: Itô and Stratonovich.
+
+\subsection{The Ambiguity of the Stochastic Integral}
+
+The integral of a function with respect to a Wiener process, $I = \int_0^t g(X(\theta)) dW(\theta)$, cannot be defined in the ordinary Riemann sense because the path of $W(t)$ is nowhere differentiable and not of bounded variation. Instead, it is defined as the limit of a Riemann-Stieltjes sum over a partition of the interval $[0, t]$. Let us partition $[0, t]$ into $N$ subintervals with points $0 = t_0 < t_1 < \ldots < t_N = t$, and let $J = \max_{i} (t_i - t_{i-1})$ denote the maximum interval length of the partition. For each subinterval, we choose an evaluation point $\tau_i \in [t_{i-1}, t_i]$. The stochastic integral is then defined as the limit (in probability) as $J \to 0$ of the sum:
+$$
+S(J) = \sum_{i=1}^N g(X(\tau_i)) \left[ W(t_i) - W(t_{i-1}) \right]
+$$
+where $S(J)$ is a random variable for each partition.
+
+If $W(t)$ were a deterministic, smooth function, the choice of $\tau_i$ would not matter in the limit $J \to 0$. However, because $W(t)$ is a random process with highly irregular paths, the value of the stochastic integral depends crucially on the choice of $\tau_i$.
+
+To illustrate this, consider the specific case $I = \int_0^t W(\theta) dW(\theta)$. The corresponding sum is:
+$$
+S(J) = \sum_{i=1}^N W(\tau_i) \left[ W(t_i) - W(t_{i-1}) \right]
+$$
+Let us compute the expected value of this sum:
+$$
+\langle S(J) \rangle = \sum_{i=1}^N \langle W(\tau_i) \left[ W(t_i) - W(t_{i-1}) \right] \rangle = \sum_{i=1}^N \left( \langle W(\tau_i) W(t_i) \rangle - \langle W(\tau_i) W(t_{i-1}) \rangle \right)
+$$
+Using the autocorrelation property of the Wiener process, $\langle W(t) W(s) \rangle = \min(t, s)$, and noting that $t_{i-1} \leq \tau_i \leq t_i$, we have:
+$$
+\langle S(J) \rangle = \sum_{i=1}^N \left( \min(\tau_i, t_i) - \min(\tau_i, t_{i-1}) \right) = \sum_{i=1}^N (\tau_i - t_{i-1})
+$$
+Thus, the expected value depends on the choice of $\tau_i$ within each interval. If we parameterize $\tau_i$ as
+$$
+\tau_i = t_{i-1} + \alpha (t_i - t_{i-1}), \qquad \alpha \in [0, 1],
+$$
+and consider a uniform partition where $J = t_i - t_{i-1} = t/N$, then
+$$
+\tau_i - t_{i-1} = \alpha J,
+$$
+
+so
+
+$$
+\langle S(J) \rangle = \sum_{i=1}^N \alpha J = \alpha N \frac tN = \alpha t.
+$$
+Taking the limit as $J \to 0$ (i.e., $N \to \infty$ and $J \to 0$), we see that
+$$
+\langle I \rangle = \lim_{J \to 0} \langle S(J) \rangle = \alpha t.
+$$
+Therefore, the expectation of the stochastic integral depends directly on the convention used for the evaluation point $\alpha$. This ambiguity in the definition of the stochastic integral is fundamental and necessitates a choice of interpretation.
+
+\begin{itemize}
+    \item The \textbf{Itô Integral} convention chooses $\alpha=0$, evaluating the integrand at the start of the interval ($\tau_i = t_{i-1}$). This ensures the integrand is independent of the future noise increment, making the resulting stochastic integral a martingale.
+    \item The \textbf{Stratonovich Integral} convention chooses $\alpha=1/2$, evaluating the integrand at the midpoint of the interval ($\tau_i = (t_{i-1}+t_i)/2$). This choice makes the rules of calculus for the integral resemble ordinary calculus.
+\end{itemize}
+
+\newpage
+
+\subsection{Choosing a Convention: The Wong-Zakai Theorem}
+The choice between Itô and Stratonovich is not merely a mathematical preference; it is a modeling decision. The \textbf{Wong-Zakai theorem} provides crucial guidance.
+
+\begin{definitionblock}[Wong-Zakai Theorem (1965)]
+    Consider an ODE perturbed by "real" noise $\eta_\epsilon(t)$ that is not perfectly white but has a very short correlation time $\epsilon$:
+    $$ \dot{x} = a(x) + b(x)\eta_\epsilon(t) $$
+    As the correlation time of the noise approaches zero ($\epsilon \to 0$), so that $\eta_\epsilon(t)$ converges to a true white noise process, the solution $x(t)$ of the ODE converges to the solution of the \textbf{Stratonovich SDE}, denoted by:
+
+    $$ dx = a(x)dt + b(x) \circ dW_t $$
+\end{definitionblock}
+
+\begin{tipsblock}[When to use which integral?]
+The Wong-Zakai theorem implies that if an SDE is derived as the limit of a physical system driven by noise with a finite (even if very small) correlation time, the Stratonovich interpretation is the more physically appropriate one. The Itô calculus is often preferred in mathematical finance and for problems where the noise is assumed to be idealized white noise from the outset, or for systems with intrinsically discrete state variables (like population counts).
+\end{tipsblock}
+
+\subsection{Connecting the Itô and Stratonovich SDEs}
 We can find a direct relationship between the two formalisms by expanding the midpoint term in the Stratonovich definition.
 First, we approximate the state at the midpoint:
 $$
@@ -715,7 +1093,6 @@ $$
 $$
 
 Substituting the expanded form, we get:
-
 $$
 \frac{\partial \rho}{\partial t} = - \left( \frac{\partial^2 (b^2)}{\partial x^2} \rho + \frac{\partial (b^2)}{\partial x} \frac{\partial \rho}{\partial x} \right) + \left( \frac{\partial^2 (b^2)}{\partial x^2} \rho + 2 \frac{\partial (b^2)}{\partial x} \frac{\partial \rho}{\partial x} + b^2 \frac{\partial^2 \rho}{\partial x^2} \right)
 $$
