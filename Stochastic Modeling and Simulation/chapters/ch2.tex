@@ -69,7 +69,7 @@ $$
 \dot{x} = f(x) + \xi(t)
 $$
 
-This is the famous \textbf{Langevin equation}. It represents a fundamental shift in how we think about physical systems—moving from purely deterministic descriptions to ones that embrace randomness. The equation captures the idea that what we observe as smooth, deterministic forces are often just the averaged effects of chaotic microscopic processes.
+This is the famous \textbf{Langevin equation}. It represents a fundamental shift in how we think about physical systems, moving from purely deterministic descriptions to ones that embrace randomness. The equation captures the idea that what we observe as smooth, deterministic forces are often just the averaged effects of chaotic microscopic processes.
 
 \begin{exampleblock}[Noise in a RLC circuit]
 In the previous example of the RLC circuit
@@ -294,11 +294,10 @@ The inner integral with respect to $\theta$ is 1 if $s$ is within the interval $
 $$
 \langle x(t)x(q) \rangle = 
 \begin{cases}
-    \omega^2 (t - q) & \text{if } t > q\\
-    \omega^2 (q - t) & \text{if } t < q
+    \omega^2 q & \text{if } t > q\\
+    \omega^2 t & \text{if } t < q
 \end{cases} 
-\quad = \quad 
-\omega^2 |t - q|
+\quad
 $$
 We can combine these cases into a single elegant expression:
 $$
@@ -469,3 +468,89 @@ $$
 $$
 This means that for any large $M$, as we make the time interval smaller, it becomes a near certainty that the slope of the secant line will exceed $M$. This confirms that the path of a Wiener process is not differentiable at any point.
 
+\section{Stochastic Numerical Methods}
+
+The non-differentiability of the Wiener process path fundamentally breaks the foundation of classical calculus, rendering traditional analytical techniques inadequate for stochastic differential equations. This mathematical obstacle necessitates the development of an entirely new framework: \textbf{stochastic calculus}, with its own integration theory and differentiation rules.
+
+\vspace{-0.7em}
+
+\subsection{The Differential Form of SDEs: Itô Equation}
+
+Let's reconsider Newton's second law. In its most common form, it is written as $F=ma$. However, its more fundamental statement relates force to the change in momentum $p=mv$, expressed in differential form as:
+
+$$
+dp = F dt
+$$
+
+This form is more general. For instance, consider the motion of a rocket, whose mass $m(t)$ changes as it consumes fuel. In this case, $F=ma$ is incorrect. The correct formulation is:
+
+$$
+d(m(t)v(t)) = F dt
+$$
+
+This differential way of writing physical laws is powerful and provides the foundation for correctly interpreting stochastic equations. A Langevin equation written as $\dot{x} = f(x,t) + g(x,t)\xi(t)$ is mathematically problematic. The rigorous approach is to express it in its differential form using the Wiener process increment $dW_t$, which represents the integral of the white noise $\xi(t)$:
+
+$$
+dx = f(x,t)dt + g(x,t)dW_t
+$$
+
+This is a \textbf{Stochastic Differential Equation (SDE)}. Its solution is understood in an integral sense:
+
+$$
+x(t) = x_0 + \int_0^t f(x(\tau), \tau)d\tau + \int_0^t g(x(\tau), \tau)dW_\tau
+$$
+
+The second integral is a stochastic integral, an object whose properties are fundamentally different from the standard Riemann integral. The infinitesimal increment $dW_t$ is defined as $dW_t = W(t+dt) - W(t)$. As we have established, it is a Gaussian random variable with mean 0 and variance $dt$, so $dW_t \sim \mathcal{N}(0, dt)$. This can be expressed as:
+
+$$
+dW_t = G(t)\sqrt{dt}
+$$
+
+where $G(t)$ is a random variable drawn from the standard normal distribution, $\mathcal{N}(0,1)$.
+
+The stochastic integral $\int_0^t g(x(\tau), \tau)dW_\tau$ represents the cumulative effect of the random forcing over time. Unlike deterministic integrals, this integral cannot be evaluated using traditional calculus rules due to the irregular nature of the Wiener process paths. The integral must be understood in the sense of Itô or Stratonovich, with Itô integration being the more commonly used convention in stochastic differential equations.
+
+\begin{definitionblock}[Itô Equation]
+Given an SLAE, we can always rewrite it as an \textbf{Itô equation}, by defining $dW = G(t)\sqrt{dt}$:
+
+$$
+dx = f(x)dt + g(x)dW
+$$
+
+\end{definitionblock}
+
+\newpage
+
+\subsection{The Euler-Maruyama Method}
+
+The Itô equation can be solved numerically using the Maruyama algorithm for stochastic differential equations. This is essentially the stochastic version of Euler's algorithm. Given a time interval $[0, T]$ and $h = T/N$, so that $t = jh$ for $j = 0, \ldots, N$. Suppose the Euler algorithm is:
+
+$$
+dx = x(t_j + h) - x(t_j) = x(t_{j+1}) - x(t_j)
+$$
+
+we can set $dt \approx h$ and write:
+
+$$
+x(t_{j+1}) = x(t_j) + f(x(t_j))h
+$$
+
+The Maruyama formula starts from this form by also considering the Gaussian effect, adding:
+
+$$
+x(t_{j+1}) = x(t_j) + f(x(t_j))h + G_j\sqrt{h}
+$$
+
+with $G_j \sim \mathcal{N}(0,1)$. Obviously, starting from this algorithm, more precise variants have been successively created.
+
+\begin{definitionblock}[The Euler-Maruyama Method]
+For the stochastic differential equation $dX_t = a(X_t, t)dt + b(X_t, t)dW_t$ with initial condition $X(0) = x_0$ and uniform time step $h$, the Euler-Maruyama approximation is given by:
+
+$$
+X_{j+1} = X_j + a(X_j, t_j)h + b(X_j, t_j)\sqrt{h}G_j
+$$
+
+where $t_j = jh$ and $\{G_j\}_{j=0}^{N-1}$ is a sequence of independent standard normal random variables.
+\end{definitionblock}
+
+This numerical scheme provides a practical foundation for simulating stochastic processes, though more sophisticated methods have been developed to improve accuracy and stability for specific applications.

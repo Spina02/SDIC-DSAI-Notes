@@ -115,6 +115,215 @@ In this case, $x_{se}=0$ is a trivial SEP, as both $f(0)=r_0 \cdot 0$ and $g(0)=
 \end{itemize}
 This analysis extends to the \textbf{perturbed logistic model}, $dx = (r_0x - \alpha x^2)dt + \omega x dW_t$, where $x_{se}=0$ is also a SEP. The condition $\omega^2/2 > r_0$ remains sufficient for the global attractivity of the origin.
 
+
+\section{Basic Applications of SDEs}
+
+\subsection{The Stochastic Malthusian Model and its Paradox}
+
+The simplest model of population growth is the Malthusian model, which assumes an unlimited environment and a constant per capita growth rate, $r$. The dynamics are described by the ODE:
+\vspace{0.4em}
+$$
+\dot{x} = rx
+$$
+where $x(t)$ represents the population size. The solution is simple exponential growth or decay, $x(t) = x(0)e^{rt}$. A more realistic model acknowledges that the growth rate is not constant but fluctuates randomly due to environmental variations. We can model this by making the growth rate a stochastic process, $r \to r + \omega\xi(t)$. This leads to the \bfit{stochastic Malthusian model}, an SDE with multiplicative noise:
+$$
+dx = (r + \omega\xi(t)) x
+$$
+where $\omega$ denotes the multiplicative noise amplitude. We can obtain the Ito formula:
+$$
+dx = rx\dd t + \omega x \dd W
+$$
+The solution of this stochastic equation can be obtained by applying Itô's formula. Setting $y = \ln x$, we find the drift and diffusion coefficients for the transformed process. Using Itô's rule:
+\small
+$$
+dy = \left[ \frac{1}{x}rx - \frac{1}{2x^2}\omega^2 x^2 \right] \dd t + \dfrac 1x \omega x \dd W
+\quad \xrightarrow{\text{simplifying}} \quad
+dy = \left[r - \frac{\omega^2}{2}\right]dt + \omega dW
+$$
+\normalsize
+This simplifies to a linear SDE which can be solved directly. Integrating from 0 to $t$:
+$$
+y(t) = y_0 + \left(r - \frac{\omega^2}{2}\right)t + \omega W(t)
+$$
+Supposing $W_0 = 0$, we can calculate the moments of $y(t)$:
+$$
+\langle y(t) \rangle = \langle y_0 \rangle + \left(r - \frac{\omega^2}{2}\right)t
+$$
+Therefore, if we have $\omega^2/2 > r$, then $y(t) \to -\infty$. We notice that, intuitively considering what $y(t)$ represents, if $\omega$ is large the population will tend to extinction regardless of $r$. In other words, a population highly subject to events, whether negative or positive, will tend to extinction.
+
+We can then find the second moment of $y(t)$:
+\small
+$$
+    \langle y(t)^2 \rangle = \left\langle \left[ y_0 + \left(r - \frac{\omega^2}{2}\right)t \right]^2 + 2\omega \left[ y_0 + \left(r - \frac{\omega^2}{2}\right)t \right] W(t) + \omega^2 W(t)^2 \right\rangle
+$$
+\normalsize
+which, upon solving, becomes:
+\vspace{-0.4em}
+$$
+    ... = \left[ y_0 + \left(r-\frac{\omega^2}{2}\right)t \right]^2 + \omega^2 t
+$$
+Assuming for convenience that $y_0$ is deterministic, then we have that the variance of $y(t)$ is:
+$$
+    \text{Var}[y(t)] = \langle y(t)^2 \rangle - \langle y(t) \rangle^2 = \omega^2 t
+$$
+Again, we can note that the variance tends to diverge over time. Returning now to $x(t)$, we have:
+$$
+    x(t) = e^{y(t)} = e^{y_0 + \left(r-\frac{\omega^2}{2}\right)t} e^{\omega W(t)}
+=
+    x(t) = x_0 e^{\left(r-\frac{\omega^2}{2}\right)t} e^{\omega W(t)}
+$$
+Then its mean value will be:
+$$
+    \langle x(t) \rangle = x_0 e^{\left(r-\frac{\omega^2}{2}\right)t} \langle e^{\omega W(t)} \rangle
+$$
+
+So, we must compute the mean of $\exp(\omega W(t))$. We know that $W(t)$ is distributed with the distribution:
+$$
+W(t) \sim N(0, t) = \frac{1}{\sqrt{2\pi t}} e^{-\frac{W^2}{2t}}
+$$
+so, to calculate the mean, we must compute:
+$$
+    \int_{-\infty}^{+\infty} \frac{1}{\sqrt{2\pi t}} e^{\omega W} e^{-\frac{W^2}{2t}} dW
+$$
+We can then combine the two exponentials and rewrite the resulting exponent as:
+\large
+$$
+    e^{\frac{-W^2+2t\omega W -t^2\omega^2+t^2\omega^2}{2t}} = e^{-\frac{(W-t\omega)^2}{2t}} e^{\frac{\omega^2 t}{2}}
+$$
+\normalsize
+As a consequence, the integral rewritten this way becomes:
+$$
+    ... = e^{\frac{\omega^2 t}{2}} \int_{-\infty}^{+\infty} \frac{1}{\sqrt{2\pi t}} e^{-\frac{(W-t\omega)^2}{2t}} dW
+$$
+This, however, is the integral of a translated Gaussian which is trivially equal to 1. Therefore:
+\large
+$$
+    \langle e^{\omega W(t)} \rangle = e^{\frac{\omega^2 t}{2}}
+$$
+\normalsize
+\vspace{-0.6em}
+Thus,
+\vspace{-0.3em}
+\large
+$$
+    \langle x(t) \rangle = \langle x_0 \rangle e^{\left(rt - \frac{\omega^2 t}{2}\right) + \frac{\omega^2 t}{2}} = \langle x_0 \rangle e^{rt}
+$$
+\normalsize
+In the Langevin hypothesis, it was the fact that the non-stochastic differential equation was nothing other than the differential equation of the mean, and here we find this result. Indeed, the two terms subtract, giving as a solution the solution of the non-stochastic case.
+
+\subsubsection{The Paradox}
+
+However, something strange emerges when we examine the long-term behavior. Returning to the definition of $y(t)$, we can rewrite it as:
+$$
+    y(t) = y_0 + \left(r - \frac{\omega^2}{2}\right)t + \omega\sqrt{t}G
+$$
+As $t \to \infty$, the deterministic term $\left(r - \frac{\omega^2}{2}\right)t$ dominates, so:
+$$
+    \lim_{t\to+\infty} y(t) = \begin{cases}
+        -\infty & \text{if } r < \frac{\omega^2}{2} \\
+        +\infty & \text{if } r > \frac{\omega^2}{2}
+    \end{cases}
+$$
+Since $x(t) = e^{y(t)}$, when $y(t) \to -\infty$, we have $x(t) \to 0$. This creates an apparent paradox: we showed that $\langle x(t) \rangle = x_0 e^{rt}$, which always grows exponentially regardless of $\omega$, yet individual realizations $x(t)$ can tend to extinction when the noise is sufficiently large ($\omega^2/2 > r$).
+
+The resolution lies in understanding the nature of the log-normal distribution. When $x(t) = e^{y(t)}$ where $y(t)$ is normally distributed, $x(t)$ follows a log-normal distribution, which is highly skewed. The mean and median can differ dramatically in such distributions.
+
+\begin{exampleblock}[The Exponential Distribution]
+Consider the simple exponential distribution with density $ae^{-aU}$. Its mean is $\langle U \rangle = 1/a$, but its median satisfies:
+$$
+    \int_0^{\text{MED}} ae^{-aU} dU = \frac{1}{2}
+$$
+which gives $\text{MED} = \log(2)/a < 1/a$. The median is smaller than the mean because the distribution has a long tail that pulls the mean upward.
+\end{exampleblock}
+
+Similarly, in our stochastic population model, $x(t)$ has a log-normal distribution. While the mean grows exponentially due to rare but extremely large population bursts, the typical behavior (represented by the median) can show decline when noise is large. The mean becomes dominated by infrequent but massive population explosions, making it a poor representative of typical outcomes.
+
+\subsubsection{Calculation of the Median}
+
+To quantify the typical behavior of the population, we need to calculate the median of $x(t)$. Since $y(t) \sim \mathcal{N}(\mu, \omega^2)$ where $\mu = y_0 + (r - \omega^2/2)t$ and the variance parameter is $\omega^2 t$, the random variable $x(t) = e^{y(t)}$ follows a log-normal distribution with probability density function:
+$$
+f_X(x) = \frac{1}{\sqrt{2\pi}\omega\sqrt{t} \cdot x} \exp\left(-\frac{(\log x - \mu)^2}{2\omega^2 t}\right), \quad x > 0
+$$
+
+The median $m$ is defined as the value satisfying $P(X \leq m) = 1/2$, which gives us the integral equation:
+$$
+\frac{1}{2} = \int_{0}^{m} \frac{1}{\sqrt{2\pi}\omega\sqrt{t} \cdot x} \exp\left(-\frac{(\log x - \mu)^2}{2\omega^2 t}\right) dx
+$$
+
+To solve this integral, we employ the substitution $w = \log x$, which transforms $dx = e^w dw = x \, dw$. The limits of integration become $w \in (-\infty, \log m]$, and our integral becomes:
+$$
+\frac{1}{2} = \int_{-\infty}^{\log m} \frac{1}{\sqrt{2\pi}\omega\sqrt{t}} \exp\left(-\frac{(w - \mu)^2}{2\omega^2 t}\right) dw
+$$
+
+This is precisely the cumulative distribution function of a normal random variable $\mathcal{N}(\mu, \omega^2 t)$ evaluated at $\log m$. Since the median of any normal distribution equals its mean, we have:
+$$
+\log m = \mu = y_0 + \left(r - \frac{\omega^2}{2}\right)t
+$$
+
+Therefore, the median of $x(t)$ is:
+$$
+\text{MED}[x(t)] = e^{\mu} = e^{y_0 + \left(r - \frac{\omega^2}{2}\right)t} = x_0 e^{\left(r - \frac{\omega^2}{2}\right)t}
+$$
+
+This result elegantly resolves the paradox. While the mean $\langle x(t) \rangle = x_0 e^{rt}$ always grows exponentially, the median, which better represents typical population trajectories, follows the drift-corrected dynamics. The long-term behavior of the median is:
+$$
+\lim_{t\to+\infty} \text{MED}[x(t)] = \begin{cases}
+    0 & \text{if } r < \frac{\omega^2}{2} \quad \text{(extinction regime)} \\
+    x_0 & \text{if } r = \frac{\omega^2}{2} \quad \text{(critical regime)} \\
+    +\infty & \text{if } r > \frac{\omega^2}{2} \quad \text{(growth regime)}
+\end{cases}
+$$
+
+The threshold $r = \omega^2/2$ represents a critical noise level: below this threshold, typical populations grow indefinitely, while above it, typical populations face extinction despite the exponentially growing mean. This dichotomy between mean and median behavior is a hallmark of log-normal processes and highlights the importance of choosing appropriate summary statistics for highly skewed distributions.
+
+\subsection{The Perturbed Logistic Equation}
+
+We have discussed the fact that the Malthus model is not realistic because it assumes infinite resources. A much better model for population dynamics is the \textbf{Logistic model}, which incorporates a density-dependent growth rate. The deterministic logistic model can be written as follows:
+$$
+\dot{x} = r(x)x
+$$
+where $r(x)$ is a decreasing function of the population size $x$. The simplest choice for this function is linear:
+$$
+r(x) = r_0 - \alpha x
+$$
+Here, $r_0$ is the intrinsic growth rate at low densities, and $\alpha$ is a coefficient representing the strength of density-dependent regulation (e.g., competition for resources).
+
+\subsubsection{Introducing Stochasticity}
+In a realistic scenario, the intrinsic growth rate $r_0$ is not constant but fluctuates due to environmental variability. We can model its fast fluctuations as:
+$$
+r_0 \to r_0 + \omega\xi(t)
+$$
+where $\xi(t)$ is Gaussian white noise. This transforms the deterministic ODE into the stochastically perturbed logistic model:
+$$
+dx = (r_0 - \alpha x)x\,dt + \omega x\,dW_t
+$$
+To analyze this equation, we can again use the logarithmic transformation $y = \ln(x)$. Applying Itô's formula yields:
+$$
+dy = \left( r_0 - \frac{\omega^2}{2} - \alpha e^y \right) dt + \omega dW
+$$
+This transformed SDE can be formally integrated to give:
+$$
+y(t) = y(0) + \left( r_0 - \frac{\omega^2}{2} \right) t + \omega W(t) - \alpha \int_0^t e^{y(s)} ds
+$$
+We can now analyze the long-term behavior of the system. We know two key facts:
+\begin{enumerate}
+    \item If $\omega^2 > 2r_0$, then the non-integral part will tend to $-\infty$ as $t \to \infty$.
+    \item The integral of the exponential is always positive since $x = e^y$ must be positive.
+\end{enumerate}
+
+\vspace{0.5em}
+
+Slightly more precisely, the fact that $\int_0^t e^{y(s)}ds > 0$ gives us an upper bound on the process $y(t)$:
+$$
+y(t) \le y(0) + \left( r_0 - \frac{\omega^2}{2} \right) t + \omega W(t)
+$$
+This leads us to a \textbf{sufficient condition} for population extinction. If the right-hand side of the inequality goes to $-\infty$, then $y(t)$ must also go to $-\infty$. This happens when the drift of the bounding process is negative. Thus, the condition for extinction is:
+$$
+\frac{\omega^2}{2} > r_0 \quad \implies \quad \lim_{t\to\infty} x(t) = 0
+$$
+This powerful result shows that if the environmental noise is sufficiently strong, the population will go extinct regardless of the density-dependent term. The noise effectively suppresses the intrinsic growth.
+
+
 \section{The Fokker-Planck Equation}
 
 While Ito's Lemma allows us to find the SDE for a transformed variable, its most powerful application is in deriving a deterministic equation for the evolution of the probability density function (PDF), $\rho(x,t)$. This bridge from the stochastic world of individual paths to the deterministic world of distributions is the celebrated \textbf{Fokker-Planck equation}.
@@ -433,7 +642,7 @@ The Fokker-Planck equation can also be interpreted from a different, physically 
 
 \small
 $$
-\partial_t P = \partial_x \left[ -a(x)P(x,t) - \partial_x \left( \frac{b(x)^2}{2}P(x,t) \right) \right]
+\partial_t P = - \partial_x  \underbrace{\left[a(x)P(x,t) + \partial_x \left( \frac{b(x)^2}{2}P(x,t) \right) \right]}_{Probability\ current}
 $$
 \normalsize
 If we factor out the outer derivative and define the expression inside the brackets as $J$, we obtain:
@@ -449,9 +658,11 @@ where $\eta$ is the probability density and $J$ is the probability current (or f
 This formulation highlights that the probability behaves like a conserved "fluid". The change in its distribution is nothing more than a redistribution, so the total amount does not change.
 
 In one dimension, the continuity equation is a direct reduction of the multi-dimensional case. For example, in the case of pure Brownian motion (diffusion), the probability current takes the form:
+\small
 $$
 J = -K \nabla P
 $$
+\normalsize
 where $K$ is the diffusion coefficient. Here, $J$ describes the net flow of probability due to diffusion, always moving from regions of high to low probability density. For this reason, $J$ is often referred to as the \textbf{probability current}.
 
 \begin{exampleblock}[Particle density]
@@ -477,11 +688,7 @@ where $K$ is the diffusion coefficient. Here, $J$ describes the net flow of prob
     \rho(x,t) = \frac{n(x,t)}{N}
     $$
 
-    \vspace{0.5em}
-
     \textbf{Evolution of $\mathbf{n(x,t)}$}
-
-    \vspace{0.5em}
 
     Consider now an infinitesimal interval $[x, x+dx]$, and let $Q_x = N_{[x, x+dx]}$ be the number of particles in it.
     Since each particle evolves according to $\dot x = f(x)$, the velocity at position $x$ is:
@@ -550,19 +757,19 @@ where $K$ is the diffusion coefficient. Here, $J$ describes the net flow of prob
 
     This leads to the continuity equation:
     $$
-    \partial_t n = -\partial_x J \qquad \Rightarrow \qquad \partial_t n + \partial_x J = 0
-    \qquad \xrightarrow{\text{in } \mathbb{R}^2} \qquad \partial_t n + \text{div}\, J = 0
+    \partial_t \eta = -\partial_x J \qquad \Rightarrow \qquad \partial_t \eta + \partial_x J = 0
+    \qquad \xrightarrow{\text{in } \mathbb{R}^2} \qquad \partial_t \eta + \text{div}\, J = 0
     $$
 
     The FP equation can also be interpreted as describing the evolution of the spatial density of a large amount of particles, each subject to a white noise force and an initial density $\theta(x)$:
     $$
-    \partial_t n(x,t) = -\partial_x\big(f(x)\,n(x,t)\big) + \partial_{xx}^2\left(\frac{g^2(x)}{2}\,n(x,t)\right)
+    \partial_t \eta(x,t) = -\partial_x\big(f(x)\,\eta(x,t)\big) + \partial_{xx}^2\left(\frac{g^2(x)}{2}\,\eta(x,t)\right)
     $$
-    where $n$ is normalized so that $\int_{\mathbb{R}} n(x,t)\,dx = N = \int_{\mathbb{R}} \theta(x)\,dx$.
+    where $\eta$ is normalized so that $\int_{\mathbb{R}} \eta(x,t)\,dx = N = \int_{\mathbb{R}} \theta(x)\,dx$.
 
     If each particle evolves according to $\dot{x} = f(x) + g(x)\,\xi(t)$, the particle current is:
     $$
-    J = f(x)\,n(x,t) - \partial_x\left(\frac{g^2(x)}{2}\,n(x,t)\right)
+    J = f(x)\,\eta(x,t) - \partial_x\left(\frac{g^2(x)}{2}\,\eta(x,t)\right)
     $$
 
     The analogous expression for the \bfit{probability current} (using normalized density $\rho(x,t)$) is:
@@ -707,10 +914,10 @@ where $C'$ is a normalization constant. Let's remark that, being a probability d
 We can distinguish two cases:
 \begin{itemize}
     \item If the integral exists (is finite), then everything is fine and we can calculate $C$ to normalize $P_s(x)$.
-    \item If instead the integral is infinite, we can only find a formal solution that has no physical meaning: in this case it is necessary to study the steady state directly starting from the SDE (\cref{sec:nit}). 
+    \item If instead the integral is infinite, we can only find a formal solution that has no physical meaning: in this case it is necessary to study the steady state directly starting from the SDE. 
 \end{itemize}
 
-\section{Multiplicative Noise: Noise-Induced Transitions} \label{sec:nit}
+\subsection{Noise-Induced Transitions} \label{sec:nit}
 
 In the case of additive noise ($g(x) = \text{const}$), the extrema of the stationary PDF $P_s(x)$ coincide with the equilibria of the deterministic system (where $f(x)=0$). With multiplicative noise, this simple correspondence breaks down. Recalling the following identity:
 $$
