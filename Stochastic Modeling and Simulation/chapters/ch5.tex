@@ -616,146 +616,75 @@ $$
 
 This makes it particularly useful for modeling bounded fluctuations with controllable correlation time through the parameter $q$.
 
-\subsubsection{$2^{nd}$ Recipe}
+\subsubsection{$2^{nd}$ Recipe: Doering-Cai-Lin Noise}
 
-The following family of SDEs:
+An alternative approach to generating bounded noises is through carefully designed stochastic differential equations. Consider the following family of SDEs:
 $$
 \begin{cases}
-\dot{y}(t) = f(y) + g(y)\xi(t)\\
-g(\pm 1) = 0\\
-f(1) < 0 \qquad f(-1) > 0\\
-f(-y) = -f(y) \qquad g(y) > 0
+\dot{y}(t) = f(y) + g(y)\xi(t) & \text{(SDE with bounded support)}\\
+g(\pm 1) = 0 & \text{(zero diffusion at boundaries)}\\
+f(1) < 0 \qquad f(-1) > 0 & \text{(inward drift at boundaries)}\\
+f(-y) = -f(y) & \text{(antisymmetric drift)}\\
+g(y) > 0 \text{ for } y \in (-1,1) & \text{(positive diffusion in interior)}
 \end{cases}
 $$
-defines a family of bounded noises. Indeed suppose that a time $\bar{t}$ it is $y(\bar{t}) = 1$ then
+
+This family defines a class of bounded noises through a clever choice of drift and diffusion coefficients. The key insight is that the boundary conditions and sign constraints ensure confinement within the interval $[-1,1]$. To see why this works, suppose that at some time $\bar{t}$ we have $y(\bar{t}) = 1$. Then the drift at the boundary becomes:
 $$
 \dot{y}|_{y=1} = f(1) < 0 \qquad \dot{y}|_{y=-1} = f(-1) > 0
 $$
-This implies
+
+These conditions ensure that the system is always pushed away from the boundaries and back toward the interior. This guarantees that:
 $$
 y(t) \in [-1,1] \Rightarrow y(t) \in [-1,1].
 $$
 
-The case
+A particularly useful member of this family is obtained by choosing:
 $$
 f(y) = -\frac{y}{\tau} \qquad g(y) = \sqrt{\frac{\delta + 1}{\tau}}\sqrt{1 - y^2}
 $$
-with $\delta > -1$ defines a family of bounded noises called the Doering-Cai-Lin noise, whose stationary distribution is
+
+where $\delta > -1$. This specific choice defines the Doering-Cai-Lin noise, which has the remarkable property that its stationary distribution can be calculated analytically:
 $$
 P_s(y) = A(1 - y^2)^{\delta}
 $$
-Thus, if $\delta < 0$ then the stationary PDF is 'horn-shaped' bimodal and if $\delta > 0$ is unimodal.
+
+The parameter $\delta$ controls the shape of the distribution in an intuitive way: if $\delta < 0$, then the stationary PDF exhibits a 'horn-shaped' bimodal structure, while if $\delta > 0$, it becomes unimodal.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.3\textwidth]{assets/doering-cai-lin.png}
+    \includegraphics[width=0.4\textwidth]{assets/doering-cai-lin.png}
     \caption{Doering-Cai-Lin noise for different values of $\delta$.}
 \end{figure}
 
-\subsubsection{$3^{rd}$ Recipe}
+\subsubsection{$3^{rd}$ Recipe: Infinite Potential Well}
 
-Let us consider a material point of mass $m = 1$ that moves in 1D under the action of three forces: a damping $F_d = -\gamma v$, a stochastic force $\omega \xi(t)$ and a force $F(y) = -U'(y)$ such that
+The third method for generating bounded noise draws inspiration from classical mechanics and the physics of confined motion. We consider a material point of unit mass ($m = 1$) moving in one dimension under the combined action of three distinct forces: a velocity-dependent damping force $F_d = -\gamma v$, a stochastic driving force $\omega \xi(t)$, and a confining force $F(y) = -U'(y)$ derived from a potential $U(y)$.
+
+The crucial feature of this approach is that the confining potential becomes infinite at the boundaries, creating an impenetrable barrier. Specifically, we require:
 $$
 \lim_{x \to -1^+} F(x) = + \infty \qquad \lim_{x \to +1^-} F(x) = - \infty
 $$
 
-And such that
+along with the potential condition:
 $$
 \lim_{x \to -1^+} U(x) = + \infty
 $$
 
-It follows that the point motion
+Under these conditions, the equation of motion becomes:
 $$
 \dot v = -\gamma v + F(y) + \omega \xi(t)
 $$
-is constrained by a infinite potential well so that:
+
+The infinite potential walls ensure that once a particle starts within the interval, it remains forever confined there:
 $$
 y(0) \in (-1, 1) \Rightarrow y(t) \in (-1, 1)
 $$
+
+This mechanical perspective provides both physical intuition and mathematical rigor for understanding how bounded fluctuations can emerge from unbounded driving forces.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{assets/bounded.png}
     \caption{Infinite potential well.}
 \end{figure}
-
-
-% \subsection{Important Considerations and Paradoxes}
-
-% \subsubsection{The Malthusian Growth Exception}
-
-% \begin{warningblock}[Attention!]
-% If a parameter can be negative, then there is no problem in using unbounded noises.
-
-% \textbf{Example: the Malthusian growth}
-% $$
-% \dot{x} = rx
-% $$
-% The net birth rate $r$ is in reality the result of the difference:
-% $$
-% r = b - m
-% $$
-% If both fluctuate, the number of deaths per time unit can be larger than the number of births per time unit!
-
-% No problems! So we can safely set:
-% $$
-% r + \omega\xi(t)
-% $$
-% \end{warningblock}
-
-% This shows that the need for bounded noise depends critically on the physical interpretation and constraints of the parameters in question.
-
-% \subsubsection{The Tumor Therapy Paradox}
-
-% Consider a model of tumor under constant continuous therapy:
-% $$
-% \dot{x} = f(x)x - \theta x
-% $$
-% where $\theta$ represents the therapy intensity. Perfect constant therapy does not exist due to fluctuations:
-% $$
-% \dot{x} = f(x)x - \theta(1 + \omega\xi(t))x
-% $$
-
-% In Ito form:
-% $$
-% dx = f(x)xdt - \theta(dt + \omega dW)x
-% $$
-
-% \textbf{PARADOX:} Cells killed per time unit are represented by:
-% $$
-% \theta(dt + \omega dW)x
-% $$
-
-% However, according to d'Onofrio (2008):
-% $$
-% \text{Prob}(dt + \omega dW < 0) > 0
-% $$
-
-% This model allows adding tumor cells to the patient! This is clearly unphysical and demonstrates the need for bounded noise in therapy models.
-
-% \subsubsection{Numerical Considerations}
-
-% This is not a rare event. Indeed, let us simulate:
-% $$
-% h + \omega G(t_i)\sqrt{h}
-% $$
-% Very frequently:
-% $$
-% h < \omega|G(t_i)|\sqrt{h}
-% $$
-% because:
-% $$r
-% h < 1 \Rightarrow h < \sqrt{h}
-% $$
-
-% When using small time steps $h$ in numerical simulations, the stochastic term $\omega G(t_i)\sqrt{h}$ can easily dominate the deterministic term $h$, leading to negative increments even when they should be positive. This numerical artifact further emphasizes the practical importance of using bounded noise processes.
-
-% \subsubsection{Another Subtle Problem}
-
-% Another more subtle problem: the quantity:
-% $$
-% dt + \omega dW
-% $$
-% can easily become excessively large, which is not correct (d'Onofrio, 2008).
-
-% Even when the noise doesn't change the sign of a parameter, it can create unrealistically large values that violate physical bounds or make the system unstable. This reinforces the need for properly bounded stochastic processes in realistic models.
