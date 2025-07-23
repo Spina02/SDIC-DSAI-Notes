@@ -1,0 +1,202 @@
+\chapter{Multi-Objective Optimisation}
+
+\section{Introduction to Multi-Objective Optimisation}
+
+Many real-world problems require the simultaneous optimization of multiple objectives, which are often conflicting. This is the domain of \bfit{multi-objective optimization}. Unlike classic global optimization, which focuses on a single objective (e.g., minimize a cost function $f: X \to \mathbb{R}$), here we must consider several fitness functions at once.
+
+\subsubsection{Single vs Multi-Objective Problems}
+
+In single-objective optimization, the goal is to optimize a single criterion. However, in practice, we often face problems with multiple objectives, such as:
+\begin{itemize}
+    \item Minimizing cost while maximizing performance
+    \item Minimizing weight while maximizing strength
+    \item Finding the fastest and cheapest route
+\end{itemize}
+
+These objectives can be \textbf{conflicting}. For example, optimizing for cost may worsen performance, and vice versa. A trivial combination of fitness values (e.g., weighted sum) often leads to overfitting a subset of criteria and does not capture the trade-offs between objectives. As a result, there may be many optimal (and perfectly valid) solutions, known as \bfit{dominating solutions}.
+
+\subsubsection{Wrong Approaches}
+
+\begin{itemize}
+\item \textbf{Objective Weighting}
+A common but flawed approach is to combine objectives into a single function using weights:
+\[
+f(x) = \sum_{i=1}^k w_i f_i(x) \qquad \text{where} \quad 0 \leq w_i \leq 1, \quad \sum_{i=1}^k w_i = 1
+\]
+However, choosing the weights is non-trivial, and this method still converges to a particular point on the Pareto set, not the whole front.
+
+\item \textbf{Distance Function Method}
+Another approach is to use a distance function to a vector of optimal fitness values $y$:
+\[
+f(x) = \left( \sum_{i=1}^k |f_i(x) - y_i|^r \right)^{1/r}
+\]
+with $r > 0$ (usually $r=2$). However, the vector $y$ may be unknown, and this method also tends to converge to a single solution, strongly influenced by the choice of $y$.
+
+\item \textbf{Vector Evaluated Genetic Algorithm (VEGA)}
+This method performs multiple rounds of selection, one for each objective. The new population is made of individuals selected using different objectives. However, this can lead to speciation: the population divides into sub-populations, each good for only one objective.
+
+\end{itemize}
+
+\section{Dominance and Pareto Front}
+
+\subsection{Dominating Solutions}
+
+In multi-objective optimization, we cannot always say which solution is best, as different solutions may excel in different objectives. Instead, we use the concept of \bfit{dominance}:
+
+\begin{minipage}{0.6\textwidth}
+
+A solution $x$ is said to \textbf{dominate} a solution $y$ if:
+\begin{itemize}
+    \item $f_i(x) \leq f_i(y)$ for all $i \in \{1, \ldots, k\}$
+    \item $f_i(x) < f_i(y)$ for at least one $i$
+\end{itemize}
+This is denoted as $x \prec y$.
+
+The set of solutions that are not dominated by any other is called the \bfit{Pareto front}.
+\end{minipage}
+\begin{minipage}{0.35\textwidth}
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/pareto-front-example.png}
+\end{minipage}
+
+These are the "best" trade-offs among the objectives.
+
+\subsubsection{Pareto Front and Optimisation}
+
+In multi-objective optimization, we are not interested in a single solution, but in the Pareto front of solutions. The Pareto front may contain infinitely many elements, but in practice, a good approximation (a representative set of solutions) is sufficient.
+
+We can use \textit{evolutionary computation} or \textit{swarm intelligence} methods to approximate the Pareto front. However, loss of diversity is a risk: the population might converge to a single point. Any multi-objective algorithm must prevent this and keep the solutions spread out on the Pareto front.
+
+\section{Non-Dominated Sorting and Evolutionary Approaches}
+
+In all naive approaches, we end up using a single objective, either by combining objectives or by using only one for selection. To actually return a Pareto set of solutions, we need to keep track of multiple objectives in the algorithm design.
+
+\subsection{Non-Dominated Sorting}
+
+Pareto-dominance induces a partial ordering of solutions, creating a natural hierarchy where solutions can be grouped into layers of increasing dominance rank. All solutions in the first Pareto front (rank 1) are mutually non-dominated, meaning none dominates any other within this front. However, they all dominate solutions in subsequent fronts. This ranking system allows us to organize the entire population according to their relative dominance relationships.
+
+
+\begin{minipage}{0.6\textwidth}
+
+    Let $P$ be the current population, the non-dominated sorting algorithm stratifies the population into successive fronts:
+    \begin{itemize}
+        \item Initialize rank $i = 1$.
+        \item While $P \neq \emptyset$:
+        \begin{itemize}
+            \item Identify $\mathcal{O}$ as the current Pareto front 
+            
+            (all non-dominated solutions in $P$).
+
+            \item Assign dominance rank $i$ to all elements of $\mathcal{O}$.
+            \item Remove these solutions: $P = P \setminus \mathcal{O}$.
+            \item Increment rank: $i = i + 1$.
+        \end{itemize}
+    \end{itemize}
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+    \vspace{-1em}
+
+    \centering
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.85\textwidth]{assets/non-dominated-sorting.png}
+        \caption{Solutions are grouped into fronts by dominance.}
+    \end{figure}
+\end{minipage}
+
+
+This process continues until all solutions are assigned a rank, creating a layered structure where lower ranks indicate better overall performance across objectives.
+\subsection{NSGA Family and Diversity Maintenance}
+
+\subsubsection{NSGA (Non-dominated Sorting Genetic Algorithm)}
+
+NSGA operates similarly to a standard genetic algorithm but incorporates multi-objective fitness computation through non-dominated sorting and diversity maintenance. Each solution is assigned a \textbf{dummy fitness} value that is \textit{proportional to its front number}. Solutions in the first front receive the highest base fitness, while those in subsequent fronts receive progressively lower values.
+
+To promote population diversity and prevent clustering around specific regions of the Pareto front, NSGA employs a \textbf{sharing} mechanism that penalizes solutions located too close to each other in the objective space. The sharing function is defined as:
+$$
+Sh(x, y) = \begin{cases} 1 - \left( \frac{d(x, y)}{\sigma_{\text{share}}} \right)^2 & \text{if } d(x, y) \leq \sigma_{\text{share}} \\ 0 & \text{otherwise} \end{cases}
+$$
+where $d(x, y)$ represents the \bfit{phenotypic distance} between solutions $x$ and $y$, and $\sigma_{\text{share}}$ defines the \bfit{maximum distance threshold} for considering two individuals as belonging to the same niche.
+
+
+The final fitness of each solution is calculated by dividing its dummy fitness by the sum of sharing values with all other solutions in the population:
+$$
+f_{\text{final}}(x) = \frac{f_{\text{dummy}}(x)}{\sum_{y \in P} Sh(x, y)}
+$$
+This shared fitness is lower when a solution has many nearby neighbors (high crowding). In this way, solutions in sparsely populated areas receive higher fitness values, making them more likely to be selected for reproduction and thus promoting exploration of less populated regions of the Pareto front.
+
+\subsubsection{NSGA-II}
+
+NSGA-II improves upon NSGA by adding:
+\begin{itemize}[noitemsep]
+    \item \textbf{Elitism}: the best solutions are always preserved.
+    \item \textbf{Fast non-dominated sorting}: to efficiently rank solutions and compute Pareto fronts.
+    \item \textbf{Crowding distance}: to maintain diversity in the population.
+    \item \textbf{Tournament selection}: the best rank wins; if two solutions have the same rank, the one in the less crowded part of the Pareto front wins.
+\end{itemize}
+
+To prevent loss of diversity, we need a measure of diversity in objective space (not genotype). \textbf{Crowding distance} (CD) is one such measure. Less crowded solutions in the same front have a higher probability of being selected for the next generation.
+
+\vspace{-0.7em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{assets/crowding-distance.png}
+    % \caption{Crowding distance: solutions in less crowded regions of the Pareto front are favored.}
+\end{figure}
+
+\vspace{-1em}
+
+The effect of using crowding distance is to spread out the solutions uniformly on the Pareto front.
+
+\subsubsection{NSGA-III}
+
+NSGA-III is a variant of NSGA-II designed for more than two objectives. It uses a set of reference points to preserve diversity on the Pareto front. Another variant, R-NSGA-III, uses user-defined aspiration points as reference.
+
+\section{Multi-Objective Particle Swarm Optimisation (MOPSO)}
+
+Multi-Objective Particle Swarm Optimisation (MOPSO) extends the classical PSO algorithm to handle multiple conflicting objectives simultaneously. The fundamental adaptation involves modifying the particle velocity update mechanism to incorporate attraction towards the Pareto front, specifically targeting the non-dominated particles discovered during the search process. Additionally, MOPSO maintains a sophisticated tracking system using hyper-cubes to monitor and preserve the dominating positions encountered throughout the optimization process.
+
+The algorithm maintains a \textbf{global repository} of non-dominated particles, denoted as $REP$, which serves as a dynamic archive of the best solutions found so far. When a new non-dominated solution emerges, any particles that become dominated by this solution are removed from the repository. To prevent unbounded growth, the repository is constrained to a maximum size $Q$. When this limit is exceeded, particles located in the most densely populated hyper-volumes are removed until the repository size returns to the specified threshold, ensuring both quality and diversity preservation.
+
+The core \textbf{velocity update formula} is modified to incorporate guidance from the repository:
+$$
+v_i(t+1) = w \cdot v_i(t) + c_{soc} \cdot r_1 \otimes (REP_h - x_i(t)) + c_{cog} \cdot r_2 \otimes (p_i - x_i(t))
+$$
+where $REP_h$ is the $h$-th particle from the repository, $p_i$ is the personal best position of particle $i$, and $\otimes$ indicates component-wise multiplication. The selection of index $h$ employs tournament selection over the repository particles, while fitness sharing mechanisms are used to reduce the fitness of particles in overcrowded hyper-cubes, promoting exploration of sparse regions in the Pareto front.
+
+The algorithm's performance depends on careful tuning of multiple hyperparameters, whose interplay influences the ability to maintain diversity while converging to the Pareto front:
+\begin{itemize}[noitemsep]
+    \item The size of the repository
+    \item The size of the tournament
+    \item The size of hyper-cubes (number of divisions)
+    \item The size of the swarm
+    \item The inertia factor
+    \item The social and cognitive factors
+    \item The maximum (and minimum) velocity
+    \item The number of iterations
+\end{itemize}
+
+\begin{tipsblock}[Platypus]
+The main python library for multi-objective optimization is \bfit{Platypus}. It provides implementations of various algorithms including NSGA-II, NSGA-III, and MOPSO, along with utilities for problem definition and result analysis.
+
+\vspace{-0.5em}
+
+\small
+\begin{codeblock}[language=Python]
+from platypus import NSGAII, Problem, Real
+
+def schaffer():
+    return [x[0]**2, (x[0]-2)**2]
+
+problem = Problem(1, 2)
+problem.types[:] = Real(-10, 10)
+problem.function = schaffer
+
+algorithm = NSGAII(problem)
+algorithm.run(10000)
+\end{codeblock}
+\normalsize
+\end{tipsblock}
