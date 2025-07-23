@@ -1,5 +1,172 @@
-\chapter{Noisy DTMC, DTCSS, CTRW}
+\chapter{Advanced Topics in Stochastic Processes}
+\label{ch:advanced_stochastic}
 
-\begin{warningblock}[Missing content]
-    This chapter is a work in progress.
-\end{warningblock}
+In this chapter, we expand our study to more complex and realistic stochastic systems. We will first investigate Markov processes in discrete time but with a continuous state space, deriving the evolution equation for their probability density and exploring surprising behaviors like the breaking of ergodicity. We then explore the consequences of introducing stochasticity into the parameters of a CTMC itself. Finally, we will step outside the Markovian framework to introduce Continuous-Time Random Walks (CTRW), a powerful tool for modeling anomalous diffusion seen in many real-world systems.
+
+\section{Discrete-Time Continuous-State Space Processes}
+
+Let us begin with a deterministic discrete-time dynamical system, where the state $x_t$ evolves according to a map $F$:
+$$
+x_{t+1} = F(x_t; p)
+$$
+In any real system, parameters like $p$ are not perfectly constant but are subject to random fluctuations from the environment. We can model this by letting the parameter become a random variable at each time step:
+$$
+p \to p + \nu_t
+$$
+where $\nu_t$ is a random variable representing the noise. The system's evolution is now stochastic:
+$$
+x_{t+1} = f(x_t, \nu_t) = F(x_t; p+\nu_t)
+$$
+If we assume that the noise term $\nu_t$ is drawn independently at each step (e.g., from a Normal distribution, $\nu_t \sim \mathcal{N}$), it has no memory of its past values. Consequently, the future state $x_{t+1}$ depends only on the present state $x_t$ and the new noise term $\nu_t$. This "memoryless" property means that the process $x_t$ is a \textbf{Discrete-Time Markov Process}.
+
+\subsection{Evolution of the Probability Density Function}
+Our primary goal is to find the analytical law that governs the evolution of the probability density function (PDF), $\rho_t(x)$. If we know the distribution at time $t$, $\rho_t(x_t)$, how can we find the distribution at the next step, $\rho_{t+1}(x_{t+1})$?
+
+This is equivalent to finding the PDF of a random variable $c$ that is a function of two independent random variables, $a$ and $b$, with known PDFs $M(a)$ and $N(b)$:
+$$
+c = f(a,b)
+$$
+The conditional PDF of $c$ for given values of $a$ and $b$ is a Dirac delta function: $\psi(c \mid a,b) = \delta(c - f(a,b))$. To get the total PDF of $c$, we must average over all possible values of $a$ and $b$:
+$$
+\psi(c) = \int_{\Omega_a} \int_{\Omega_b} \delta(c - f(a,b)) M(a) N(b) \,da\,db
+$$
+Applying this to our stochastic process, with $c=x_{t+1}$, $a=x_t$, and $b=\nu_t$, we obtain the evolution equation for the PDF:
+$$
+\rho_{t+1}(x_{t+1}) = \int \int \delta(x_{t+1} - f(x_t, \nu_t)) \rho_t(x_t) N(\nu_t) \,dx_t\,d\nu_t
+$$
+This integral equation, known as the \textbf{Chapman-Kolmogorov equation} for this process, allows us to determine the PDF at any future time step, given the initial distribution $\rho_0(x_0)$.
+
+If the function $f(x, \nu)$ is strictly monotone with respect to $x$, we can solve for $x_t$ to get a unique inverse $x_t = f^{-1}(x_{t+1}; \nu_t)$. We can then integrate out the Dirac delta with respect to $x_t$:
+$$
+\rho_{t+1}(x_{t+1}) = \int \rho_t\left(f^{-1}(x_{t+1}; \nu_t)\right) N(\nu_t) \,d\nu_t
+$$
+If $f(x, \nu)$ is not monotone, its inverse is multi-valued, and we must sum over all monotonic "branches" $f_j$ of the function:
+$$
+\rho_{t+1}(x_{t+1}) = \int \sum_{j} \rho_t\left(f_j^{-1}(x_{t+1}; \nu_t)\right) N(\nu_t) \,d\nu_t
+$$
+
+\subsection{Asymptotic Behavior and the Stationary Distribution}
+As $t \to \infty$, the PDF $\rho_t(x)$ may converge to a time-invariant \textbf{stationary distribution}, $\rho_{ss}(x)$. If such a distribution exists, it must be a fixed point of the evolution equation. For a monotone function $f$, this means $\rho_{ss}(x)$ must satisfy the integral equation:
+$$
+\rho_{ss}(x) = \int \rho_{ss}\left(f^{-1}(x; \nu)\right) N(\nu) \,d\nu
+$$
+The evolution of the PDF can be viewed as a deterministic dynamical system operating in the infinite-dimensional space of all valid probability distributions. The stationary PDF is then an equilibrium point of this dynamical system. Any physically acceptable solution must satisfy the constraints $\rho_{ss}(x) \ge 0$ and $\int \rho_{ss}(x) dx = 1$.
+
+\begin{exampleblock}[Stochastic Attractors and Breaking Ergodicity]
+In non-linear systems, stochastic dynamics can lead to complex behaviors not seen in their deterministic counterparts. Consider a stochastic process $y(t)$ whose dynamics are bounded by two deterministic processes, $w(t)$ and $u(t)$, such that $w(t) \le y(t) \le u(t)$. If the bounding dynamics are bistable, the stochastic process can be trapped in one of two distinct regions of the state space.
+
+For certain complex models, under specific parameter conditions, one can show the existence of two stable equilibria for each bounding process ($w_l, w_r$ and $u_l, u_r$) and two unstable equilibria ($w_c, u_c$). The long-term behavior of the stochastic process $y(t)$ then depends on its initial condition:
+\begin{itemize}
+    \item If $y(0) \in [0, w_c)$, then $y(t \to \infty)$ converges to a stochastic attractor in the interval $(u_l, w_l)$.
+    \item If $y(0) \in (u_c, \infty)$, then $y(t \to \infty)$ converges to a \textit{different} attractor in the interval $(w_r, u_r)$.
+\end{itemize}
+This phenomenon is a \textbf{breaking of ergodicity}. The system has two distinct stochastic attractors, and the long-term statistical properties depend on the basin of attraction of the initial state. A temporary change in system parameters can cause an \textbf{irreversible jump}, forcing the system into one attractor, from which it cannot escape even if the parameters revert to their original values.
+\end{exampleblock}
+
+\missing{end of the chapter}
+
+% \subsection{The Linear Model}
+% Let's analyze the simplest case: a linear process with additive noise.
+% $$
+% x_{t+1} = a x_t + \nu_t, \qquad \text{with } |a|<1
+% $$
+% Here, $f^{-1}(x; \nu) = (x-\nu)/a$ and the Jacobian is $|1/a|$. The stationary PDF must satisfy:
+% $$
+% \rho_e(x) = \frac{1}{|a|} \int_{-\infty}^{\infty} \rho_e\left(\frac{x-\nu}{a}\right) N(\nu) \,d\nu
+% $$
+% Now, assume the noise is Gaussian with zero mean and variance $\sigma^2$: $N(\nu) = \frac{1}{\sqrt{2\pi}\sigma}e^{-\nu^2/(2\sigma^2)}$. The long-term behavior of $x_t$ is a weighted sum of Gaussian random variables:
+% $$
+% x_t = a^t x_0 + \sum_{q=0}^{t-1} a^q \nu_{t-1-q}
+% $$
+% As $t\to\infty$, the term with the initial condition vanishes, and by the properties of Gaussian distributions, $x_t$ itself must be Gaussian. We can therefore assume the stationary distribution has the form of a Gaussian with zero mean and unknown variance $\sigma_x^2$:
+% $$
+% \rho_e(x) = \frac{1}{\sqrt{2\pi}\sigma_x} e^{-x^2/(2\sigma_x^2)}
+% $$
+% Substituting this into the integral equation and performing the Gaussian integral (by completing the square in the exponent), we find that the equation is satisfied if and only if the variances are related by:
+% $$
+% \sigma_x^2 = a^2 \sigma_x^2 + \sigma^2 \quad \implies \quad \boxed{\sigma_x^2 = \frac{\sigma^2}{1-a^2}}
+% $$
+% This is a powerful result: it gives the exact variance of the stationary distribution for the linear process. As $a \to 1$, the variance diverges, indicating that the restoring force is too weak to contain the diffusion.
+
+% \section{Perturbations of CTMC Propensities}
+% In our study of CTMCs, we assumed the transition rates (propensities) $W_\eta(X)$ were deterministic functions of the state. However, the parameters within these functions (e.g., reaction constants) can themselves be subject to external stochastic influences.
+
+% Let the propensity for an event $\eta$ be modulated by a stochastic process $\xi(t)$:
+% $$
+% W_\eta(X, t) = W_\eta(X) L_\eta(\xi(t))
+% $$
+% where $L_\eta$ is a positive random function, often normalized such that $\langle L_\eta(\xi(t)) \rangle = 1$. This means the average propensity is the same as in the deterministic case, but it now fluctuates in time.
+
+% This change has a profound effect on the simulation algorithm. The total rate, $W_{sum}(X,t) = \sum_\eta W_\eta(X,t)$, is now a stochastic process. Consequently, the waiting time to the next event is no longer exponentially distributed. To find the time $\tau$ of the next jump, we must solve the integral equation for a specific realization of the noise $\xi(t)$:
+% $$
+% \int_t^{t+\tau} W_{sum}(X, \xi(s)) ds = -\ln(u_1)
+% $$
+% where $u_1 \sim \text{Unif}(0,1)$. This requires generating a path of the noise process $\xi(s)$ and numerically solving for $\tau$, which is computationally much more intensive than the standard Gillespie algorithm. This forms the basis of the \textbf{Stochastic Simulation Algorithm with Noise (SSAN)}.
+
+% \section{Continuous-Time Random Walks (CTRW)}
+% So far, we have focused on Markov processes. However, many real-world phenomena exhibit memory, where the future evolution depends on the past. A classic example is \textbf{anomalous diffusion}, where the mean squared displacement does not grow linearly with time:
+% $$
+% \langle x^2(t) \rangle \sim t^\alpha, \qquad \alpha \neq 1
+% $$
+% \begin{itemize}
+%     \item \textbf{Subdiffusion} ($\alpha < 1$): The particle spreads slower than in normal diffusion.
+%     \item \textbf{Superdiffusion} ($\alpha > 1$): The particle spreads faster than in normal diffusion.
+% \end{itemize}
+% This behavior cannot be explained by simple Markovian random walks. The solution is to generalize the random walk to allow for random waiting times between jumps. This leads to the non-Markovian framework of the \textbf{Continuous-Time Random Walk (CTRW)}.
+
+% A CTRW is defined by two independent probability distributions:
+% \begin{itemize}
+%     \item The \textbf{waiting time distribution}, $\omega(T)$, gives the probability density for waiting a time $T$ between jumps.
+%     \item The \textbf{jump length distribution}, $W(z)$, gives the probability density of making a jump of length $z$.
+% \end{itemize}
+% The process is no longer Markovian because the probability of jumping in the next instant depends on how long the particle has already been waiting.
+
+% \subsection{The Montroll-Weiss Equation}
+% The central tool for analyzing CTRWs is the \textbf{Montroll-Weiss equation}. We define $p(x,t)$ as the PDF of the walker \textit{arriving} at position $x$ exactly at time $t$. A walker can arrive at $(x,t)$ only by having arrived at some previous position $(x-z)$ at a previous time $(t-T)$ and then making a jump of length $z$ after waiting for a time $T$. Summing over all possibilities gives an integral equation for $p(x,t)$:
+% $$
+% p(x,t) = \delta(x)\delta(t) + \int_{-\infty}^\infty dz \int_0^t dT \, W(z) \omega(T) p(x-z, t-T)
+% $$
+% The first term represents the initial condition: an arrival at $x=0$ at $t=0$. The second term is a convolution in both space and time. This equation is difficult to solve directly, but it becomes simple in Fourier-Laplace space. Applying a Fourier transform in space (variable $k$) and a Laplace transform in time (variable $s$), the convolutions become products:
+% $$
+% \bar{p}(k,s) = 1 + \hat{W}(k)\tilde{\omega}(s)\bar{p}(k,s)
+% $$
+% Solving this algebraic equation for $\bar{p}(k,s)$ yields the famous Montroll-Weiss equation.
+
+% \begin{definitionblock}[The Montroll-Weiss Equation]
+% The Fourier-Laplace transform of the arrival-time PDF for a CTRW is given by:
+% $$
+% \bar{p}(k,s) = \frac{1}{1 - \hat{W}(k)\tilde{\omega}(s)}
+% $$
+% \end{definitionblock}
+
+% This powerful equation contains all the statistical information about the CTRW. By analyzing its behavior for small $s$ and $k$ (which corresponds to long times and large distances), one can derive the properties of the process, including the exponent $\alpha$ for anomalous diffusion. For example, if the waiting time distribution has a "heavy tail" such that $\omega(T) \sim T^{-1-\alpha}$ for $0 < \alpha < 1$, the mean waiting time is infinite, leading to long periods of trapping and ultimately resulting in subdiffusion with exponent $\alpha$.
+
+% \section{Boundary Conditions and Inference}
+
+% \subsection{Boundary Conditions for Confined Processes}
+% For stochastic processes confined to a specific domain $\Omega = [a,b]$, the Fokker-Planck or Master equations must be supplemented with boundary conditions.
+% \begin{itemize}
+%     \item \textbf{Reflecting Boundaries:} The particle cannot leave the domain. This implies that the net probability current $J(x,t)$ must be zero at the boundaries: $J(a,t) = J(b,t) = 0$. For population processes, this is often the case at zero (e.g., $x(t) \ge 0$).
+%     \item \textbf{Absorbing Boundaries:} The particle is removed from the system upon hitting a boundary. This translates to the condition that the probability density itself is zero at the boundaries: $\rho(a,t) = \rho(b,t) = 0$.
+%     \item \textbf{Periodic Boundaries:} The particle moves on a circle of length $L$. The density and the current must be continuous at the endpoints: $\rho(0,t) = \rho(L,t)$ and $J(0,t) = J(L,t)$.
+% \end{itemize}
+% The choice of boundary conditions is a crucial part of the model specification and dramatically affects the system's long-term behavior.
+
+% \subsection{Inference for Discretely Observed SDEs}
+% A common problem is inferring the parameters $\theta$ of an SDE when the process is only observed at a discrete set of times $\{t_0, t_1, \ldots, t_k\}$. The central object for this task is the \textbf{transition density}, $p(x_{k+1} \mid x_k, \theta)$, which is the probability density of observing the state $x_{k+1}$ at time $t_{k+1}$, given that the process was at state $x_k$ at time $t_k$.
+
+% Theoretically, this transition density is the solution of the Fokker-Planck equation at time $t_{k+1}$ with an initial condition given by a Dirac delta function at the previous observation point:
+% $$
+% \partial_t \rho = -\partial_x (f(x)\rho) + \partial^2_{xx}\left(\frac{g^2(x)}{2}\rho\right), \quad \text{with} \quad \rho(x, t_k) = \delta(x-x_k)
+% $$
+% The transition density is then $p(x_{k+1} \mid x_k, \theta) = \rho(x_{k+1}, t_{k+1})$.
+
+% \begin{exampleblock}[Transition Density for the Stochastic Malthusian Model]
+% For the SDE $dx = rx\,dt + \omega x\,dW_t$, the solution is a log-normal process. The transition density $p(x_{k+1} \mid x_k, \theta=(r,\omega))$ is known analytically and is given by the log-normal PDF:
+% $$
+% p(x_{k+1} \mid x_k, \theta) = \frac{1}{x_{k+1}\sqrt{2\pi\omega^2\Delta t}} \exp\left( -\frac{\left(\ln(x_{k+1}) - \ln(x_k) - (r-\omega^2/2)\Delta t\right)^2}{2\omega^2\Delta t} \right)
+% $$
+% where $\Delta t = t_{k+1}-t_k$. This exact formula can be used in likelihood-based parameter estimation methods.
+% \end{exampleblock}
+
+% For most non-linear SDEs, the transition density is not known analytically. In these cases, it must be approximated, for instance by solving the Fokker-Planck equation numerically or by using advanced techniques such as series expansions in Hermite polynomials between observations.
