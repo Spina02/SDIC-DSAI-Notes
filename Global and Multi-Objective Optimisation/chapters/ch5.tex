@@ -96,7 +96,7 @@ The most common variants alter the differential mutation formula to change the b
 \subsubsection{Adaptive Differential Evolution (JADE)}
 \bfit{JADE (Adaptive DE with Optional External Archive)} is a powerful adaptive variant of Differential Evolution, introduced in 2009 by Zhang and Sanderson~\cite{zhang2009jade}. JADE enhances the standard DE algorithm with several key innovations:
 \begin{itemize}
-    \item \textbf{New Mutation Strategy:} JADE introduces the \texttt{DE/current-to-pbest} mutation scheme, which improves the balance between exploration and exploitation by guiding individuals toward the best solutions found so far.
+    \item \textbf{New Mutation Strategy:} JADE introduces the \texttt{DE/current-to-best} mutation scheme, which improves the balance between exploration and exploitation by guiding individuals toward the best solutions found so far.
     \item \textbf{External Archive:} An external archive of sub-optimal (recently replaced) solutions is maintained. This archive is used during mutation to increase population diversity and help escape local optima.
     \item \textbf{Dynamic Hyper-parameter Update:} JADE adaptively updates its control parameters ($F$ and $p_{CR}$) during the run, allowing the algorithm to self-tune and respond to the problem landscape.
 \end{itemize}
