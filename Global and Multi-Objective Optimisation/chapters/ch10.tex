@@ -1,0 +1,403 @@
+\chapter{Distribuited Methods, Coevolution}
+
+\vspace{-1.5em}
+
+\section{Distribuited Methods}
+
+Evolutionary algorithms are often computationally expensive, especially when fitness evaluations are costly or when large populations are required. Distributed and parallel methods allow us to leverage multiple cores, computers, or even specialized hardware (such as GPUs) to accelerate these computations. Beyond speed, distributed models can also improve the quality of evolution by maintaining greater diversity within the population.
+
+There are several reasons to use distributed methods:
+
+\begin{itemize}
+    \item \textbf{Efficiency:} Running evolutionary algorithms can be resource-intensive. By distributing the workload across multiple processors or machines, we can significantly reduce computation time.
+    \item \textbf{Quality:} Some distributed models help preserve diversity, which can lead to better solutions and avoid premature convergence.
+    \item \textbf{Suitability:} Population-based evolutionary algorithms are naturally amenable to parallelization, often more so than other optimization methods.
+\end{itemize}
+
+The simplest way to parallelize evolutionary algorithms is to run multiple independent instances (or runs) of the algorithm in parallel, each on a different core or machine. This is often called \textbf{embarrassingly parallel} computation.
+
+\subsection{Master-Slave Model}
+
+A more sophisticated approach, known as the \textbf{master-slave} or \textbf{client-server} model, is to distribute the fitness evaluation step, which is often the most computationally expensive part of the algorithm.
+
+\begin{itemize}
+    \item The evolutionary process (selection, variation, etc.) is managed by a central node (master).
+    \item Fitness evaluations are delegated to worker nodes (slaves), which may be on different machines.
+    \item Only individuals and their fitness are communicated between nodes, minimizing data transfer.
+\end{itemize}
+
+% \vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.52\textwidth]{assets/distributed-fitness.png}
+    \caption{\centering Fitness evaluations are distributed, the evolutionary process remains centralized.}
+\end{figure}
+
+\vspace{-1em}
+
+The master-slave model offers several key advantages that make it particularly well-suited for evolutionary algorithms with expensive fitness evaluations:
+
+\begin{itemize}
+    \item \textbf{Scalability:} If fitness evaluation is expensive, then this method scales well.
+    \item \textbf{Fault Tolerance:} The system can be robust to failures of individual worker nodes.
+    \item \textbf{Flexibility:} Nodes can be added or removed as needed.
+    \item \textbf{Limitation:} If communication time is comparable to evaluation time, the benefits diminish.
+\end{itemize}
+
+\begin{tipsblock}[Practical Note]
+    Distributed fitness assessment is most effective when the cost of evaluating individuals dominates the cost of communication. For problems with lightweight fitness functions, the overhead of distribution may outweigh the benefits.
+\end{tipsblock}
+
+\subsection{Island Model}
+
+Distributed evolution can be inspired by the concept of real-world islands: populations evolve independently on separate islands, with occasional exchange of individuals. This approach, known as the \bfit{Island Model}, introduces additional parameters and topological considerations, enabling both improved scalability and increased diversity.
+
+\subsubsection{Model Description and Parameters}
+
+In the Island Model, the global population is divided into several subpopulations (islands), each evolving independently. Periodically, individuals migrate between islands, allowing beneficial traits to spread while maintaining diversity.
+
+Key parameters include:
+\begin{itemize}
+    \item \textbf{Number of islands:} How many subpopulations are maintained.
+    \item \textbf{Population size per island:} The number of individuals on each island.
+    \item \textbf{Migration topology:} How islands are connected (who can exchange individuals with whom).
+    \item \textbf{Migration policy:} Which individuals are exchanged, how many, and how often.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/island-model.png}
+    \caption{\centering Island Model: subpopulations (islands) are connected by migration paths.}
+\end{figure}
+
+\begin{observationblock}[Independency of Islands]
+    There is no need for the islands to share the same parameters or even the same fitness function.
+\end{observationblock}
+
+\subsubsection{Topologies for Island Models}
+
+The migration topology determines the pattern of connections between islands. Common topologies are:
+\begin{itemize}
+    \item \textbf{Ring:} Each island exchanges individuals with its immediate neighbors.
+    \item \textbf{Grid:} Islands are arranged in a 2D grid, exchanging with adjacent islands.
+    \item \textbf{Fully connected:} Every island can exchange with every other island.
+    \item \textbf{Toroid:} A grid with wrap-around connections.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/island-topologies.png}
+    \caption{\centering Examples of common island model topologies: ring, grid, fully connected, toroid.}
+\end{figure}
+
+\vspace{-2em}
+
+\subsubsection{A Typical Island Model Algorithm}
+
+A typical island model algorithm is:
+
+\begin{enumerate}
+    \item Each island evolves its population independently using a standard evolutionary algorithm.
+    \item Every $K$ generations, a subset (e.g., the top $5\%$) of individuals is selected for migration.
+    \item Migrants are sent to neighboring islands according to the chosen topology.
+    \item Migration can be synchronous (at the same time) or asynchronous (whenever ready).
+\end{enumerate}
+
+\begin{tipsblock}[Synchronous vs. Asynchronous Migration]
+    \begin{itemize}
+        \item \bfit{Synchronous migration} requires all islands to pause and exchange individuals at the same time, which can be less efficient if islands progress at different speeds.
+        \item \bfit{Asynchronous migration} allows islands to exchange whenever they are ready, improving resource utilization and scalability.
+    \end{itemize}
+\end{tipsblock}
+
+\subsubsection{Variants: Central and Collector Topologies}
+
+There are two main variants of the island model:
+
+\begin{itemize}
+
+\item \textbf{One Central Population (Star Topology)}
+
+In the star topology, each island evolves independently, but periodically sends its best individuals to a central island. The central island acts as a collector and redistributor of genetic material.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.15\textwidth]{assets/star-topology.png}
+    \caption{\centering Star topology: peripheral islands send individuals to a central island.}
+\end{figure}
+
+\item \textbf{Collector Topology}
+
+A more general variant is the collector topology, where islands are arranged in a directed acyclic graph. Individuals move in one direction, allowing for staged or layered optimization (e.g., different islands reward different aspects of a solution).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.2\textwidth]{assets/collector-topology.png}
+    \caption{\centering Collector topology: individuals move through a directed acyclic graph of islands.}
+\end{figure}
+
+\end{itemize}
+
+\vspace{-2em}
+
+\subsection{Spatially-Embedded Evolutionary Algorithms}
+
+Beyond coarse-grained parallelism (islands), we can also embed individuals in a spatial structure, such as a grid or lattice. In spatially-embedded evolutionary algorithms, each individual interacts only with its immediate neighbors, creating a fine-grained parallel structure that promotes local competition while maintaining global diversity.
+
+The key characteristics of spatially-embedded EAs include:
+
+\begin{itemize}
+    \item \textbf{Spatial positioning:} Each individual occupies a specific location in the topological structure.
+    \item \textbf{Local neighborhoods:} Selection, crossover, and mutation operations are performed using only individuals within a defined local neighborhood (e.g., Moore or von Neumann neighborhoods).
+    \item \textbf{Gradual information diffusion:} Good solutions spread gradually across the spatial structure, preventing rapid convergence and maintaining population diversity.
+    \item \textbf{Parallel execution:} This fine-grained parallelism maps naturally to parallel hardware architectures, particularly GPUs where thousands of individuals can be processed simultaneously.
+    \item \textbf{Asynchronous updates:} Individual locations can be updated independently, allowing for efficient parallel implementation without global synchronization.
+\end{itemize}
+
+The spatial embedding creates natural niches where different regions of the population can explore different areas of the search space, leading to better exploration and reduced premature convergence compared to panmictic populations.
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/spatial-ea.png}
+    \caption{\centering In spatially-embedded EAs, each individual interacts only with its neighbors.}
+\end{figure}
+
+\vspace{-1em}
+
+A typical update cycle for an individual in spatially-embedded EA involves the following steps:
+\begin{itemize}
+    \item \textbf{Parent selection:} Select two parent individuals from the local neighborhood
+    \item \textbf{Crossover:} Apply crossover operation between the selected parents to generate offspring
+    \item \textbf{Mutation:} Apply mutation operators to the offspring to introduce genetic variation
+    \item \textbf{Replacement:} Replace the current individual at this spatial location with the generated offspring
+\end{itemize}
+
+\section{Coevolution}
+
+In standard evolutionary algorithms, the fitness of an individual is determined solely by its own performance on the objective function. In \bfit{coevolutionary algorithms}, however, the fitness of an individual is influenced by interactions with other individuals, either within the same population or across multiple populations. This fundamental shift from independent to interdependent fitness evaluation enables the evolution of more complex and adaptive behaviors.
+
+The main idea of coevolution is that the fitness of an individual is affected by external factors:
+\begin{itemize}
+    \item \textbf{Performance against others:} Fitness may depend on how well an individual performs against other members of the population (e.g., in games or adversarial tasks).
+    \item \textbf{Collective performance:} Sometimes, the fitness is based on the performance of the entire population as a group.
+    \item \textbf{Similarity penalties:} Too many similar individuals may be penalized to encourage diversity.
+\end{itemize}
+
+This interdependent nature of fitness evaluation means that in coevolution, the distinction between absolute and relative fitness becomes critically important:
+\begin{itemize}
+    \item \textbf{Absolute fitness:} The fitness we wish to optimize (e.g., winning against all possible opponents).
+    \item \textbf{Relative fitness:} The fitness as measured within the current population, which may only reflect performance against current peers.
+\end{itemize}
+
+\begin{tipsblock}[Fitness in Coevolution]
+    Progress in coevolution should ideally be measured using both internal (relative) and external (absolute) fitness, to ensure that improvements are meaningful beyond the current population.
+\end{tipsblock}
+
+\subsection{One-Population Competitive Coevolution}
+
+Competitive coevolution is a type of coevolutionary algorithm where the fitness of an individual is determined by its performance against other individuals in the same population. This approach is often used when evolving agents that play games. Each individual's fitness is determined by competing against other individuals in the same population. For example, agents may play matches against each other, and fitness is based on the number of victories.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/coevolution-competition.png}
+    \caption{\centering Competitive coevolution: example with a too weak or too strong opponent.}
+\end{figure}
+
+\vspace{-1em}
+
+A challenge is that evaluating the "real" fitness can be difficult, especially if the population is much weaker or stronger than a fixed opponent. This is known as the problem of using a fixed opponent: 
+
+\textit{Evaluating the fitness of the individuals can be misleading if the opponent is too weak or too strong}.
+
+This can be solved using a \bfit{collection of fixed opponents}, or using other \bfit{individuals as opponents}.
+
+\subsubsection{Evaluation Methods}
+
+Several methods exist for evaluating individuals in competitive coevolution:
+
+\begin{itemize}
+\item \textbf{Pairwise:} Only make individual $n$ compete with individual $n+1$. This approach is very efficient, requiring only $O(n)$ tests, but the results are highly dependent on the specific adversary each individual faces, which can introduce significant bias.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=2em]{assets/evaluation-pairwise.png}
+\end{figure}
+
+\item \textbf{Complete:} Every individual competes with every other individual. This method provides a precise assessment of fitness, as all possible matchups are considered, but it is computationally expensive, requiring $O(n^2)$ tests as the population grows.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=2em]{assets/evaluation-complete.png}
+\end{figure}
+
+\item \textbf{K-fold:} Every individual competes with $k$ randomly selected individuals. This method offers a tunable trade-off between computational cost and evaluation accuracy. However, some individuals may be tested more than others, potentially introducing uneven selection pressure.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=2em]{assets/evaluation-k-fold.png}
+\end{figure}
+
+\item \textbf{Single-elimination tournament:} Every individual proceeds with the competitions until it is beaten. This approach is efficient, as only $O(n)$ tests are needed, and better individuals are likely to be tested more times. However, unlucky pairings can penalize some individuals, making the outcome sensitive to the tournament structure.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=2em]{assets/evaluation-single-elimination.png}
+\end{figure}
+
+\end{itemize}
+
+\textbf{Fitnessless Selection}
+
+In some cases, the fitness is never explicitly computed, which can be both computationally efficient and conceptually elegant. E.g., in tournament selection, the selected individual is simply the winner of the tournament, without requiring any numerical fitness assignment. This approach bypasses the need to calculate absolute fitness values and instead relies on relative performance comparisons.
+
+\subsection{Two-Population Competitive Coevolution}
+
+In two-population competitive coevolution, two distinct populations are evolved in parallel, each serving a complementary but opposing role.
+
+\begin{itemize}
+    \item \textbf{Primary population:} The individuals we are actually interested in improving and optimizing (e.g., sorting networks, game-playing strategies, or neural network controllers).
+    
+    \item \textbf{Alternative (foil) population:} Individuals that serve as adaptive adversaries, specifically designed to challenge, test, and "foil" the primary population by exploiting its weaknesses (e.g., arrays that are difficult to sort, counter-strategies, or challenging test cases).
+\end{itemize}
+
+This setup creates a powerful evolutionary arms race where both populations continuously improve together. As the primary population develops better solutions, the foil population evolves more challenging test cases that expose new weaknesses and vice versa.
+
+\begin{exampleblock}[Evolving Sorting Networks]
+A classic example is the coevolution of sorting networks and difficult-to-sort arrays:
+
+\begin{itemize}[noitemsep]
+    \item The primary population consists of candidate sorting networks.
+    \item The foil population consists of arrays that are hard to sort.
+\end{itemize}
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/coevolution-two-populations.png}
+\end{figure}
+
+\vspace{-1em}
+
+For this scenario, fitness is defined as follows:
+
+\begin{itemize}
+    \item \textbf{For sorting networks:} Fitness is the number of arrays sorted correctly.
+    \item \textbf{For arrays:} Fitness is the number of networks that fail to sort the array.
+\end{itemize}
+The two fitnesses are in conflict, making the coevolution competitive.
+
+\end{exampleblock}
+
+
+\subsubsection{How the Evolution is Performed}
+
+The evaluation process in two-population competitive coevolution is dynamic, as both populations are constantly changing. The process of assessing the fitness can be described in several steps:
+
+\begin{enumerate}
+    \item \textbf{Shuffle and Pairing:} Individuals from population P are paired with individuals from population Q, typically by shuffling and pairing them randomly. This pairing is often repeated $k$ times to ensure a robust evaluation, and care is taken to avoid performing the same evaluation more than once.
+    
+    \vspace{-1em}
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[height=8em]{assets/coevolution-evaluation-1.png}
+        \caption{Shuffling and pairing individuals from two populations for evaluation.}
+    \end{figure}
+
+    \vspace{-1.5em}
+
+    \item \textbf{Comparison with Previous Generation:} To make the evolutionary process more stable and informative, individuals from one population at the current generation can be compared with individuals from the other population at the previous generation. This helps to smooth out abrupt changes and provides a more consistent selection pressure.
+    
+    \vspace{-1em}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[height=8em]{assets/coevolution-evaluation-2.png}
+        \caption{Comparing individuals with those from the previous generation.}
+    \end{figure}
+
+    \vspace{-1.5em}
+
+    \item \textbf{Combining Best and Random Opponents:} For each individual, it is possible to select $k_1$ opponents from the best individuals of the other population (from the previous generation) and $k_2$ opponents randomly. This hybrid approach balances exploitation (testing against the best) and exploration (testing against random opponents).
+\end{enumerate}
+
+This multi-faceted evaluation strategy ensures that individuals are tested thoroughly and fairly, promoting robust coevolutionary progress in both populations.
+
+Two-population competitive coevolution can suffer from “\textbf{loss of gradient}”: If one population becomes much stronger than the other, the weaker population provides no useful feedback, and selection pressure is lost. In such cases, it may be helpful to pause the evolution of the stronger population, allowing the weaker one to “catch up.”
+
+\subsection{N-Population Cooperative Coevolution}
+
+In some problems, a solution can be decomposed into multiple interacting sub-solutions, each with its own characteristics. Instead of evolving a single, very large individual, it can be more effective to have multiple interacting populations, each responsible for a different part of the solution. This approach is known as \bfit{N-population cooperative coevolution}.
+
+Some examples include robot soccer (where each player is a sub-solution), or any multiplayer game with more than one role. While it is always possible to create an enormous individual encoding all roles, using multiple populations allows for more flexibility and specialization.
+
+There are two main approaches to evaluating fitness in cooperative coevolution:
+
+\begin{itemize}
+    \item \textbf{Parallel methods:} All populations evolve at the same time, and the same methods of evaluation as in competitive coevolution can be used. As usual, it is important to specify how individuals from different populations are paired for evaluation.
+
+    \item \textbf{Sequential methods:} Populations are evolved one at a time (alternating optimization). This is less suitable for competitive coevolution, but can be used in some cooperative settings.
+\end{itemize}
+
+\subsubsection{Possible Drawbacks}
+
+A key challenge in cooperative coevolution is \bfit{lucky pairs}: an individual may appear to have good fitness simply because it is paired with strong individuals from other populations, even if it does not contribute to the global solution. E.g., in evolving a soccer team, a weak player may still have high fitness if the rest of the team is strong. Another drawback is \bfit{overgeneralization}: individuals may become decent at everything, but not excel at anything. Their average performance is good, but they are not optimal for any specific scenario. A possible solution is to compute the fitness as the max or min (instead of the average) among all tests, but this is not a perfect solution.
+
+Additionally, moving from a local optimum may require multiple populations to change behavior at the same time, which can be difficult to achieve in practice.
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{assets/coevolution-drawbacks.png}
+\end{figure}
+
+\vspace{-1em}
+
+\subsubsection{Diversity Maintenance}
+
+Premature convergence to a sub-optimal solution is a common problem in optimization. One way to avoid this is to increase the population size or adjust algorithm parameters, but it is often more effective to enforce diversity directly within the population.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{assets/coevolution-diversity-1.png}
+    \hspace{2em}
+    \includegraphics[width=0.45\textwidth]{assets/coevolution-diversity-2.png}
+\end{figure}
+
+\vspace{-1em}
+
+Diversity can be measured in several ways:
+\begin{itemize}
+    \item \textbf{Genotype:} Similarity in the encoded structure (e.g., Hamming distance for bit strings).
+    \item \textbf{Phenotype:} Similarity in behavior or solution, even if encoded differently.
+    \item \textbf{Fitness:} Similarity in fitness values (useful in multi-objective optimization).
+\end{itemize}
+
+To maintain diversity, \textbf{fitness sharing} can be used. This technique addresses the tendency of populations to converge prematurely by penalizing individuals that cluster too closely together in the search space. Individuals that are too similar have their fitness reduced by having to "share" it with others. The degree of punishment depends on their similarity:
+
+$$
+s(x, y) =
+\begin{cases}
+1 - \left( \frac{d(x, y)}{\sigma} \right)^{\alpha} & \text{if } d(x, y) \leq \sigma \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+where $d(x, y)$ is the \textit{distance} between individuals $x$ and $y$, $\sigma$ is a \textit{threshold} that defines the niche radius (the range within which individuals are considered similar), and $\alpha > 0$ controls the \textit{degree of punishment} applied to similar individuals.
+
+The shared fitness value is then computed as:
+
+$$
+f(x) = \frac{r(x)^\beta}{\sum_y s(x, y)}
+$$
+
+where $r(x)$ is the \textit{raw fitness} and the denominator sums the sharing function over all individuals in the population. A \textit{scaling factor} $\beta > 1$ can also be used to amplify fitness differences before sharing occurs. 
+
+The parameters $\alpha$, $\beta$, and $\sigma$ collectively control the \bfit{strength} and \bfit{range} of fitness sharing, allowing fine-tuning of the diversity pressure.
+
+This approach encourages the population to spread out across different regions of the search space, creating natural niches where multiple solutions can coexist. By preventing the population from clustering around a single high-fitness region, fitness sharing helps to avoid premature convergence and maintain a diverse set of solutions that can continue to explore different areas of the problem landscape.

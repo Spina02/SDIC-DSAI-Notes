@@ -1,0 +1,308 @@
+\chapter{Neuroevolution}\label{ch:neuroevolution}
+
+\bfit{Neuroevolution} is a field of machine learning that uses evolutionary algorithms to design artificial neural networks (ANNs). While the dominant paradigm for training ANNs is gradient-based backpropagation, this method primarily optimizes the network's weights for a fixed architecture. Neuroevolution offers a broader approach, capable of evolving not only the weights but also the network's topology (its structure and connections) and other hyperparameters. This makes it a powerful tool for automating neural network design and tackling problems where gradient information is unavailable or unreliable, such as in reinforcement learning.
+
+\section{A Primer on Artificial Neural Networks}
+
+\begin{minipage}{0.55\textwidth}
+An Artificial Neural Network is a computational model inspired by the structure of biological brains. It is composed of interconnected nodes, called \bfit{neurons}, which are typically organized into layers.
+
+Each neuron receives inputs, performs a computation, and passes the result to other neurons. The computation within a single neuron involves three steps:
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/nn-layers.png}
+    \vspace{-1em}
+
+    \caption{\centering A simple feedforward neural network architecture.}
+    \label{fig:nn_layers}
+\end{figure}
+\end{minipage}
+\begin{enumerate}[noitemsep]
+    \item \textbf{Weighted Sum:} The neuron calculates a weighted sum of its inputs.
+    \item \textbf{Bias:} A bias term $b_i$ is added to the weighted sum.
+    \item \textbf{Activation Function:} A non-linear \bfit{activation function} $f$ is applied to the result.
+\end{enumerate}
+The output of a neuron $i$ is thus given by $f(b_i + \sum_{j \to i} w_{ji}x_j)$, where $w_{ji}$ are the weights of the connections from input neurons $j$.
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/nn-neuron.png}
+    \caption{\centering The computation performed by a single neuron.}
+    \label{fig:nn_neuron}
+\end{figure}
+
+\vspace{-1em}
+
+While many networks use \textbf{fully connected layers}, where every neuron in one layer connects to every neuron in the next, other architectures are better suited for certain data types. \textbf{Convolutional layers}, for example, connect each neuron only to a small, local region of the previous layer—its \bfit{receptive field}. All neurons in a convolutional layer share the same weights, which are applied as the receptive field slides across the input (with a given stride). This local connectivity and weight sharing make convolutional layers highly efficient and effective for spatial data like images, in contrast to the dense and unique connections of fully connected layers.
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/partially-connected-nn.png}
+    \caption{\centering A partially connected neural network architecture.}
+    \label{fig:partially_connected_nn}
+\end{figure}
+
+\vspace{-1.5em}
+
+\subsection{Neural Network Training}
+The standard method for training a neural network is through an optimization process, typically \bfit{(stochastic) gradient descent}, which iteratively adjusts the network's weights $w_{ij}$ to minimize a loss function (the error). This process, known as \bfit{backpropagation}, requires the loss function $L$ and activation functions to be differentiable.
+$$ w_{ij} \leftarrow w_{ij} - \eta \frac{\partial L}{\partial w_{ij}} $$
+where $\eta$ is the learning rate.
+
+However, backpropagation only learns the weights. The \bfit{architecture} of the network (the number, size, and type of layers) and other critical \bfit{hyperparameters} (e.g., learning rate, momentum) must be selected manually by the human designer. Neuroevolution provides a way to automate this entire design process.
+
+\section{Neuroevolution: Evolving Neural Networks}
+
+Neuroevolution applies evolutionary algorithms to the design of neural networks. Instead of manual design, the process aims to discover effective networks through evolution. An EA can be used to evolve various components of a neural network:
+\begin{itemize}
+    \item \textbf{Weights:} As an alternative to backpropagation, especially in domains without gradients.
+    \item \textbf{Hyperparameters:} Such as learning rates, momentum, or dropout rates.
+    \item \textbf{Activation Functions:} Evolving the mathematical form of the activation functions.
+    \item \textbf{Architecture (Topology):} Evolving the connections, layers, and types of layers that form the network structure.
+\end{itemize}
+
+Historically, "classic" neuroevolution (before the rise of deep learning) focused on evolving both the weights and topology of smaller networks. However, directly evolving every single weight and connection in modern, large-scale deep networks is often computationally infeasible, which has led to the development of more sophisticated encoding schemes.
+
+\subsection{Encoding Schemes}
+The choice of how to represent a neural network as a genotype is critical, as it determines how genetic operators like crossover and mutation can be applied. Several encoding schemes have been proposed.
+
+\begin{itemize}
+    \item \bfit{GENITOR Encoding:} For a fixed network topology, each potential edge is encoded as a binary substring. One bit indicates the presence of the edge, while the remaining bits encode its weight. The entire network is represented by concatenating these substrings into a single, long binary string. This allows for standard GA operators but is inflexible as the number of neurons is fixed.
+    
+    \item \bfit{Matrix Encoding:} The network's connectivity is represented by an adjacency matrix, where each entry indicates the presence or absence of a connection. This allows the connections to be modified, but the number of neurons remains fixed. For large networks, the matrix becomes excessively large ($n^2$ for $n$ neurons), making this approach not scalable.
+    
+    \item \bfit{Node-Based Encoding:} The main "unit" of the genome is the node. Each gene represents a neuron and contains information about its outgoing connections and their weights. This representation is flexible, as both new nodes and new connections can be created by adding to the list of genes. A similar encoding is used by the NEAT algorithm.
+    
+    \item \bfit{Path Encoding:} The network is represented as a collection of paths, where each path traces a route from an input neuron to an output neuron. The full network is reconstructed by overlaying all evolved paths. Recombination is typically done via two-point crossover on the lists of paths.
+\end{itemize}
+
+\subsection{The Competing Conventions Problem}
+
+A fundamental challenge in evolving neural network topologies is the \bfit{competing conventions problem} (also known as the permutation problem). This occurs when two different genotypes encode networks that are functionally identical but have different structural representations.
+
+For example, two networks might perform the same computation, but the hidden neurons that perform specific sub-functions appear in a different order. If a standard crossover operator is applied to these two parent genotypes, it is likely to combine parts that are not functionally compatible. The resulting offspring can be a meaningless combination of mismatched sub-networks, performing much worse than either parent.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/nn-competition.png}
+    \includegraphics[width=0.6\textwidth]{assets/nn-competition-1.png}
+    \caption{\centering The Competing Conventions Problem. The two parent networks are functionally identical (isomorphic), but their hidden neuron functionalities are permuted.}
+    \label{fig:competing_conventions}
+\end{figure}
+
+\vspace{-1.5em}
+Solving this problem is crucial for effective topological evolution. It requires a crossover mechanism that can intelligently align and combine functionally corresponding genes.
+
+\section{NEAT: NeuroEvolution of Augmenting Topologies}
+
+\bfit{NEAT (NeuroEvolution of Augmenting Topologies)} is a highly influential neuroevolution method specifically designed to solve the competing conventions problem and effectively evolve both network weights and topologies. Its key features are:
+\begin{enumerate}
+    \item \textbf{Complexifying Evolution}: NEAT starts with a population of simple networks (initially with no hidden nodes) and gradually adds complexity (new nodes and connections) via mutation over generations.
+    \item \textbf{Innovation Numbers}: Each new structural gene (a new node or link) is assigned a globally unique \bfit{innovation number}. These numbers serve as historical markers, allowing NEAT to track the lineage of genes.
+    \item \textbf{Intelligent Crossover}: By aligning genes with matching innovation numbers, NEAT can perform crossover between different topologies in a meaningful way, avoiding the competing conventions problem.
+    \item \textbf{Speciation}: The population is divided into \bfit{species} based on topological similarity. Mating occurs primarily within species, which protects new innovations from having to immediately compete with different, more established topologies, giving them time to optimize.
+\end{enumerate}
+
+\subsection{The NEAT Genome}
+The NEAT genotype is a direct encoding consisting of two types of genes:
+\begin{itemize}
+    \item \bfit{Neuron Genes}: A list of all neurons in the network. Each gene has an ID and a type (e.g., input, output, hidden).
+    \item \bfit{Link Genes}: A list of all connections. Each link gene specifies the source and destination neuron, the connection's weight, an enabled/disabled status bit, and its unique \bfit{innovation number}.
+\end{itemize}
+Crucially, a connection can be present in the genome but be disabled, meaning it does not participate in the network's computation but can be re-enabled by a future mutation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/neat-genome.png}
+    \caption{\centering A NEAT genome, composed of neuron genes and link genes. Each link gene has an innovation number to track its historical origin.}
+    \label{fig:neat_genome}
+\end{figure}
+
+\subsection{Genetic Operators in NEAT}
+
+\subsubsection{Mutation}
+NEAT uses a variety of mutation operators to introduce variation:
+\begin{itemize}
+    \item \textbf{Add Connection}: A new link gene is created between two previously unconnected neurons.
+    \item \textbf{Add Node}: An existing connection is "split". The old connection is disabled, and a new hidden node is inserted. Two new connections are created: one from the original source to the new node (with weight 1), and one from the new node to the original destination (with the old weight).
+    \item \textbf{Weight Mutation}: The weights of existing connections can be either slightly perturbed or assigned a completely new random value.
+    \item \textbf{Enable/Disable Mutation}: The status of a link gene is toggled.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/neat-mutation.png}
+    \caption{\centering The "add node" mutation in NEAT splits an existing connection.}
+    \label{fig:neat_add_node}
+\end{figure}
+
+\vspace{-1.5em}
+
+\subsubsection{Crossover and the Innovation Number}
+
+\begin{minipage}{0.5\textwidth}
+The \textbf{innovation number} is a unique identifier assigned to each new structural gene (connection or node) created by mutation in NEAT. 
+
+\vspace{0.5em}
+
+This number is incremented globally with every new mutation, ensuring that identical structural changes, such as adding the same connection or splitting the same link in different individuals, receive the same innovation number, even if they occur in different genomes or generations. 
+
+\vspace{0.5em}
+
+This mechanism is crucial for solving the competing conventions problem, as it allows NEAT to track the historical origin of each gene.
+
+\vspace{0.5em}
+
+During \textbf{crossover}, NEAT uses innovation numbers to align the link genes of two parent genomes.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+
+    \vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/innovation-number.png}
+    \caption{\centering The same mutation in two different individuals receives the same innovation number.}
+    \label{fig:innovation_number}
+\end{figure}
+\end{minipage}
+
+The process works as follows:
+
+\begin{itemize}
+    \item \bfit{Matching Genes}: Genes with the same innovation number in both parents are considered matching. For each matching gene, the offspring randomly inherits the gene from either parent.
+    \item \bfit{Disjoint Genes}: These are genes whose innovation numbers fall within the range of the other parent's innovation numbers but are absent in that parent. 
+    \item \bfit{Excess Genes}: These are genes whose innovation numbers are outside the range of the other parent's innovation numbers.
+    \item \bfit{Inheritance Rule}: Disjoint and excess genes are inherited only from the \bfit{fitter} parent (the parent with higher fitness).
+\end{itemize}
+
+This alignment and inheritance strategy allows NEAT to recombine genomes with different topologies in a meaningful way, preserving useful structural innovations and ensuring that offspring are viable.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/neat-crossover-1.png}
+    \caption{\centering Example: Two individuals with their genes sorted by innovation number. Matching genes are aligned, while disjoint and excess genes are identified.}
+    \label{fig:neat_crossover}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/neat-crossover-2.png}
+    \caption{\centering Crossover in NEAT: Matching genes (by innovation number) are inherited randomly from either parent. Disjoint and excess genes are inherited from the fitter parent only. This process enables the combination of different topologies while preserving functional structures.}
+    \label{fig:neat_crossover_2}
+\end{figure}
+
+
+
+\subsubsection{Speciation}
+
+A \textbf{species} in NEAT is a group of individuals with similar genetic structure, allowing new structural innovations to be protected and optimized before facing competition from the entire population. Speciation in NEAT serves two main purposes:
+\begin{itemize}
+    \item It protects new topological innovations by grouping similar individuals together, so that crossover and competition occur primarily within species.
+    \item It prevents premature convergence by allowing diverse solutions to coexist.
+\end{itemize}
+
+\paragraph{Creation of Species}
+\begin{itemize}
+    \item \textbf{Compatibility Distance:} Two individuals will belong to the same species if their \emph{compatibility distance} $\delta$ is less than a fixed threshold. The compatibility distance is calculated as:
+    $$
+    \delta = c_1 \frac{E}{N} + c_2 \frac{D}{N} + c_3 \overline{W}
+    $$
+    where $E$ is the number of excess genes, $D$ is the number of disjoint genes, $\overline{W}$ is the average weight difference of matching genes, $N$ is the number of genes in the larger genome (set to 1 if both genomes are small), and $c_1, c_2, c_3$ are coefficients that weight each term.
+    
+    \item \textbf{Assignment:} Each existing species is represented by a random genome (the representative) from the previous generation. Each new individual is compared to the representatives, and is assigned to the first compatible species found. If it is not compatible with any existing species, it forms a new species and becomes its representative.
+\end{itemize}
+
+To prevent a single species from dominating the population, NEAT uses \textbf{fitness sharing}:
+\begin{itemize}
+    \item The raw fitness $f_i$ of each individual $i$ is divided by the number of individuals $|S_i|$ in its species:
+    $$
+    f'_i = \frac{f_i}{|S_i|}
+    $$
+    \item The number of offspring allocated to each species is proportional to the sum of the adjusted fitnesses of its members.
+\end{itemize}
+This mechanism ensures that smaller, innovative species are not overwhelmed by larger, established ones, allowing new structures to mature and compete effectively.
+
+\section{Indirect Encodings for Large Networks}
+
+Direct encodings, such as those used in NEAT, become impractical for modern deep neural networks with millions of parameters. \bfit{Indirect encodings} address this challenge by evolving a compact set of rules or a generative program that constructs the final, large-scale network. This approach enables the automatic discovery of regularities, symmetries, and repeating patterns.
+
+There are several indirect encoding methods for large networks. The most prominent ones are:
+
+\begin{itemize}
+    \item \textbf{Grammar-Based Encoding}
+    
+    A grammar (such as a context-free grammar) is evolved to generate the structure of a neural network. The grammar can produce an adjacency matrix or a sequence of construction rules, allowing for the compact specification of complex, regular architectures.
+    \small
+    $$
+    S \mapsto \begin{bmatrix} A & B \\ A & C \end{bmatrix}
+    \qquad
+    A \mapsto \begin{bmatrix} 0 & 0 \\ 0 & 0 \end{bmatrix}
+    \qquad
+    B \mapsto \begin{bmatrix} 1 & 0 \\ 1 & 0 \end{bmatrix}
+    \qquad
+    C \mapsto \begin{bmatrix} 0 & 1 \\ 0 & 0 \end{bmatrix}
+    $$
+    \normalsize
+    This is the same we saw in \cref{sec:ge}, but here the matrices represent neural networks.
+    
+    
+    \item \textbf{Bi-Dimensional Growth Encoding (L-Systems)}
+
+    Bi-dimensional growth encoding uses \bfit{L-systems} (Lindenmayer systems), recursive rewriting rules originally designed to model plant growth, to generate complex and regular neural connectivity patterns in 2D space.
+
+    Each neuron has an L-system that recursively defines its branching structure (number, angle, and length of branches). Synaptic connections are determined by where branches from different neurons intersect or come close.
+
+    \vspace{-0.5em}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{assets/bi_dimensional_growth_encoding.png}
+        \caption{\centering Illustration of bi-dimensional growth encoding using L-systems.}
+        \label{fig:bi_dimensional_growth_encoding}
+    \end{figure}
+
+    \vspace{-1em}
+
+    This approach enables the automatic emergence of repeating motifs and spatial regularities that are hard to achieve with direct encodings.
+    
+    \item \textbf{HyperNEAT}
+    
+    HyperNEAT is a prominent indirect encoding technique that evolves a \bfit{Compositional Pattern-Producing Network (CPPN)}: a small neural network whose inputs are the geometric coordinates of two neurons in the target network (the "substrate"). The CPPN outputs the weight of the connection between those neurons.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.75\textwidth]{assets/cppn.png}
+        \caption{\centering CPPN representation of a neural network.}
+        \label{fig:cppn}
+    \end{figure}
+    
+    By systematically querying the CPPN for all possible pairs of coordinates, HyperNEAT can generate large, structured neural networks from a compact genome. The CPPN itself is evolved using NEAT, enabling the discovery of geometric and functional regularities in the connectivity pattern.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\textwidth]{assets/hyperneat.png}
+        \caption{\centering HyperNEAT uses a CPPN to generate the network structure.}
+        \label{fig:hyperneat}
+    \end{figure}
+    
+    \item \textbf{DENSER}
+    
+    DENSER (Deep Evolutionary Network Structured Representation) is a method for evolving deep neural network architectures using a hierarchical, layer-based approach. Both the number, type, and parameters of the layers are evolved, while the network weights are learned via backpropagation.
+
+    The process is organized into two evolutionary levels:
+    \begin{itemize}
+        \item \textbf{Top level:} A genetic algorithm (GA) encodes the overall sequence and general types of layers (such as convolutional, pooling, or fully connected).
+        \item \textbf{Lower level:} For each layer, grammatical evolution (GE), specifically, dynamic structured GE, is used to generate the detailed parameters (e.g., filter size, activation function, etc.).
+    \end{itemize}
+
+    Only the best-performing networks are trained for more than a few epochs, focusing computational resources on the most promising candidates. This approach enables the automatic discovery of effective and diverse deep network architectures.
+\end{itemize}
