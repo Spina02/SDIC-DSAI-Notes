@@ -1,0 +1,128 @@
+\chapter{Approximate Solution Methods}
+
+The novelty in this chapter is that the approximate value function is represented not as a table but as a parameterized functional form with weight vector \textbf{w} $\in \mathbb{R}$. We will write $\hat{v}(s,w) \approx v_{\pi}(s)$ for the approximate value of state $s$ given weight vector \textbf{w}.
+
+Typically, the number of weights is much less than the number of states, consequently, when a single state is updated, the change generalizes from that state to affect the values of many other states. Such generalization makes the learning potentially more powerful byt also potentially more difficult to manage and understand. Extending RL to function approximation also makes it applicable to partially observable problems, in which the full state is not available to the agent. 
+
+What function approximation can't do, however, is augment the state representation with memories of past observations. 
+
+\section{Value-function Approximation}
+
+All of the prediction methods covered in this book have been described as updates to an estimated value function that shifts its value at particular states toward a "backed-up value", or \textit{update target}, for that state. Let us refer to an individual update by the notation $s \to u$, where $s$ is the state updated and $u$ is the update target that $s$'s estimated value is shifted toward. 
+
+It is natural to interpret each update as specifying an example of the desired input-output behavior of the value function. In a sense, the update $s\to u$ means that the estimated value for state $s$ should be more like the update target $u$. Up to now, the actual update has been trivial: the table entry for $s$'s estimated value has simply been shifted a fraction of the way toward $u$, and the estimated values of all other states were left unchanged. Now we permit arbitrarily complex and sophisticated methods to implement the update, and updating at $s$ generalizer so that the estimated values of many other states are changed as well. 
+
+Function approximation methods expect to receive examples of the desired input-output behavior of the function they are trying to approximate. We use these methods for value prediction simply by passing to them the $s \to u$ of each update as a training example. We then interpret the approximate function they produce as an estimated value function. In RL, however, it is imoirtant that learning be able to occur online, while the agent interacts with its environment or with a model of its environment. To do this requires methods that are able to learn efficiently from incrementally acquired data. In addition, RL generally requires function approximation methods able to handle nonstationary target functions. 
+
+\section{The Prediction Objective ($\overline{VE}$)}
+
+Up to now we have not specified an explicit objective for prediction. In the tabular case a continuous measure of prediction quality was not necessary because the learned value function could come to equal the true value function exactly. Moreover, the learned values at each state were decoupled—an update at one state affected no other. But with genuine approximation, an update at one state affects many others, and it is not possible to get the values of all states exactly correct. By assumption we have far more states than weights, so making one state's estimate more accurate invariably means making others' less accurate. We are obligated then to say which states we care most about. We must specify a state distribution $\mu(s) \geq 0$, $\sum_s \mu(s) = 1$, representing how much we care about the error in each state $s$. By the error in a state $s$ we mean the square of the difference between the approximate value $\hat{v}(s,w)$ and the true value $v_\pi(s)$. Weighting this over the state space by $\mu$, we obtain a natural objective function, the mean square value error, denoted $\overline{VE}$:
+
+$$\overline{VE}(w) \doteq \sum_{s \in S} \mu(s) [v_\pi(s) - \hat{v}(s,w)]^2$$
+
+The square root of this measure, the root $\overline{VE}$, gives a rough measure of how much the approximate values differ from the true values and is often used in plots. Often $\mu(s)$ is chosen to be the fraction of time spent in $s$. Under on-policy training this is called the on-policy distribution; we focus entirely on this case in this chapter. In continuing tasks, the on-policy distribution is the stationary distribution under $\pi$.
+
+\section{Stochastic-gradient and Semi-gradient Methods}
+
+We now develop in detail one class of learning methods for function approximation in value prediction, those based on stochastic gradient descent (SGD). SGD methods are among the most widely used of all function approximation methods and are particularly well suited to online reinforcement learning.
+
+In gradient-descent methods, the weight vector is a column vector with a fixed number of real valued components, $w \doteq (w_1, w_2, \ldots, w_d)^T$, and the approximate value function $\hat{v}(s,w)$ is a differentiable function of $w$ for all $s \in S$. We will be updating $w$ at each of a series of discrete time steps, $t = 0, 1, 2, 3, \ldots$, so we will need a notation $w_t$ for the weight vector at each step. For now, let us assume that, on each step, we observe a new example $S_t \to v_\pi(S_t)$ consisting of a (possibly randomly selected) state $S_t$ and its true value under the policy. These states might be successive states from an interaction with the environment, but for now we do not assume so. Even though we are given the exact, correct values, $v_\pi(S_t)$ for each $S_t$, there is still a difficult problem because our function approximator has limited resources and thus limited resolution. In particular, there is generally no $w$ that gets all the states, or even all the examples, exactly correct. In addition, we must generalize to all the other states that have not appeared in examples.
+
+We assume that states appear in examples with the same distribution, $\mu$, over which we are trying to minimize the $\overline{VE}$ as given by (9.1). A good strategy in this case is to try to minimize error on the observed examples. Stochastic gradient-descent (SGD) methods do this by adjusting the weight vector after each example by a small amount in the direction that would most reduce the error on that example:
+
+$$w_{t+1} \doteq w_t - \frac{1}{2}\alpha \nabla [v_\pi(S_t) - \hat{v}(S_t,w_t)]^2$$
+
+$$= w_t + \alpha [v_\pi(S_t) - \hat{v}(S_t,w_t)] \nabla\hat{v}(S_t,w_t)$$
+
+where $\alpha$ is a positive step-size parameter, and $\nabla f(w)$, for any scalar expression $f(w)$ that is a function of a vector (here $w$), denotes the column vector of partial derivatives of the expression with respect to the components of the vector:
+
+$$\nabla f(w) \doteq \left(\frac{\partial f(w)}{\partial w_1}, \frac{\partial f(w)}{\partial w_2}, \ldots, \frac{\partial f(w)}{\partial w_d}\right)^T$$
+
+This derivative vector is the gradient of $f$ with respect to $w$. SGD methods are "gradient descent" methods because the overall step in $w_t$ is proportional to the negative gradient of the example's squared error (9.4). This is the direction in which the error falls most rapidly. Gradient descent methods are called "stochastic" when the update is done, as here, on only a single example, which might have been selected stochastically. Over many examples, making small steps, the overall effect is to minimize an average performance measure such as the $\overline{VE}$.
+
+We turn now to the case in which the target output, here denoted $U_t \in \mathbb{R}$, of the $t$th training example, $S_t \to U_t$, is not the true value, $v_\pi(S_t)$, but some, possibly random, approximation to it. For example, $U_t$ might be a noise-corrupted version of $v_\pi(S_t)$, or it might be one of the bootstrapping targets using $\hat{v}$ mentioned in the previous section. In these cases we cannot perform the exact update (9.5) because $v_\pi(S_t)$ is unknown, but we can approximate it by substituting $U_t$ in place of $v_\pi(S_t)$. This yields the following general SGD method for state-value prediction:
+
+$$w_{t+1} \doteq w_t + \alpha [U_t - \hat{v}(S_t,w_t)] \nabla\hat{v}(S_t,w_t)$$
+
+If $U_t$ is an unbiased estimate, that is, if $\mathbb{E}[U_t|S_t = s] = v_\pi(s)$, for each $t$, then $w_t$ is guaranteed to converge to a local optimum under the usual stochastic approximation conditions (2.7) for decreasing $\alpha$.
+
+One does not obtain the same guarantees if a bootstrapping estimate of $v_\pi(S_t)$ is used as the target $U_t$ in (9.7). Bootstrapping targets such as $n$-step returns $G_{t:t+n}$ or the DP target $\sum_{a,s',r} \pi(a|S_t)p(s',r|S_t,a)[r + \hat{v}(s',w_t)]$ all depend on the current value of the weight vector $w_t$, which implies that they will be biased and that they will not produce a true gradient-descent method. One way to look at this is that the key step from (9.4) to (9.5) relies on the target being independent of $w_t$. This step would not be valid if a bootstrapping estimate were used in place of $v_\pi(S_t)$. Bootstrapping methods are not in fact instances of true gradient descent (Barnard, 1993). They take into account the effect of changing the weight vector $w_t$ on the estimate, but ignore its effect on the target. They include only a part of the gradient and, accordingly, we call them semi-gradient methods.
+
+Although semi-gradient (bootstrapping) methods do not converge as robustly as gradient methods, they do converge reliably in important cases such as the linear case discussed in the next section. Moreover, they offer important advantages that make them often clearly preferred. One reason for this is that they typically enable significantly faster learning, as we have seen in Chapters 6 and 7. Another is that they enable learning to be continual and online, without waiting for the end of an episode. This enables them to be used on continuing problems and provides computational advantages. A prototypical semi-gradient method is semi-gradient TD(0), which uses $U_t \doteq R_{t+1} + \hat{v}(S_{t+1},w)$ as its target.
+
+\section{Linear Methods}
+
+One of the most important special cases of function approximation is that in which the approximate function, $\hat{v}(\cdot,w)$, is a linear function of the weight vector, $w$. Corresponding to every state $s$, there is a real-valued vector $x(s) \doteq (x_1(s), x_2(s), \ldots, x_d(s))^T$, with the same number of components as $w$. Linear methods approximate the state-value function by the inner product between $w$ and $x(s)$:
+
+$$\hat{v}(s,w) \doteq w^T x(s) \doteq \sum_{i=1}^d w_i x_i(s)$$
+
+In this case the approximate value function is said to be linear in the weights, or simply linear.
+
+The vector $x(s)$ is called a feature vector representing state $s$. Each component $x_i(s)$ of $x(s)$ is the value of a function $x_i : S \to \mathbb{R}$. We think of a feature as the entirety of one of these functions, and we call its value for a state $s$ a feature of $s$. For linear methods, features are basis functions because they form a linear basis for the set of approximate functions. Constructing $d$-dimensional feature vectors to represent states is the same as selecting a set of $d$ basis functions. Features may be defined in many different ways; we cover a few possibilities in the next sections.
+
+It is natural to use SGD updates with linear function approximation. The gradient of the approximate value function with respect to $w$ in this case is
+
+$$\nabla\hat{v}(s,w) = x(s)$$
+
+Thus, in the linear case the general SGD update (9.7) reduces to a particularly simple form:
+
+$$w_{t+1} \doteq w_t + \alpha [U_t - \hat{v}(S_t,w_t)] x(S_t)$$
+
+Because it is so simple, the linear SGD case is one of the most favorable for mathematical analysis. Almost all useful convergence results for learning systems of all kinds are for linear (or simpler) function approximation methods.
+
+In particular, in the linear case there is only one optimum (or, in degenerate cases, one set of equally good optima), and thus any method that is guaranteed to converge to or near a local optimum is automatically guaranteed to converge to or near the global optimum. For example, the gradient Monte Carlo algorithm presented in the previous section converges to the global optimum of the $\overline{VE}$ under linear function approximation if $\alpha$ is reduced over time according to the usual conditions.
+
+The semi-gradient TD(0) algorithm presented in the previous section also converges under linear function approximation, but this does not follow from general results on SGD; a separate theorem is necessary. The weight vector converged to is also not the global optimum, but rather a point near the local optimum. It is useful to consider this important case in more detail, specifically for the continuing case. The update at each time $t$ is
+
+$$w_{t+1} \doteq w_t + \alpha (R_{t+1} + w_t^T x_{t+1} - w_t^T x_t) x_t$$
+
+$$= w_t + \alpha (R_{t+1} x_t - x_t (x_t - x_{t+1})^T w_t)$$
+
+where here we have used the notational shorthand $x_t = x(S_t)$. Once the system has reached steady state, for any given $w_t$, the expected next weight vector can be written
+
+$$\mathbb{E}[w_{t+1}|w_t] = w_t + \alpha(b - Aw_t)$$
+
+where
+
+$$b \doteq \mathbb{E}[R_{t+1}x_t] \in \mathbb{R}^d \quad \text{and} \quad A \doteq \mathbb{E}[x_t(x_t - \gamma x_{t+1})^T] \in \mathbb{R}^{d \times d}$$
+
+From (9.10) it is clear that, if the system converges, it must converge to the weight vector $w_{TD}$ at which
+
+$$b - Aw_{TD} = 0$$
+$$\Rightarrow b = Aw_{TD}$$
+$$\Rightarrow w_{TD} \doteq A^{-1}b$$
+
+This quantity is called the TD fixed point. In fact linear semi-gradient TD(0) converges to this point. Some of the theory proving its convergence, and the existence of the inverse above, is given in the box.
+
+At the TD fixed point, it has also been proven (in the continuing case) that the $\overline{VE}$ is within a bounded expansion of the lowest possible error:
+
+$$\overline{VE}(w_{TD}) \leq \frac{1}{1-\gamma} \min_w \overline{VE}(w)$$
+
+That is, the asymptotic error of the TD method is no more than $\frac{1}{1-\gamma}$ times the smallest possible error, that attained in the limit by the Monte Carlo method. Because $\gamma$ is often near one, this expansion factor can be quite large, so there is substantial potential loss in asymptotic performance with the TD method. On the other hand, recall that the TD methods are often of vastly reduced variance compared to Monte Carlo methods, and thus faster, as we saw in Chapters 6 and 7. Which method will be best depends on the nature of the approximation and problem, and on how long learning continues.
+
+\section{Feature Construction for Linear Methods}
+
+Linear methods are interesting because of their convergence guarantees, but also because in practice they can be very efficient in terms of both data and computation. Whether or not this is so depends critically on how the states are represented in terms of features, which we investigate in this large section. Choosing features appropriate to the task is an important way of adding prior domain knowledge to reinforcement learning systems.
+
+Intuitively, the features should correspond to the aspects of the state space along which generalization may be appropriate. If we are valuing geometric objects, for example, we might want to have features for each possible shape, color, size, or function. If we are valuing states of a mobile robot, then we might want to have features for locations, degrees of remaining battery power, recent sonar readings, and so on.
+
+A limitation of the linear form is that it cannot take into account any interactions between features, such as the presence of feature $i$ being good only in the absence of feature $j$. For example, in the pole-balancing task (Example 3.4), high angular velocity can be either good or bad depending on the angle. If the angle is high, then high angular velocity means an imminent danger of falling—a bad state—whereas if the angle is low, then high angular velocity means the pole is righting itself—a good state. A linear value function could not represent this if its features coded separately for the angle and the angular velocity. It needs instead, or in addition, features for combinations of these two underlying state dimensions. In the following subsections we consider a variety of general ways of doing this.
+
+\begin{itemize}
+    \item \textbf{Polynomials.} You can represent a state with $n$ dimensions, so that $x(s) = (s_1,s_2,\dots,s_n)^T$, maybe with interactions or appending a constant value (1) at the beginning to represent affine functions in the original state numbers. Thus, each order-$n$ polynomial-basis feature $x_i$ can be written as 
+    \begin{equation}
+        x_i(s) = \prod_{j=1}^n s_j^{c_{i,j}}
+    \end{equation}
+    where $c_{i,j}$ is an integer in the set $\{0,1,\dots,n\}$ for an integer $n\geq 0$. 
+    \item \textbf{Fourier Basis.} The Fourier basis represents functions as a sum of sinusoids. For a state $s$, we can define Fourier features as
+    \begin{equation}
+        x_i(s) = \cos(\omega_i^T s + \phi_i)
+    \end{equation}
+    where $\omega_i$ is a frequency vector and $\phi_i$ is a phase shift. This allows for capturing periodic patterns in the state space.
+    \item \textbf{Radial Basis Functions (RBFs).} RBFs are a popular choice for function approximation, defined as
+    \begin{equation}
+        x_i(s) = \exp\left(-\frac{1}{2\sigma^2} \|s - \mu_i\|^2\right)
+    \end{equation}
+    where $\mu_i$ is the center of the RBF and $\sigma$ controls the width. RBFs are particularly useful for capturing localized features in the state space.
+    \item \textbf{ANN.} Artificial Neural Networks (ANNs) can be used to learn complex feature representations from raw state inputs. They consist of multiple layers of interconnected nodes, where each node applies a non-linear transformation to its inputs. The learned features can capture intricate patterns and interactions in the state space.
+\end{itemize}

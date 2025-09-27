@@ -1,0 +1,108 @@
+\chapter{n-step Bootstrapping}
+
+Neither MC methods nor one-step TD methods are always the best. In this chapter we present \textbf{n-step TD methods} that generalize both approaches, so that one can shift from one to the other smoothly as needed to meed the demands of a particular task. $n$-step methods span a spectrum with MC methods at one end and one-step TD methods at the other. The best methods are often intermediate between the two extremes. 
+
+As usual, we first consider the prediction problem and then the control problem. That is, we first consider how $n$-step methods can help in predicting returns as a function of state for a fixed policy (i.e., in estimating $v_{\pi}$). Then we extend the ideas to action values and control methods. 
+
+\section{$n$-step TD Prediction}
+
+Consider estimating $v_{\pi}$ from sample episodes generated using $\pi$. Monte Carlo methods perform an update for each state based on the entire sequence of observed rewards from that state until the end of the episode. The update of one-step TD methods, on the other hand, is based on just the one next reward, bootstrapping from the value of the state one step later as a proxy for the remaining rewards. One kind of intermediate method, then, would perform an update based on an intermediate number of rewards. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{assets/n_step_backup_diagram.png}
+\caption{The backup diagram of $n$-step methods. These methods form a spectrum ranging from one-step TD methods to Monte Carlo methods.}
+\label{fig:n_step_backup_diagram}
+\end{figure}
+
+Figure \ref{fig:n_step_backup_diagram} shows the backup diagram of the spectrum of $n$-step updates for $v_{\pi}$, with the one-step TD update on the left and the up-until-termination Monte Carlo update on the right.
+
+Methods in which the TD extends over $n$ steos are called \textbf{$n$-step TD methods}. We know that in Monte Carlo updates the estimate of $v_{\pi}(S_t)$ is updated in the direction of the complete return:
+
+\begin{equation}
+    G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + \dots + \gamma^{T-t-1} R_T \label{eq:61}
+\end{equation}
+
+where $T$ is the last time step of the episode. Let us call this quantity the \textit{target} of the update. Whereas in Monte Carlo updates the target is the return, in one-step updates the target is the first reward plus the discounted estimated value of the next state, which we call the \textit{one-step return}:
+
+\begin{equation}
+    G_t^{t:t+1} = R_{t+1} + \gamma v_{t}(S_{t+1}) \label{eq:62}
+\end{equation}
+
+where $V_t : \mathcal{S} \to \mathbb{R}$ here is the estimate at time $t$ of $v_{\pi}$. Our point now is that this idea makes just as much sense after two steps as it does after one. The target for a two-step update is the \textit{two-step return}:
+
+\begin{equation}
+    G_t^{t:t+2} = R_{t+1} + \gamma R_{t+2} + \gamma^2 v_{t}(S_{t+2}) \label{eq:63}
+\end{equation}
+
+Similarly, the target for an arbitrary $n$-step update is the \textit{$n$-step return}:
+
+\begin{equation}
+    G_t^{t:t+n} = R_{t+1} + \gamma R_{t+2} + \dots + \gamma^{n-1} R_{t+n} + \gamma^n v_{t}(S_{t+n}) \label{eq:64}
+\end{equation}
+
+The natural state-value learning algorithm for using $n$-step returns is thus:
+
+\begin{equation}
+V_{t+n}(S_t) = V_{t+n-1}(S_t) + \alpha \left[G_{t:t+n} - V_{t+n-1}(S_t)\right], \quad 0\leq t < T, \label{eq:65}
+\end{equation}
+
+while the values of all other states remain unchanged: $V_{t+n}(S) = V_{t+n-1}(s)$, for all $s\neq S_t$. We call this algorithm $n$-step TD. Note that no changes at all are made during the first $n-1$ steps of each episode. To make up for that, an equal number of additional updates are made at the end of the episode, after termination and before starting the next episode. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/n_step_code.png}
+\label{fig:n_step_code}
+\end{figure}
+
+The $n$-step return uses the value funtion $V_{t+n-1}$ to correct for the missing rewards beyond $R_{t+n}$. An important property of $n$-step returns is that their expectation is guaranteed to be a better estimate of $v_{\pi}$ than $V_{t+n-1}$ is, in a worst-state sense. That is, the worst error of the expected $n$-step return is guaranteed to be less than or equal to $\gamma^n$ times the worst error under $V_{t+n-1}$:
+
+\begin{equation}
+    \max_{s} | \mathbb{E}_{\pi} \left[G_{t:t+n}|S_t=s\right] - v_{\pi}(s) | \leq \gamma^n \max_{s} |V_{t+n-1}(s) - v_{\pi}(s)|, \label{eq:66}
+\end{equation}
+
+for all $n \geq 1$. This is called the \textbf{error reduction property of $n$-step returns}. 
+
+\section{$n$-step Sarsa}
+
+How can $n$-step methods be used not just for prediction, but for control? The main idea is to simply switch states for actions (state-action pairs) and then use an $\epsilon$-greedy policy. This is the $n$-step version of Sarsa and is called \textbf{$n$-step Sarsa}. We redefine $n$-step returns (update targets) in terms of estimated action values:
+
+\begin{equation}
+    G_{t:t+n} = R_{t+1} + \gamma R_{t+2} + \dots + \gamma^{n-1}R_{t+n} + \gamma^n Q(t+n-1)(S_{t+n},A_{t+n}), n\geq 1, 0\leq t < T-n, \label{eq:67}
+\end{equation}
+
+with $G_{t:t+n} = G_t$ if $t+n \geq T$. The natural algorithm is then:
+
+\begin{equation}
+    Q_{t+n}(S_t,A_t) = Q_{t+n-1}(S_t,A_t) + \alpha\left[G_{t:t+n} - Q_{t+n-1}(S_t,A_t)\right], \quad 0\leq t < T, \label{eq:68}
+\end{equation}
+
+while the values of all other states remain unchanged: $Q_{t+n}(s,a) = Q_{t+n-1}(s,a),$ for all $s,a$ such that $s\neq S_t$ or $a\neq A_t$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/n_step_sarsa_code.png}
+\caption{The $n$-step Sarsa algorithm. The $n$-step return is used to update the action value function. The policy is $\epsilon$-greedy with respect to the action value function.}
+\label{fig:n_step_sarsa_code}
+\end{figure}
+
+\section{$n$-step Off-policy Learning}
+
+In $n$-step methods, returns are constructed over $n$ steps, so we are interested in the relative probability of just those $n$ actions. To make a simple off-policy version of $n$-step TD, the update for time $t$ (actually made at time $t+n$) can simply be weighted by $\rho_{t:t+n-1}$:
+
+\begin{equation}
+    V_{t+n}(S_t) = V_{t+n-1}(S_t) + \alpha \rho_{t:t+n-1}\left[G_{t:t+n} - V_{t+n-1}(S_t)\right], \quad 0\leq t < T, \label{eq:69}
+\end{equation}
+
+where $\rho_{t:t+n-1}$, called the \textit{importance sampling ratio}, is the relative probability under the two policies of taking the $n$ actions from $A_t$ to $A_{t+n-1}$:
+
+\begin{equation}
+    \rho_{t:h} = \prod_{k=t}^{\min (h,T-1)}\frac{\pi(A_k|S_k)}{b(A_k|S_k)} \label{eq:610}
+\end{equation}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/n_step_off_policy_code.png}
+\caption{The $n$-step off-policy learning algorithm. The importance sampling ratio $\rho_{t:t+n-1}$ is used to weight the update. The policy is $\epsilon$-greedy with respect to the action value function.}
+\label{fig:n_step_off_policy_code}
+\end{figure}

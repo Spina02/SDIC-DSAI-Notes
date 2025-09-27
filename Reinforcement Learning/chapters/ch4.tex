@@ -1,0 +1,162 @@
+\chapter{Monte Carlo Methods}
+
+Here we do not assume complete knowledge of the environment. Monte Carlo methods require only \textbf{experience}, meaning sample sequences of states, actions and rewards from actual or simulated interaction with an environment. Learning from \textit{actual} experience is striking because it requires no prior knowledge of the environment's dynamics, yet can still attain optimal behavior. Learning from \textit{simulated} experience is also powerful. Altough a morel is required, the model need only generate sample transitions, not the complete probability distributions of all possible transitions that is required for dynamic programming (DP).
+
+Monte Carlo methods (MC) are ways of solving the RL problem based on averaging sample returns. Here are defined only for episodic tasks. Only on the completion of an episode are value estimates and policies changed. 
+
+Essentially, MC methods sample and average \textit{returns} for each state-action pair much like the bandit methods which sample and average rewards for each action. The main difference is that now there are multiple states, each acting like a different bandit problem and the different bandit problems are interrelated. That is, the return after taking an action in one state depends on the actions taken in later states in the same episode. Because all the action selections are undergoing learning, the problem becomes nonstationary from the point of view of the earlier state. 
+
+To handle the nonstationarity, we adapt the idea of general policy iteration (GPI) developed earlier for DP. Whereas there we computed value functions from knowledge of the MDP, here we \textit{learn} value functions from sample returns with the MDP.
+
+\section{Monte Carlo Prediction}
+
+We begin by considering MC methods for learning the state-valiue function for a given policy. An obvious way to estimate it from experience is simply to average the returns observed after visits to that state. As more returns are observed, the average should converge to the expected value. Suppose we wish to estimate $v_{\pi}(s)$, the value of a state $s$ under policy $\pi$ given a set of episodes obtained by following $\pi$ and passing through $s$. Each occurrence of state $s$ in an episode is called a \textit{visit} to $s$. The \textit{first-visit MC method} estimates $v_{\pi}(s)$ as the average of the returns following the first visits to $s$, whereas the \textit{every-visit MC method} averages the returns following all visits to $s$. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{assets/mc_prediction_code.png}
+\label{fig:mc_prediction_code}
+\end{figure}
+
+Both first-visit and every-visit MC converge to $v_{\pi}(s)$ as the number of visits to $s$ goes to infinity.
+
+Can we generalize the idea of backup diagram to MC algorithms? The general idea of a backup diagram is to show at the top the root node to be updated and to show below all the transitions and leaf nodes whose rewards and estimated values contribute to the update. For MC estimation of $v_{\pi}$, the root is a state node, and below it is the entire trakectory of transitions along a particular single episode, ending at the terminal state. An important fact about MC methods is that the estimates for each state are independent. MC methods do not bootstrap as we defined it in the previous chapter. 
+
+Note that the computational expense of estimating the value of a single state is independent of the number of states. This can make MC methods particularly attractive when one requires the value of only one or a subset of states. One can generate many sample episodes starting from the states of interest, averaging returns from only these states, ignoring all others. 
+
+\section{Monte Carlo Estimatino of Action Values}
+
+If a model is not available, then it is particularly useful to estiamte action values rather than state values. With a model, state values alone are sufficient to determine a policy; one simply looks ahead one step and chooses whichever action leads to the best combination of reward and next state. Without a model, however, state values alone are not sufficient. One must explicitly estimate the value of each action in order for the values to be useful in suggesting a policy. 
+
+The policy evaluation problem for action values is to estimate $q_{\pi}(s,a)$, the expected return when starting in state $s$, taking action $a$ and thereafter following policy $\pi$. A state-action pair $s,a$ is said to be visited in an episode if ever the state $s$ is visited and action $a$ is taken in it. 
+
+The only complication is that many state-action pairs may never be visited. If $\pi$ is a deterministic policy, then following $\pi$ one will observe returns only for one of the actions from each state. With no return to average, the MC estimates of the other actions will not improve with experience. This is a serious problem because the purpose of learning action values is to help in choosing among the actions available in each state. This is the general problem of \textbf{maintaininig exploration}.
+
+For policy evaluation to work for action values, we must assure continual exploration. One way to do this is by specifying the episodes start in a state-action pair., and that every pair has a nonzero probability of being selected as the start. This guarantees that all state-action pairs will be visited an infinite number of times in the limit of an infinite number of episodes. We call this the assumption of \textbf{exploring starts}.
+
+\section{Monte Carlo Control}
+
+Let's consider a MC version of classical policy iteration. In this method, we perform alternating complete steps of policy evaluaton and policy improvement, beginning with an arbitrary policy $\pi_0$ and ending with the optimal policy and optimal action-value function:
+
+$$
+\pi_0 \rightarrow^E q_{\pi_0} \rightarrow^I \pi_1 \rightarrow^E q_{\pi_1} \rightarrow^I \pi_2 \rightarrow^E \ldots \rightarrow^I \pi_* \rightarrow^E q_*,
+$$
+
+where $\rightarrow^E$ denotes a complete policy evaluation and $\rightarrow^I$ denotes a complete policy improvement. 
+
+Policy evaluation is done exactly as described in the preceding section. Many episodes are experienced, with the approximate action-value function approaching the true function asymptotically. For the moment, let us assume that we do indeed observe an infinite number of episodes and that, in addition, the episodes are generated with exploring starts. Under these assumptions, the MC methods will compute each $q_{\pi_k}$ exactly, for arbitraty $\pi_k$. 
+
+Policy improvement is done by making the policy greedy with respect to the current value function. In this case we have an acion-value function, and therefore no model is needed to construct the greedy policy. For any given action-value function $q$, the corresponding greedy policy is the one that, for each $s \in \mathcal{S}$, deterministically chooses an action with maximal action-value:
+
+$$
+\pi(s) = \argmax{a} q(s,a)
+$$
+
+Policy improvement then can be done by constructing each $\pi_{k+1}$ as the greedy policy with respect to $q_{\pi_k}$. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{assets/mc_control.png}
+    \label{fig:mc_control}
+\end{figure}
+
+The first strong assumption we made (exploring starts) is easy to remove. In both DP and MC cases there are two ways to solve the problem. One is to hold firm to the idea of approximating $q_{\pi_k}$ in each policy evaluation. Measurements and assumptions are made to obtain bounds on the magnitude and probability of error in the estimates, and then sufficient steps are taken during each policy evaluation to assure that these bounds are sufficiently small. 
+
+The second approach is to give up trying to complete policy evaluation before returning to policy improvement. On each evaluation step we move the value function toward $q_{\pi_k}$, but we don't expect to actually get close except over many steps. Below is the pseudocode of the so called \textbf{Monte Carlo with Exploring Starts (MCES)}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{assets/mc_control_code.png}
+\caption{Monte Carlo with Exploring Starts (MCES)}
+\label{fig:mc_control_code}
+\end{figure}
+
+\section{Monte Carlo Control without Exploring Starts}
+
+How can we avoid the unlikely assumption of exploring starts? The only general way to ensure that all acitons are selected infinitely often is for the agent to continue to select them. There are two approaches:
+\begin{itemize}
+    \item \textbf{On-policy methods} - attempt to evaluate or improve the policy that is used to make decisions
+    \item \textbf{Off-policy methods} - evaluate or improve a policy different from the one used to generate the data
+\end{itemize}
+
+In on-policy control methods, the policy is generally \textit{soft}, meaning that $\pi(a|s) > 0$ for all $s \in \mathcal{S}$ and all $a \in \mathcal{A}(s)$, but gradually shifted closer and closer to a deterministic optimal policy.
+
+The on-policy control method we present in this section uses $\epsilon$-greedy policies, meaning that mist of the time they choose an action that has maximal estimated action value, but with probability $\epsilon$ they instead select an action at random. 
+
+As in MCES, we use first-visit MC methods to estimate the action-value function for the current policy. Without the assumption of exploring starts, however, we cannot simply improve the policy by making it greedy with respect to the current value function, because that would prevent further exploration of nongreedy actions. Fortunately, GPI does not require that the policy be taken all the way to a greedy policy, only that it be moved toward a greedy policy. In our on-policy method we will move it only to an $\epsilon$-greedy policy. For any $\epsilon$-soft policy, $\pi$, any $\epsilon$-greedy policy with respect to $q_\pi$ is guaranteed to be better than or equal to $\pi$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{assets/mc_control_on_policy.png}
+\caption{Monte Carlo Control with $\epsilon$-greedy policies}
+\label{fig:mc_control_on_policy}
+\end{figure}
+
+So, the policy ieration workds for $\epsilon$-soft policies. Using the natural notion of greedy policy for $\epsilon$-soft policies, one is assured of improvement on every step, except when the best policy has been found among the $\epsilon$-soft policies. This analysis is independent of how the action-value functions are determined at each stage, but it does assume that they are computed exactly. Now we only achieve the best policy among the $\epsilon$-soft policies, but on the other hand, we have eliminated the assumption of exploring starts.
+
+\section{Off-policy Prediction via Importance Sampling}
+
+All learning control methods face a dilemma: they seek to learn action values conditional on subsequent optimal behavior, but they need to behave non-optimally in order to explore all actions. How can they learn about the optimal policy while behaving according to an exploratory policy? The on-policy approach in the preceding section is actually a compromise, i.e., it learns action values not for the optimal policy but for a near-optimal policy that still explores. A more straightforward approach is to use two policies, one that is learned about and that becomes the optimal policy, and one that is more exploratory and is used to generate behavior. The first is the \textbf{target policy}, while the second is the \textbf{behavior policy}. In this case we say that learning is from data "off" the target policy, and the overall process is termed \textit{off-policy learning}.
+
+Off-policy methods are often of greater variance and are slower to converge. On the other hand, off-policy methods are more powerful in general.
+
+We begin by considering the \textit{prediction} problem, where both target and behavior policies are fixed. Suppose we wish to estimate $v_{\pi}$ or $q_{\pi}$, but all we have are episodes following another policy $b$, where $b\neq \pi$. In this case, $\pi$ is the target policy, $b$ is the behavior policy, and both policies are considered fixed and given. 
+
+We require that every action taken under $\pi$ is also taken, at least occasionally, under $b$. This is called the assumption of \textit{coverage}. It follows from coverage that $b$ must be stochastic in states where it is not identical to $\pi$. The target policy $\pi$, on the other hand, may be deterministic. 
+
+Almost all off-policy methods utilize \textbf{importance sampling}, a general technique for estimating expected values under one distribution given samples from another. We apply importance sampling to off-policy learning by weighting returns according to the relative probability of their trajectories occurring under the target and behavior policies, called the \textit{importance-sampling ratio}. Given a starting state $S_t$, the probability of the subsequent state-action trajectory occurring under any policy $\pi$ is:
+
+\begin{align*}
+Pr\{A_t, & S_{t+1}, A_{t+1}, \dots, S_T | S_t, A_{t:T-1} \approx \pi\} \\
+&= \pi(A_t | S_t)p(S_{t+1} | S_t, A_t)\pi(A_{t+1} | S_{t+1}) \dots p(S_T | S_{T-1},A_{T-1}) \\
+&= \prod_{k=t}^{T-1}\pi(A_k | S_k)p(S_{k+1} | S_k,A_k)
+\end{align*}
+
+where $p$ here is the state-transition probability function. 
+
+The importance-sampling ratio is:
+
+$$
+\rho_{t:T-1} = \frac{\prod_{k=T}^{T-1}\pi(A_k | S_k)p(S_{k+1}|S_k,A_k)}{\prod_{k=t}^{T-1}b(A_k | S_k)p(S_{k+1} | S_k,A_k)} = \prod_{k=t}^{T-1}\frac{\pi(A_k | S_k)}{b(A_k | S_k)}
+$$
+
+Recall that we wish to estimate the expected returns (values) under the target policy, but all we have are returns $G_t$ due to the behavior policy. These returns have the wrong expectation $\mathbb{E}\left[G_t | S_t=s\right] = v_b(s)$ and so cannot be averaged to obtain $v_{\pi}$ This is where importance sampling comes in. The ratio $\rho_{t:T-1}$ transforms the returns to have the right expected value:
+
+$$
+\mathbb{E}\left[\rho_{t:T-1}G_t | S_t=s\right] = v_{\pi}(s)
+$$
+
+We can define the set of all time steps in which state $s$ is visited, denoted $\mathcal{T}(s)$. Also, let $T(t)$ denote the first time of termination following time $t$, and $G_t$ denote the return after $t$ up through $T(t)$. Then $\left\{G_t\right\}_{t\in\mathcal{T}(s)}$ are the returns that pertain to state $s$, and $\left\{\rho_{t:T(t)-1}\right\}_{t\in\mathcal{T}(s)}$ are the corresponding importance-sampling rations. To estimate $v_{\pi}(s)$, we simply scale the returns by the ratios and average the results:
+
+$$
+V(s) = \frac{\sum_{t\in\mathcal{T}(s)}\rho_{t:T(t)-1}G_t}{|\mathcal{T}(s)|}
+$$
+
+When importance sampling is done as a simple average in this way it is called \textit{ordinary importance sampling}. 
+
+An important alternative is \textit{weighted importance sampling}, which uses a weighted average, defined as:
+
+$$
+V(s) = \frac{\sum_{t\in\mathcal{T}(s)}\rho_{t:T(t)-1}G_t}{\sum_{t\in\mathcal{T}(s)}\rho_{t:T(t)-1}}
+$$
+
+\section{Incremental Implementation}
+
+MC prediction methods can be implemented incrementally, on an episode-by-episode basis, using extensions of the techniques described in Chapter 3. In MC methods we average returns. In all other aspects the same methods of Chapter 3 can be used for on-policy MC methods. For off-policy MC methods, we need to separately consider those that use ordinary importance sampling and those that use weighted importance sampling. 
+
+In ordinary importance sampling, the returns are scaled by the importance sampling ratio $\rho_{t:T(t)-1}$, then simply averaged. This leaves the case of off policy methods using weighted importance sampling. Here we have to form a weighted average of the returns, and a slightly different incremental algorithm is required. We let the definition and demonstration of this algorithm be left in the book \cite{barto2021reinforcement}.
+
+\section{Off-policy Monte Carlo Control}
+
+Recall that the distinguishing feature of on-policy methods is that they estimate the value of a policy while using it for control. In off-policy methods these two functions are separated. The policy used to generate behavior, called the \textit{behavior policy}, may in fact be unrelated to the policy that is evaluated and improved, called the \textit{target policy}. An advantage of this separation is that the target policy may be deterministic (e.g. greedy), while the behavior policy can continue to sample all possible actions. 
+
+These techniques require that the behavior policy has a nonzero probability of selecting all actions that might be selected by the target policy (coverage). To explore all possibilities, we require that the behavior policy be soft. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{assets/off_policy_mc_control.png}
+\caption{Off-policy Monte Carlo Control}
+\label{fig:off_policy_mc_control}
+\end{figure}
+
+A potential problem is that this method learns only from the tails of episodes, when all of the remaining actions in the episode are greedy. If nongreedy actions are common, then learning will be slow, particularly for states appearing in the early portions of long episodes. 
