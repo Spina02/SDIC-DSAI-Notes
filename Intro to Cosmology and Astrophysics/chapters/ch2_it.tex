@@ -1,0 +1,1341 @@
+\chapter{Tensori}
+
+Introduciamo il concetto di \textit{tensore}, fondamentale per descrivere grandezze geometriche e fisiche in modo indipendente dal sistema di coordinate scelto. Analizzeremo come queste grandezze si trasformano passando da un sistema di coordinate a un altro, definendo tensori controvarianti, covarianti e misti. Vedremo infine come il tensore metrico permetta di convertire tra componenti controvarianti e covarianti.
+
+\section{Leggi di Trasformazione Tensoriale}
+
+Il concetto chiave per definire un tensore è la sua \textbf{legge di trasformazione} al cambiare delle coordinate. Consideriamo due sistemi di coordinate $n$-dimensionali, $u^i = (u^1, ..., u^n)$ e $u'^j = (u'^1, ..., u'^n)$.
+
+\subsubsection{Tensori Controvarianti (di Rango 1)}
+
+Ricordiamo dal \cref{ch:geometria_differenziale} che i differenziali delle coordinate si trasformano secondo la regola:
+$$
+du'^j = \sum_{i=1}^{n} \dfrac {\partial u'^j}{\partial u^i} du^i
+$$
+Una qualsiasi grandezza le cui componenti $V^i$ nel sistema $u$ si trasformano in $V'^j$ nel sistema $u'$ seguendo la \emph{stessa} regola dei differenziali:
+\vspace{0.5em}
+$$
+\boxed{
+    V'^{j} = \sum_{i=1}^{n} \dfrac {\partial u'^j}{\partial u^i} V^{i}
+    \quad \xrightarrow{\text{notazione di Einstein}}\quad
+    V'^{j} = \dfrac {\partial u'^j}{\partial u^i} V^{i}
+    }0
+$$
+è definita \textbf{tensore controvariante di rango 1}, o semplicemente \bfit{vettore controvariante}.
+Ne consegue che le componenti del differenziale delle coordinate, $du^i$, costituiscono esse stesse un vettore controvariante.
+
+\begin{observationblock}[Scalari]
+Una grandezza \bfit{scalare} $\Phi$ è una quantità il cui valore in un punto non dipende dal sistema di coordinate ($\Phi(u^i) = \Phi(u'^j)$). È considerato un \textbf{tensore di rango 0}. Un esempio fisico è la temperatura in un punto dello spazio.
+\end{observationblock}
+
+\subsubsection{Tensori Covarianti (di Rango 1)}
+
+Consideriamo ora il \bfit{gradiente} di un campo scalare $\Phi$. Le sue componenti nel sistema $u^i$ sono date dalle derivate parziali $W_i = \partial \Phi / \partial u^i$. Vediamo come si trasformano queste componenti passando al sistema $u'^j$. Le componenti nel nuovo sistema sono $W'_j = \partial \Phi / \partial u'^j$. Usando la regola della catena per la derivazione:
+$$
+W'_{j} = \dfrac{\partial \Phi} {\partial u'^j}
+= \sum_i \dfrac{\partial \Phi} {\partial u^i} \dfrac{\partial u^i} {\partial u'^j}
+= \sum_i W_i \dfrac{\partial u^i} {\partial u'^j}
+$$
+Una qualsiasi grandezza le cui componenti $W_i$ si trasformano secondo questa regola:
+\vspace{0.4em}
+$$
+\boxed{
+    W'_{j} = \sum_i \dfrac{\partial u^i} {\partial u'^j} W_i
+    \quad \xrightarrow{\text{notazione di Einstein}}\quad
+    W'_{j} = \dfrac{\partial u^i} {\partial u'^j} W_i
+    }
+$$
+è definita \textbf{tensore covariante di rango 1}, o \bfit{covettore} (o \bfit{forma 1}).
+
+Notiamo che la trasformazione usa le derivate $\partial u^i / \partial u'^j$, inverse rispetto a quelle usate per i tensori controvarianti ($\partial u'^j / \partial u^i$). Le componenti del gradiente $\partial \Phi / \partial u^i$ formano un covettore.
+
+\subsubsection{Tensore Metrico ($g_{ij}$) e suo Inverso ($g^{ij}$)}
+
+Abbiamo visto nel \cref{ch:geometria_differenziale} che la distanza infinitesima al quadrato, $ds^2$, è uno scalare (invariante per cambi di coordinate). La sua espressione è data dalla prima forma fondamentale $ds^2 = g_{ij} du^i du^j$. Poiché $ds^2$ è invariante, deve valere in qualsiasi sistema di coordinate $ds^2 = g_{ij} du^i du^j = g'_{lk} du'^l du'^k$.
+
+Sostituendo la legge di trasformazione per i differenziali $du^i = \frac{\partial u^i}{\partial u'^l} du'^l$ (e analogamente per $du^j$), otteniamo:
+\vspace{0.2em}
+$$
+ds^2 = g_{ij} \left( \dfrac {\partial u^i}{\partial u'^l} du'^l \right) \left( \dfrac {\partial u^j}{\partial u'^k} du'^k \right) = \left( g_{ij} \dfrac {\partial u^i}{\partial u'^l} \dfrac {\partial u^j}{\partial u'^k} \right) du'^l du'^k
+$$
+Confrontando questa espressione con $ds^2 = g'_{lk} du'^l du'^k$, e poiché l'uguaglianza deve valere per qualsiasi scelta dei differenziali $du'^l, du'^k$, deduciamo la legge di trasformazione per le componenti del tensore metrico:
+\vspace{0.2em}
+$$
+\boxed{ g'_{lk} = g_{ij} \dfrac {\partial u^i}{\partial u'^l} \dfrac {\partial u^j}{\partial u'^k} }
+$$
+Tale trasformazione coinvolge due fattori $\partial u / \partial u'$ e conferma che $g_{ij}$ è un \textbf{tensore covariante di rango 2}.
+
+\vspace{0.5em}
+
+Consideriamo ora la matrice inversa del tensore metrico, le cui componenti sono indicate con $g^{ij}$, definita dalla relazione fondamentale $g_{ij}\,g^{jk} = \delta_i^k$. Vogliamo determinare come si trasformano le componenti $g^{ij}$ al cambiare delle coordinate. Supponiamo che $g^{ij}$ si trasformi come un tensore controvariante di rango 2, ovvero:
+$$
+g'^{pq} = g^{ik} \dfrac{\partial u'^p}{\partial u^i} \dfrac{\partial u'^q}{\partial u^k} \quad \text{(Ipotesi)}
+$$
+Per verificare questa ipotesi, controlliamo se essa è consistente con l'invarianza della delta di Kronecker, cioè se $g'^{pq} g'_{qn} = \delta^p_n$. Utilizziamo le leggi di trasformazione per $g'^{pq}$ (ipotizzata) e per $g'_{qn}$ (nota):
+
+\begin{enumerate}
+\item Partiamo da  
+    \vspace{0.4em}
+    $$
+    g'^{pq}\,g'_{qn}
+    =\bigl(g^{ik}\,\dfrac{\partial u'^p}{\partial u^i}\,\dfrac{\partial u'^q}{\partial u^k}\bigr)\,
+        \bigl(g_{mj}\,\dfrac{\partial u^m}{\partial u'^q}\,\dfrac{\partial u^j}{\partial u'^n}\bigr)
+    $$
+\item Raggruppiamo le derivate e i tensori metrici:
+    \vspace{0.4em}
+    $$
+    =\,g^{ik}g_{mj}\;
+        \dfrac{\partial u'^p}{\partial u^i}\;
+        \bigl(\dfrac{\partial u'^q}{\partial u^k}\,\dfrac{\partial u^m}{\partial u'^q}\bigr)\;
+        \dfrac{\partial u^j}{\partial u'^n}
+    $$
+\item Applichiamo la regola della catena all'interno delle parentesi:  
+    \vspace{0.4em}
+    $$
+    \dfrac{\partial u'^q}{\partial u^k}\,\dfrac{\partial u^m}{\partial u'^q} 
+    = \delta^m_k
+    \qquad \rightarrow \qquad
+    =\,g^{ik}g_{mj}\;
+        \dfrac{\partial u'^p}{\partial u^i}\;\delta^m_k\;
+        \dfrac{\partial u^j}{\partial u'^n}
+    =\,g^{ik}g_{kj}\;
+        \dfrac{\partial u'^p}{\partial u^i}\;
+        \dfrac{\partial u^j}{\partial u'^n}
+    $$
+\item Usiamo \(g^{ik}g_{kj}=\delta^i_j\):
+    \vspace{0.4em}
+    $$
+    =\,\delta^i_j\;
+        \dfrac{\partial u'^p}{\partial u^i}\;
+        \dfrac{\partial u^j}{\partial u'^n}
+    =\,\dfrac{\partial u'^p}{\partial u^i}\,
+        \dfrac{\partial u^i}{\partial u'^n}
+    $$
+\item Di nuovo la catena dà
+    \vspace{0.4em}
+   $$
+   \dfrac{\partial u'^p}{\partial u^i}\,
+   \dfrac{\partial u^i}{\partial u'^n}
+   =\delta^p_n
+   $$
+\end{enumerate}
+
+Poiché la verifica $g'^{pq} g'_{qn} = \delta^p_n$ ha successo, l'ipotesi iniziale era corretta. La legge di trasformazione per le componenti della metrica inversa è quindi:
+$$
+\boxed{ g'^{lk} = g^{ij} \dfrac {\partial u'^l}{\partial u^i} \dfrac {\partial u'^k}{\partial u^j} }
+$$
+Tale trasformazione coinvolge due fattori $\frac{\partial u'}{\partial u}$ e conferma che $g^{ij}$ è un \textbf{tensore controvariante di rango 2}.
+
+\subsubsection{Tensori Misti}
+Un tensore può avere sia indici controvarianti (in alto) che covarianti (in basso). Un esempio fondamentale è la \textbf{delta di Kronecker} $\delta^k_i$, che è un \bfit{tensore misto di rango 2} (1 controvariante, 1 covariante).
+Per un generico tensore misto, come $V^j_i$, la legge di trasformazione combina le regole precedenti: un fattore $\partial u'/\partial u$ per ogni indice controvariante e un fattore $\partial u/\partial u'$ per ogni indice covariante:
+\vspace{0.5em}
+$$
+V'^k_l = \dfrac {\partial u'^k}{\partial u^j} \dfrac {\partial u^i}{\partial u'^l} V^j_i
+$$
+
+\begin{observationblock}[Rango e Indici]
+    Un tensore ha \textbf{rango} $N+M$ se ha $N$ indici controvarianti e $M$ covarianti (spesso detto di tipo $(N,M)$).
+
+    \underline{\textbf{Nota}}: \textit{Non tutti gli oggetti matematici definiti con indici si trasformano come tensori. Un esempio importante che vedremo più avanti sono i simboli di Christoffel $\Gamma^k_{ij}$.}
+\end{observationblock}
+
+\begin{tipsblock}[Invarianza della Delta di Kronecker]
+    Si può dimostrare che $\delta^k_i$ è l'unico tensore (a parte gli scalari costanti e il tensore nullo) le cui componenti sono le stesse in tutti i sistemi di coordinate.
+    $$
+    \delta'^k_l = \dfrac {\partial u'^k}{\partial u^j} \dfrac {\partial u^i}{\partial u'^l} \delta^j_i = \dfrac {\partial u'^k}{\partial u^j} \dfrac {\partial u^j}{\partial u'^l} = \dfrac{\partial u'^k}{\partial u'^l} = \delta^k_l
+    $$
+\end{tipsblock}
+
+\subsection{Algebra Tensoriale}
+
+Le operazioni algebriche di base (somma, prodotto per scalare) si applicano ai tensori componente per componente, a patto che abbiano lo stesso rango e lo stesso tipo (stesso numero di indici controvarianti e covarianti). Esistono inoltre operazioni specifiche per i tensori:
+
+\begin{itemize}
+    \item \textbf{Prodotto Esterno (o Tensoriale):} Il prodotto esterno di due tensori genera un nuovo tensore il cui rango è la somma dei ranghi dei tensori originali. Ad esempio, il prodotto esterno di un tensore di tipo (0,2), $A_{ij}$, e di un vettore controvariante (tipo (1,0)), $C^k$, è un tensore di tipo (1,2):
+    $$
+    D^k_{ij} = A_{ij} C^k
+    $$
+    Le componenti del nuovo tensore sono semplicemente il prodotto delle componenti dei tensori originali. Non si applica la somma di Einstein in questo caso, poiché non ci sono indici ripetuti.
+
+    \item \textbf{Contrazione:} La contrazione riduce il rango di un tensore di 2. Si applica a un tensore che abbia almeno un indice controvariante e uno covariante. Consiste nell'eguagliare uno degli indici superiori con uno degli indici inferiori e sommare su quell'indice secondo la convenzione di Einstein. Ad esempio:
+    \vspace{0.4em}
+    $$
+    \text{Sia } T^j_{kl} \text{ un tensore (1,2). Contraendo gli indici } j \text{ e } l \text{ si ottiene:} \quad B_k = T^j_{kj}
+    $$
+    $B_k$ è un tensore di rango 1 (covariante).
+
+    \item \textbf{Prodotto Scalare (Contrazione + Prodotto Esterno):} Il prodotto scalare tra due vettori (che geometricamente è $\bar{v} \cdot \bar{w}$) può essere visto come il prodotto esterno seguito da una doppia contrazione usando il tensore metrico. Per due vettori controvarianti $v^i$ e $w^j$, il prodotto esterno è $v^i w^j$. Contraendo con $g_{ij}$:
+    $$
+    \text{Scalare } = g_{ij} v^i w^j \quad (= \bar{v} \cdot \bar{w})
+    $$
+    Analogamente, per due vettori covarianti $v_i$ e $w_j$:
+    $$
+    \text{Scalare } = g^{ij} v_i w_j
+    $$
+    E per un vettore controvariante $v^i$ e uno covariante $w_j$:
+    $$
+    \text{Scalare } = v^i w_i \quad (= v^i g_{ij} w^j)
+    $$
+
+    \item \textbf{Innalzare e Abbassare Indici:} Il tensore metrico $g_{ij}$ e il suo inverso $g^{ij}$ permettono di convertire componenti controvarianti in covarianti e viceversa, mantenendo l'identità del tensore sottostante. Per un vettore $\mathbf{D}$ con componenti controvarianti $D^j$ e covarianti $D_i$:
+    $$
+    \boxed{ D_i = g_{ij}\,D^j } \quad (\text{abbassare l'indice } j)
+    $$
+    $$
+    \boxed{ D^i = g^{ij}\,D_j } \quad (\text{innalzare l'indice } j)
+    $$
+    Questo si estende a tensori di rango superiore. Ad esempio, per un tensore $T^{ij}$: $T^i_j = g_{jk} T^{ik}$, $T_{ij} = g_{ik} T^k_j = g_{ik} g_{jl} T^{kl}$, ecc.
+
+    \begin{tipsblock}
+    L'operazione di abbassare l'indice di un vettore controvariante $v^i$ per ottenere $v_k = g_{ik} v^i$ corrisponde geometricamente a calcolare la proiezione del vettore $\bar{v}$ sulla direzione definita dal vettore di base $\bar{x}_k$: $v_k \equiv \bar{v} \cdot \bar{x}_k$. Questo sarà utile nell'interpretazione grafica.
+    \end{tipsblock}
+
+\end{itemize}
+
+\subsection{Rappresentazione Geometrica delle Componenti Vettoriali}
+
+Mentre un vettore $\bar{A}$ è un'entità geometrica indipendente dalle coordinate, le sue \emph{componenti} dipendono dal sistema di coordinate e dalla base scelta. Capire la differenza tra componenti controvarianti ($A^i$) e covarianti ($A_i$) può essere più intuitivo con un esempio grafico.
+
+Consideriamo un piano con un sistema di coordinate $u^1, u^2$ non necessariamente ortogonali. In un punto $P$, i \textbf{vettori di base covarianti} $\bar{x}_1 = \partial \bar{r}/\partial u^1$ e $\bar{x}_2 = \partial \bar{r}/\partial u^2$ sono tangenti alle linee coordinate passanti per $P$. Questi vettori formano la \textit{base naturale} o \textit{base covariante}.
+
+Un vettore $\bar{A}$ può essere scomposto in questa base:
+$$ \bar{A} = A^1 \bar{x}_1 + A^2 \bar{x}_2 = A^i \bar{x}_i $$
+Le $A^i$ sono le \textbf{componenti controvarianti}. Geometricamente, esse corrispondono alle componenti ottenute scomponendo il vettore $\bar{A}$ tramite la \emph{regola del parallelogramma}, usando direzioni parallele ai vettori di base $\bar{x}_i$. Sono le "usuali" componenti vettoriali.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.6\textwidth]{assets/tensors.png}
+    \caption{Rappresentazione geometrica delle componenti controvarianti ($A^i$) e covarianti ($A_i$) di un vettore $\bar{A}$ in una base non ortogonale ($\bar{x}_1, \bar{x}_2$). Le componenti controvarianti sono ottenute con proiezioni parallele agli assi, mentre quelle covarianti con proiezioni ortogonali ai vettori della base duale (non mostrata) o equivalentemente $A_i = \bar{A} \cdot \bar{x}_i$.}
+\end{figure}
+
+Le \textbf{componenti covarianti} $A_i$ sono definite dal prodotto scalare del vettore $\bar{A}$ con i vettori della base covariante:
+$$ A_i = \bar{A} \cdot \bar{x}_i $$
+Geometricamente, $A_i$ rappresenta la \emph{proiezione ortogonale} del vettore $\bar{A}$ sulla direzione del vettore di base $\bar{x}_i$, moltiplicata per la lunghezza di $\bar{x}_i$ (infatti $A_i = |\bar{A}| |\bar{x}_i| \cos \theta_i$). 
+
+\textbf{Attenzione:} questo \underline{non} corrisponde alla proiezione ortogonale sugli assi coordinati, a meno che la base non sia ortonormale.
+
+\begin{itemize}
+    \item Se la base $\{\bar{x}_i\}$ è \textbf{ortonormale} ($g_{ij} = \delta_{ij}$), allora $\bar{A} = A^i \bar{x}_i$ e $A_i = \bar{A} \cdot \bar{x}_i = (A^j \bar{x}_j) \cdot \bar{x}_i = A^j (\bar{x}_j \cdot \bar{x}_i) = A^j \delta_{ji} = A^i$. In questo caso, e solo in questo caso, le componenti controvarianti e covarianti coincidono.
+    
+    \item Se la base è solo \textbf{ortogonale} ($g_{ij} = 0$ per $i \neq j$), le componenti controvarianti e covarianti sono proporzionali: $A_i = g_{ii} A^i$ (no somma).
+    
+    \item Nel caso generale \textbf{non ortogonale}, le componenti sono distinte e legate dalla metrica: $A_i = g_{ij} A^j$.
+\end{itemize}
+
+\begin{observationblock}[Principio di Covarianza Generale]
+La distinzione tra componenti controvarianti e covarianti è cruciale in Relatività Generale. Il \textbf{Principio di Covarianza Generale} afferma che le leggi fisiche devono essere espresse da equazioni tensoriali. Un'equazione tra tensori (es. $A^\alpha_{\beta \gamma} = B^\alpha_{\beta\gamma}$) è valida in un sistema di coordinate se e solo se è valida in tutti i sistemi di coordinate, poiché entrambi i membri si trasformano allo stesso modo. Questo garantisce che le leggi fisiche siano indipendenti dalla scelta (arbitraria) delle coordinate.
+\end{observationblock}
+
+\begin{exampleblock}[Vettori nel piano in coordinate polari]
+    \begin{minipage}[H]{0.64\textwidth}
+        $$
+        ds^2 = dr^2 + r^2 d\theta^2 \quad \rightarrow \quad
+        u^1 \equiv r \qquad u^2 = \theta
+        $$
+        \vspace{0.3em}
+        $$
+        g_{ij} = \begin{pmatrix} 1 & 0 \\ 0 & r^2 \end{pmatrix} 
+        \quad
+        g^{ij} = \begin{pmatrix} 1 & 0 \\ 0 & \frac 1{r^2} \end{pmatrix}    
+        $$
+        \vspace{0.3em}
+        $$
+        g = r^2 \ \ \rightarrow \ \ \sqrt{g} = r
+        $$
+
+        \vspace{1.5em}
+
+        Dati $A_i = (5,9)$ e $B^i = (3, 7)$, abbiamo:
+    \end{minipage}%
+    \begin{minipage}[H]{0.35\textwidth}
+        \centering
+        \includegraphics[width = 0.9\textwidth]{assets/vec.png}
+    \end{minipage}
+    \vspace{0.5em}
+    $$A_i B^i = A_1B^1 + A_2B^2 = 5 \cdot 3 + 9 \cdot 7 = 78$$
+    in particolare:
+    $$
+    \begin{array}{rcl}
+        A^i = g^{ij} A_j & \quad \rightarrow \quad & A^1 = g^{11}A_1 + g^{12}A_2 = 1 \cdot 5 + 0 \cdot 9 = 5\\
+        & \rightarrow & A^2 = g^{21}A_1 + g^{22}A_2 = 0 \cdot 5 + 1/r^2 \cdot 9 = 9 / r^2 \\
+        B_i = g_{ij} B^j & \rightarrow & B_1 = g_{11}B^1 + g_{12}B^2 = 1 \cdot 3 + 0 \cdot 7 = 3\\
+        & \rightarrow & B_2 = g_{21}B^1 + g_{22}B^2 = 0 \cdot 3 + r^2 \cdot 7 = 7 r^2
+    \end{array}
+    $$
+
+    Quindi:
+    $$
+    A^iB_i = A^1B_1 + A^2B_2 = 5 \cdot 3 + 9 / r^2 \cdot 7 r^2 = 78 = A_iB^i
+    $$
+    Cioè $A^iB_i = g_{ij}A^iB^j = g^{ij}A_jB_i  =A_iB^i$ è invariante.
+
+    \vspace{1em}
+
+    \underline{\textbf{Nota}}: Abbiamo che $dS = \sqrt{g} \dd u^1 \dd u^2 \to r \dd r \dd \theta$ è l'elemento di superficie.
+\end{exampleblock}
+
+\newpage
+
+\section{Curvatura di una Superficie}
+\label{sec:curvatura_superficie}
+
+Dopo aver definito la metrica intrinseca di una superficie tramite la prima forma fondamentale, possiamo esplorare un concetto geometrico fondamentale: la \bfit{curvatura}. Mentre la curvatura di una curva piana è descritta da un singolo numero (il raggio di curvatura o il suo inverso), la curvatura di una superficie in un punto è più complessa e dipende dalla direzione considerata.
+
+\subsection{Curvature Normali e Principali}
+\label{subsec:curvature_principali}
+
+Consideriamo un punto $P$ su una superficie regolare $M$ e il versore normale $\hat{n}$ in $P$. Per ogni vettore tangente $\bar{v}$ in $P$, il piano definito da $\hat{n}$ e $\bar{v}$ interseca la superficie $M$ lungo una curva $\mathcal{C}_{\bar{v}}$.
+
+\begin{minipage}[H]{0.62\textwidth}
+    Questa curva $\mathcal{C}_{\bar{v}}$ ha una sua curvatura $k$ nel punto $P$, definita come visto per le curve piane (\cref{sec:curva_piana}). La \textbf{curvatura normale} $k_n(\bar{v})$ della superficie $M$ in $P$ lungo la direzione $\bar{v}$ è definita come:
+    $$ k_n(\bar{v}) = k \, \cos \alpha $$
+    dove $\alpha$ è l'angolo tra il versore normale alla curva $\mathcal{C}_{\bar{v}}$ e il versore normale alla superficie $\hat{n}$ in $P$. Alternativamente, si può definire $k_n = \pm 1/R$, dove $R$ è il raggio di curvatura della curva $\mathcal{C}_{\bar{v}}$ e il segno dipende da quale lato giace il centro di curvatura rispetto a $\hat{n}$.
+
+    \vspace{1em}
+
+    Si dimostra (Teorema di Eulero sulla curvatura) che al variare della direzione del versore tangente $\bar{v}$ nel piano tangente in $P$, la curvatura normale $k_n(\bar{v})$ assume un valore massimo $k_1$ e un valore minimo $k_2$ in due direzioni tra loro ortogonali.
+\end{minipage}%
+\hspace{0.02\textwidth}
+\begin{minipage}{0.35\textwidth}
+    \centering
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.95\textwidth]{assets/surface_curv.png}
+        \caption{Curvatura normale $k_n$ in un punto $P$ lungo la direzione $\bar{v}$.}
+        \label{fig:curvatura_sup}
+    \end{figure}
+\end{minipage}
+
+$k_1$ e $k_2$ sono chiamate \textbf{curvature principali} e le rispettive direzioni sono dette \textbf{direzioni principali}.
+
+\subsection{Curvatura Gaussiana e Curvatura Media}
+\label{subsec:curvatura_gaussiana}
+
+A partire dalle curvature principali, si definiscono due importanti misure scalari della curvatura in $P$:
+
+\begin{itemize}
+    \item La \textbf{Curvatura Gaussiana} $K$: È il prodotto delle curvature principali.
+    \vspace{0.4em}
+    $$ K = k_1 \cdot k_2 $$
+    \vspace{-1.5em}
+
+    La curvatura Gaussiana è una misura \emph{intrinseca} della curvatura (Teorema Egregium di Gauss): può essere calcolata conoscendo solo la prima forma fondamentale ($g_{ij}$) e le sue derivate, senza riferimento allo spazio ambiente $\mathbb{R}^3$. Questo la rende fondamentale in Relatività Generale.
+    \vspace{0.5em}
+    \item La \textbf{Curvatura Media} $H$: È la media aritmetica delle curvature principali.
+    \vspace{0.4em}
+    $$ H = \frac{k_1 + k_2}{2} $$
+    \vspace{-1.5em}
+
+    La curvatura media è una misura \emph{estrinseca}, dipende da come la superficie è immersa nello spazio ambiente.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ex_curvature.png}
+    \caption{Esempi di curvature principali e Gaussiana: (a) Piano: $k_1=k_2=0 \Rightarrow K=0$. (b) Sfera di raggio R: $k_1=k_2=1/R \Rightarrow K=1/R^2 > 0$. (c) Cilindro: $k_1=1/R, k_2=0 \Rightarrow K=0$.}
+    \label{fig:ex_curvature}
+\end{figure}
+
+\begin{observationblock}[Curvatura e Forma Locale della Superficie]
+    \label{ex:forma_locale}
+    La curvatura Gaussiana $K$ fornisce informazioni qualitative sulla forma locale della superficie attorno a un punto $P$.
+    
+    \vspace{0.4em}
+
+    \begin{itemize}
+        \item Se $K > 0$ (punto ellittico), la superficie sta "tutta da una parte" rispetto al piano tangente $\pi$ in $P$ (almeno localmente), come nel caso della sfera.
+        \item Se $K < 0$ (punto iperbolico o a sella), la superficie attraversa il piano tangente, assomigliando localmente a una sella. Un esempio è il paraboloide iperbolico $z = x^2 - y^2$.
+        \item Se $K = 0$ (punto parabolico), la situazione è intermedia (come nel cilindro o nel piano).
+    \end{itemize}
+
+    \vspace{0.4em}
+
+    Possiamo capire meglio questa relazione analizzando lo sviluppo in serie di Taylor della superficie attorno al punto $P$. 
+    
+    \vspace{0.4em}
+
+    Supponiamo, per semplicità, di scegliere un sistema di coordinate $(x,y)$ tale che $P$ sia l'origine $(0,0)$ e il piano tangente in $P$ sia il piano $z=0$. 
+    
+    \begin{figure}[H]
+        \centering
+        \begin{minipage}{0.45\textwidth}
+            \centering
+            \includegraphics[width=0.95\textwidth]{assets/hyperbolic_point.png}
+            \caption{Punto iperbolico ($K<0$)}
+        \end{minipage}%
+        \hspace{0.05\textwidth}%
+        \begin{minipage}{0.45\textwidth}
+            \centering
+            \includegraphics[width=0.85\textwidth]{assets/taylor_surface.png}
+            \caption{Sviluppo locale attorno a $P$}
+        \end{minipage}
+    \end{figure}
+    \vspace{-1em}
+    
+    L'equazione locale della superficie sarà $z = f(x,y)$, con $f(0,0)=0$ e $\partial f/\partial x |_P = \partial f/\partial y |_P = 0$.
+    
+    Lo sviluppo di Taylor al secondo ordine è:
+    \vspace{0.4em}
+    $$
+    z = \underbrace{f(0,0)}_{0} + \underbrace{\left. \frac{\partial f}{\partial x} \right|_P}_{0} x + \underbrace{\left. \frac{\partial f}{\partial y} \right|_P}_{0} y 
+    + \frac{1}{2} \left[ \left. \frac{\partial^2 f}{\partial x^2} \right|_P x^2 + 2 \left. \frac{\partial^2 f}{\partial x \partial y} \right|_P xy + \left. \frac{\partial^2 f}{\partial y^2} \right|_P y^2 \right] + \mathcal{O}(3)
+    $$
+    Raccogliendo i termini del secondo ordine:
+    \vspace{0.4em}
+    $$
+    z \approx \frac{1}{2} \left( a x^2 + 2b xy + c y^2 \right)
+    $$
+    dove $a = \partial^2 f/\partial x^2 |_P$, $b = \partial^2 f/\partial x \partial y |_P$, $c = \partial^2 f/\partial y^2 |_P$.
+    
+    L'equazione $ax^2 + 2bxy + cy^2 = \text{costante}$ (corrispondente a tagliare la superficie con un piano $z=\text{costante}$ vicino a $P$) descrive una conica nel piano $xy$. La natura di questa conica dipende dal segno del discriminante della forma quadratica, $\Delta = ac - b^2$. 
+    
+    \vspace{0.4em}
+    
+    Si può dimostrare che questo segno è direttamente legato al segno della curvatura Gaussiana $K$ in $P$:
+
+    \vspace{0.4em}
+
+    \begin{itemize}
+        \item Se $ac - b^2 > 0$ (corrisponde a $K>0$): l'equazione descrive un'ellisse. La superficie è localmente concava o convessa come una scodella (punto ellittico).
+        \item Se $ac - b^2 = 0$ (corrisponde a $K=0$): l'equazione descrive una parabola o linee parallele (punto parabolico).
+        \item Se $ac - b^2 < 0$ (corrisponde a $K<0$): l'equazione descrive un'iperbole (punto iperbolico o a sella).
+    \end{itemize}
+
+    \vspace{0.4em}
+
+    Inoltre, orientando opportunamente gli assi $x, y$ lungo le direzioni principali in $P$, il termine misto $b$ si annulla e lo sviluppo diventa $z \approx \frac{1}{2}(a' x'^2 + c' y'^2)$. Le costanti $a'$ e $c'$ sono direttamente proporzionali alle curvature principali $k_1$ e $k_2$.
+\end{observationblock}
+
+\newpage
+
+\section{Geodetiche}
+\label{sec:geodetiche}
+
+\vspace{-1.3em}
+
+\begin{minipage}{0.63\textwidth}
+Intuitivamente, una \bfit{geodetica} su una superficie (o più in generale, su una varietà Riemanniana o pseudo-Riemanniana) è la curva che generalizza il concetto di "linea retta" in uno spazio curvo. È la curva di lunghezza "stazionaria" (spesso minima, ma non sempre) tra due punti sufficientemente vicini.
+
+\vspace{0.5em}
+
+Ad esempio su una sfera sono geodetiche tra i punti $P_1$ e $P_2$ sia $\mathcal C_1$ che $\mathcal C_2$ (entrambi archi di cerchio massimo), ma il cammino più breve corrisponde a $\mathcal C_1$ .
+\end{minipage}
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{assets/geodetica.png}
+        % \caption{Geodetiche su una superficie sferica.}
+        \label{fig:geodetiche}
+    \end{figure}
+\end{minipage}
+
+\vspace{-1.5em}
+
+\subsubsection{Definizione Variazionale}
+\label{subsec:definizione_variazionale}
+
+Consideriamo una curva $\bar{r}(t) = \bar{x}(u^i(t))$ su una superficie, che collega due punti $P_1 = \bar{r}(t_1)$ e $P_2 = \bar{r}(t_2)$. 
+\vspace{0.6em}
+La lunghezza di questa curva è data dall'integrale dell'elemento di lunghezza $ds$:
+\vspace{0.5em}
+$$ 
+ds^2 = g_{jk} du^j du^k
+\qquad \Rightarrow \qquad
+S = \int_{P_1}^{P_2} ds = \int_{t_1}^{t_2} \sqrt{g_{jk}\dfrac{du^j}{dt} \dfrac{du^k}{dt}}\, dt
+$$
+
+Definiamo il Lagrangiano $L$ come l'integrando:
+\vspace{0.5em}
+$$
+L(u^i, \dot{u}^i, t) = \sqrt{g_{jk}\dot{u}^j \dot{u}^k} \equiv \sqrt{F} \qquad \text{dove } \dot{u}^i = \frac{du^i}{dt}
+$$
+
+\begin{definitionblock}[Geodetiche]
+Una curva è una geodetica se la sua lunghezza $S$ è stazionaria rispetto a piccole variazioni della curva che mantengano fissi gli estremi $P_1$ e $P_2$. Dal calcolo delle variazioni, ciò avviene se le coordinate $u^i(t)$ soddisfano le \textbf{equazioni di Eulero-Lagrange}:
+\vspace{0.5em}
+$$
+\boxed{ \frac{\partial L}{\partial u^i} - \frac{d}{dt} \left( \frac{\partial L}{\partial \dot{u}^i} \right) = 0 \quad \text{per ogni } i }
+$$
+\end{definitionblock}
+
+\subsection{Derivazione dell'Equazione delle Geodetiche}
+\label{subsec:derivazione_geodetiche_notes}
+
+Calcoliamo i termini delle equazioni di Eulero-Lagrange usando $L = \sqrt{F}$.
+
+\begin{enumerate}
+    \item \textbf{Calcolo di $\partial L / \partial u^i$}:
+        \vspace{0.5em}
+        $$ \frac{\partial L}{\partial u^i} = \frac{1}{2\sqrt{F}} \frac{\partial F}{\partial u^i} = \frac{1}{2L} \frac{\partial g_{jk}}{\partial u^i} \dot{u}^j \dot{u}^k $$
+
+    \item \textbf{Calcolo di $\partial L / \partial \dot{u}^i$}:
+        \vspace{0.5em}
+        $$ \frac{\partial L}{\partial \dot{u}^i} = \frac{1}{2\sqrt{F}} \frac{\partial F}{\partial \dot{u}^i} = \frac{1}{2L} (g_{ik} \dot{u}^k + g_{ji} \dot{u}^j) $$
+        Usando la simmetria $g_{ji}=g_{ij}$ e scambiando gli indici muti $k \leftrightarrow j$ nel secondo termine:
+        \vspace{0.5em}
+        $$ \frac{\partial L}{\partial \dot{u}^i} = \frac{1}{2L} (g_{ik} \dot{u}^k + g_{ik} \dot{u}^k) = \frac{1}{L} g_{ik} \dot{u}^k $$
+
+    \item \textbf{Equazione di Eulero-Lagrange}: Sostituendo i termini calcolati:
+        \vspace{0.5em}
+        $$ \frac{1}{2L} \frac{\partial g_{jk}}{\partial u^i} \dot{u}^j \dot{u}^k - \frac{d}{dt} \left( \frac{g_{ik} \dot{u}^k}{L} \right) = 0 $$
+
+    \item \textbf{Semplificazione con Parametrizzazione Affine}:
+    L'equazione si semplifica notevolmente se scegliamo un parametro $t$ tale che sia proporzionale all'ascissa curvilinea $s$, cioè $s = \alpha t + \beta$. Per semplicità, assumiamo $t=s$ (scegliendo $\alpha=1, \beta=0$), che corrisponde a parametrizzare la curva con la sua lunghezza d'arco. In questo caso:
+    \vspace{0.4em}
+    $$ L = \sqrt{g_{jk} \frac{du^j}{ds} \frac{du^k}{ds}} = \frac{ds}{ds} = 1 \quad (\text{costante}) $$
+    Poiché $L=1$, la derivata $\frac{dL}{dt} = \frac{dL}{ds} = 0$. L'equazione di Eulero-Lagrange diventa:
+    \vspace{0.4em}
+    $$ \frac{1}{2} \frac{\partial g_{jk}}{\partial u^i} \dot{u}^j \dot{u}^k - \frac{d}{ds} \left( g_{ik} \dot{u}^k \right) = 0 $$
+    dove ora $\dot{u}^k = du^k/ds$. Calcolando la derivata totale rispetto a $s$:
+    \vspace{0.4em}
+    $$ 
+    \frac{1}{2} \frac{\partial g_{jk}}{\partial u^i} \dot{u}^j \dot{u}^k - \left( \frac{\partial g_{ik}}{\partial u^l} \frac{du^l}{ds} \dot{u}^k + g_{ik} \frac{d\dot{u}^k}{ds} \right) = 0 $$
+    $$ \frac{1}{2} \frac{\partial g_{jk}}{\partial u^i} \dot{u}^j \dot{u}^k - \frac{\partial g_{ik}}{\partial u^l} \dot{u}^l \dot{u}^k - g_{ik} \ddot{u}^k = 0 
+    $$
+
+    dove $\ddot{u}^k = d^2u^k/ds^2$. Moltiplicando per -1 e riordinando:
+
+    $$
+    g_{ik} \ddot{u}^k + \frac{\partial g_{ik}}{\partial u^l} \dot{u}^l \dot{u}^k - \frac{1}{2} \frac{\partial g_{lk}}{\partial u^i} \dot{u}^l \dot{u}^k = 0
+    $$
+
+    (Nell'ultimo termine abbiamo scambiato gli indici muti $j \leftrightarrow l$).
+
+    \item \textbf{Introduzione dei Simboli di Christoffel}:
+    Per raggruppare i termini e introdurre i simboli di Christoffel.
+    
+    Sfruttando la simmetria del prodotto $\dot{u}^l \dot{u}^k$ (che è simmetrico rispetto allo scambio degli indici $l, k$), si ottiene:
+    $$
+    \frac{\partial g_{ik}}{\partial u^l} \dot{u}^l \dot{u}^k = \frac{1}{2} \left( \frac{\partial g_{ik}}{\partial u^l} + \frac{\partial g_{il}}{\partial u^k} \right) \dot{u}^l \dot{u}^k
+    $$
+    
+    Sostituendo nell'equazione precedente:
+    \vspace{0.4em}
+    $$
+    g_{ik} \ddot{u}^k + \left[ \frac{1}{2} \left( \frac{\partial g_{ik}}{\partial u^l} + \frac{\partial g_{il}}{\partial u^k}  - \frac{\partial g_{lk}}{\partial u^i}\right)\right] \dot{u}^l \dot{u}^k  = 0
+    $$
+    
+    Il termine tra parentesi quadre è proprio $\Gamma_{ilk}$. Quindi:
+    \vspace{0.4em}
+    $$
+    g_{ik} \ddot{u}^k + \Gamma_{ilk} \dot{u}^l \dot{u}^k = 0
+    $$
+
+    (Abbiamo rinominato l'indice muto $j \to l$ rispetto alla formula $\Gamma_{ijk}$ per coerenza).
+
+    \item \textbf{Equazione Finale}:
+    Moltiplichiamo ora per $g^{mi}$ e sommiamo sull'indice $i$:
+    \vspace{0.4em}
+    $$
+    g^{mi} g_{ik} \ddot{u}^k + g^{mi} \Gamma_{ilk} \dot{u}^l \dot{u}^k = 0
+    $$
+    $$
+    \delta^m_k \ddot{u}^k + \Gamma^m_{lk} \dot{u}^l \dot{u}^k = 0
+    $$
+
+    dove abbiamo usato la definizione dei simboli di Christoffel di seconda specie $\Gamma^m_{lk} = g^{mi} \Gamma_{ilk}$. Ridenominando l'indice libero $m \to l$ e gli indici muti $(l,k) \to (j,k)$:
+
+    $$
+    \boxed{ \frac{d^2u^l}{ds^2} + \Gamma^l_{jk} \frac{du^j}{ds} \frac{du^k}{ds} = 0 }
+    $$
+
+    Questa è l'\textbf{equazione delle geodetiche} quando la curva è parametrizzata rispetto alla sua lunghezza d'arco $s$. Tale equazione esprime la condizione di stazionarietà, cioè l'equazione differenziale che definisce una geodetica
+\end{enumerate}
+
+\begin{definitionblock}[Simboli di Christoffel]
+    \begin{enumerate}
+        \item I \textbf{simboli di Christoffel di prima specie} sono:
+        $$ \Gamma_{ijk} = \frac{1}{2} \left( \frac{\partial g_{ik}}{\partial u^j} + \frac{\partial g_{ji}}{\partial u^k} - \frac{\partial g_{jk}}{\partial u^i} \right) $$
+
+        \item I \textbf{simboli di Christoffel di seconda specie} (o \bfit{connessione affine} di Levi-Civita) sono:
+        $$ \Gamma^l_{jk} = g^{li} \Gamma_{ijk} = \frac{1}{2} g^{li} \left( \frac{\partial g_{ik}}{\partial u^j} + \frac{\partial g_{ji}}{\partial u^k} - \frac{\partial g_{jk}}{\partial u^i} \right) $$
+        cioè è una quantità dipendente da $g_{ij}$ e dalle sue derivate prime. Si noti inoltre che $\Gamma^l_{jk} = \Gamma^l_{kj}$.
+    \end{enumerate}
+
+    Entrambi sono simmetrici negli ultimi due indici inferiori: $\Gamma_{ijk} = \Gamma_{ikj}$ e $\Gamma^l_{jk} = \Gamma^l_{kj}$. 
+    
+    Per convenienza, si usa spesso la notazione con la virgola per le derivate parziali: $\frac{\partial g_{ik}}{\partial u^j} \equiv g_{ik,j}$.
+\end{definitionblock}
+
+È fondamentale notare che i simboli di Christoffel $\Gamma^l_{jk}$, nonostante abbiano tre indici, \textbf{non sono le componenti di un tensore}. La loro legge di trasformazione sotto un cambio di coordinate $u^i \to u'^m$ è più complessa:
+$$
+\Gamma'^l_{mn} = \frac{\partial u'^l}{\partial u^l} \frac{\partial u^j}{\partial u'^m} \frac{\partial u^k}{\partial u'^n} \Gamma^l_{jk} + \underbrace{\frac{\partial u'^l}{\partial u^l} \frac{\partial^2 u^l}{\partial u'^m \partial u'^n}}
+$$
+
+La presenza del secondo termine (che coinvolge le derivate seconde delle funzioni di trasformazione) impedisce ai $\Gamma^l_{jk}$ di trasformarsi come un tensore. Tuttavia, l'intera equazione delle geodetiche è un'equazione tensoriale (uguaglianza tra due tensori nulli, o meglio, tra l'accelerazione covariante e zero), garantendo la sua validità in ogni sistema di coordinate.
+
+\begin{exampleblock}[Piano in coordinate cartesiane]
+
+Nel caso banale di una trasformazione da coordinate cartesiane ad altre coordinate cartesiane $(u, v) \to (x, y)$, la metrica è data da:
+
+$$
+u, v \rightarrow x, y
+\quad \Rightarrow \quad
+g_{ij} = 
+\begin{pmatrix}
+    1 & 0 \\
+    0 & 1
+\end{pmatrix}
+$$
+
+Il tensore metrico è diagonale, quindi l'elemento di linea si semplifica a:
+
+$$
+\dd s^2 = g_{ij} \dd u^i \dd u^j = \sum_{ij} g_{ij} \dd u^i \dd u^j = \dd u^2 + \dd v^2
+$$
+
+Nel piano cartesiano, tutte le derivate della metrica sono nulle, quindi anche tutti i simboli di Christoffel sono nulli. Le equazioni delle geodetiche si semplificano quindi a:
+
+Abbiamo quindi:
+
+$$
+\begin{cases}
+\dfrac{\dd ^2u^i}{\dd s^2} = 0 \\[0.8em]
+\dfrac{\dd ^2v^i}{\dd s^2} = 0
+\end{cases}
+\quad \Rightarrow \quad
+\begin{cases}
+\dfrac{\dd x}{\dd s} = a \quad \to \quad x = as + b \\[0.8em]
+\dfrac{\dd y}{\dd s} = b \quad \to \quad y = cs + d
+\end{cases}
+$$
+Abbiamo dunque:
+
+$$
+s = \dfrac{x-b}{a}
+\qquad
+y = c \dfrac{x-b}{a} + d = \dfrac ca x + \left( d - \dfrac{cb}{a} \right)
+$$
+
+dunque, rinominando $m = \dfrac ca$ e $n = d - \dfrac{cb}{a}$, otteniamo l'equazione di una retta:
+
+$$
+y = m\,x + n
+$$
+
+\end{exampleblock}
+
+\begin{exampleblock}[Piano in coordinate polari]
+
+Nel caso del piano in coordinate polari, le coordinate sono $(r, \theta)$ e la metrica è data da:
+
+$$
+ds^2 = dr^2 + r^2 d\theta^2,
+\quad 
+\quad 
+g_{ij} = \begin{pmatrix}
+    1 & 0 \\
+    0 & r^2
+\end{pmatrix},
+\quad
+\quad
+g^{ij} = \begin{pmatrix}
+    1 & 0 \\
+    0 & \dfrac{1}{r^2}
+\end{pmatrix}.
+$$
+
+$$
+\dfrac{d^2u^i}{ds^2} + \Gamma_{jk}^i \dfrac{du^j}{ds} \dfrac{du^k}{ds} = 0
+$$
+\vspace{1em}
+Ricordiamo che i simboli di Christoffel sono dati da:
+
+$$
+\Gamma_{jk}^i = \dfrac{1}{2} g^{ir} \left( \dfrac{\partial g_{jr}}{\partial u^k} + \dfrac{\partial g_{kr}}{\partial u^j} - \dfrac{\partial g_{jk}}{\partial u^r} \right)
+$$
+ricordando anche la simmetria su $j$ e $k$.
+
+Calcoliamo esplicitamente i simboli di Christoffel:
+
+\begin{itemize}
+
+    \item Se $i = r = 1$:
+    
+    $$
+    \Gamma_{jk}^1 = \dfrac{1}{2} g^{11} \left( \dfrac{\partial g_{j1}}{\partial u^k} + \dfrac{\partial g_{k1}}{\partial u^j} - \dfrac{\partial g_{jk}}{\partial u^1} \right) \quad \text{perchè $g^{12} = 0$}
+    $$
+    
+    \begin{itemize}[label=\textbullet]
+        \item Se $j = k = 2$ (tutti gli altri termini sono nulli):
+    
+        $$
+        \Gamma_{22}^1 = \dfrac{1}{2} g^{11} \left( \cancel{\dfrac{\partial g_{21}}{\partial u^2}} + \cancel{\dfrac{\partial g_{21}}{\partial u^2}} - \dfrac{\partial g_{22}}{\partial u^1} \right) = - \dfrac{1}{2} \cdot 1 \cdot \dfrac{\partial r^2}{\partial r} = - r
+        $$
+    \end{itemize}
+    
+    \item Se $i = r = 2$:
+    
+    $$
+    \Gamma_{jk}^2 = \dfrac{1}{2} g^{22} \left( \dfrac{\partial g_{j2}}{\partial u^k} + \dfrac{\partial g_{k2}}{\partial u^j} - \dfrac{\partial g_{jk}}{\partial u^2} \right) \quad \text{perchè $g^{21} = 0$}
+    $$
+    
+    \begin{itemize}[label=\textbullet]
+        \item Se $j = 1, k = 2$ (tutti gli altri termini sono nulli):
+    
+        $$
+        \Gamma_{12}^2 = \dfrac{1}{2} g^{22} \left( \cancel{\dfrac{\partial g_{12}}{\partial u^2}} + \dfrac{\partial g_{22}}{\partial u^1} - \cancel{\dfrac{\partial g_{12}}{\partial u^2}} \right) = \dfrac12 \dfrac 1{r^2} \dfrac{\dd r^2}{\dd r} = \dfrac 1r
+        $$
+    \end{itemize}
+    
+\end{itemize}
+
+Si ottiene quindi:
+
+$$
+\boxed{\Gamma_{11}^1 = \Gamma_{12}^1 = \Gamma_{11}^2 = \Gamma_{22}^2 = 0}
+$$
+
+Da cui otteniamo il sistema:
+
+$$
+\left\{
+\begin{aligned}
+    &\dfrac{d^2 r}{ds^2} - r \left( \dfrac{d\theta}{ds} \right)^2 = 0\\
+    &\dfrac{d^2 \theta}{ds^2} + \dfrac{2}{r} \left( \dfrac{dr}{ds} \right) \left( \dfrac{d\theta}{ds} \right) = 0
+\end{aligned}
+\right.
+$$
+
+Le soluzioni di questo sistema di equazioni differenziali rappresentano sempre rette nel piano Euclideo, come ci si aspetta.
+\vspace{1em}
+Un caso particolare per illustrarlo si ha se $\frac{d\theta}{ds} = 0$ (corrispondente a un moto lungo un raggio, con $\theta = \text{costante}$). In questa situazione, la prima equazione del sistema si semplifica in $\frac{d^2r}{ds^2} = 0$. Integrando due volte, si ottiene $\frac{dr}{ds} = \text{costante}$ e $r(s)$ lineare in $s$, il che descrive appunto una retta passante per l'origine.
+
+\end{exampleblock}
+
+\newpage
+
+Abbiamo definito le geodetiche su una superficie (che sono le analoghe alle rette nel piano cartesiano). Sappiamo che, sul piano, la circonferenza $C$ di un cerchio di raggio $a$ è $C = 2\pi a$.
+
+In modo analogo, su una superficie qualsiasi, possiamo definire una "circonferenza geodetica" di raggio $a$ e centro $O$ nel seguente modo:
+\begin{itemize}
+    \item Da $O$ tracciamo tutte le geodetiche (le "rette" della superficie).
+    \item Su ciascuna geodetica, individuiamo il punto che dista da $O$ una lunghezza (ascissa curvilinea) pari ad $a$.
+\end{itemize}
+L'insieme di tutti questi punti costituisce la circonferenza geodetica di raggio $a$ e centro $O$.
+
+Possiamo ora chiederci: qual è la lunghezza $C$ di questa circonferenza? E come dipende dalla curvatura della superficie?
+
+Vediamo il caso della sfera di raggio $R$ (che possiamo visualizzare nello spazio euclideo $E^3$):
+$$
+C = 2\pi x = 2\pi R \sin\left(\frac{a}{R}\right)
+$$
+Dove $x = R \sin(a/R)$ è il raggio del "parallelo" a distanza $a$ dal polo.
+
+Per $a \ll R$ (cioè per cerchi piccoli rispetto al raggio della sfera), possiamo sviluppare il seno in serie di Taylor:
+
+\begin{minipage}{0.65\textwidth}
+$$
+\sin\left(\frac{a}{R}\right) \approx \frac{a}{R} - \frac{1}{6}\left(\frac{a}{R}\right)^3 + \cdots
+$$
+Sostituendo:
+\vspace{0.4em}
+$$
+C \approx 2\pi R \left( \frac{a}{R} - \frac{1}{6}\frac{a^3}{R^3} \right) = 2\pi a - \frac{\pi}{3} \frac{a^3}{R^2} + O(a^5)
+$$
+
+Osserviamo che:
+\begin{itemize}
+    \item \textbf{Sul piano}, $C = 2\pi a$ esattamente.
+    \item \textbf{Sulla sfera}, la lunghezza della circonferenza è minore di $2\pi a$ a causa della curvatura positiva.
+\end{itemize}
+\end{minipage}%
+\begin{minipage}{0.35\textwidth}
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/geodetica_sfera.png}
+\end{minipage}
+
+La differenza $2\pi a - C$ è legata alla curvatura della superficie. Infatti, per la sfera la curvatura di Gauss è $K = 1/R^2$. Possiamo allora scrivere, trascurando i termini di ordine superiore:
+$$
+K = 3\pi \lim_{a \to 0} \left( \frac{2\pi a - C}{a^3} \right)
+$$
+Questa formula vale in generale: misura come la lunghezza della circonferenza geodetica si discosta dal caso piano, per piccoli raggi $a$.
+
+\begin{center}
+    Se $K = 0$ (piano): $C = 2\pi a$.
+    \hspace{2em}
+    Se $K > 0$ (sfera): $C < 2\pi a$.
+    \hspace{2em}
+    Se $K < 0$ (punto di sella): $C > 2\pi a$.
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/circs.png}
+    \label{fig:circs}
+\end{figure}
+\vspace{-1em}
+La curvatura di Gauss $K$ è dunque una proprietà \bfit{locale} e \bfit{intrinseca} della superficie: dipende solo dalle distanze misurabili sulla superficie stessa, non dal modo in cui essa è immersa nello spazio. $K$ è invariante rispetto al sistema di coordinate scelto (come $ds^2$), anche se può variare da punto a punto sulla superficie (invariante non significa costante).
+
+Come si fa a determinare $K$ a partire da $g_{ij}$? Poichè il tensore metrico è quello che contiene l'informazione sulle distanze, e misurando queste ottengo $K$, ci deve essere un legame tra le due grandezze. Vediamo che $K$ deve dipendere dalle derivate seconde (almeno) di $g_{ij}$ in un punto. Questo deriva dal fatto che $K$ è invariante, non dipende dal sistema di coordinate usato, ed è una quantità locale, cioè dipende dal comportamento di $g_{ij}$ in un intorno infinitesimo del punto scelto.
+
+In un intorno infinitesimo di un punto è sempre possibile scegliere un sistema di coordinate in cui la matrice dei componenti metrici
+$
+\scriptsize
+g_{ij} = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}
+$
+ed in cui le derivate parziali $g_{ij,k}$ sono nulle. Tale sistema viene definito \emph{localmente euclideo}.
+
+Per capire come ciò sia possibile, ricordiamo che la trasformazione della metrica da $g_{ij}$ a $g'_{kl}$ è:
+$$
+g'_{kl} = \frac{\partial u^i}{\partial u'^k} \frac{\partial u^j}{\partial u'^l}\, g_{ij}.
+$$
+Espandiamo $g'_{kl}$ attorno al punto $x_0$ (usiamo la notazione $\frac{\partial g'_{kl}}{\partial x^m} = g'_{kl,m}$ per le derivate parziali):
+$$
+g'_{kl}(x) = g'_{kl}(x_0) + g'_{kl,m}(x_0)\,(x^m - x^m_0) + \frac{1}{2}\, g'_{kl,mn}(x_0)\,(x^m - x^m_0)(x^n - x^n_0) + \cdots,
+$$
+dove
+$$
+g'_{kl}(x_0) = \Biggl[ \frac{\partial u^i}{\partial u'^k} \frac{\partial u^j}{\partial u'^l}\, g_{ij} \Biggr]_{x_0},
+$$
+$$
+g'_{kl,m}(x_0) = \Biggl[ \frac{\partial u^i}{\partial u'^k} \frac{\partial u^j}{\partial u'^l}\, g_{ij,m} \Biggr]_{x_0} 
++ \Biggl[ \frac{\partial^2 u^i}{\partial u'^m \partial u'^k} \frac{\partial u^j}{\partial u'^l}\, g_{ij} \Biggr]_{x_0}
++ \Biggl[ \frac{\partial u^i}{\partial u'^k} \frac{\partial^2 u^j}{\partial u'^m \partial u'^l}\, g_{ij} \Biggr]_{x_0}
+$$
+Per la simmetria tra gli indici $i$ e $j$ e tra $k$ e $l$, possiamo riscrivere:
+\vspace{0.4em}
+$$
+g'_{kl,m}(x_0) = \Biggl[ \frac{\partial u^i}{\partial u'^k} \frac{\partial u^j}{\partial u'^l}\, g_{ij,m} \Biggr]_{x_0} 
++ \Biggl[ 2\, \frac{\partial^2 u^i}{\partial u'^m \partial u'^k} \frac{\partial u^j}{\partial u'^l}\, g_{ij} \Biggr]_{x_0}
+$$
+Analogamente, per le derivate seconde si ha:
+\vspace{0.4em}
+$$
+g'_{kl,mn}(x_0) = \Biggl[ \frac{\partial u^i}{\partial u'^k} \frac{\partial u^j}{\partial u'^l}\, g_{ij,mn} \Biggr]_{x_0}
++ \Biggl[ 2\, \frac{\partial^3 u^i}{\partial u'^m \partial u'^n \partial u'^k} \frac{\partial u^j}{\partial u'^l}\, g_{ij} \Biggr]_{x_0} + \text{ derivate prime, seconde e terze}
+$$
+
+Supponendo di voler, tramite un'opportuna trasformazione di coordinate, portare $g'_{kl}$ in una forma voluta in un intorno di $x_0$, dobbiamo specificare nella trasformazione le seguenti quantità:
+\vspace{0.6em}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{>{\centering\arraybackslash}m{4.5cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{3cm}}
+\textbf{Derivate} & \textbf{2--D} & \textbf{3--D} & \textbf{4--D} & \textbf{N--D} 
+\\ \hline
+\vspace{0.5em}
+$\left(\frac{\partial u^i}{\partial u'^k}\right)_{x_0}$ & $2\times2=4$ & $9$ & $16$ & \small $N^2$ 
+\\[0.5em]
+$\left(\frac{\partial^2 u^i}{\partial u'^m \partial u'^k}\right)_{x_0}$ & $2\times3=6$ & $18$ & $40$ & \small $\dfrac{N^2(N+1)}{2}$ 
+\\[0.5em]
+$\left(\frac{\partial^3 u^i}{\partial u'^m \partial u'^n \partial u'^k}\right)_{x_0}$ & $2\times4=8$ & $30$ & $80$ & \small $\dfrac{N^2(N+1)(N+2)}{6}$ \\
+\end{tabular}
+\end{center}
+\vspace{0.8em}
+
+D'altro canto, il \bfit{numero dei valori e delle derivate indipendenti} del tensore metrico risulta:
+\vspace{0.6em}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{>{\centering\arraybackslash}m{4.5cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{3cm}}
+    & \textbf{2--D} & \textbf{3--D} & \textbf{4--D} & \textbf{N--D}\\
+    \hline
+    \vspace{0.5em}
+    $\displaystyle g'_{kl}(x_0)$
+        & $3$
+        & $6$
+        & $10$
+        & \small $\displaystyle \dfrac{N(N+1)}{2}$
+        \\[0.5em]
+        $\displaystyle g'_{kl,m}(x_0)$
+        & $6$
+        & $18$
+        & $40$
+        & \small $\displaystyle \dfrac{N^2(N+1)}{2}$
+        \\[0.5em]
+    $\displaystyle g'_{kl,mn}(x_0)$
+        & $9$
+        & $36$
+        & $100$
+        & \small $\displaystyle \Bigl[\dfrac{N(N+1)}{2}\Bigr]^2$\\
+\end{tabular}
+\end{center}
+
+Dalle considerazioni precedenti possiamo trarre le seguenti conclusioni per le dimensioni 2, 3 e 4:
+
+\begin{itemize}
+    \item \textbf{2--D:} Se si fissano i valori di $g'_{kl}(x_0)$ si hanno 3 equazioni per 4 coefficienti, lasciando un grado di libertà (la rotazione degli assi attorno a $x_0$). Se si impone $g'_{kl,m}(x_0) \equiv 0$, si dispongono di 6 equazioni per 6 parametri, dunque la condizione è realizzabile. Tuttavia, se si volesse anche annullare $g'_{kl,mn}(x_0)$, si avrebbero 9 equazioni per 8 parametri: il sistema risulta troppo vincolato e non ammette soluzioni, quindi le derivate seconde non possono essere annullate localmente.
+
+    \item \textbf{3--D:} Per fissare $g'_{kl}(x_0)$ ci sono 6 equazioni e 9 parametri, con 3 gradi di libertà associati alla rotazione dello spazio (ad es. gli angoli di Eulero). Si può porre $g'_{kl,m}(x_0) = 0$ (18 equazioni per 18 incognite), ma non $g'_{kl,mn}(x_0) = 0$ (36 equazioni per 30 incognite).
+
+    \item \textbf{4--D (Spazio di Minkowski):} Per imporre $g'_{kl}(x_0)$ si hanno 10 equazioni e 16 parametri, con 6 gradi di libertà (3 rotazioni più 3 trasformazioni di Lorentz). È possibile forzare $g'_{kl,m}(x_0) = 0$ (40 equazioni per 40 incognite), ma non $g'_{kl,mn}(x_0) = 0$ (100 equazioni per 80 incognite).
+\end{itemize}
+
+Poiché in un punto si può sempre imporre $g_{ij} = \delta_{ij}$ e $g_{ij,k} = 0$, la curvatura deve necessariamente dipendere dalle derivate seconde di $g_{ij}$. La forma di dipendenza più semplice, plausibilmente, è quella lineare. Prima di indagare se esista un'espressione di questo tipo, occorre definire la derivata covariante.
+
+\section{Derivata Covariante}
+
+Abbiamo visto che la derivata (o gradiente) di un campo scalare $\varphi$, ossia $\frac{\partial \varphi}{\partial u^i}$, è un vettore covariante. Potrebbe sembrare naturale derivare allo stesso modo un campo vettoriale $A_i(u^k)$, ottenendo un tensore di rango due; tuttavia, ciò non avviene. In generale, il differenziale $dA_i$ (ingrediente essenziale nel rapporto incrementale) non si comporta come un tensore. Infatti, dalla legge di trasformazione
+$$
+A_i \;=\; \frac{\partial u'^k}{\partial u^i}\,A'_k
+$$
+discende che
+$$
+dA_i \;=\; \frac{\partial u'^k}{\partial u^i}\,dA'_k
+\;+\;
+A'_k\,d\!\Bigl(\frac{\partial u'^k}{\partial u^i}\Bigr)
+\;=\;
+\frac{\partial u'^k}{\partial u^i}\,dA'_k
+\;+\;
+\frac{\partial^2 u'^k}{\partial u^i\,\partial u^l}\,A'_k\,du^l.
+$$
+Osserviamo che $dA_i$ è un vettore solo se $\frac{\partial^2 u'^k}{\partial u^i\,\partial u^l} = 0$, ossia se le nuove coordinate $u'^i$ sono funzioni lineari delle $u^i$ (ad esempio, quando si passa da un sistema di coordinate rettilinee a un altro rettilineo).
+
+Perché $dA_i$ non è un vettore? Perché la differenza
+$$
+dA_i \;=\; A_i(u^i + du^i) \;-\; A_i(u^i)
+$$
+riguarda due vettori applicati in punti diversi (anche se infinitamente vicini). In un sistema di coordinate generico, i coefficienti di trasformazione variano da punto a punto, quindi tali vettori non si trasformano nello stesso modo. Perché la differenza di due vettori sia a sua volta un tensore, i due vettori devono essere \emph{confrontati nello stesso punto}. Se ambedue si trovano nello stesso punto, allora subiscono la stessa trasformazione, e anche la loro differenza si comporta come un tensore. Ne segue che, per definire una derivata che si comporti da tensore, abbiamo bisogno di una \emph{derivata covariante}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/cov_der.png}
+    \caption{Derivata covariante}
+    \label{fig:der_cov}
+\end{figure}
+
+In uno spazio euclideo, per derivare un vettore $A_i(u^i)$ si procede \emph{spostando parallelamente} $A_i(u^i)$ fino a farne coincidere il punto di applicazione con quello di $A_i(u^i + du^i)$, senza modificarne modulo né direzione. Nel nuovo punto $P'$, si calcola la differenza e si prende il limite del rapporto incrementale:
+\vspace{0.4em}
+$$
+\lim_{du^i \to 0}\;\frac{A_i(u^i + du^i) \;-\; A_i(u^i)}{du^i}.
+$$
+In uno spazio non euclideo, definiamo il \emph{trasporto parallelo} da $u^i$ a $u^i + du^i$ come quello spostamento che produce una variazione $\delta A_i$ tale che, passando a un sistema localmente euclideo (il che, localmente, è sempre possibile), tale variazione risulti nulla: $\delta A_i = 0$. Pertanto, in $P'$, abbiamo $A_i + dA_i \equiv A_i(u^i + du^i)$ e $A_i + \delta A_i$, corrispondente al trasporto parallelo di $A_i(u^i)$ da $P$ a $P'$. La differenza:
+\vspace{0.4em}
+$$
+DA_i
+\;=\;
+\bigl(A_i + dA_i\bigr) \;-\; \bigl(A_i + \delta A_i\bigr)
+\;=\;
+dA_i \;-\;\delta A_i
+$$
+è un vettore, in quanto differenza tra due vettori applicati nello stesso punto. Questo $DA_i$, denominato \bfit{Differenziale Assoluto}, permette di introdurre una nuova tipologia di derivata che si comporta come un tensore: la \bfit{derivata covariante}.
+
+Resta ora da determinare $\delta A_i$: se imponiamo che $DA_i$ sia lineare come i dierenziali ordinari, $\delta A_i$ dovrà dipendere linearmente sia dal vettore trasportato $A_i$ che dallo spostamento $du^i$, per cui potremo scrivere:
+\vspace{0.4em}
+$$
+\delta A_i = \Delta_{m\,i}^l A_m du^l
+$$
+dove le quantità $\Delta_{m\,i}^l$ sono funzioni delle coordinate e dipendono dal sistema di riferimento. Nel sistema localmente Euclideo i $\Delta_{m\,i}^l$ sono nulli, ma non lo saranno in generale, per cui si osserva che i $\Delta_{m\,i}^l$ non rappresentano un tensore (ricordiamo che un tensore nullo in un sistema di riferimento rimane nullo in tutti gli altri). Questo suggerisce un altro oggetto a tre indici che non è un tensore, cioè la connessione affine. Come si può verificare, è infatti $\Delta_{m\,i}^l \equiv \Gamma_{m\,i}^l$, per cui $\delta A_i = \Gamma_{m\,i}^l A_m du^l$.
+
+Allora il differenziale assoluto diventa:
+\vspace{0.4em}
+$$
+DA_i = \dd A_i - \delta A_i = \dfrac{\partial A_i}{\partial u^l} du^l - \Gamma^m_{il} A_m
+$$
+
+La \textbf{derivata covariante per un vettore covariante} $DA_i / \partial u^l$ indicata con $A_{i,l}$ sarà:
+\vspace{0.4em}
+$$
+A_{i,l} = \dfrac{DA_i}{\partial u^l} = \dfrac{\partial A_i}{\partial u^l} - \Gamma^m_{il} A_m
+$$
+
+La derivata covariante di un tensore si può ricavare considerando questo come il prodotto di due vettori e richiedendo che essa soddisfi la regola di \emph{Leibniz} per la derivazione di un prodotto. 
+
+Consideriamo allora un tensore di rango due $T_{ik} \equiv A_iB_k$, si ha che:
+\vspace{0.4em}
+$$
+\begin{array}{rcl}
+    T_{ik;l} & = & B_kA_{i;l} + A_iB_{k;l} \\[0.8em]
+    & = & B_k \left(\dfrac{\partial A_i}{\partial u^l} - \Gamma_{il}^m A_m\right) + A_i \left(\dfrac{\partial B_k}{\partial u^l} - \Gamma_{kl}^m B_m\right) \\[0.8em]
+    & = & B_k \dfrac{\partial A_i}{\partial u^l} + A_i \dfrac{\partial B_k}{\partial u^l} - \Gamma_{il}^m A_m B_k - \Gamma_{kl}^m A_i B_m \\[0.8em]
+    & = & \dfrac{\partial T_{ik}}{\partial u^l} - \Gamma_{il}^m T_{mk} - \Gamma_{kl}^m T_{im}
+\end{array}
+$$
+
+Questa relazione vale in generale. Osserviamo ora l'espressione:
+\vspace{0.4em}
+$$
+A_{i;l} = (g_{ik}A^k)_{;l} = g_{ik;l}A^k + g_{ik}A^k_{;l}
+$$
+
+Ma $A_{i;k}$ è un tensore, e posso usare il tensore metrico per scriverlo come $A_{i;l} = g_{ik}A_{;l}^k$; se confrontiamo con l'espressione scritta sopra vediamo che $g_{ik;l} = 0$.
+
+\newpage
+
+Usiamo ora la relazione per la derivata covariante di un tensore per esplicitare questo risultato:
+\vspace{0.4em}
+\begin{alignat}{2}
+g_{ik;l} = 0 \quad \rightarrow \quad \dfrac{\partial g_{ik}}{\partial u^l} - \Gamma_{il}^m g_{mk} - \Gamma_{kl}^m g_{im} = 0
+\tag*{(I)}
+\end{alignat}
+
+Facciamo ora, in questa relazione, una rotazione in senso antiorario degli indici $i$, $k$ e $l$; otteniamo:
+\vspace{0.4em}
+\begin{alignat}{2}
+\dfrac{\partial g_{kl}}{\partial u^i} - \Gamma_{ki}^m g_{ml} - \Gamma_{li}^m g_{km} = 0
+\tag*{(II)}
+\end{alignat}
+
+Ed ancora una rotazione degli indici:
+% \vspace{0.4em}
+\begin{alignat}{2}
+\dfrac{\partial g_{li}}{\partial u^k} - \Gamma_{lk}^m g_{mi} - \Gamma_{ik}^m g_{lm} = 0
+\tag*{(III)}
+\end{alignat}
+
+Se facciamo ora (I) + (III) - (II) otteniamo, sfruttando la simmetria degli indici bassi di 
+$\Gamma_{il}^m$ e $g_{ik}$:
+\vspace{0.4em}
+$$
+\dfrac{\partial g_{ik}}{\partial u^l} + \dfrac{\partial g_{li}}{\partial u^k} - \dfrac{\partial g_{kl}}{\partial u^i} - \cancel{\Gamma_{il}^m g_{mk}} - \Gamma_{kl}^m g_{im} - \Gamma_{lk}^m g_{mi} - \cancel{\Gamma_{ik}^m g_{lm}} + \cancel{\Gamma_{ki}^m g_{ml}} + \cancel{\Gamma_{li}^m g_{km}} = 0
+$$
+E semplificando:
+$$
+\dfrac{\partial g_{ik}}{\partial u^l} + \dfrac{\partial g_{li}}{\partial u^k} - \dfrac{\partial g_{kl}}{\partial u^i} - 2 \Gamma_{kl}^m g_{im} = 0
+$$
+
+Moltiplicando ora quest'ultima relazione per $\frac 12 g^{ij}$ otteniamo:
+\vspace{0.4em}
+$$
+\dfrac 12 \left(
+    \dfrac{\partial g_{ik}}{\partial u^l} + \dfrac{\partial g_{li}}{\partial u^k} - \dfrac{\partial g_{kl}}{\partial u^i} 
+\right)
+= \Gamma_{kl}^m g_{im}g^{ij} = \Gamma_{kl}^m \delta_m^j = \Gamma_{kl}^j
+$$
+
+Ritroviamo quindi la relazione che definisce la connessione affine, verificando così l'assunzione $\Delta_{il}^m \equiv \Gamma^m_{il}$.
+
+Consideriamo ora il \emph{prodotto scalare} $A_iB^i$; essendo una quantità scalare essa non cambia per trasporto parallelo ($\delta (A_iB^i) = 0$), da cui:
+\vspace{0.4em}
+$$
+B^i\delta A_i + A_i\delta B^i = 0 \quad \rightarrow \quad A_i\delta B^i = -B^i\delta A_i
+$$
+
+Sostituendo $\delta A_i = \Gamma^m_{il} A_m du^l$ otteniamo:
+\vspace{0.4em}
+$$
+A_i\delta B^i = -B^i\Gamma^m_{il} A_mdu^l
+$$
+
+Essendo $i$ ed $m$ indici muti sommati, li scambio tra loro:
+\vspace{0.4em}
+$$
+A_i\delta B^i = -B_m\Gamma_{ml}^i A_idu^l
+$$
+
+ed essendo $A_i$ un vettore generico, dovrà essere:
+\vspace{0.4em}
+$$
+\delta B^i = -\Gamma^i_{ml}B^mdu^l
+$$
+
+da cui la relazione che esprime la \textbf{derivata covariante per un vettore controvariante}:
+\vspace{0.4em}
+$$
+\dfrac{DB^i}{du^l} = \dfrac{\partial B^i}{\partial u^l} - \Gamma^i_{ml}B^m
+$$
+che è l'opposto in segno della derivata covariante per un vettore covariante.
+
+\begin{definitionblock}[Regola generale per la derivazione covariante]
+    La regola generale per la derivazione covariante di un tensore di rango arbitrario consiste nel farne la derivata parziale e poi di aggiungere un termine del tipo $+\Gamma$ per ogni indice controvariante ed un termine del tipo $-\Gamma$ per ogni indice covariante.
+\end{definitionblock}
+
+\subsection{Trasporto parallelo e tensore di curvatura}
+
+Sia $u^i = u^i(s)$ l'equazione parametrica di una curva, con $s$ ascissa curvilinea misurata a partire da un certo punto sulla curva. Sappiamo che $du^i$ è un vettore (dalla definizione di vettore controvariante), ds è uno scalare, e $du^i/ds \equiv v^i$ è quindi un vettore. In particolare, $v^i$ è il versore tangente alla curva.
+
+\begin{tipsblock}[Verifica di un versore]
+    possiamo verificare che $v^i$ è un versore, cioè ha modulo unitario, eseguendo il prodotto scalare $v_iv^i$:
+    $$
+    v_iv^i =  g_{ij}v^iv^j = g_{ij} \dfrac{du^i}{ds} \dfrac{du^j}{ds} \equiv 1 \quad \text{da} \quad ds^2 = g_{ij}du^idu^j
+    $$
+\end{tipsblock}
+
+Se fossi in uno spazio Euclideo, per definire una geodetica come un segmento di linea retta, direi che il versore
+tangente non cambia con $s$:
+$$
+\dfrac{dv^i}{ds} = 0
+$$
+Se ora voglio generalizzare questa relazione ad uno spazio qualsiasi, a 2 o più dimensioni, devo usare non la derivata normale, ma quella covariante:
+$$
+\dfrac{Dv^i}{ds} = 0
+$$
+Esplicitando i termini
+$$
+\dfrac{Dv^i}{ds} = \dfrac{dv^i}{du^l} \dfrac{du^l}{ds} = 
+\dfrac{du^l}{ds}
+\left( \dfrac{\partial v^i}{\partial u^l} + \Gamma^i_{ml}v^m
+\right) = 0
+$$
+Cioè:
+$$
+\dfrac{dv^i}{du^l} \dfrac{du^l}{ds} + \Gamma^i_{ml}v^m \dfrac{du^l}{ds} = 0
+\quad \Rightarrow \quad
+\dfrac{dv^i}{ds} + \Gamma^i_{ml}v^m v^l = 0
+$$
+da cui, ricordando che $du^i/ds = v^i$, abbiamo:
+$$
+\dfrac{d^2u^i}{ds^2} + \Gamma^i_{ml} \dfrac{du^m}{ds} \dfrac{du^l}{ds} = 0
+$$
+
+Ritroviamo cioè la nostra equazione della geodetica (anche a riprova del fatto che, passando dal caso Euclideo a quello generale, si devono sostituire le derivate "normali" con quelle covarianti).
+
+Vediamo che lungo la geodetica $Dv^i = 0$, cioè $dv^i = \delta v^i$: il versore $v^i$, trasportato parallelamente da un punto $u^i$ sulla geodetica, a un punto $u^i + du^i$ silla stessa geodetica, coincide con il vettore $v^i + dv^i$, tangente alla geodetica in $u^i + du^i$.
+
+Consideriamo ora un vettore $A_i$ che viene trasportato parallelamente lungo la stessa geodetica. L'angolo che esso forma con $v^i$, versore tangente, sarà dato dal prodotto scalare $A_iv^i$. Ma uno scalare non cambia per trasporto parallelo, per cui lungo la geodetica l'angolo tra $A_i$ e $v^i$ rimane costante: \bfit{un vettore trasportato parallelamente lungo una geodetica forma sempre lo stesso angolo con la tangente alla curva}.
+
+Immaginiamo ora di trasportare parallelamente un vettore $\bar v_0$ lungo un triangolo formato da pezzi di geodetica.
+Se siamo in uno spazio Euclideo (ad esempio su un piano) il vettore $\bar v_f$ che ottengo dopo aver chiuso il cammino coinciderà con $\bar v_0$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/vec_transport.png}
+    \caption{Trasporto di un vettore lungo un triangolo nelle varie geometrie.}
+    \label{fig:vec_transport}
+\end{figure}
+\vspace{-1.5em}
+La stessa cosa non accade lungo un triangolo sferico: il vettore appare ruotato di un angolo che ha lo stesso
+verso di rotazione del verso in cui ho percorso il triangolo sferico. L'opposto accade per un triangolo iperbolico (K < 0).
+
+Possiamo vedere la cosa anche in un altro modo: immaginiamo di andare da un punto A ad un punto B sia direttamente che passando per un punto C, sempre lungo archi di geodetica. 
+
+Nello spazio Euclideo il risultato del trasporto parallelo lungo i due percorsi è il medesimo, ma la stessa cosa non accade sulle superfici curve (quanto qui detto per un triangolo formato da archi di geodetica vale per un percorso generico, che si può pensare come costituito da un gran numero di archetti di geodetica). Il risultato è che, a meno di non essere in uno spazio Euclideo, \bfit{non esiste un modo naturale e non ambiguo per muovere un vettore da un punto ad un altro}; possiamo trasportarlo parallelamente, ma il risultato dipende dal cammino, e non c'è una scelta naturale per questo. Quindi \bfit{posso confrontare due vettori solamente se sono applicati allo stesso punto}. Ad esempio, due particelle che passano una accanto all'altra hanno una velocità relativa ben definita (e minore di $c$, con $c$ velocità della luce), ma due particelle in differenti punti di uno spazio generico non hanno una velocità relativa ben definita.
+
+Vediamo di quantificare quanto detto sopra in modo qualitativo. Muovendosi lungo un cammino chiuso formato
+da archi di geodetica, un vettore $A_k$ trasportato parallelamente subirà, tornando al punto di partenza, una
+variazione
+$$
+\Delta A_k = \oint \delta A_k = \oint \Gamma^i_{km}A_i du^m
+$$
+
+Per risolvere l'integrale usiamo il Teorema di Stokes:
+
+\rule{\textwidth}{0.4pt}
+\begin{theorem}[Teorema di Stokes]
+    Sia $S$ una superficie orientata delimitata da una curva chiusa $C$ orientata positivamente. Per ogni campo vettoriale $\vec{A}$ di classe $C^1$ definito su $S$, vale la relazione:
+    vspace{0.4em}
+    $$
+    \oint_{C} \vec{A} \cdot d\vec{l} = \int_{S} (\nabla \times \vec{A}) \cdot d\vec{S}
+    $$
+    dove $d\vec{l}$ è l'elemento di linea lungo $C$ e $d\vec{S}$ è l'elemento di superficie orientato su $S$.
+
+    \vspace{-0.6em}
+    \rule{\textwidth}{0.4pt}
+\end{theorem}
+
+Nella forma tensoriale, l'integrale di linea di un vettore $A_i$ lungo una curva chiusa si scrive come:
+
+$$
+\oint
+A_idu^i = \dfrac 12 \int_{Superficie}
+\left(
+    \dfrac{\partial A_m}{\partial u^l} - \dfrac{A_l}{\partial u^m}
+\right)
+df^{lm}
+$$
+
+dove $df^{lm}$ è un tensore che corrisponde alla proiezione dell'elemento di area della superficie sui piani coordinati. Nel nostro caso $A_i du^i \rightarrow \Gamma_{km}^i A_i du^m$, per cui:
+
+$$
+\Delta A_k = \dfrac 12 \int_{Superficie}
+\left[
+    \dfrac{\partial (\Gamma_{km}^iA_i)}{\partial u^l} - \dfrac{\partial (\Gamma_{kl}^iA_i)}{\partial u^m}
+\right]
+df^{lm}
+$$
+
+Se supponiamo che la superficie delimitata dalla curva chiusa sia infinitesima (una superficie finita si può scomporre in elementi infinitesimi), l'integrando sarà costante, a meno di infinitesimi di ordine superiore, e potremo scrivere:
+
+$$
+\Delta A_k = \dfrac 12 \left[
+    \dfrac{\partial (\Gamma_{km}^i)}{\partial u^l} A_i - \dfrac{\partial (\Gamma_{kl}^i)}{\partial u^m} A_i + \Gamma_{km}^i \dfrac{\partial A_i}{\partial u^l} - \Gamma_{kl}^i \dfrac{\partial A_i}{\partial u^m}
+\right] \Delta f^{lm}
+$$
+
+Siccome $A_i$ viene spostato parallelamente sulla curva:
+
+$$
+\dfrac{\partial A_i}{\partial u^l} = \dfrac{\delta A_i}{\partial u^l}=\Gamma_{il}^n A_n
+$$
+
+Allora:
+
+$$
+\begin{array}{rcl}
+\Delta A_k & = & \dfrac 12 \Delta f^{lm} \left[
+    \dfrac{\partial \Gamma_{km}^i}{\partial u^l} A_i - \dfrac{\partial \Gamma_{kl}^i}{\partial u^m} A_i + \Gamma_{km}^i \Gamma_{il}^n A_n - \Gamma_{kl}^i \Gamma_{im}^n A_n
+\right] = \\
+& = & \dfrac 12 A_i \Delta f^{lm} \left[
+    \dfrac{\partial \Gamma_{km}^i}{\partial u^l} - \dfrac{\partial \Gamma_{kl}^i}{\partial u^m} + \Gamma_{km}^n \Gamma_{nl}^i - \Gamma_{kl}^n \Gamma_{nm}^i
+\right]
+\end{array}
+$$
+
+dove il secondo passaggio, in cui si è esplicitato $A_i$, è stato ottenuto scambiando tra loro gli indici muti $i$ ed $n$ nei termini con i prodotti delle connessioni affini. La quantità in parentesi graffa è un tensore, poichè lo sono $A_i$, $\Delta f^{lm}$ e $\Delta A_k$ (differenza di due vettori applicati allo stesso punto). Ad essa si da il nome di \textbf{tensore di Riemann - Christoffel} o \textbf{tensore di curvatura}:
+\vspace{0.4em}
+$$
+\boxed{R^i_{klm} = \dfrac{\partial \Gamma^i_{km}}{\partial u^l} - \dfrac{\partial \Gamma^i_{kl}}{\partial u^m} + \Gamma^n_{km} \Gamma^i_{nl} - \Gamma^n_{kl} \Gamma^i_{nm}}
+$$
+
+\begin{warningblock}[Tensore di Riemann]
+    Nella letteratura il tensore di Riemann può essere definito con i segni scambiati rispetto alla definizione qui presentata (il che non cambia le sue proprietà, ma può essere fonte di confusione).
+\end{warningblock}
+
+Se in un punto, o una zona di spazio, $R^i_{klm} = 0$, allora $\Delta A_k = 0$: il trasporto parallelo lungo una curva chiusa lascia il vettore inalterato, e la zona di spazio si dice \bfit{piatta}.
+
+Questo accade in uno spazio Euclideo, come anche in qualunque (zona di) spazio in cui $g_{ij}$ sia costante, perchè le connessioni affini sono nulle e così pure il tensore di curvatura; e poichè un tensore uguale a
+zero in un sistema di coordinate rimane nullo in qualunque sistema di coordinate, allora $R^i_{klm} = 0$ in qualunque sistema di riferimento. Se invece $R^i_{klm} \neq 0$ il trasporto parallelo dipende dal percorso, e lo spazio (o la zona di spazio) si dice, per contrasto, curvo (da qui in nome di tensore di curvatura).
+
+\subsection{Proprietà del tensore di curvatura}
+
+Si può dimostrare che $R^i_{klm}$ è l'unico tensore che può essere costruito dal tensore metrico e dalle sue derivate prime e seconde, e che è lineare nelle derivate seconde e quadratico nelle derivate prime. Del tensore metrico si può scrivere la forma totalmente covariante $R_{jklm} = g_{ji}R^i_{klm}$.
+
+Consideriamo il tensore $R^i_{klm}$ come scritto sopra, e mettiamoci nel sistema localmente euclideo in cui, nel punto $u^i$, risulta $\partial g_{ij}/\partial u^k = 0$. Allora le connessioni affini (simboli di Christoffel) sono nulle, e le derivate covarianti si riducono a semplici derivate parziali. In questo sistema:
+\vspace{0.4em}
+$$
+R^i_{klm;j} = \dfrac{\partial R^i_{klm}}{\partial u^j} = \dfrac{\partial^2 \Gamma^i_{km}}{\partial u^j \partial u^l} - \dfrac{\partial^2 \Gamma^i_{kl}}{\partial u^j \partial u^m}
+$$
+
+si annullano in $u^i$ le connessioni affini, ma non necessaraimente le loro derivate.
+
+Permutando ciclicamente gli indici $l, m$ e $j$ otteniamo:
+\vspace{0.4em}
+$$
+R^i_{kmj;l} = \dfrac{\partial^2 \Gamma^i_{kj}}{\partial u^l \partial u^m} - \dfrac{\partial^2 \Gamma^i_{km}}{\partial u^l \partial u^j}
+\qquad \qquad
+R^i_{kjl;m} = \dfrac{\partial^2 \Gamma^i_{kl}}{\partial u^m \partial u^j} - \dfrac{\partial^2 \Gamma^i_{kj}}{\partial u^m \partial u^l}
+$$
+
+Sommando le tre relazioni, è facile vedere che si ottiene:
+\vspace{0.4em}
+$$
+\boxed{R^i_{klm;j} + R^i_{kmj;l} + R^i_{kjl;m} = 0}
+$$
+
+Questa è detta \bfit{identità di Bianchi}. Ricordiamo che, anche se l'abbiamo ricavata nel sistema localmente euclideo, essendo una relazione tensoriale, essa vale in tutti i sistemi di riferimento.
+
+Possiamo anche abbassare l'indice controvariante con il tensore metrico e otteniamo:
+\vspace{0.3em}
+$$
+R_{ijkl;m} + R_{ijml;k} + R_{ijlk;m} = 0
+$$
+
+\newpage
+
+Vediamo le proprietà del tensore di Riemann nella versione completamente covariante $R_{jklm} = g_{ji}R^i_{klm}$:
+
+\begin{itemize}
+    \item \textbf{Simmetria}:
+    $$
+    R_{jklm} = R_{lmjk}
+    $$
+    \item \textbf{Antisimmetria}:
+    $$
+    R_{jklm} = -R_{kjlm} = -R_{jkml} = R_{kjml}
+    $$
+    \item \textbf{Ciclicità}:
+    $$
+    R_{jklm} + R_{klmj} + R_{lmjk} = 0
+    $$
+\end{itemize}
+
+Dal tensore di Riemann, per contrazione, si può ricavare un tensore di rango 2, chiamato \bfit{tensore di Ricci}, definito come:
+$$ \boxed{R_{km} = R^i_{kim}} $$
+
+Per le proprietà di antisimmetria del tensore di Riemann, contraendo $i$ ed $m$ in $R^i_{klm}$ otteniamo nuovamente il tensore di Ricci, ma con un segno meno:
+$$ R^i_{kli} = -R^i_{kil} = - R_{kl}$$
+Il tensore di Ricci è \bfit{simmetrico}:
+\vspace{0.3em}
+$$
+R_{mk} = R^i_{mik} = g^{ir}R_{rmik} = g^{ir}R_{ikrm} = R^r_{krm} = R_{km}
+$$
+
+Esso è l'unico tensore simmetrico di rango 2 che si può ottenere da $R^i_{klm}$. Da esso si ricava lo \bfit{scalare di Ricci} o \bfit{scalare di curvatura}:
+$$
+R = g^{km}R_{km}
+$$
+
+Esso è il solo scalare che si può ottenere da $R^i_{klm}$.
+
+Le proprietà sopra evidenziate del tensore di Riemann fanno si che, in $N$ dimensioni, il numero delle sue componenti indipendenti sia:
+$$
+\mathcal N = \dfrac{N^2(N^2-1)}{12}
+$$
+
+\begin{itemize}
+\item Per $N = 1, \mathcal N = 0$ ed $R_{1111} \equiv 0$ sempre: una curva ha sempre curvatura (intrinseca) nulla, non ho informazioni su come la curva è "embedded" in uno spazio a 2 o più dimensioni. Ciò si traduce nel fatto che non posso capire su quale spazio è adagiata la mia curva, e quindi non posso parlare di curvatura.
+
+\item Per $N = 2, \mathcal N = 1$. C'è un'unica componente indipendente, ad esempio $R_{1221}$:
+
+$$
+R_{11} = R^l_{1l1} = g^{il} R_{i1l1} = \underbrace{g^{11}R_{1111}}_{=\,0} + \underbrace{g^{11}R_{1121}}_{=\,0} + \underbrace{g^{21}R_{2111}}_{=\,0} + g^{22}R_{2121} = g^{22}R_{1212}
+$$
+
+Dove, per antisimmetria, $R_{ijkl} = - R_{jikl} = - R_{ijlk}$, dunque $R_{1111} = - R_{1111} = 0$, e lo stesso per $R_{1121}$ e $R_{2111}$. Analogamente otteniamo:
+$$
+R_{12} = R_{21} = -g^{21}R_{1212}, \qquad R_{22} = g^{11}R_{1212}
+$$
+
+Ora che abbiamo tutte le componenti, possiamo calcolare lo scalare di Ricci:
+
+$$
+\begin{array}{rcl}
+R &=& g^{11}g^{22} R_{1212} - 2 g^{12}g^{21}R_{2121} + g^{22}g^{11}R_{1212}\\[0.3em]
+&=&
+2 R_{1221}\left(
+g^{11}g^{22} - g^{12}g^{21}
+\right)\\[0.3em]
+&=&
+2 R_{1221} \det g^{ij}
+\end{array}
+$$
+Ma $\qquad
+\det \begin{pmatrix}
+\frac{g_22}{g} & - \frac{g_{12}}{g} \\
+- \frac{g_{21}}{g} & \frac{g_{11}}{g}
+\end{pmatrix} = (g_{11}g_{22} - g_{12}g_{21})/g^2 = \frac 1g
+$, dunque:
+
+$$
+\underbrace{R = 2 \dfrac {R_{1221}}g}_{\text{tensore di curvatura}}
+\qquad \to \qquad
+\boxed{\dfrac R2 = \dfrac {R_{1221}}g = K_{Gauss}}
+$$
+
+\item Per $N = 3, \mathcal N = 6$.  tante quante sono le componenti del tensore di Ricci (simmetrico). Quindi per $N = 3$ basta conoscere $R_{km}$ per descrivere la curvatura dello spazio.
+
+\item Per $N = 4, \mathcal N = 20$, mentre $R_{km}$ ha 10 componenti soltanto. È necessario ricorrere al tensore $R^i_{klm}$ completo (a parte situazioni di particolare simmetria, e vedremo che così sarà nel caso dell'universo isotropo ed omogeneo).
+\end{itemize}
+
+Dall'identità di Bianchi, nella forma covariante, sfruttando le proprietà di antisimmetria del tensore di Riemann, si ha:
+$$
+R_{iklm;j} - R_{kimj;l} - R_{iklj;m} = 0
+$$
+moltiplichiamo per $g^{il}g^{km}$ e otteniamo:
+\vspace{0.3em}
+$$
+g^{km}R^l_{klm;j} - g^{il} R^m_{imj;l} - g^{km}R^l_{klj;m} = 0
+$$
+cioè:
+$$
+g^{km}R_{km;j} - g^{il} R_{ij;l} - g^{km}R_{kj;m} = 0
+$$
+da cui:
+$$
+R_{;j} - R^l_{j;l} - R^m_{j;m} = R_{;j} -  2 R^l_{j;l} = 0
+$$
+dalla quale si ha:
+$$
+R^l_{j;l} = \dfrac{1}{2} R_{;j} = \dfrac{1}{2} \dfrac{\partial R}{\partial u^j}
+$$
+
+dove l'ultimo passaggio è dovuto al fatto che $R$ è uno scalare, non dipende quindi dal sistema di riferimento usato, e la sua derivata covariante coincide con la semplice derivata parziale. La quantità $R^l_{j;l}$ rappresenta la divergenza (covariante) del tensore di Ricci. Consideriamo ora il tensore misto:
+\vspace{0.4em}
+$$
+R^l_j - \dfrac 12 \delta^l_j R
+$$
+
+La sua divergenza sarà (per la regola della derivazione di un prodotto ed essendo $\delta^l_{j;l} = 0$):
+\vspace{0.4em}
+$$
+R^l_{j;l} - \dfrac 12 \delta_j^l \dfrac{\partial R}{\partial u^l} = R^l_{j;l} - \dfrac 12 \dfrac{\partial R}{\partial u^j} = 0
+$$
+
+per quanto visto poco sopra. Il tensore in questione ha quindi divergenza (covariante) nulla. Se passiamo alle componenti covarianti otteniamo:
+\vspace{0.4em}
+$$
+g_{il}R^l_j - \dfrac 1 2 g_{il}\delta^l_j R = R_{ij} - \dfrac 1  g_{ij} R \equiv G_{ij}
+$$
+dove $G_{ij}$ è detto \bfit{tensore di Einstein}. Questo tensore ha importantissime proprietà: è \textit{simmetrico}, ha \textit{divergenza nulla} e, derivando dal tensore di Riemann, contiene termini \textit{lineari nelle derivate seconde} della metrica e \textit{quadratici nelle sue derivate prime}.

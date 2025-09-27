@@ -1,0 +1,168 @@
+\chapter{Lecture: 04/04/2025}
+
+\section{Il principio di Mach}
+
+\dots
+
+\section{Il principio di equivalenza}
+
+L'esperienza che corpi diversi cadono (in assenza di resistenza dell'aria) allo stesso modo per effetto della gravità ha portato a concludere, con grande precisione, che massa inerziale min e massa gravitazionale mgrav sono tra loro proporzionali (e in pratica uguali, facendo rientrare entro la costante di gravitazione G la costante di proporzionalità). Einstein assunse che, per definizione, $m_{in} \equiv m_{grav}$ . Questo porta al famoso esperimento pensato dell'\bfit{ascensore di Einstein}: se un osservatore, dotato di strumenti scientifici, è rinchiuso in un ascensore e non può quindi vedere cosa accade attorno a lui, non sarà in grado di distinguere, dai suoi esperimenti di meccanica, tra le due situazioni:
+
+\begin{itemize}
+    \item è fermo in un campo gravitazionale con accelerazione di gravità $\bar g$.
+    \item è nello spazio vuoto, e l'ascensote è accelerato verso l'alto con accelerazione costante $\bar g$.
+\end{itemize}
+
+Analogamente, poichè tutto case allo stesso modo in un campo gravitazionale, l'osservatore non sarà in grado di distinguere tra le situazioni di:
+
+\begin{itemize}
+    \item moto rettilineo uniforme nel vuoto
+    \item moto accelerato (caduta libera) in un campo gravitazionale.
+\end{itemize}
+
+%[immagine ?]
+
+Questo ci permette di dire quali sono i sistemi localmente inerziali: quelli in caduta libera. Quindi in un sistema in caduta libera valgono localmente (e al prim'ordine in $g_{\alpha\beta}$) le leggi della Relatività Ristretta.
+Il Principio di Equivalenza richiede che tutte le leggi della fisica (non solamente quelle della Meccanica) siano le stesse sia in un sistema localmente inerziale, sia nella Relatività Ristretta.
+Il fatto che gli effetti della gravitazione scompaiano in un sistema in caduta libera, fa sì che i fenomeni che vi avvengono sono completamente indipendenti dalla presenza di masse vicine. Secondo il punto di vista di Mach, invece, una grossa massa vicina dovrebbe introdurre una anisotropia della massa inerziale. Effetti dovuti al Sole o alla nostra Galassia sono stati ricercati, ma non trovati entro $\Delta m/m \sim 10^{-20}$, per cui il principio di equivalenza sembra favorito rispetto alle ipotesi di Mach (che quindi non sono completamente coerenti con la Relatività Generale, a parte l'ispirazione fornita ad Einstein)
+
+\section{Il principio di covarianza generale}
+
+\dots
+
+\section{Le equazioni di Einstein}
+
+\dots
+
+\section{Il limite newtoniano - campo debole (weak field)}
+
+Scritte le equazioni di Einstein, occorre verificare che, nel limite di validità della fisica classica, esse si riducono alla legge di Newton; dobbiamo anche vedere quanto vale la costante $\kappa$ che compare nelle equazioni.
+
+Supponiamo che il campo sia stazionario (cioè la sua derivata temporale sia nulla), che le velocità delle particelle siano piccole ($v \ll c$) e che, a grandi distanze dalle masse che generano il campo, il tensore metrico sia
+asintoticamente piatto: $g_{\alpha\beta} \to \eta_{\alpha\beta}$. Supponiamo inoltre che il campo sia debole: cioè che gli scostamenti dalla metrica $\eta_{\alpha\beta}$ siano piccoli:
+\vspace{0.4em}
+$$
+g_{\alpha\beta} = \eta_{\alpha\beta} + h_{\alpha\beta}, \qquad \text{con } |h| \ll 1
+$$
+
+Poich+ $v/c \ll 1$ sarà:
+$$
+\begin{array}{l}
+    \dfrac{dx^0}{ds} = \dfrac{cdt}{cd\tau} = \dfrac{dt}{d\tau} \\
+    \dfrac{dx^i}{ds} = \dfrac{d\bar x^i}{cd\tau} = \dfrac 1c \dfrac{dx^i}{dt} \dfrac{dt}{d\tau} = \dfrac{v^i}{c} \dfrac{dt}{d\tau} \ll \dfrac{dt}{d\tau} \equiv \dfrac{dx^0}{ds}
+\end{array}
+$$
+
+L'equazione delle geodetiche sarà, come al solito, 
+\vspace{0.4em}
+$$
+\dfrac{d^2 x^\alpha}{ds^2} + \Gamma^\alpha_{\beta\gamma} \dfrac{dx^\beta}{ds} \dfrac{dx^\gamma}{ds} = 0
+$$
+
+ma, per \alpha fissato, nella somma sugli indici $\beta$ e $\gamma$, i termini in cui compaiono i $dx^i/ds$ sono trascurabili rispetto al termine con $dx^0/ds$, per cui possiamo scrivere:
+\vspace{0.4em}
+$$
+\dfrac{d^2 x^\alpha}{ds^2} + \Gamma^\alpha_{00} \left( \dfrac{dx^0}{ds} \right)^2 = \dfrac{d^2 x^\alpha}{ds^2} + \Gamma^\alpha_{00} \left( \dfrac{dt}{d\tau} \right)^2 \simeq 0
+$$
+
+Con l'assnzione che $g_{\alpha\beta} = \eta_{\alpha\beta} + h_{\alpha\beta} \ \ (h \ll 1)$ vediamo come calcolare $g^{\alpha\beta}$. Sappiamo che, per definizione, $g_{\alpha\delta}g^{\delta\beta} \equiv \delta_{\alpha}^{\beta}$ e che $\eta_{\alpha\delta}\eta^{\alpha\delta} \equiv \delta_{\alpha}^{\beta}$.
+
+Definiamo la quantitò $h^{\gamma \delta} \equiv \eta^{\gamma\alpha}\eta^{\gamma\beta}h_{\alpha\beta}$. Mostriamo che:
+
+$$\vspace{0.4em}
+(\eta_{\alpha\beta} + h_{\alpha\beta})(\eta^{\alpha\beta - h^{\alpha\beta}}) = \delta_{\alpha}^{\delta}
+$$
+
+Sviluppando il termine a sinistra, e trascurando i termini del secondo ordine in $h$,
+\vspace{0.4em}
+$$
+(\eta_{\alpha\beta} + h_{\alpha\beta})(\eta^{\alpha\beta - h^{\alpha\beta}}) = \eta_{\alpha\beta}\eta^{\beta\delta} - \eta_{\alpha\beta}h^{\beta\delta} + h_{\alpha\beta} \eta^{\beta\delta} - h_{\alpha\beta h^{\beta\delta}} =
+$$
+$$
+= \delta_{\alpha}^{\delta} - \eta_{\alpha\beta}\eta^{\beta\sigma} \eta^{\delta\tau}h_{\sigma\tau} + h_{\alpha\beta}\eta^{\beta\delta} = \delta^\delta_\alpha
+$$
+
+Infatti $\eta_{\alpha\beta}\eta^{\beta\sigma} \equiv \delta_\alpha^\sigma$, $\ \delta_\alpha^\sigma h_{\sigma\tau} = h_{\alpha\tau}$, e $\eta^{\delta\tau}h_{\alpha\tau} \equiv h_\alpha^\beta \eta^{\delta\beta}$, poichè $\tau$ è un indice muto e posso chiamarlo $\beta$. Vedo quindi che $\eta^{\beta\delta} - h^{\beta\delta} = g^{\beta\delta}$.
+
+Calcoliamo $\Gamma^\alpha_{00}$ (ricordiamo che la stazioanrietà implica che le derivate rispetto a $x^0$ soo nulle):
+$$
+\Gamma^\alpha_{00} = \dfrac{1}{2} g^{\alpha\beta} \left( \dfrac{\partial g_{0\gamma}}{\partial x^0} + \dfrac{\partial g_{0\gamma}}{\partial x^0} - \dfrac{\partial g_{00}}{\partial x^\gamma} \right) = \dfrac{1}{2} \big(\eta^{\alpha\gamma} - h^{\alpha\gamma} \big) \left(
+    - \dfrac{\partial g_{00}}{\partial x^\gamma} 
+\right)
+\simeq -\dfrac 12 \eta^{\alpha\gamma} \dfrac{\partial g_{00}}{\partial x^\gamma} 
+$$
+
+Al primo ordin in $h$, quindi:
+$$
+\dfrac{d^2 x^\alpha}{ds^2} \simeq -\dfrac 12 \eta^{\alpha\gamma} \dfrac{\partial h_{00}}{\partial x^\gamma} \left( \dfrac{dt}{d\tau} \right)^2
+$$
+
+\begin{itemize}
+    \item Se $\alpha = 0$, ottengo:
+    $$
+    \dfrac{d^2 x^0}{ds^2} = -\dfrac 12 \eta^{00} \dfrac{\partial h_{00}}{\partial x^0} \left( \dfrac{dt}{d\tau} \right)^2 = 0 
+    \quad \rightarrow \quad
+    \dfrac{dx^0}{ds} = \dfrac{dt}{d\tau} = \text{costante}
+    $$
+
+    \item Se $\alpha = i$, ottengo:
+    $$
+    \dfrac{d^2 x^i}{ds^2} = \dfrac{d^2 x^i}{c^2 d \tau^2} = \dfrac 1{c^2} \dfrac{dt}{d\tau} \cdot \dfrac{d}{dt} \left[ \dfrac{dt}{d\tau} \dfrac{dx^i}{dt} \right] = \dfrac{1}{c^2} \left( \dfrac{dt}{d\tau} \right)^2 \dfrac{d^2 x^i}{dt^2}
+    $$
+    Per cui,
+    $$
+    \dfrac{d^2 x^i}{ds^2} = \dfrac 1{c^2} \left( \dfrac{dt}{d\tau} \right)^2 \dfrac{d^2 x^i}{dt^2} \simeq \dfrac 12 \eta^{i\gamma} \dfrac{\partial h_{00}}{\partial x^\gamma} \left( \dfrac{dt}{d\tau} \right)^2 \qquad (\eta^{i\gamma}) = -1 \text{ per } \gamma = i
+    $$
+    cioè:
+    $$
+    \dfrac 1{c^2} \dfrac{d^2 x^i}{dt^2} \simeq -\dfrac 12 \dfrac{\partial h_{00}}{\partial x^i} \quad \text{vettorialmente:} \quad 
+    \dfrac 1{c^2} \dfrac{d^2 \bar x}{dt^2} \simeq -\dfrac 12 \bar \nabla h_{00}
+    $$
+\end{itemize}
+
+Ma secondo la gravità newtoniana, indicando con $\Phi$ il potenziale gravitazionale, abbiamo:
+$$
+\dfrac{d^2 \bar x}{dt^2} = -\bar \nabla \Phi
+$$
+e, confrontando i due risultati, otteniamo:
+$$
+- \bar \nabla \Phi \simeq -\dfrac {c^2}2 \bar \nabla h_{00} \quad \rightarrow \quad h_{00} \simeq \dfrac{2\Phi}{c^2} + \text{cost.}
+$$
+
+Ma, se a grandi distanze dalle masse sorgenti del campo, $\Phi \to 0$ e $h_{00} \to 0$, pure perchè assumiamo che $g_{\alpha\beta} \to \eta_{\alpha\beta}$, segue che $cost. = 0$, cioè:
+
+$$
+h_{00} \simeq \dfrac{2\Phi}{c^2} \qquad \rightarrow \qquad g_{00} \simeq 1 + \dfrac{2\Phi}{c^2}
+$$
+
+L'ipotesi di campo debole, $|h| \ll 1$, implica quindi che sia $2 \Phi/c^2 \ll 1$.
+
+Nel caso di una massa $M$ in cui la densità è distribuita con simmetria sferica, il potenziale esterno è dato da $\Phi = -GM/r$ secondo Newton. L'ipotesi che il campo sia debole implica quindi che $|2\Phi/c^2| \ll 1$, cioè:
+$$
+\dfrac{2GM}{r c^2} \ll 1
+$$
+
+Per un buco nero o un corpo generico sferico, $R_S \equiv 2GM/c^2$ è il cosiddetto \bfit{raggio di Schwartzschild}, corrispondente, per un buco nero non rotante ed elettricamente neutro, all'\bfit{orizzonte degli eventi}, la zona dalla quale nulla può uscire (prescindendo da effetti quantistici di evaporazione). In questo caso vedo che la condizione di campo debole è che
+$$
+\dfrac{R_S}{r} \ll 1 \qquad \rightarrow \qquad r \gg R_S
+$$
+Per il nostro sole, $R_S \sim 3 km$.
+
+Vediamo ora, con le stesse assunzioni fatte sopra, che  le equaizoni di Einstein si riducono all'equazione di Poisson $\nabla^2 \Phi = 4 \pi G \rho_0$ e determiniamo la costante $\kappa$.Il tensore di curvatura è:
+$$
+R^\alpha_{\beta\gamma\delta} = \dfrac{\partial \Gamma^\alpha_{\beta\delta}}{\partial x^\gamma} - \dfrac{\partial \Gamma^\alpha_{\beta\gamma}}{\partial x^\delta} + \Gamma^\sigma_{\beta\delta}\Gamma^\alpha_{\sigma\gamma} - \Gamma^\sigma_{\beta\gamma}\Gamma^\alpha_{\sigma\delta} \simeq \dfrac{\partial \Gamma^\alpha_{\beta\delta}}{\partial x^\gamma} - \dfrac{\partial \Gamma^\alpha_{\beta\gamma}}{\partial x^\delta} \quad \text{(gli altri termini sono } O(h^2) \text{)}
+$$
+
+I simboli di Christoffel sono:
+$$
+\Gamma^\alpha_{\beta\gamma} = \dfrac{1}{2} g^{\alpha\sigma} \left( \dfrac{\partial g_{\beta\sigma}}{\partial x^\gamma} + \dfrac{\partial g_{\gamma\sigma}}{\partial x^\beta} - \dfrac{\partial g_{\beta\gamma}}{\partial x^\sigma} \right) \simeq \dfrac{1}{2} \eta^{\alpha\sigma} \left( \dfrac{\partial h_{\beta\sigma}}{\partial x^\gamma} + \dfrac{\partial h_{\gamma\sigma}}{\partial x^\beta} - \dfrac{\partial h_{\beta\gamma}}{\partial x^\sigma} \right) \quad \text{(allo $O(h)$)}
+$$
+
+Il tensore di Ricci si ottiene da $R^\alpha_{\beta\gamma\delta}$ contraendo il primo e il terzo indice:
+
+$$
+\begin{array}{lcl}
+R_{\beta\delta} &=& R^\alpha_{\beta(\gamma \equiv \alpha)\delta} = \dfrac{\partial \Gamma^\alpha_{\beta\delta}}{\partial x^\alpha} - \dfrac{\partial \Gamma^\alpha_{\beta\gamma}}{\partial x^\delta} = \\
+&=& \dfrac 12 \eta^{\alpha\sigma} ...
+\end{array}
+$$
