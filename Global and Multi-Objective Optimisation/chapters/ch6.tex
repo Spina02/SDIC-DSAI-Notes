@@ -6,8 +6,8 @@ Traditional Genetic Programming operators, such as subtree crossover and mutatio
 
 \section{Geometric Operators on Metric Spaces}
 
-The foundation of GSGP lies in defining the space of solutions as a \bfit{metric space}. A metric space is a set $S$ equipped with a distance function (or metric) $d: S \times S \to \mathbb{R}^+$, which satisfies four key properties for any $x, y, z \in S$:
-\begin{itemize}
+The foundation of GSGP lies in defining the space of solutions as a \bfit{metric space}. A metric space is a set $S$ equipped with a \bfit{distance function} (or metric) $d: S \times S \to \mathbb{R}^+$, which satisfies four key properties for any $x, y, z \in S$:
+\begin{itemize}[noitemsep]
     \item \textbf{Identity:} $d(x, y) = 0 \iff x = y$ The distance is zero if and only if the points are identical.
     \item \textbf{Symmetry:} $d(x, y) = d(y, x)$ The distance from x to y is the same as from y to x.
     \item \textbf{Non-negativity:} $d(x, y) \ge 0$ Distance is always non-negative.
@@ -16,16 +16,16 @@ The foundation of GSGP lies in defining the space of solutions as a \bfit{metric
 
 Within a metric space, we can define geometric concepts like segments and balls:
 \begin{itemize}
-    \item The \bfit{segment} $S(x, y)$ between two points $x$ and $y$ is the set of all points $z$ for which the triangular inequality holds with equality:
+    \item A \bfit{segment} $S(x, y)$ between two points $x$ and $y$ is the set of all points $z$ for which holds:
     $$ S(x, y) = \{z \in S \mid d(x, z) + d(z, y) = d(x, y)\} $$
-    \item The \bfit{ball} $B(x, r)$ of radius $r$ centered at a point $x$ is the set of all points $y$ whose distance from $x$ is at most $r$:
+    \item A \bfit{ball} $B(x, r)$ of radius $r$ centered in $x$ is the set of all points $y$ whose distance from $x$ is at most $r$:
     $$ B(x, r) = \{y \in S \mid d(x, y) \le r\} $$
 \end{itemize}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.6\textwidth]{assets/metric-space.png}
-    \caption{\centering Segments and balls in different metric spaces. Left: In Euclidean space ($\mathbb{R}^2$), the segment is a line and the ball is a circle. Right: In the space of binary strings $\{0,1\}^3$ with Hamming distance, the segment between two points is the set of strings on the minimal path along the hypercube's edges, and the ball $B(x,1)$ is the set containing $x$ and its immediate neighbors.}
+    \caption{\centering Segments and balls in different metric spaces (Euclidean, ($\mathbb{R}^2$) and Hamming, $\{0,1\}^3$)}
     \label{fig:metric_spaces}
 \end{figure}
 
@@ -51,21 +51,29 @@ The standard subtree crossover in GP is \bfit{not geometric}. A simple counterex
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.8\textwidth]{assets/gp-not-geometric.png}
-    \caption{\centering An example demonstrating that standard GP subtree crossover is not geometric. Crossing a tree with itself can produce a new tree, which is impossible for a true geometric operator.}
+    \includegraphics[width=0.7\textwidth]{assets/gp-not-geometric.png}
+    \caption{\centering An example demonstrating that standard GP subtree crossover is not geometric. Crossing a tree with itself produces a new tree, which is impossible for a geometric operator.}
     \label{fig:gp_not_geometric}
 \end{figure}
 
-\section{From Syntactic to Semantic Space}
-The issue with standard GP operators is that they are defined on the \bfit{syntactic space} (the space of all possible program trees), but what we truly care about is the \bfit{semantic space} (the space of all possible program behaviors).
-The \bfit{semantics} of a program can be defined as the vector of its outputs produced for a given finite set of fitness cases (inputs).
+\section{Geometric Semantic Operators}
+
+Standard GP operators act on the \bfit{syntactic space} (all possible program trees), but what matters is the \bfit{semantic space} (all possible program behaviors).
+A program's \bfit{semantics} are its output vector on a given set of fitness cases (inputs).
+
+\vspace{-0.5em}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/syntax-semantics.png}
+    \includegraphics[width=0.65\textwidth]{assets/syntax-semantics.png}
+
+    \vspace{-0.5em}
+
     \caption{\centering The distinction between syntax and semantics. Two different trees, $T_1$ and $T_2$ (different syntax), produce two different vectors of outputs for the same set of inputs (different semantics).}
     \label{fig:syntax_vs_semantics}
 \end{figure}
+
+\vspace{-1.5em}
 
 The core idea of GSGP is to design operators that are geometric in the \textit{semantic space}, not the syntactic one. This requires:
 \begin{enumerate}
@@ -73,21 +81,25 @@ The core idea of GSGP is to design operators that are geometric in the \textit{s
     \item Designing new crossover and mutation operators that construct an offspring tree whose \textit{semantics} are guaranteed to lie on the segment between the parent semantics (for crossover) or in a ball around the parent's semantics (for mutation).
 \end{enumerate}
 
-\section{Geometric Semantic Operators}
-
 \subsection{Geometric Semantic Crossover (GSC)}
 GSC generates an offspring $T_{off}$ whose semantics are a linear interpolation of the semantics of its parents, $T_1$ and $T_2$. This is achieved by constructing the offspring tree as:
 $$
     T_{off} = (R \times T_1) + ((1 - R) \times T_2)
 $$
-Where $R$ is a randomly generated program tree whose outputs are guaranteed to be in the range $[0, 1]$. This construction ensures that for any input, the output of $T_{off}$ will be on the segment between the outputs of $T_1$ and $T_2$.
+Where $R$ is a randomly generated program tree whose outputs are guaranteed to be in the range $[0, 1]$. For any input, the output of $T_{off}$ will be on the segment between the outputs of $T_1$ and $T_2$.
+
+\vspace{-0.5em}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{assets/gsc-crossover.png}
-    \caption{\centering The structure of Geometric Semantic Crossover. The offspring tree is a composition of the parent trees $T_1$ and $T_2$ and a random tree $R$.}
+    \includegraphics[width=0.6\textwidth]{assets/gsc-crossover.jpg}
+
+    \vspace{-0.5em}
+    \caption{\centering The structure of Geometric Semantic Crossover.}
     \label{fig:gsc_crossover}
 \end{figure}
+
+\vspace{-1.5em}
 
 The effect on the semantic space is that the offspring's behavior is bounded by the behavior of its parents, providing a highly controlled and exploitative search.
 
@@ -100,12 +112,21 @@ Where $m$ is the \bfit{mutation step} (a constant that defines the mutation radi
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{assets/gsm-mutation.png}
+    \includegraphics[width=0.7\textwidth]{assets/gsm-mutation.png}
     \caption{\centering The structure of Geometric Semantic Mutation. The offspring tree is created by adding a scaled random component (controlled by mutation step $m$) to the parent tree $T_1$.}
     \label{fig:gsm_mutation}
 \end{figure}
+
+\vspace{-1.5em}
 
 \section{Challenges and Advancements in GSGP}
 While semantically powerful, GSGP faces a significant practical challenge: the trees it produces grow exponentially with each generation. The formula for GSC, for example, combines three trees to make one, leading to rapid and unsustainable bloat.
 
 This has led to the development of more advanced implementations like \bfit{Fast GSGP}, which use techniques such as \textbf{subtree sharing} and optimized data structures to manage this complexity, making the approach viable in practice. These methods have shown that GSGP can significantly outperform standard GP on many benchmark problems, especially in terms of generalization to unseen data.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/fast-gsgp.png}
+    \caption{\centering Fast GSGP illustration.}
+    \label{fig:fast_gsgp}
+\end{figure}

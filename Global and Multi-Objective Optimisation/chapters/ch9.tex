@@ -1,0 +1,261 @@
+\chapter{Policy Optimisation}\label{ch:policy_opt}
+
+In many real-world problems, an optimal solution is not a single static object but a \bfit{policy}: a strategy that dictates the best action to take in any given situation. Policy optimisation is a core challenge in reinforcement learning. The foundational concepts include agents, states, and actions, with Q-learning serving as a classic method. Evolutionary approaches, particularly \bfit{Learning Classifier Systems (LCS)}, use rule-based systems to evolve robust and generalisable policies.
+
+\section{The Reinforcement Learning Framework}
+
+This problem is typically framed within the context of an agent interacting with an environment. The goal is to learn a behavior that maximizes a cumulative reward signal over time.
+
+The interaction is formalized by the following components:
+\begin{itemize}
+    \item A finite set of \bfit{states} $\mathcal{S}$, representing all possible situations the agent can be in.
+    \item A finite set of \bfit{actions} $\mathcal{A}$, representing all possible moves the agent can make.
+    \item A \bfit{transition function} $P(s'|s, a)$, the probability of moving to state $s'$ after an action $a$ in state $s$.
+    \item A \bfit{reward function} $R(s, a)$, which is the immediate reward received for taking action $a$ in state $s$.
+\end{itemize}
+A key assumption is that the environment is \bfit{Markovian}, meaning the transition probabilities and rewards depend only on the current state and action, not on the sequence of events that preceded them. This "memoryless" property simplifies the problem significantly: the agent does not need to remember its entire history. Instead, its behavior can be defined by a \bfit{policy}, $\pi$. A policy is a function that maps states to actions:
+$$ \pi: \mathcal{S} \to \mathcal{A} $$
+Given a state $s$, $\pi(s)$ is the action the agent will perform. The ultimate goal is to find the \bfit{optimal policy}, $\pi^*$, which maximizes the expected cumulative reward over the agent's lifetime.
+
+\subsection{Dense Policy Optimisation: Q-Learning}
+
+\bfit{Q-learning} is a foundational, non-evolutionary technique for finding the optimal policy. Instead of learning the policy $\pi$ directly, it learns a state-action value function, called the \bfit{Q-function}.
+
+The Q-function, $Q(s, a)$, represents the expected total future reward of taking action $a$ in state $s$ and then following the optimal policy thereafter. In its simplest form, for discrete states and actions, this function can be stored in a lookup table called a \bfit{Q-table}, with a row for each state and a column for each action.
+
+Once the optimal Q-function, $Q^*$, is known, the optimal policy $\pi^*$ can be derived directly by always choosing the action with the highest Q-value in the current state:
+$$ \pi^*(s) = \arg\,\max_{a \in \mathcal{A}} Q^*(s, a) $$
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/q-table.png}
+    \caption{\centering A Q-table stores the Q-value for every state-action pair.}
+    \label{fig:q_table}
+\end{figure}
+
+\vspace{-1.5em}
+
+The approach to finding the optimal Q-function, $Q^*$, depends on whether the agent has access to a model of the environment's dynamics.
+
+\begin{itemize}
+    \item \textbf{Model-Based Learning}
+    
+    When the agent knows the transition probabilities $P(s'|s, a)$ and the reward function $R(s, a)$, it can compute $Q^*$ using dynamic programming techniques as the Bellman equation:
+    $$
+    Q^*(s, a) = R(s, a) + \gamma \sum_{s' \in \mathcal{S}} P(s'|s, a) \max_{a' \in \mathcal{A}} Q^*(s', a')
+    $$
+    Here, $\gamma \in [0,1)$ is the \bfit{discount factor}, which determines how much future rewards are valued relative to immediate rewards. This equation expresses a self-consistency: the value of taking action $a$ in state $s$ equals the immediate reward plus the expected value of the best possible action in the next state, weighted by the probability of reaching each possible $s'$. By repeatedly applying this update to all state-action pairs (\bfit{value iteration}), the Q-table converges to $Q^*$.
+
+    \item \textbf{Model-Free Learning}
+    
+    In most real-world scenarios, the agent does not know the environment's transition probabilities or reward function in advance. Instead, it must learn $Q^*$ directly from experience by interacting with the environment. This \bfit{model-free} approach uses the following update rule:
+    $$
+    Q(s, a) \leftarrow (1-\alpha)Q(s, a) + \alpha\left[r + \gamma \max_{a' \in \mathcal{A}} Q(s', a')\right]
+    $$
+    where $\alpha \in (0,1]$ is the \bfit{learning rate}. Over time, as the agent explores the environment and updates its Q-table, the values will eventually converge to $Q^*$.
+
+    \begin{tipsblock}[Intuition]
+        Model-free Q-learning enables agents to learn optimal behavior even in complex, unknown environments, simply by trial and error. The update rule ensures that the agent continually refines its estimates of long-term reward, balancing past experience with new observations.
+    \end{tipsblock}
+\end{itemize}
+
+Tabular Q-learning, while foundational, has two major \textbf{drawbacks}:
+\begin{enumerate}
+    \item \textbf{Lack of Generalization}: It requires a distinct entry in the Q-table for every possible state-action pair. It cannot generalize to unseen states or handle continuous state spaces. The size of the Q-table explodes as the state space grows.
+    \item \textbf{Exploration vs. Exploitation}: The standard update is purely exploitative. To ensure the agent explores the environment sufficiently, techniques like $\epsilon$-greedy action selection (where the agent takes a random action with probability $\epsilon$) must be added.
+\end{enumerate}
+These limitations motivate the use of \bfit{sparse policy optimisation} techniques, which can generalize across states. \textbf{Learning Classifier Systems} are a powerful evolutionary approach to this problem.
+
+\subsection{Learning Classifier Systems (LCS)}
+\bfit{Learning Classifier Systems (LCS)} are a family of rule-based systems that use evolutionary algorithms to evolve a set of rules that collectively form a policy. The core idea is to aggregate states using rules, allowing for generalization.
+
+\textbf{Rule-Based Representations}
+
+An LCS works with a set of rules, each typically in the form: \texttt{IF <condition> THEN <action>}.
+\begin{itemize}
+    \item The \bfit{condition} part (the rule body) specifies a subset of the state space where the rule applies.
+    \item The \bfit{action} part (the rule head) specifies the action to be taken if the condition is met.
+\end{itemize}
+A single rule can cover many states, and a single state can be covered by multiple rules. This requires an \bfit{arbitration scheme} to decide the rule when multiple ones match the current state.
+
+For rule conditions in different spaces:
+\begin{itemize}
+    \item \textbf{Boolean Spaces}: Conditions are often represented using a ternary alphabet $\{0, 1, \#\}$, where \texttt{\#} is a "don't care" symbol that matches both 0 and 1. For example, the condition \texttt{10\#} matches states where the first variable is 1, the second is 0, and the third can be anything.
+    \item \textbf{Real-Valued Spaces}: Conditions can be defined by geometric shapes, such as hyper-rectangles ("boxes"), hyper-ellipsoids, or hyperplanes.
+\end{itemize}
+
+\textbf{The Pitt vs. Michigan Approach}
+
+There are two main architectural paradigms for LCS:
+\begin{enumerate}
+    \item \textbf{The Pittsburgh (Pitt) Approach}: Each individual in the evolutionary population is an \textit{entire set of rules} (a complete policy). The fitness is evaluated for the rule set as a whole.
+    \item \textbf{The Michigan Approach}: Each individual is a \textit{single rule}. The entire population of rules forms the policy. This is a form of cooperative co-evolution, where rules must collaborate to form a good solution.
+\end{enumerate}
+
+\subsection{The Pitt Approach: SAMUEL}
+\bfit{SAMUEL (Strategy Acquisition Method Using Empirical Learning)} is a classic system that exemplifies the Pittsburgh-style LCS. In SAMUEL, each individual in the population is a complete rule set, representing an entire policy. The system's lifecycle combines phases of local, intra-generational rule improvement with a traditional evolutionary process acting on the entire population.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/samuel-cycle.png}
+    \caption{\centering The SAMUEL cycle.}
+    \label{fig:samuel_cycle}
+\end{figure}
+
+\vspace{-1.5em}
+
+\subsubsection{Rule Selection}
+
+When the agent finds itself in a particular state, the process of selecting which \textbf{action to perform} in SAMUEL involves two key steps:
+\begin{enumerate}
+    \item \textbf{Matching:} Each rule in the individual's rule set is evaluated to compute a \bfit{match score}, which quantifies how well the rule's condition aligns with the current state. This allows for partial or fuzzy matches, so that rules can generalize across similar states rather than requiring an exact match.
+    \item \textbf{Selection:} From all available rules, a smaller \bfit{match set} is constructed, typically by selecting the rule(s) with the highest match scores (a form of truncated selection). The final rule to execute is then chosen from this match set, often stochastically, with the probability of selection proportional to each rule's match score.
+\end{enumerate}
+This two-step process enables SAMUEL to flexibly arbitrate between overlapping or competing rules, and to adapt to uncertainty or noise in the environment.
+
+\subsubsection{Rule Quality Metrics}
+
+SAMUEL maintains and updates several distinct \textbf{metrics} for each rule, allowing it to assess and refine the rule set over time:
+\begin{itemize}
+    \item \bfit{Fitness}: The fitness of the entire rule set (the individual) is simply the sum of all rewards obtained by the agent during its evaluation period.
+    \item \bfit{Utility}: Similar to a Q-value, this measures the expected reward for applying a rule $R_i$. It is updated without discounting future rewards:
+    $$ \text{Utility}(R_i) \leftarrow (1-\alpha)\text{Utility}(R_i) + \alpha r $$
+    where $r$ is the immediate reward received and $\alpha$ is a learning rate controlling the update speed.
+    \item \bfit{Utility Variance}: This metric tracks the variability or consistency of a rule's payoff, which is crucial for distinguishing between reliable and unreliable rules:
+    $$ \text{UtilityVariance}(R_i) \leftarrow (1-\alpha)\text{UtilityVariance}(R_i) + \alpha(\text{Utility}(R_i) - r)^2 $$
+    A low variance indicates that the rule's performance is stable, and vice versa.
+    \item \bfit{Strength}: This composite metric provide an overall assessment of a rule's quality:
+    $$ \text{Strength}(R_i) \leftarrow \text{Utility}(R_i) + \gamma \text{UtilityVariance}(R_i), \quad \text{where } 0 \le \gamma < 1 $$
+    The parameter $\gamma$ controls the influence of variance on the strength score, allowing the system to penalize rules that are inconsistent even if their average reward is high.
+    \item \bfit{Activity}: This metric records how frequently a rule is active (i.e., selected and applied). It is used to identify and prune rules that are rarely or never used, helping to keep the rule set efficient and focused. When a rule proposing action $a$ is applied, the activity of all rules with action $a$ in their head is reinforced, while the activity of all other rules decays:
+    \begin{align*}
+        \text{Activity}(R_i) &\leftarrow (1-\beta)\text{Activity}(R_i) + \beta \quad &&\text{(if rule } R_i \text{ proposes action } a) \\
+        \text{Activity}(R_j) &\leftarrow \delta \cdot \text{Activity}(R_j) \quad &&\text{(if rule } R_j \text{ does not propose action } a)
+    \end{align*}
+    Here, $\beta$ is a reinforcement rate and $0 < \delta < 1$ is a decay factor. At the start of the agent's lifetime, all rules are initialized with the same activity: $Activity(R_i) = \frac 12$.
+\end{itemize}
+Together, these metrics enable SAMUEL to not only evaluate the effectiveness of individual rules, but also to adaptively refine the rule set by promoting strong, reliable, and frequently used rules while eliminating weak or redundant ones.
+
+\subsubsection{Genetic Operators in SAMUEL}
+
+SAMUEL features a rich set of genetic operators, divided into two distinct phases: a local, exploitative \textbf{Lamarckian} phase that modifies rules within a single individual, and a standard \textbf{Classical} phase that operates on the population of individuals.
+
+\begin{itemize}
+\item \textbf{Lamarckian Mutation Operators}
+
+These operators are applied during the agent's evaluation lifetime to perform local improvements on its rule set. The parent rule is typically kept in the population alongside the newly created one.
+\begin{itemize}
+    \item \bfit{Rule Deletion}: An old rule with a low activity value may be selected for deletion.
+    \item \bfit{Rule Specialisation}: If a rule is too general (covers a very large number of states), more restrictive conditions can be added to create a more specialized version.
+    \item \bfit{Rule Generalisation}: If a rule is too specific (covers very few states), some of its conditions can be removed to make it more general.
+    \item \bfit{Rule Covering}: If a rule frequently fires with a partial match, the conditions that are not being matched can be removed to improve its applicability.
+    \item \bfit{Rule Merging}: If two strong rules have the same action and cover overlapping sets of states, they can be merged into a single, more general rule.
+\end{itemize}
+
+\item \textbf{Classical Mutation and Recombination}
+
+These operators are applied during the evolutionary phase to create new individuals (rule sets) from existing ones.
+\begin{itemize}
+    \item \bfit{Standard Mutation}: Changes parts of a rule without keeping the parent.
+    \item \bfit{Creep Mutation}: Makes small, random changes to a rule's conditions, mimicking a local hill-climbing search.
+    \item \bfit{Uniform Crossover}: Two parent rule sets exchange a fixed number, $k$, of rules.
+    \item \bfit{Clustered Crossover}: This operator first identifies pairs or sequences of rules that frequently lead to rewards. It then performs uniform crossover but ensures these beneficial clusters of rules are kept together and not broken apart.
+\end{itemize}
+\end{itemize}
+
+\subsubsection{Population-Level Operations}
+
+\paragraph{Selection}
+Selection in SAMUEL is a two-stage process. It first establishes a dynamic fitness baseline:
+$$ \text{baseline} \leftarrow (1-\nu)\text{baseline} + \nu(\mu_{\text{fitness}} + \psi \sigma^2_{\text{fitness}}) $$
+This baseline is updated using the current population's mean and variance of fitness. Only individuals whose fitness is \textit{above} this baseline are considered for the subsequent standard selection procedure (e.g., roulette wheel or tournament selection), which creates the parent pool for the next generation.
+
+\paragraph{Initialisation}
+SAMUEL supports several strategies for creating the initial population of rule sets:
+\begin{enumerate}
+    \item \textbf{Random Rules}: The initial rule sets are populated with randomly generated rules.
+    \item \textbf{Domain-Specific Rules}: The system can be seeded with a set of human-designed, heuristic rules that are known to be useful, potentially speeding up the initial phase of evolution.
+    \item \textbf{Generalist Rules}: Each individual can be initialized with a set of highly general rules of the form \texttt{IF <all states> THEN a} for each possible action $a$. These rules cover the entire state space and are subsequently refined and specialized by the Lamarckian and classical operators during the evolutionary process.
+\end{enumerate}
+
+\subsection{The Michigan Approach}
+In the Michigan approach, the paradigm shifts: each individual in the evolving population is a \textit{single rule}, and the policy is represented by the \textit{entire population of rules}. This setup is a form of cooperative coevolution, where rules must collaborate and compete to form an effective global solution. We will examine two Michigan-style systems: ZCS and its powerful successor, XCS.
+
+\subsubsection{The Zeroth-Level Classifier System (ZCS)}
+ZCS is an early, influential Michigan-style LCS. It maintains a population of \texttt{IF...THEN...} rules and uses a steady-state Genetic Algorithm to evolve them.
+
+\begin{itemize}[noitemsep]
+    \item The population is a \bfit{single set of rules} (each individual is a rule).
+    \item The fitness of a rule is directly tied to its \bfit{utility} (its predicted payoff).
+    \item ZCS requires an \bfit{exact match} for a rule's condition to be satisfied.
+    \item It includes a \bfit{covering} mechanism: if the agent encounters a state $s$ for which no rule matches, a new rule that covers $s$ is created and replaces an existing, low-fitness one in the population.
+\end{itemize}
+
+ZCS operates as a steady-state system. The inner loop consists of agent interaction with the environment and fitness updates. The outer, evolutionary loop is triggered periodically.
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/zcs-cycle.png}
+    \caption{\centering The steady-state cycle of the ZCS algorithm.}
+    \label{fig:zcs_cycle}
+\end{figure}
+
+\vspace{-1.5em}
+
+The \textbf{fitness update} in ZCS is inspired by the bucket-brigade algorithm, a precursor to Q-learning.
+\begin{enumerate}[noitemsep]
+    \item For the current state $s$, find the \bfit{match set} $M$ of all rules whose conditions match $s$.
+    \item Select one rule from $M$ to apply (e.g. fitness-proportional selection) and extract its action $a$.
+    \item Identify the \bfit{action set} $A \subseteq M$ of all rules in $M$ that also propose action $a$.
+    \item Perform action $a$, receive reward $r$, and transition to the next state $s'$.
+    \item Each rule $A_i \in A$ updates its fitness by sharing some with the previous action set and receiving a portion of the reward $r$ plus discounted future value from $A'$:
+    \vspace{-0.5em}
+    \small
+    $$ \text{Fitness}(A_i) \leftarrow (1-\alpha)\text{Fitness}(A_i) + \alpha \frac{1}{|A|} \bigg( r + \gamma \sum_{A'_j \in A'} \text{Fitness}(A'_j) \bigg) $$
+    \normalsize
+    \item Additionally, rules in $M$ that proposed different actions ($B=M-A$) are penalized: 
+    \vspace{-0.5em}
+    \small
+    $$ \text{Fitness}(B_i) \leftarrow \beta \cdot \text{Fitness}(B_i), \quad \text{with } \beta \in [0,1] $$
+    \normalsize
+\end{enumerate}
+
+When the GA is triggered, two parents $P_1, P_2$ are selected for \textbf{fitness redistribution}:
+\begin{itemize}[noitemsep]
+    \item If no crossover occurs, the parents and children ($C_1, C_2$) share fitness: 
+    \small
+    $$ \text{Fitness}(C_i) \leftarrow \frac{1}{2}\text{Fitness}(P_i) \quad \text{and} \quad \text{Fitness}(P_i) \leftarrow \frac{1}{2}\text{Fitness}(P_i) $$
+    \normalsize
+    \item If crossover occurs, children receive a portion of the parents' fitness, the parents' fitness is halved: 
+    \small
+    $$ \text{Fitness}(C_i) \leftarrow \frac{1}{4}(\text{Fitness}(P_1) + \text{Fitness}(P_2)) \quad \text{and} \quad \text{Fitness}(P_i) \leftarrow \frac{1}{2}\text{Fitness}(P_i) $$
+    \normalsize
+\end{itemize}
+
+
+\subsubsection{The XCS Algorithm}
+\bfit{XCS} is a landmark LCS that builds upon ZCS and introduces several major improvements, most notably the decoupling of a rule's fitness from its predicted utility. This fundamental change transforms the objective of the system.
+
+The central innovation in XCS is the \textbf{accuracy-based fitness}: a rule's fitness is based on the \bfit{accuracy} of its prediction, not the magnitude of the prediction itself. This encourages the system to form a complete and accurate map of the entire state-action-payoff landscape, rewarding rules that are reliable predictors, even if they predict low payoffs. XCS maintains several distinct measures for each rule:
+\begin{enumerate}
+    \item \bfit{Rule Utility (Prediction)}: An estimate of the expected payoff if the rule is applied. This is kept separate from fitness.
+    \item \bfit{Utility Error}: An estimate of the mean absolute error in the utility prediction.
+    \item \bfit{Accuracy}: A measure derived from the utility error. Lower error means higher accuracy.
+    \item \bfit{Fitness}: A function of the rule's accuracy. This value is used for selection in the genetic algorithm.
+\end{enumerate}
+
+XCS differs from ZCS in four key ways:
+\begin{itemize}
+    \item \textbf{Action Selection}: XCS makes a more informed decision by considering all rules in the match set $M$. It first calculates a \textit{system prediction} for each possible action $a$ by taking a fitness-weighted average of the utility predictions of all rules in $M$ that propose action $a$. The action with the highest system prediction is then chosen (often with an $\epsilon$-greedy strategy).
+    $$ \text{Score}(a) = \frac{\sum_{r \in R_a} \text{Utility}(r) \times \text{Fitness}(r)}{\sum_{r \in R_a} \text{Fitness}(r)}, \quad \text{where } R_a \subseteq M $$
+
+    \item \textbf{Utility and Fitness Updates}: The utility, error, and accuracy of rules in the current action set are updated using Q-learning-style rules. Fitness is then updated as a function of accuracy.
+
+    \item \textbf{Fitness Redistribution}: When offspring are created, the fitness of the parents is not changed. The offspring inherit a fraction of the parents' fitness, preventing experienced rules from being immediately disadvantaged.
+    
+    \item \textbf{Niche-Based GA}: The genetic algorithm for creating new rules operates only within the \bfit{action set} of the chosen action. This "niche" approach encourages specialization, as rules only compete with other rules that advocate for the same action in the same context.
+\end{itemize}
+
+By prioritizing accuracy, XCS evolves a population of classifiers that are not just effective but also maximally general, forming a compact and comprehensive model of the environment.
