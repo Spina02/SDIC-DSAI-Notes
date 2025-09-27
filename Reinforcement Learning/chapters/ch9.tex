@@ -1,0 +1,91 @@
+\chapter{Policy Gradient Methods}
+
+So far in this book almost all the methods have been \textit{action-value methods}; they learned the values of actions and then selected actions based on their estimated action values. In this chapter we consider methods that instead learn a \textit{parameterized policy} that can select actions without consulting a value function. A value function may still be used to \textit{learn} the policy parameter, but it is not required for action selection. We will use the notation $\theta \in \mathbb{R}^{d'}$ for the policy's parameter vector. 
+
+In this chapter we consider methods for learning the policy parameter based on the gradient of some scalar performance mearure $J(\theta)$ with respect to the policy parameter. These methods seek to \textit{maximize} the performance, so their updates approximate gradient \textit{ascent} in $J$: 
+
+$$
+\theta_{t+1} = \theta_t + \alpha \hat{\nabla J(\theta_t)},
+$$
+
+All methods that follow this general schema are called \textit{policy gradient methods}.
+
+\section{Policy Approximation and its Advantages}
+
+In policy gradient methods, the policy can be parameterized in any way, as long as $\pi(a|s,\theta)$ is differentiable with respect to its parameters, i.e., as long as $\nabla \pi(a|s,\theta)$ exists and is finite for all $s \in \mathcal{S}, a \in \mathcal{A}(s), \theta \in \mathbb{R}^{d'}$. 
+
+If the action space is discrete and not too large, then a natural. and common kind of parameterization is to form parameterized numerical preferences $h(s,a,\theta) \in \mathbb{R}$ for each state-action pair. The actions with the highest preferences in each state are given the highest probabilities of being selected, for example, according to an exponential soft-max distribution:
+
+$$
+\pi(a|s,\theta) = \frac{e^{h(s,a,\theta)}}{\sum_{a'} e^{h(s,a',\theta)}}
+$$
+
+The action preferences themselves can be parameterized arbitrarily. As an example, they might be computed by a deep artificial neural network (ANN), where $\theta$ is the vector of all the connection weights of the network. Or the preferences could be simply linear in features:
+
+$$
+h(s,a,\theta) = \theta^\top \phi(s,a)
+$$
+
+\section{Policy Gradient Theorem}
+
+We can simplify the notation without losing any meaninful generality by assuming that every episode starts in sime particular (non-random) state $s_0$. Then, in the episodic case we define performance as:
+
+$$
+J(\theta) = v_{\pi_{\theta}}(s_0)
+$$
+
+where $v_{\pi_{\theta}}$ is the true value function for $\pi_{\theta}$, the policy determined by $\theta$. From here on in our discussion we will assume no discounting ($\gamma = 1$) for the episodic case. 
+
+With function approximation it may seem challenging to change the policy parameter in a way that ensures improvement. The problem is that performance depends on both the action selections and the distribution of states is which those selections are made, and that both of these are affected by the polict parameter. Given s state, the effect of the policy parameter on the actions, and thus on the reward, can be computed in a relatively straightforward way from knowledge of the parameterization. But the effect of the policy on the state distribution is a function of the environment and is typically unknown. How can we estimate the performance gradient with respect to the policy parameter when the gradient depends on the unknown effect of policy changes on the state distribution?
+
+Here comes the \textit{policy gradient theorem}, which provides an analytical expression for the gradient of performance with respect to the policy parameter. The policy gradient theorem for the episodic case estabilishes that 
+
+$$
+\nabla J(\theta) \propto \sum_{s}\mu(s) \sum_{a}q_{\pi}(s,a)\nabla\pi(a|s,\theta),
+$$
+
+The distribution $\mu$ here (seen in Chapters 8 and 9) is the on-policy distribution under $\pi$.
+
+\section{REINFORCE: Monte Carlo Policy Gradient}
+
+Recall out stratgy for stochastic gradient ascent, which requires a way to obtain samples such that the expectation of the sample gradient is proportional to the actual gradient of the performance measure as a function of the parameter. The sample gradient need only be proportional to the gradient because any constant of proportionality can be absorbed into the step size $\alpha$, which is otherwise arbitrary. 
+
+Notice that the right-hand side of the policy gradient theorem is a sum over states weighted by how often the staes occyr under the target policy $\pi$; if $\pi$ is followed, then states will be encountered in these proportions. Thus:
+
+\begin{align*}
+\nabla J(\theta) &\propto \sum_{s}\mu(s)\sum_a q_{\pi}(s,a)\nabla\pi(a|s,\theta) \\
+&= \mathbb{E}_{\pi}\left[\sum_a q_{\pi}(S_t,a)\nabla\pi(a|S_t,\theta)\right]
+\end{align*}
+
+We could stop here and instantiate our stochastic gradient-ascent algorithm as
+
+$$
+\theta_{t+1} = \theta_t + \alpha \sum_a \hat{q}(S_t,a,w)\nabla\pi(a|S_t,\theta)
+$$
+
+but our current interest is the classical REINFORCE algorithm whose update at time $t$ involves just $A_t$, the one action actually taken at time $t$. 
+
+We continue our derivation of REINFORCE by introducing $A_t$ in the same way as we introduced $S_t$, i.e., by replacing a sum over the random variable's possible values by an expectation under $\pi$, and then sampling the expectation. 
+
+\begin{align*}
+    \nabla J(\theta) &\propto \mathbb{E}_{\pi}\left[\sum_a \pi(a|S_t,\theta)q_{\pi}(S_t,a)\frac{\nabla\pi(a|S_t,\theta)}{\pi(a|S_t,\theta)}\right] \\
+    &= \mathbb{E}_{\pi}\left[q_{\pi}(S_t,A_t)\frac{\nabla\pi(A_t|S_t,\theta)}{\pi(A_t|S_t,\theta)}\right] \\
+    &= \mathbb{E}_{\pi}\left[G_t\frac{\nabla\pi(A_t|S_t,\theta)}{\pi(A_t|S_t,\theta)}\right] \hspace{1cm} (\text{because } \mathbb{E}_{\pi}\left[G_t|S_t,A_t\right] = q_{\pi}(S_t,A_t))
+\end{align*}
+
+where $G_t$ is the return as usual. The final expression in brackets is exactly what is needed, a quantity that can be sampled on each time step whose expectation is proportional to the gradient. Using this sample to instantiate our generic stochastic gradient-ascent algorithm yields the REINFORCE update:
+
+$$
+\theta_{t+1} = \theta_t + \alpha G_t \frac{\nabla\pi(A_t|S_t,\theta)}{\pi(A_t|S_t,\theta)}
+$$
+
+The vector is the direction in parameter space that most increases the probability of repeating the action $A_t$ on future visits to state $S_t$. The update increases the parameter vector in this direction proportional to the return, and inversely proportional to the action probability. The former makes sense because it causes the parameter to move most in the directions that favour actions that yield the highest return. The latter makes sense because otherwise actions that are selected frequently are at an advantage and might win out even if they do not yield the highest return. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/reinforce_code.png}
+\caption{Monte-Carlo Policy-Gradient Control (episodic) for $\pi_*$}
+\label{fig:reinforce_code}
+\end{figure}
+
+As a stochastic gradient method, REINFORCE has good theoretical convergence properties. By construction, the expected update over an episode is in the same direction as the performance gradient. This assures an improvement in expected performance for sufficiently small $\alpha$, and convergence to a local optimum under standard stochastic approximation conditions for decreasing $\alpha$. However, as Monte Carlo method REINFORCE may be of high variance and thus produce slow learning. 

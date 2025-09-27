@@ -1,0 +1,111 @@
+
+\chapter{Introduction}
+
+Reinforcement Learning (RL) is learning what to do so as to maximize a numerical reward signal. The learner is not told which actions to take, but instead must discover which actions yield the most reward by trying them. 
+It is different from supervised learning, where the agent learns from a dataset of input-output pairs, and from unsupervised learning, where the agent tries to find patterns in data without any explicit feedback. Therefore, it is considered a third machine learning paradigm.
+
+One challenge that arise here is the trade-off between exploration and exploitation. The agent must explore the environment to discover which actions yield the most reward, but it must also exploit its current knowledge to maximize its reward. 
+All reinforcement learning agents have explicit goals, can sense aspects of their environments and can choose actions to influence their environments, making RL an approach that starts with a complete, interactive and goal-seeking agent.
+
+Elements of reinforcement learning include:
+\begin{itemize}
+    \item \textbf{Policy}: A strategy that the agent employs to determine its actions based on the current state of the environment. Roughly speaking, it is a mapping from perceived states of the environment to actions to be taken when in those states. In some cases the policy may be a simple function or lookup table, whereas in others it may involve extensive computation such as a search process. In general, policies may be stochastic, specifying provabilities for each action.
+    \item \textbf{Reward signal}: A feedback signal that the agent receives from the environment after taking an action. The reward signal is used to evaluate the effectiveness of the agent's actions and to guide its learning process. It is the primary basis for alternating the policy.
+    \item \textbf{Value function}: A function that estimates the expected cumulative reward that the agent can obtain from a given state or state-action pair. The value function helps the agent to evaluate the long-term consequences of its actions and to make decisions that maximize its expected reward over time. The value of a state is the total amount of reward an agent can expect to accumulate over the future, starting from that state.
+    \item \textbf{Model of the environment}: An internal representation of the environment that the agent uses to predict the consequences of its actions. The model can be used to simulate the environment and to plan actions based on the predicted outcomes. It is not always necessary, but it can be useful for planning and decision-making.
+\end{itemize}
+
+Most of the time we move \textit{greedily}, selecting the move that leads to the state with greatest value, i.e., with the highest estimated probability of winning. Occasionally, however, we select randomly from among the other moves instead. These are called \textit{exploratory} moves because they cause us to experience states that we might otherwise never see.
+
+If we let $S_t$ denote the state before the greedy move, and $S_{t+1}$ the state after that move, then the update to the estimated value of $S_t$, denoted $V(S_t)$, can be written as 
+$$
+V(S_t) \leftarrow V(S_t) + \alpha \left( V(S_{t+1}) - V(S_t) \right)
+$$
+where $\alpha$ is a small positive number called the \textit{learning rate}. This equation is known as the \textit{temporal difference} (TD) learning rule, which is a fundamental concept in reinforcement learning. It allows the agent to update its value estimates based on the difference between the predicted value of the next state and the current value estimate.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/tic_tac_toe_example.png}
+    \caption{Tic Tac Toe example of a reinforcement learning agent. The agent learns to play the game by exploring different moves and receiving rewards based on the outcome of the game.}
+    \label{fig:tic_tac_toe_example}
+\end{figure}
+
+\subsection*{Multi-Armed Bandit Problem}
+
+The most important feature distinguishing RL from other types of learning is that it uses training information that \textit{evaluates} the actions taken rather than \textit{instructs} by giving correct actions. This is what creates the need for active exploration, for an explicit search for good behavior. 
+
+Let's say we have a slot machine with multiple arms ($k$) and we are forced to repeatedly choose one arm to pull. After each choice we receive a numerical reward chosen from a stationary (\textit{strong assumption!}) probability distribution that depends on the action we selected. Our objective is to maximize the expected total reward over some time period, i.e. \textit{time steps}.
+
+In this $k$-armed bandit problem, each of the $k$ actions has an expected or mean reward given that that action is selected; this is the \textit{value} of that action. We denote the action selected on time step $t$ as $A_t$ and the corresponding reward as $R_t$. The value then of an arbitrary action $a$, denoted $q_*(a)$, is the expected reward given that $a$ is selected:
+$$
+q_*(a) \equiv \mathbb{E}[R_t | A_t = a]
+$$
+We assume that we don't know the action values with certainty, although we may have estimates. We denote the estimated value of action $a$ at time step $t$ as $Q_t(a)$. We would like $Q_t(a)$ to be close to $q_*(a)$, but we do not know the true values.
+
+It we maintain estimates of the action values, then at any time step there is at least one action whose estimated value is greatest. We call these the \textit{greedy} actions. When we select one of these actions, we say that we are \textit{exploiting} our current knowledge of the values of the actions. If instead we select one of the nongreedy actions, then we say we are \textit{exploring}, because this enables us to improve our estimate of the nongreedy action's value. Exploitation is the right thing to do to maximize the expected reward on the one step, but exploration may produce the greater total reward in the long run.
+
+However, most of these methods make strong assumptions about stationarity and prior knowledge that are either violated or impossible to verify in most applications and in the full reinforcement learning problem that we consider in subsequent chapters. The guarantees of optimality or bounded loss for these methods are of little comfort when the assumptions of their theory do not apply.
+
+\subsubsection*{Action-value Methods}
+
+Action-value methods are a class of reinforcement learning algorithms that focus on estimating the value of actions based on the rewards received from the environment. The key idea is to maintain an estimate of the expected reward for each action and to use this information to make decisions about which action to take next.
+$$
+Q_t(a) \equiv \frac{\sum_{i=1}^{t-1}R_i \cdot \mathbb{1}(A_i = a)}{\sum_{i=1}^{t-1}\mathbb{1}(A_i = a)}
+$$
+We call this the \textit{sample-average} method for estimating action values becuase each estimate is an average of the sample of relevant rewards. To select an action, the simplest approach is to select one of the actions with the highest estimated value, i.e., one of the greedy actions as defined in the previous section. We write this \textit{greedy} action selection method as
+$$
+A_t \equiv \argmax{a} Q_t(a)
+$$
+A simple alternative is to behave greedily most of the time, but every once in a while, with a small probability $\epsilon$, instead select randomly from all the actions with equal probability, independently of the action-value estimates. These methods are named \textit{$\epsilon$-greedy}. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/comparison_greedy.png}
+    \caption{Comparison between greedy and $\epsilon$-greedy action selection methods. The $\epsilon$-greedy method explores the environment by selecting random actions with a small probability $\epsilon$, while the greedy method always selects the action with the highest estimated value.}
+    \label{fig:comparison_greedy}
+\end{figure}
+
+\subsubsection*{Nonstationary Bandit Problems}
+
+Previous methods assume that the action values are stationary, meaning that they do not change over time. However, in many real-world scenarios, the action values can change due to various factors such as changes in the environment or the agent's own actions. This leads to nonstationary bandit problems, where the action values are not fixed and can vary over time. In such cases it makes sense to give more weight to recent rewards than to long-past rewards. One of the most popular ways of doing this is to use a constant step-size parameter. 
+$$
+Q_{n+1}(a) = Q_n(a) + \alpha(R_{n+1} - Q_n(a))
+$$
+where $\alpha \in [0, 1]$ is a constant step-size parameter that determines how much weight to give to the most recent reward. This approach allows the agent to adapt to changes in the environment and to update its action-value estimates accordingly.
+
+\subsubsection*{Optimistic Initial Values}
+
+All the methods we have discussed so far are dependent to some extent on the initial action-value estimates, $Q_1(a)$. In the language of statistics, these methods are \textit{biased} by their initial estimates.
+
+Initial action-values can also be used as a simple way to encourage exploration. Setting the initial action values to be optimistic, i.e., higher than the true expected rewards, can encourage the agent to explore more. This is because the agent will initially prefer actions with higher estimated values, leading to more exploration of those actions until their true values are learned. We regard it as a simple trick that can be quite effective on stationary problems, but it is far from being a generally useful approach to encouraging exploration. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/optimistic_initial_values.png}
+    \caption{Optimistic initial values in action-value methods. The agent starts with high initial estimates for all actions, encouraging exploration until the true values are learned.}
+    \label{fig:optimistic_initial_values}
+\end{figure}
+
+\subsubsection*{Gradient Bandit Algorithms}
+
+Here we consider learning a numerical \textit{preference} for each action $a$, which we denote as $H_t(a) \in \mathbb{R}$. The larger the preference, the more often that action is taken, but the preference has no interpretation in terms of reward. Only the relative preference of one action over another is important. 
+$$
+Pr\{A_t = a\} = \frac{e^{H_t(a)}}{\sum_{b} e^{H_t(b)}} = \pi_t(a)
+$$
+where $\pi_t(a)$ indicates the probability of taking aciton $a$ at time step $t$. The action probabilities are normalized so that they sum to one.
+
+There is a natural learning algorithm for soft-max action preferences based on the idea of stochastic gradient ascent. On each step, after selecting action $A_t$ and receiving the reward $R_t$, the action preferences are updated by:
+$$
+H_{t+1}(a) = H_t(a) + \alpha(R_t - \bar{R}_t) (1 - \pi_t(A_t)), \quad \text{and}
+$$
+$$
+H_{t+1}(A_t) = H_t(A_t) - \alpha(R_t - \bar{R}_t) \pi_t(a) \quad \text{for all } a \neq A_t
+$$
+where $\bar{R}_t$ is the average reward received up to time step $t$. This update rule adjusts the preferences based on the received reward, encouraging actions that yield higher rewards and discouraging those that yield lower rewards.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/gradient_bandit.png}
+    \caption{Gradient bandit algorithms for action selection. The agent learns preferences for actions based on the received rewards, using a soft-max policy to select actions probabilistically.}
+    \label{fig:gradient_bandit_algorithms}
+\end{figure}

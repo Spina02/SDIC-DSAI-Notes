@@ -1,0 +1,213 @@
+\chapter{Dynamic Programming}
+
+The term dynamic programming (DP) refers to a collection of algorithms that can be used to compute optimal policies given a perfect model of the environment as a Markov Decision Process (MDP). Classical DP algorithms are of limited utility in reinforcement learning both because of their assumption of a perfect model and because of their great computational expense, but they are still important theoretically. 
+
+We usually assume that the environment is a finite MDP. That is, we assume that its state, action and reward sets are finite and that its dynamics are given by a set of probabilities $p(s',r | s,a)$, for all $s \in \mathcal{S}, a \in \mathcal{A}, r \in \mathcal{R}, and s' \in \mathcal{S}$. A common way of obtaining approximate solutions for tasks with continuous states and actions is to quantize the state and action spaces and then apply finite-state DP methods. The key idea of DP is the value functions to organize and structure the search for good policies.
+
+We can easily obtain optimal policies once we found the optimal value functions $v_*$ or $q_*$ which satisfy the Bellman optimality equations:
+
+\begin{align*}
+    v_*(s) &= \max_a \sum_{s',r} p(s',r | s,a) \left[ r + \gamma v_*(s') \right] \\
+    q_*(s,a) &= \sum_{s',r} p(s',r | s,a) \left[ r + \gamma v_*(s') \right]
+\end{align*}
+
+As we shall see, DP algorithms are obtained by turning Bellman equations such as these into assignments, i.e., into update rules for improving approximations of the desired value functions. 
+
+\section{Policy Evaluation}
+
+First we consider how to compute the state-value function $v_{\pi}$ for an arbitrary policy $\pi$. This is called \textbf{policy evaluation} in the DP literature.
+\begin{align*}
+    v_{\pi}(s) &= \mathbb{E}_{\pi}\left[G_t | S_t=s\right] \\
+    &= \mathbb{E}_{\pi}\left[R_{t+1} + \gamma G_{t+1} | S_t=s\right] \\
+    &= \mathbb{E}_{\pi}\left[R_{t+1} + \gamma v_{\pi}(S_{t+1}) | S_t=s\right] \\
+    &= \sum_{a} \pi(a|s) \sum_{s',r} p(s',r | s,a) \left[ r + \gamma v_{\pi}(s') \right] 
+\end{align*}
+
+where $\pi(a|s)$ is the probability of taking action $a$ in state $s$ under policy $\pi$.
+
+If the environment's dynamics are completely known, then the last equation above is a system of $$|S|$$ linear equations in the $$|S|$$ unknowns $v_{\pi}(s)$, one for each state $s \in \mathcal{S}$. Iterative solutions here are most suitable. The initial approximation $v_0$ is chosen arbitrarily, while the terminal state must be $0$. Each successive approximation is obtained by using the Bellman equation for $v_{\pi}$ as an updated rule:
+\begin{align*}
+    v_{k+1}(s) = \mathbb{E}\left[R_{t+1} + \gamma v_k(S_{t+1}) | S_t=s\right] \\
+    &= \sum_{a} \pi(a|s) \sum_{s',r} p(s',r | s,a) \left[ r + \gamma v_k(s') \right]
+\end{align*}
+
+The sequence can be shown in general to converge to $v_{\pi}$ as $k \to \infty$ under the same conditions that guarantee the existence of $v_{\pi}$. This algorithm is called the \textbf{iterative policy evaluation}.
+
+It essentially replaces the old value of $s$ with a new value obtained from the old values of the successor states of $s$, and the expected immediate rewards, along all the one-step transitions possible under the policy being evaluated. We call this kind of operation an \textit{expected update}. All the updates done in DP algorithms are called \textit{expected} updates because they are based on an expectation over all possible next states rather than on a sample next state. 
+
+A complete in-place version of iterative policy evaluation is shown in pseudocode in the box below.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/iterative_policy_evaluation_code.png}
+    \caption{Iterative Policy Evaluation Algorithm}
+    \label{fig:iterative_policy_evaluation}
+\end{figure}
+
+\section{Policy Improvement}
+
+Our reason for computing the value function for a policy is to help find better policies. Suppose we have determined the value function $v_{\pi}$ for an arbitrary deterministic policy $\pi$. For some state $s$ we would like to know whether or not we should change the policy to deterministically choose an action $a \neq \pi(s)$. We know how good it is to follow the current policy from $s$ but would it be better or worse to change to the new policy? One way to answer this question is to consider selecting $a$ in $s$ and thereafter following the existing policy $\pi$. The value of this way of behaving is 
+
+\begin{align*}
+    q_{\pi}(s,a) &= \mathbb{E}\left[R_{t+1} + \gamma v_{\pi}(S_{t+1}) | S_t=s, A_t=a\right] \\
+    &= \sum_{s',r}p(s',r | s,a)\left[r + \gamma v_{\pi}(s')\right]
+\end{align*}
+
+If it is greater than $v_{\pi}(s)$ then one would expect it to be better still to select $a$ every time $s$ is encountered, and that the new policy would in fact be a better one overall.
+
+That this is true is a special case of a general result called the \textit{policy improvement theorem}. The policy $\pi'$ must be as good as, or better than, $\pi$, i.e., it must obtain greater or equal expected return from all states $s \in \mathcal{S}$. 
+
+It is a natural extension to consider changes at all states, selecting at each state the action that appears best according to $q_{\pi}(s,a)$. In other words, to consider the new greedy policy $\pi'$ given by:
+
+\begin{align*}
+    \pi'(s) &= \argmax{a}q_{\pi}(s,a) \\
+    &= \argmax{a}\mathbb{E}\left[R_{t+1} + \gamma v_{\pi}(S_{t+1}) | S_t=s, A_t=a\right] \\
+    &= \argmax{a}\sum_{s',r}p(s',r | s,a)\left[r + \gamma v_{\pi}(s')\right]
+\end{align*}
+
+The greedy policy takes the action that looks best in the short term, according to $v_{\pi}$. The process of making a new policy that improves on an original policy, by making it greedy with respect to the value function of the original policy, is called \textbf{policy improvement}.
+
+\section{Policy Iteration}
+
+Once a policy $\pi$ has been improved using $v_{\pi}$ to yield a better policy $\pi'$, we can then compute $v_{\pi'}$ and improve it again to yield an even better $\pi''$. We can thus obtain a sequence of monotonically improving policies and value functions:
+
+$$
+\pi_0 \rightarrow^E v_{\pi_0} \rightarrow^I \pi_1 \rightarrow^E v_{\pi_1} \rightarrow^I \pi_2 \rightarrow^E \ldots \rightarrow^I \pi_* \rightarrow^E v_*,
+$$
+
+where the superscripts $E$ and $I$ indicate the expected update of the value function and the improvement of the policy, respectively. Because a finite MDP has only a finite number of deterministic policies, this process must converge to an optimal policy and the optimal value function in a finite number of iterations. This way of finding an optimal policy is called \textbf{policy iteration}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/policy_iteration_code.png}
+    \label{fig:policy_iteration}
+\end{figure}
+
+\section{Value Iteration}
+
+One drawback to policy iteration is that each of its iterations involves policy evaluation, which may itself be a protracted iterative computation requiring multiple sweeps through the state set. The policy evaluation step of policy iteration can be truncated in several ways without losing the convergence guarantees of policy iteration. One important special case is when policy evaluation is stopped after just one sweep, and this algorithm is called \textbf{value iteration}. It can be written as a particularly simple update operation that combines the policy improvement and truncated policy evaluation steps:
+
+\begin{align*}
+    v_{k+1}(s) &= \max_a \mathbb{E}\left[R_{t+1} + \gamma v_k(S_{t+1}) | S_t=s, A_t=a\right] \\
+    &= \max_a \sum_{s',r}p(s',r | s,a)\left[r + \gamma v_k(s')\right]
+\end{align*}
+
+Value iteration formally requires an infinite number of iterations to converge exactly to $v_*$. In practice, we stop once the value function changes by only a small amount in a sweep.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/value_iteration_code.png}
+    \caption{Value Iteration Algorithm}
+    \label{fig:value_iteration}
+\end{figure}
+
+Value iteration effectively combines, in each of its sweeps, one sweep of policy evaluation and one sweep of policy improvement. Faster convergence if often achieved by interposing multiple policy evaluation sweeps between each policy improvement sweep. 
+
+\section{Asynchronous DP}
+
+A major drawback to the DP methods that we have discussed so far is that they involve operations over the entire state set of the MDP, i.e., they require sweeps of the state set. If the state set is very large, then even a single sweep can be prohibitively expensive. 
+
+\textbf{Asynchronous DP} algorithms are in-place iterative DP algorithms that are not organized in terms of systematic sweeps of the state set. These algorithms update the values of states in any order whatsoever, using whatever values of other states happen to be available. The values of some states may be updated several times before the values of others are updated once. To converge correctly, however, an asynchronous algorithm must continue to update the values of all the states: it cannot ignore any state after some point in the computation. Asynchronous DP algorithms allow great flexibility in selecting states to update. 
+
+Avoiding sweeps does not necessarily mean that we can get away with less computation. It just means that an algorithm does not need to get locked into any hopelessly long sweep before it can make progress improving a policy. We can try to take advantage of this flexibility by selecting the states to which we apply updates so as to improve the algorithm's rate of progress. We can try to order the updates to let value information propagate from state to state in an efficient way. Some states may not need their values updated as often as others.
+
+\section{Generalized Policy Iteration}
+
+Policy iteration consists of two simultaneous, interacting processes: one making the value function consistent with the current policy (policy evaluation), and the other making the policy greedy with respect to the current value function (policy improvement). In policy iteration, these two processes alternate, each completing before the other begins, even though this is not really necessary. 
+
+We use the term \textbf{generalized policy iteration (GPI)} to refer to the general idea of letting policy-evaluation and policy-improvement processes interact, independent of the granularity and other details of the two processes. Almost all RL methods are well described as GPI. That is, all have identifiable policies and value functions, with the policy always being improved with respect to the value function for the policy. If both the evaluation process and the improvement process stabilize, then the value function and policy must be optimal.
+
+\section{Linear Programming for MDP}
+
+Primal: optimize a function $f(u)$ where $u \in \mathbb{R}^{|S|}$
+
+$$
+f(u) = \sum_{s} p_0(s)u(s)
+$$
+
+$\Omega: \left\{u \in \mathbb{R}^{|S|} : \sum_{s} p(s'|sa)(r(sas') + \gamma u(s')) - u(s) \leq 0 \quad \forall sa \right\} $
+
+$\Omega$ is a polyhedron and a convex set. The objective is to minimize the function $f(u)$ over the set $\Omega$.
+
+\begin{observationblock}
+    If $u \in \Omega$ we call it a \textbf{Feasible Point}. 
+\end{observationblock}
+
+\textbf{The solution of the primal MDP linear programming = optimal solution of the MDP}
+
+$$
+\max_{\pi} G_{\pi}(p_0) = f(V^*) = \min_{u \in \Omega} f(u)
+$$
+
+\begin{itemize}
+    \item $V^*$ is feasible : $V^* \in \Omega \to f(V^*) \geq \min_{u\in \Omega}f(u)$ 
+    Since:
+    $$
+    \sum_{s'} p(s'|sa)(r(sas') + \gamma V^*(s')) \leq \max_a\left[\sum_{s'} p(s'|sa)(r(sas') + \gamma V^*(s'))\right] = V^*(s) \quad \forall sa
+    $$
+    \item if $u$ is feasible, then $u \geq V^*$ component wise (meaning $\forall s \quad u(s) \geq V^*(s)$).
+    $$
+    \begin{array}{c}
+        if \quad u \in \Omega \\
+        u(s) - V^*(s) \geq \sum_{s'} p(s'|sa^*)(f(sa^*s') + \gamma u(s')) - \sum_{s'}p(s'sa^*)(r(sa^*s') + \gamma V^*(s')) \\
+        = \gamma \sum_{s'}p(s'|sa^*s')(u(s') - V^*(s')) \geq \gamma \sum_{s'}p(s'|sa^*)\min(u-V^*)\\
+        u(s) - V^*(s) \geq \gamma \min(u-V^*) \to (1-\gamma) \min(u-V^* \geq 0) \to f(u) \geq f(V^*)
+    \end{array}
+    $$
+\end{itemize}
+
+
+Primal problem:
+$$
+\min_{u\in\Omega} f(u)
+$$
+
+Can we go from this constraint problem to an unconstrained problem? Yes. 
+$$
+\min_{u\in\Omega} f(u) \to \min_{u\in\mathbb{R}^|S|}\left[f(u) + h(u)\right] \quad h(u) = \left\{
+\begin{array}{ll}
+    +\infty \quad \text{if} \quad u \notin \Omega \\
+    0 \quad \text{if} \quad u \in \Omega
+\end{array}
+\right.
+$$
+
+$$
+h(u) = \max_{Z \geq 0}\left[\sum_{sa}z(sa)\left(\sum_{s'}p(s'|sa)(r(sas') + \gamma u(s')) - u(s)\right)\right]
+$$
+
+thus:
+
+$$
+\min_{u\in\Omega} f(u) = \min_u \max_{Z \geq 0} \mathbb{L}(u, Z)
+$$
+
+$$
+\begin{array}{rl}
+    \mathbb{L}(u, Z) 
+    & = \sum_{sa}Z(sa)p(s'|sa)r(sas') + \sum_{s'}u(s')(p(s) + \gamma\sum_{s'}p(s'|sa)Z(sa) - \sum_{a'}Z(s'a)) \\
+    & = \max_{Z \geq 0}\left[\sum_{sa}z(sa)p(s'|sa)r(sas') + \min_{u}\left[\sum_{s'}u(s')\left(p(s') + \gamma \sum_{s'}p(s'|sa)Z(sa) - \sum_{a'}Z(s'a)\right)\right]\right]\\
+    & = \max_{Z \geq 0} \left[\sum_{sa}Z(sa)p(s'|sa)r(sas')\right] \to \text{\textbf{Dual MDP Problem}} \\
+    & = \left\{Z \in \mathbb{R}^{|s|} \quad : \quad Z \geq 0, \quad p_0(s') + \gamma \sum_{sa}p(s'|sa)Z(sa) - \sum_{a'}z(s'a') = 0 \quad \forall s'\right\}
+\end{array}
+$$
+
+Then:
+$$
+\begin{array}{ll}
+    \max_{\pi}G_{\pi}(p_0) \to G_{\pi}(p_0) = \sum_{t=0}^{\infty}\gamma^t \sum_{sas'}p_t(s)\pi(a|s)p(s'|sa)r(sas')\\
+    \eta_{\pi}(s'a) \cong \sum_{t=0}^{\infty}\gamma^t p_t(s)\pi(a|s) = \mathbb{E}(\sum_{t=0}^{\infty} \gamma^t \mathds{1}(s_tA_t = sa))\\
+    = \sum_{sas'} \eta_{\pi}(sa)p(s'|sa)r(sas')\\
+    z \to \eta_{\pi}
+\end{array}
+$$
+
+
+
+
+
+
+
+
+
+
