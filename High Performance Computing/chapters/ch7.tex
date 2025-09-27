@@ -1,0 +1,295 @@
+\chapter{Debugging}
+
+A \textbf{bug} is an error, flaw, failure or fault in a computer program or system that causes it to produce an incorrect or unexpected result, or to behave in unintended ways. Hence, \textbf{debugging} is the process of finding and resolving bugs within a computer program that prevent correct operation of computer software or a system. What is the best way to proceed?
+\begin{enumerate}
+    \item Do not insert bugs $\rightarrow$ well, obviously you can say :), but not that easy as you may think;
+    \item Add \plaintt{printf} statements everywhere $\rightarrow$ highly discouraged, but sometimes works and is the first approach you may think of;
+    \item Use a debugger $\rightarrow$ the best way to proceed, but you need to learn how to use it.
+\end{enumerate}
+
+\section{GDB}
+
+The GNU Project Debugger (\plaintt{gdb}) is a portable debugger that runs on many Unix-like systems and works for many programming languages, including C, C++, and Fortran. It allows you to see what is going on `inside' another program while it executes or what another program was doing at the moment it crashed. There are three basic usages of \plaintt{gdb}:
+\begin{itemize}
+    \item Debugging a code (best is compiled using the \plaintt{-g} option);
+    \item Inspecting a code crash through a core file;
+    \item Debugging/inspecting a running code.
+\end{itemize}
+
+\begin{tipsblock}
+    It is highly advised to learn \textbf{keyboard commands}.
+\end{tipsblock}
+
+\subsection*{Debugging a code}
+
+In order to include debugging information in your code, you need to compile it with the \plaintt{-g} family options (read the \plaintt{gcc} manual for complete info):
+\begin{itemize}
+    \item \plaintt{-g}: produce debugging information in the operating system's native format (e.g. DWARF, STABS, etc.);
+    \item \plaintt{-ggdb}: produce debugging information in the format used by \plaintt{gdb};
+    \item \plaintt{-g3}: produce even more debugging information, including macro definitions.
+    \item \plaintt{-O0}: disable optimizations (highly recommended when debugging).
+    \item \plaintt{-ggdb(level)}: produce debugging information in the format used by \plaintt{gdb}, with different levels of detail (0-3).
+\end{itemize}
+
+You just start your code under \plaintt{gdb} control:
+\begin{codeblock}[language=bash]
+gdb ./my_program
+\end{codeblock}
+
+You can define the arguments needed by your program already at invocation
+\begin{codeblock}[language=bash]
+gdb --args ./my_program arg1 arg2 ...
+\end{codeblock}
+
+or you can define the arguments from within \plaintt{gdb} using the \plaintt{set args} command:
+\begin{codeblock}[language=bash]
+gdb ./my_program
+Reading symbols from my_program...done.
+(gdb) set args arg1 arg2 ...
+(gdb) run
+\end{codeblock}
+
+To run the code (to spot a segmentation fault, for example) you just need to use the \plaintt{run} command. If your program crashes, \plaintt{gdb} will stop the execution and will show you where the crash happened. Or, you may want to stop it from the beginning to have full control over each step:
+\begin{codeblock}[language=bash]
+(gdb) break main 
+(gdb) run 
+\end{codeblock}
+
+Or you may already know where the bug is and set a breakpoint there:
+\begin{codeblock}[language=bash]
+(gdb) break myfile.c:linenumber
+(gdb) run
+\end{codeblock}
+
+\begin{observationblock}[Breakpoints]
+    \textbf{Breakpoints} are a key concept in debugging. They are stopping points at which the execution interrupts and the control is given back to you, so that you can inspect the memory contents (vars, register values, ...) or follow the subsequent execution step by step. A breakpoint can be defined in several ways:
+    \begin{itemize}
+        \item at the current position:
+        \begin{codeblock}[language=bash]
+(gdb) break
+        \end{codeblock}
+        \item at offset lines after/before the current line:
+        \begin{codeblock}[language=bash]
+(gdb) break +N
+(gdb) break -N
+        \end{codeblock}
+        \item at linenum of a file:
+        \begin{codeblock}[language=bash]
+(gdb) break filename:linenum
+        \end{codeblock}
+        \item at the entry point of a function:
+        \begin{codeblock}[language=bash]
+(gdb) break function_name
+        \end{codeblock}
+        \item more options in the \plaintt{gdb} manual.
+    \end{itemize}
+
+    A breakpoint may be defined as dependent on a given condition:
+    \begin{codeblock}[language=bash]
+(gdb) break linenum if var==value
+    \end{codeblock}
+    This sets a breakpoint at line \plaintt{linenum} that will stop the execution only if the variable \plaintt{var} is equal to \plaintt{value}.
+
+    You can also define a list of commands to be executed when the breakpoint is hit:
+    \begin{codeblock}[language=bash]
+(gdb) break linenum
+(gdb) commands
+> command1
+> command2
+> end
+    \end{codeblock}
+    This sets a breakpoint at line \plaintt{linenum} that will execute \plaintt{command1} and \plaintt{command2} when the breakpoint is hit, before stopping the execution and giving the control back to you.
+\end{observationblock}
+
+When you have the \textbf{control} of the program execution, you can decide how to proceed:
+\begin{itemize}
+    \item \plaintt{(gdb) cont [c]}: continue until the end/next stop 
+    \item \plaintt{((gbd) count-ignore)}: continue ignoring the next count-ignore stops (for instance, a bp)
+    \item \plaintt{(gdb) next [n] | count}: continue to the next src line in the current stack frame 
+    \item \plaintt{(gdb) step [s] | count}: conutnue to the next src line, entering in called functions
+    \item \plaintt{(gdb) until [u] | count}: continue until a src line past the current one is reached in the current stack fr
+    \item \plaintt{(gdb) advance location}: continue until the specified location is reached 
+\end{itemize}
+
+Examining the \textbf{stack} is often of vital importance. With \plaintt{gdb} you can have a quick and detailed inspection of all the stack frames. 
+\begin{codeblock}[language=bash]
+backtrace   [args]  /* print the backtrace of the whole stack */
+            n       /* print only the n innermost frames */
+            -n      /* print all but the n innermost frames */
+            full    /* print local variable values */
+\end{codeblock}
+
+Accessing the content of \textbf{memory} is fundamental when debugging:
+\begin{itemize}
+    \item \plaintt{(gdb) print var}: print the value of variable \plaintt{var};
+    \item \plaintt{(gdb) x/FMT address}: explore memory starting at address \plaintt{address}, where \plaintt{FMT} is a format specifier (see the \plaintt{gdb} manual for details);
+    \item \plaintt{(gdb) display expr}: add expr to the list of expressions to display each time your program stops.
+\end{itemize}
+
+Examining \textbf{registers} is also possible:
+\begin{itemize}
+    \item \plaintt{(gdb) info registers}: print the value of all registers;
+    \item \plaintt{(gdb) info vector}: print the content of vector registers;
+    \item \plaintt{(gdb) print \&rsp}: print value of the stack pointer.
+\end{itemize}
+
+If there are macros in the code, they can be expanded, provided that you compiled the code with the appropriate option (e.g. \plaintt{-g3 [gdb3][-dwarf-4]}):
+\begin{itemize}
+    \item \plaintt{(gdb) macro expand macro}: shows the expansion of macro; expression can be any string of tokens;
+    \item \plaintt{(gdb) info macro [-a|-all] macro}: shows the current (or all) definition(s) of macro;
+    \item \plaintt{(gdb) info macros location}: shows all macro definitions effective at location.
+\end{itemize}
+
+Finally, you can set \textbf{watchpoints} (aka "keep an eye on this and that") instead of breakpoints, to stop the execution whenever a value of an expression/variable/memory region changes:
+\begin{itemize}
+    \item \plaintt{(gdb) watch variable}: keep an eye onto variable;
+    \item \plaintt{(gdb) watch expression}: stops when the value of expression changes;
+    \item \plaintt{(gdb) watch -l expression}: interpret expression as a memory location to be watched;
+    \item \plaintt{(gdb) rwatch expression}: stops when expression is read.
+\end{itemize}
+
+\subsection*{Inspecting a code crash}
+
+It happens that you have code. crashes in conditions not easily reproducible when you debug the code itself. However, the OS can dump the entire program status on a file, called the \textbf{core file}. In order to allow it to dump the code, you have to check/set the core file size limit:
+\begin{codeblock}[language=bash]
+ulimit -c [size limit in KB] 
+\end{codeblock}
+
+Once you have a core, you can inspect it with \plaintt{gdb}:
+\begin{codeblock}[language=bash]
+gdb ./executable ./corefile
+\end{codeblock}
+
+The first thing to do, normally, is to unwind the stack frame to understand where the program crashed:
+\begin{codeblock}[language=bash]
+(gdb) bt full /* print the backtrace of the whole stack with local variable values */
+\end{codeblock}
+
+\subsection*{Debugging a running process(es)}
+
+In order to debug a running process, you can simply attach \plaintt{gdb} to it:
+\begin{codeblock}[language=bash]
+gdb 
+(gdb) attach PID
+\end{codeblock}
+
+and start searching it to understand what is going on.
+
+\begin{observationblock}[GUI]
+    You can start \plaintt{gdb} with a text-user-interface:
+    \begin{codeblock}[language=bash]
+gdb -tui
+    \end{codeblock}
+    or you can activate/deactivate it from within \plaintt{gdb} itself:
+    \begin{itemize}
+        \item \plaintt{Ctrl-x a}: toggle the TUI mode (press Ctrl and x together, then a);
+        \item \plaintt{Ctrl-x o}: change focus;
+        \item \plaintt{Ctrl-x 2}: shows assembly windows;
+        \item \plaintt{layout src}: shows the source code window (type at the gdb prompt);
+        \item \plaintt{layout asm}: shows the assembly window;
+        \item \plaintt{layout split}: shows both source code and assembly windows.
+    \end{itemize}
+\end{observationblock}
+
+\section{Debugging parallel codes}
+
+Debugging in parallel is much more complex since the fundamental additional challenge is the simultaneus execution. 
+\paragraph{Shared memory paradigm (OpenMP, pthreads, ...)} 
+\begin{itemize}
+    \item Multiple threads running;
+    \item Shared vs private memory regions;
+    \item Race conditions.
+\end{itemize}
+\paragraph{Message-passing paradigm (MPI)}
+\begin{itemize}
+    \item Multiple independent processes (+ possible multithread);
+    \item Communication;
+    \item Deadlocks.
+\end{itemize}
+
+\begin{codeblock}[language=bash]
+gcc -g -o my_program my_program.c -lpthread
+gdb ./my_program
+\end{codeblock}
+
+It is necessary to explicitly set up \plaintt{gdb} for multi-thread debugging:
+\begin{codeblock}[language=bash]
+(gdb) set paginating off 
+(gdb) set scheduler-locking On
+(gdb) set non-stop [on|off]
+\end{codeblock}
+
+In \plaintt{all-stop} mode, whenever the execution stops, all the threads stop (wherever they are). Whenever you restart the execution, all the threads restart. However, \plaintt{gdb} can. not single-step all the threads in the steplock. Some threads may execute several instructions even if you single-stepped the thread under focus with \plaintt{step} or \plaintt{next} commands. 
+\plaintt{non-stop} mode means that when you stop a thread, all the other ones continue running until they finish or they reach some breakpoint that you pre-defined. 
+
+\begin{codeblock}[language=bash]
+(gdb) thread thread_no /* change focus to thread_no */
+(gdb) info threads /* shows info of active threads */
+(gdb) thread apply [thread_no] [all] args /* apply a command to a list of threads */
+(gdb) break <...> thread thread_no /* inserts a break into a list of threads */
+\end{codeblock}
+
+\begin{tipsblock}
+    \begin{itemize}
+        \item If possible, write a code natively parallel but able to run in serial, which means with 1 MPI task or 1 thread;
+        \item Profile, debug and optimize that code in serial first;
+        \item If multi-threaded, test and debug thread sync/races with 1 MPI task;
+        \item Deal with communications, synchronization and race/deadlock conditions on a small number of MPI tasks;
+        \item Profile, debug and optimize communications on a small number of MPI tasks;
+        \item Finally, try the full-size run.
+    \end{itemize}
+    Unfortunately, some times bugs or improper design issues arise only with large number of processes or threads. 
+\end{tipsblock}
+
+It is still possible to use \plaintt{gdb} directly, called from mpirun:
+\begin{codeblock}[language=bash]
+mpirun -np <NP> -e gdb ./my_program
+\end{codeblock}
+
+\begin{warningblock}
+    However, depending on your system that may not work as expected.
+\end{warningblock}
+
+The simplest way to use \plaintt{gdb} with a parallel program is 
+\begin{codeblock}[language=bash]
+mpirun -np <NP> xterm -e gdb ./my_program 
+\end{codeblock}
+which launches \plaintt{<NP>} xterm windows with running gdb processes in which you can run each parallel process. 
+\begin{codeblock}[language=bash]
+(gdb) run <arg_1> <arg_2> ...
+\end{codeblock}
+
+\begin{observationblock}
+    Normally on an HPC facility you do that while running an \textbf{interactive session} and in several occasions this will not work since HPC environments are hostile to X for several reasons (remember to connect with \plaintt{-X} or \plaintt{-Y} switch of ssh).
+\end{observationblock}
+
+Another possibility is to open as many connections as processes on different terminals on your local machine, and attach \plaintt{gdb} to the already running MPI processes, even though it is not so practical:
+\begin{codeblock}[language=bash]
+mpi run -np <NP> ./my_program <arg_1> <arg_2> ...
+
+/* followed by, on each terminal */
+gdb -p <PID_of_MPI_task_n>
+\end{codeblock}
+
+There are still two \textbf{issues}:
+\begin{enumerate}
+    \item \textbf{Where} to run \plaintt{gdb}, if \textbf{xterm} is not available and you don't want to use it in multi-thread mode? Consider using \plaintt{screen};
+    \item \textbf{How} the MPI tasks should be convinced to wait for \plaintt{gdb} to step in?
+\end{enumerate}
+
+A possible issue for attaching \plaintt{gdb} to a running process is that you \textbf{may not have the capability to do that} on a Linux system. Solutions:
+\begin{itemize}
+    \item Get the capability from the system administrator;
+    \item As root, type \plaintt{echo 0 > /proc/sys/kernel/yama/ptrace\_scope};
+    \item Set the \plaintt{kernel.yama.ptrace\_scope} variable in the file \plaintt{/etc/sysctl.d/10-ptrace.conf} to 0.
+\end{itemize}
+
+The last solution turns off the security measure permanently, it is not a good idea.
+
+We are left with the problem of attaching the \plaintt{gdb} to a running process. There is a classical trick, that requires to insert some small additional code in your program:
+\begin{codeblock}[language=C]
+int wait=1;
+while (wait)
+    sleep(1);
+\end{codeblock}
+The MPI processes will wait indefinetly until the value of wait does not change, which you can do from inside \plaintt{gdb} attached to each process.
