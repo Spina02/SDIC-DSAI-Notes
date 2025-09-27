@@ -29,7 +29,7 @@ Since $\Sigma$ is positive definite, we can diagonalize it and decompose it in $
 
 We can do a change of coordinate in this way:
 $$
-y = \Lambda^{-\frac{1}{2}E^T(x-\mu)}
+y = \Lambda^{-\frac{1}{2}}E^T(x-\mu)
 $$
 
 Then we have that 
@@ -67,7 +67,7 @@ Stated otherwise: \textbf{every distribution which is an exponential of a quadra
 
 The following properties will not be proved. You can find more details in the Bishop book:
 \begin{itemize}
-    \item \textbf{Linear transformation}: Suppose to have $y = Mx + \eta$ where $x \sim \mathcal{N}(\mu_x, \sum_x), \eta \sim \mathcal{N}(\mu, \sum), x \perp \eta$. Then $y$ is Gaussian, $y \sim \mathcal{N}(M\mu_x + \mu, M\sum_xM^T + \sum)$. This means that Gaussians are closed under linear transformations. 
+    \item \textbf{Linear transformation}: Suppose to have $y = Mx + \eta$ where $x \sim \mathcal{N}(\mu_x, \sum_x), \eta \sim \mathcal{N}(\mu, \sum), x \perp\!\!\!\perp \eta$. Then $y$ is Gaussian, $y \sim \mathcal{N}(M\mu_x + \mu, M\sum_xM^T + \sum)$. This means that Gaussians are closed under linear transformations. 
     \item \textbf{Marginals and conditionals}: Assume that
     \[
     z = \begin{bmatrix} x \\ y \end{bmatrix}, \quad 
@@ -149,7 +149,7 @@ The following properties will not be proved. You can find more details in the Bi
 
 \section{Bayesian Estimation}
 
-Consider $n$ observations of i.i.d. random variables $\underbar{x} = x_1, \dots, x_n$ ad a family of models $p(x|\theta)$, corresponding to out likelihood distribution, in which we are looking for the model that best fits our data. 
+Consider $n$ observations of i.i.d. random variables $\underbar{x} = x_1, \dots, x_n$ ad a family of models $p(x|\theta)$, corresponding to our likelihood distribution, in which we are looking for the model that best fits our data. 
 
 \begin{figure}[H]
 \centering
@@ -178,7 +178,7 @@ $$
 p(\theta) = Beta(\theta|\alpha,\beta) = \frac{1}{B(\alpha, \beta)}\theta^{\alpha-1}(1-\theta)^{\beta-1}
 $$
 
-Where B is the \textbf{Beta function}. It representa a family of distributions having a domain in $[0,1]$, which can be skewed more toward 0 or 1 by playing with the parameters. It can be showed that 
+Where B is the \textbf{Beta function}. It represents a family of distributions having a domain in $[0,1]$, which can be skewed more toward 0 or 1 by playing with the parameters. It can be showed that 
 $$
 \mathbb{E}_{Beta(\alpha, \beta)}[\theta] = \frac{\alpha}{\alpha+\beta}
 $$
@@ -219,7 +219,7 @@ We are moving from the problem of describing probabilistic models and performing
 
 We have data, in the form of $\underbar{x}, \underbar{y} : (x_i, y_i)$ where $i = 1, \dots, N$, i.e. we have pairs of inputs and outputs. Assume that $p(y|x) = p(y|x, \theta)$ is a parametric model of our random variables. At first, we are going to choose $\theta_{ML}$ with a maximum likelihood approach 
 $$
-\theta_{ML} = argmax p(\underbar{y}|\underbar{x}, \theta)
+\theta_{ML} = \argmax{\theta} p(\underbar{y}|\underbar{x}, \theta)
 $$
 
 Therefore what we need to do is to identify our parametric model, which in linear regression is just 
@@ -254,7 +254,7 @@ $$
 w_m = \left(\Phi^T \Phi\right)^{-1}\Phi^T \underbar{y}
 $$
 
-\begin{definitionblock}[Defign Matrix]
+\begin{definitionblock}[Design Matrix]
     $\Phi_{ij} = \phi_j(x_i)$ is called the \textbf{design matrix}, it is the j-th feature (basis function) evaluated on the i-th datum.
 \end{definitionblock}
 
@@ -283,8 +283,7 @@ where $\lambda$ is the regularization coefficient.
         \includegraphics[width=0.7\textwidth]{assets/fig22.png}
         \caption{On the left, the sinusoidal
         function and the generated data points.
-        On the right, the true conditional distri-
-        bution $p(t|x)$ in which the green curve
+        On the right, the true conditional distribution $p(t|x)$ in which the green curve
         denotes the mean and the shaded region
         spans one standard deviation on each
         side of the mean (Bishop)}
@@ -294,9 +293,9 @@ where $\lambda$ is the regularization coefficient.
         \centering
         \includegraphics[width=0.7\textwidth]{assets/fig23.png}
         \caption{On the left, the result of fit-
-        ting the model to the diﬀerent data sets
+        ting the model to the different data sets
         varying $\ln(\lambda)$. On the right, the average
-        of the fits on the ￿￿￿ datasets (Bishop)}
+        of the fits on the 100 datasets (Bishop)}
     \end{figure}
 \end{exampleblock}
 
@@ -329,7 +328,7 @@ $$
 p(w|\underbar{x}, \underbar{y}, \alpha, \beta) = \frac{p(\underbar{y}|\underbar{x}, w, \beta)p(w|\alpha)}{p(\underbar{y}|\underbar{x}, \alpha, \beta)}
 $$
 
-In this scenario, choosing a Gaussian prior and having the Gaussian likelihoodof the linear regression problem, we have an analytical form for our posterios distribution, as we are about to see. 
+In this scenario, choosing a Gaussian prior and having the Gaussian likelihood of the linear regression problem, we have an analytical form for our posterior distribution, as we are about to see. 
 
 Let's consider the logarithm of the posterior first 
 $$
@@ -366,7 +365,7 @@ $$
 
 So, in Bayesian regression, we treat our parameters probabilistically,
 placing a prior distribution over them, computing the posterior given
-the observation that we have and we using it to make predictions. We
+the observation that we have and we use it to make predictions. We
 have seen that for a Gaussian prior we have a Gaussian posterior, and we
 also have an analytically computable posterior, given that we know how
 to invert matrices.
@@ -407,7 +406,7 @@ without retraining the model from the start!
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.7\textwidth]{assets/fig26.png}
-        \caption{Illustration of sequentila Bayesian learning for a sample linear model of the form $f(x, \textbf{w}) = w_0 + w_1 \cdot x$ (Bishop).}
+        \caption{Illustration of sequential Bayesian learning for a sample linear model of the form $f(x, \textbf{w}) = w_0 + w_1 \cdot x$ (Bishop).}
         \label{fig:onlinelearning}
     \end{figure}
     The first row corresponds to the situation before any data points are observed: the prior distribution of $w_0, w_1$ is a multivariate standard normal distribution. In the next rows this distribution is reshaped by the information contained in the dataset and the posterior distribution becomes sharper and centered on the true parameter values. 
@@ -441,14 +440,9 @@ As such, we can see, graphically, that the credibility interval of our model shr
 \centering
 \includegraphics[width=0.7\textwidth]{assets/fig27.png}
 \caption{Example of the predictive
-distribution for a Bayesian linear regres-
-sion model on the dataset shown in
+distribution for a Bayesian linear regression model on the dataset shown in
 section 6.3. Increasing the number of
-data points, the red curve (which rep-
-resents the mean of the predictive dis-
-tribution) approximates better the sinu-
-soidal function and the standard devia-
-tion (the shaded region) decreases. Note
+data points, the red curve (which represents the mean of the predictive distribution) approximates better the sinusoidal function and the standard deviation (the shaded region) decreases. Note
 that the predictive uncertainty is smallest
 in the neighbourhood of the data points
 (Bishop)}
@@ -605,16 +599,16 @@ estimation). Of course, there are some assumptions for this theorem to
 hold: the key assumption is that the "true" value of the parameter is
 interior to the parameters space.
 
-Thus, the eﬀective number of parameters in Bayesian estimation is
+Thus, the effective number of parameters in Bayesian estimation is
 adaptive: parameters will be “included" (in the sense that their uncertainty
 is low) in the model only if there is enough evidence in the data to justify
 their use. In a certain sense, a Bayesian model can say “I don’t know"
-when needed. This has the eﬀect of avoiding overfitting and giving a
+when needed. This has the effect of avoiding overfitting and giving a
 more correct estimation of the error when doing predictions.
 
 \section{Model Comparison}
 
-Imagine that we are doing linear regression and we pick two diﬀerent
+Imagine that we are doing linear regression and we pick two different
 sets of basis functions. Which of the two models should we choose?
 
 To answer this question, we can leverage the marginal likelihood.
@@ -647,7 +641,7 @@ How to perform model selection? We have two choices
     since this is a Kullback-Leibler divergence, we observe that if $\mathbb{M}_1$ is the true model (i.e. $D \sim p(D|\mathbb{M}_1)$), the expectation of the logarithm of the Bayes Factor $\log \frac{p(D|\mathbb{M}_1)}{p(D|\mathbb{M}_2)}$ will be positive. Hence, on average, the correct model will have the largest Bayes factor. 
 
     \begin{exampleblock}
-        Let $\mathbb{M}_1$ and $\mathbb{M}_2$ be two models s.t. $\mathbb{M}_1$ is nested in $\mathbb{M}_2$, i.e., the set of parameters of $\mathbb{M}_1$ is a subset of the parameters of $\mathbb{M}_2$ (for example, linear models where the set of basis functions of $\mathbb{M}_1$ is contained in the one of $\mathbb{M}_2$). This implies $\mathbb{M}_2$ is a more complex model than $\mathbb{M}_1$, and that the distributino $p(D|\mathbb{M}_2)$ is more spread than $p(D|\mathbb{M}_1)$ since the model can explain more data instances. Nevertheless, if $\mathbb{M}_1$ generated the data, then the Bayes factor will be in favor of $\mathbb{M}_1$, since $p(D|\mathbb{M}_1)$ is more concentrated on the few
+        Let $\mathbb{M}_1$ and $\mathbb{M}_2$ be two models s.t. $\mathbb{M}_1$ is nested in $\mathbb{M}_2$, i.e., the set of parameters of $\mathbb{M}_1$ is a subset of the parameters of $\mathbb{M}_2$ (for example, linear models where the set of basis functions of $\mathbb{M}_1$ is contained in the one of $\mathbb{M}_2$). This implies $\mathbb{M}_2$ is a more complex model than $\mathbb{M}_1$, and that the distribution $p(D|\mathbb{M}_2)$ is more spread than $p(D|\mathbb{M}_1)$ since the model can explain more data instances. Nevertheless, if $\mathbb{M}_1$ generated the data, then the Bayes factor will be in favor of $\mathbb{M}_1$, since $p(D|\mathbb{M}_1)$ is more concentrated on the few
         data instances that it can explain. Hence we can see the Occam’s
         Razor principle emerging from the use of the Bayes factor, since
         the simpler model will be favored in absence of enough evidence

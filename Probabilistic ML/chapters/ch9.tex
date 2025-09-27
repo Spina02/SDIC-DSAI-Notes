@@ -103,19 +103,19 @@ The idea is to approximate $p(z|x,\theta)$ with the so called \textbf{variationa
 Let's consider the \textbf{Kullback-Leibler divergence} of $q$ and $p$ 
 
 $$
-KL[q||p] = KL[q(z)||p(z|x,\theta)] = \mathbb{E}_{q(z)}\left[-\log \frac{p(z|x,\theta)}{q(z)}\right] = \sum_z q(z)\log \frac{p(z|x,\theta)}{q(z)}
+KL[q||p] = KL[q(z)||p(z|x,\theta)] = \mathbb{E}_{q(z)}\left[-\log \frac{p(z|x,\theta)}{q(z)}\right] = -\sum_z q(z)\log \frac{p(z|x,\theta)}{q(z)}
 $$
 
 The trick now is to add and subtract the term $|\log p(x|\theta)$ in the logarithm 
 
 $$
--\sum_z q(z)\log\frac{p(z|x,\theta)}{q(z)} = -\sum_z q(z)\left[\log\frac{p(z|x,\theta)}{q(z)}\right] + \log p(x|\theta) - \log p(x|\theta) 
+-\sum_z q(z)\log\frac{p(z|x,\theta)}{q(z)} = -\sum_z q(z)\left[\log\frac{p(z|x,\theta)}{q(z)} + \log p(x|\theta) - \log p(x|\theta)\right] 
 $$
 
 And then we can start to aggregate these factors obtaining
 
 $$
-KL[q(z)||p(z|x,\theta)] = -\sum_z q(z)\log\frac{p(x,z|\theta)}{q(z)} + \log p(x|\theta)
+KL[q(z)||p(z|x,\theta)] = -\underbrace{\sum_z q(z)\log\frac{p(x,z|\theta)}{q(z)}}_{\text{ELBO}} + \log p(x|\theta)
 $$
 
 \begin{definitionblock}[ELBO]
@@ -141,7 +141,7 @@ Whenever we have a tractable form for $p(x,z|\theta)$ then the ELBO is also trac
 Let's start from this expression for the ELBO 
 
 $$
-\mathcal{L}(q,\theta) = \mathbb{E}_q\left[\log\frac{p(x,z|\theta)}{q(z)}\right] = \mathbb{E}_q[\log p(x,z|\theta)] + \mathbb{E}_q[-\log q(z)]
+\mathcal{L}(q,\theta) = \mathbb{E}_q\left[\log\frac{p(x,z|\theta)}{q(z)}\right] = \underbrace{\mathbb{E}_q[\log p(x,z|\theta)]}_{\text{Energy term}} + \underbrace{\mathbb{E}_q[-\log q(z)]}_{\text{Entropy} (H(q))}
 $$
 
 The first term is called the \textbf{Energy term}, while the second term is actually the entropy of the $q$ distribution (written $H(q)$).
@@ -233,7 +233,7 @@ Moreover we have N observations of $x$ which means that we also have N correspon
 The joint distribution for the GMM model, using the one-hot encoding representation for our variates is 
 
 $$
-p(x,z|\theta) = \prod_{j=1}^K \pi_j^{z_j} \cdot \mathcal{N}(x|\mu_j,\sigma_j^2)^{z_j}
+p(x,z|\theta) = \underbrace{\prod_{j=1}^K \pi_j^{z_j}}_{p(z|\theta)} \cdot \underbrace{\mathcal{N}(x|\mu_j,\sigma_j^2)^{z_j}}_{p(x|z,\theta)}
 $$
 
 where notice that $z_j$ is 1 only for one j-th component and zero otherwise, which means that in the product we only really get one factor (the others are all 1).
@@ -288,7 +288,7 @@ $$
 
 where $\pi_j^{new}$ is the count of the probability that each observation comes from the j-th component over all the observations; $\mu_j^{new}$ is a weighted mean of the variables $x$ for all the observations that comes from component $j$; $\Sigma_j^{new}$ is again a weighted average of all the covariances. 
 
-\textbf{Remark.} A good initial guess for the parameters for our algorithm is given by runing a k-means clustering and considering the averages and covariances of each cluster as a starting value for $\mu_j$ and $\Sigma_j$. In fact, k-means could be thought of as an approximation of EM, where covariances are assumed to be identical and sperical. 
+\textbf{Remark.} A good initial guess for the parameters for our algorithm is given by runing a k-means clustering and considering the averages and covariances of each cluster as a starting value for $\mu_j$ and $\Sigma_j$. In fact, k-means could be thought of as an approximation of EM, where covariances are assumed to be identical and spherical. 
 
 \newpage 
 \section{EM for Bayesian Networks}

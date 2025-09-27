@@ -43,7 +43,7 @@ and we start by rewriting the lower bound as:
 
 $$
 \begin{array}{rl}
-    \mathcal{\phi,\theta} &= \mathbb{E}_{q(z|x,\phi)}[\log p(x,z|\theta) - \log q(z|x,\phi)] \\
+    \mathcal{L}(\phi,\theta) &= \mathbb{E}_{q(z|x,\phi)}[\log p(x,z|\theta) - \log q(z|x,\phi)] \\
     &= \mathbb{E}_{q(z|x,\phi)}[\log p(x|z,\theta) + \log p(z) - \log q(z|x,\phi)] \\
     &= \mathbb{E}_{q(z|x,\phi)}[\log p(x|z,\theta)] - \mathbb{E}_{q(z|x,\theta)}\left[\log\frac{q(z|x,\phi)}{p(z)}\right] \\
     &= \mathbb{E}_{q(z|x,\phi)}[\log p(x|z,\theta)] - KL[q(z|x,\phi)||p(z)]
@@ -120,11 +120,11 @@ We still have to choose the functions $\mu_z(x,\phi)$ and $\sigma_z^2(x,\phi)$. 
     \label{fig:vae_architecture2}
 \end{figure}
 
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}{0.45\textwidth}
     \textbf{Remark.} The variational autoencoder can be interpreted as a directed probabilistic graphical model with latent variables.
 \end{minipage}
 \hfill
-\begin{minipage}[t]{0.45\textwidth}
+\begin{minipage}{0.45\textwidth}
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.4\textwidth]{assets/fig49.png}
@@ -143,7 +143,7 @@ Diffusion models are a family of probabilistic generative models that progressiv
     \label{fig:diffusion_process}
 \end{figure}
 
-\subsection*{Forward Diffusino Process}
+\subsection*{Forward Diffusion Process}
 
 Given a data point $x_0 \in \mathcal{X}$ sampled from the data distribution $p(x_0)$, consider a Markov chain $p(x_t|x_{t-1})$ with $t \in 1, \dots, T$ satisfying the following properties:
 \begin{itemize}[label=$\blacktriangleright$, leftmargin=2em, itemindent=0em]
