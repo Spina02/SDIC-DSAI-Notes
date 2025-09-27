@@ -27,7 +27,7 @@
     </tr>
     <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Algorithms/main.pdf">Algorithms</a></td>
-      <td><strong><span style="color: lime;">[WIP]</span></strong></td>
+      <td><strong><span style="color: lime;">[DONE]</span></strong></td>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Deep%20Learning/main.pdf">Deep Learning</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
@@ -45,8 +45,8 @@
     </tr>
     <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Global%20and%20Multi-Objective%20Optimisation/main.pdf">Global and Multi-Objective Optimisation</td>
-      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Galaxies%20and%20Astrophysics/main_it.pdf">Introduction to Galaxies and Astrophysics</td>
+      <td><strong><span style="color: lime;">[DONE]</span></strong></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Intro%20to%20Cosmology%20and%20Astrophysics/main_it.pdf">Introduction to Cosmology and Astrophysics</td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
   </tbody>
