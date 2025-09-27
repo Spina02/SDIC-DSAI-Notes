@@ -10,12 +10,12 @@ Markov Chains are natural models for sequential data, the following is a Markov 
 \begin{center}
     \begin{tikzpicture}
         % Nodes
-        \node (x1) [circle, draw, fill=gray!50] at (-4.5, 0) {\(x_1\)};
-        \node (x2) [circle, draw, fill=gray!50] at (-3, 0) {\(x_2\)};
-        \node (x3) [circle, draw, fill=gray!50] at (-1.5, 0) {\(x_3\)};
-        \node (xn-1) [circle, draw, fill=gray!50] at (1.5, 0) {\(x_{n-1}\)};
-        \node (xn) [circle, draw, fill=gray!50] at (4.5, 0) {\(x_n\)};
-        \node (xn+1) [circle, draw, fill=gray!50] at (6, 0) {\(x_{n+1}\)};
+        \node (x1) [circle, draw, fill=gray!50, minimum size=1.2cm] at (-4.5, 0) {\(x_1\)};
+        \node (x2) [circle, draw, fill=gray!50, minimum size=1.2cm] at (-3, 0) {\(x_2\)};
+        \node (x3) [circle, draw, fill=gray!50, minimum size=1.2cm] at (-1.5, 0) {\(x_3\)};
+        \node (xn-1) [circle, draw, fill=gray!50, minimum size=1.2cm] at (1.5, 0) {\(x_{n-1}\)};
+        \node (xn) [circle, draw, fill=gray!50, minimum size=1.2cm] at (4.5, 0) {\(x_n\)};
+        \node (xn+1) [circle, draw, fill=gray!50, minimum size=1.2cm] at (6, 0) {\(x_{n+1}\)};
         
         % Edges
         \draw[->] (x1) -- (x2);
@@ -34,10 +34,10 @@ $$
 
 It holds that future observations are independent of all but the most recent observation:
 $$
-x_{n+1} \perp x_1, x_2, \dots, x_n | x_n
+x_{n+1} \perp\!\!\!\perp x_1, x_2, \dots, x_n | x_n
 $$
 
-A \textbf{time homogeneus} process is a process whose transiiton probability does not change in time, i.e. such that $p(x_1|x_{n-q}) = p(x_2|x_1)$.
+A \textbf{time homogeneus} process is a process whose transition probability does not change in time, i.e. such that $p(x_1|x_{n-q}) = p(x_2|x_1)$.
 
 These chains are not always the best model for describing sequential observations, indeed often there is a deeper dependency on the past, and first-order Markov chains suffer from too short memory. 
 
@@ -46,13 +46,13 @@ In these cases, we can mode to \textbf{Markov models of order k}, where the depe
 \begin{center}
     \begin{tikzpicture}
         % Nodes
-        \node (x1) [circle, draw, fill=gray!50] at (-4.5, 0) {\(x_1\)};
-        \node (x2) [circle, draw, fill=gray!50] at (-3, 0) {\(x_2\)};
-        \node (x3) [circle, draw, fill=gray!50] at (-1.5, 0) {\(x_3\)};
-        \node (xn-1) [circle, draw, fill=gray!50] at (1.5, 0) {\(x_{n-1}\)};
-        \node (xn) [circle, draw, fill=gray!50] at (4.5, 0) {\(x_n\)};
-        \node (xn+1) [circle, draw, fill=gray!50] at (6, 0) {\(x_{n+1}\)};
-        \node (xn+2) [circle, draw, fill=gray!50] at (7.5, 0) {\(x_{n+2}\)};
+        \node (x1) [circle, draw, fill=gray!50, minimum size=1.2cm] at (-4.5, 0) {\(x_1\)};
+        \node (x2) [circle, draw, fill=gray!50, minimum size=1.2cm] at (-3, 0) {\(x_2\)};
+        \node (x3) [circle, draw, fill=gray!50, minimum size=1.2cm] at (-1.5, 0) {\(x_3\)};
+        \node (xn-1) [circle, draw, fill=gray!50, minimum size=1.2cm] at (1.5, 0) {\(x_{n-1}\)};
+        \node (xn) [circle, draw, fill=gray!50, minimum size=1.2cm] at (4.5, 0) {\(x_n\)};
+        \node (xn+1) [circle, draw, fill=gray!50, minimum size=1.2cm] at (6, 0) {\(x_{n+1}\)};
+        \node (xn+2) [circle, draw, fill=gray!50, minimum size=1.2cm] at (7.5, 0) {\(x_{n+2}\)};
 
         % Edges
         \draw[->] (x1) -- (x2);
@@ -76,7 +76,7 @@ $$
 
 And it holds that:
 $$
-x_{n+2} \perp x_{n-1} | x_n, x_{n+1}
+x_{n+2} \perp\!\!\!\perp x_{n-1} | x_n, x_{n+1}
 $$
 
 \textbf{Remark}: if $x_i$ are discrete, we talk about \textit{Markov chains}; if $x_i$ are continuous and $p(x_n|\dots)$ are Gaussian, we talk about \textit{autoregressive models} (of order k).
@@ -86,16 +86,16 @@ If we want to build a model for sequential data that is not limited to the Marko
 \begin{center}
     \begin{tikzpicture}
         % Nodes
-        \node (x1) [circle, draw, fill=gray!50] at (-4, 0) {\(x_1\)};
-        \node (x2) [circle, draw, fill=gray!50] at (-2, 0) {\(x_2\)};
-        \node (x3) [circle, draw, fill=gray!50] at (0, 0) {\(x_3\)};
-        \node (xn-1) [circle, draw, fill=gray!50] at (4, 0) {\(x_{n-1}\)};
-        \node (xn) [circle, draw, fill=gray!50] at (6, 0) {\(x_n\)};
-        \node(z1) [circle, draw] at (-4, 2) {\(z_1\)};
-        \node(z2) [circle, draw] at (-2, 2) {\(z_2\)};
-        \node(z3) [circle, draw] at (0, 2) {\(z_3\)};
-        \node(zn-1) [circle, draw] at (4, 2) {\(z_{n-1}\)};
-        \node(zn) [circle, draw] at (6, 2) {\(z_n\)};
+        \node (x1) [circle, draw, fill=gray!50, minimum size=1.2cm] at (-4, 0) {\(x_1\)};
+        \node (x2) [circle, draw, fill=gray!50, minimum size=1.2cm] at (-2, 0) {\(x_2\)};
+        \node (x3) [circle, draw, fill=gray!50, minimum size=1.2cm] at (0, 0) {\(x_3\)};
+        \node (xn-1) [circle, draw, fill=gray!50, minimum size=1.2cm] at (4, 0) {\(x_{n-1}\)};
+        \node (xn) [circle, draw, fill=gray!50, minimum size=1.2cm] at (6, 0) {\(x_n\)};
+        \node(z1) [circle, draw, minimum size=1.2cm] at (-4, 2) {\(z_1\)};
+        \node(z2) [circle, draw, minimum size=1.2cm] at (-2, 2) {\(z_2\)};
+        \node(z3) [circle, draw, minimum size=1.2cm] at (0, 2) {\(z_3\)};
+        \node(zn-1) [circle, draw, minimum size=1.2cm] at (4, 2) {\(z_{n-1}\)};
+        \node(zn) [circle, draw, minimum size=1.2cm] at (6, 2) {\(z_n\)};
 
         % Edges
         \draw[->] (z1) -- (x1);
@@ -110,7 +110,7 @@ If we want to build a model for sequential data that is not limited to the Marko
     \end{tikzpicture}
 \end{center}
 
-If we consider two observations $x_i, x_j$, then $x_i \not\perp x_j|\underbar{x}$ (with $\underbar{x} = x_1, \dots, x_n$) since there is not any obserbed node in the path from $x_i$ to $x_j$.
+If we consider two observations $x_i, x_j$, then $x_i \not\perp\!\!\!\perp x_j|\underbar{x}$ (with $\underbar{x} = x_1, \dots, x_n$) since there is not any obserbed node in the path from $x_i$ to $x_j$.
 
 In order to describe the space models like the one above, we need:
 \begin{itemize}
@@ -204,7 +204,7 @@ $$
 
 There are several class of inference problems that we may want to perform on HMMs:
 \begin{itemize}[label=$\blacktriangleright$, left=0.5pt]
-    \item \textbf{Filtering}: given the observations $\underbar{x}$, we want to compute tue distribution over hidden states of the last latent variable at the end of the sequence, i.e. compute the probability $p(z_n|\underbar{x})$.
+    \item \textbf{Filtering}: given the observations $\underbar{x}$, we want to compute true distribution over hidden states of the last latent variable at the end of the sequence, i.e. compute the probability $p(z_n|\underbar{x})$.
     \item \textbf{Smoothing}: we want to compute the distribution of a latent variable somewhere in the middle of the sequence, at a certain time $k$, i.e. compute the probability of $p(z_k|\underbar{x})$ with $k < N$.
     \item \textbf{Most likely explanation}: most likely sequence of latent variables that generated a particular sequence of observations, i.e. compute $z^* = \argmax{\underbar{z}}p(\underbar{z}|\underbar{x})$ with $\underbar{z} = z_1,\dots,z_n$.
 \end{itemize}

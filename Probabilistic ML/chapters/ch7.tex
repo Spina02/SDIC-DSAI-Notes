@@ -14,7 +14,7 @@ Consider a dataset $D = (x_n,y_n)$, with $n = 1, \dots, N$, where $y_n$ are cate
 We have three possible approaches to classification:
 \begin{itemize}
     \item \textbf{Discriminant function} $f(x) \in \{1, \dots, K\}$: the goal is to learn a function that maps each input to a specific class (e.g. random forest classification is based on this approach).
-    \item \textbf{Discriminative approach} $p(C_k|x) = f(h(x))$: the goal is to model explicitlythe class posterior (e.g. logistic regression, where $p(C_k|x) = f(w^T\phi (x))$). In this context $f$ is called \textit{activation function}, $f^{-1}$ is called \textit{link function}.
+    \item \textbf{Discriminative approach} $p(C_k|x) = f(h(x))$: the goal is to model explicitly the class posterior (e.g. logistic regression, where $p(C_k|x) = f(w^T\phi (x))$). In this context $f$ is called \textit{activation function}, $f^{-1}$ is called \textit{link function}.
     \item \textbf{Generative approach} $p(C_k|x) = \frac{p(x|C_k)p(C_k)}{p(x)}$: the goal is to model the class conditional probability $p(x|C_k)$ from data, then, considering a prior over classes $p(C_k)$, plug the Bayes' theorem to compute class posterior $p(C_k|x)$.
 \end{itemize}
 

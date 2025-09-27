@@ -3,7 +3,7 @@
 
 Our focus in this chapter is on solving inference based problems by sampling strategies. This is needed because in the context of Bayesian Networks we are only able to perform inference if our network satisfies certain structural properties; in particular it has to be a tree or a poli-tree. 
 
-Even in a simple exampl like 
+Even in a simple example like 
 
 \begin{center}
     \begin{tikzpicture}
@@ -62,7 +62,7 @@ We are going to explore methods that allow us to sample from a surrogate $q(x)\a
 
 \subsection*{Rejection Sampling}
 
-Suppose to have a distribution $p(x)$ and another distribution $g(x)$ from which it is easy to sample, called the \textbf{proposal distribution}, such that $\exists M>0 : Mg(x)\geq p(x), \forall$, which of course implies that $\frac{p(x)}{Mg(x)}\leq 1$.
+Suppose to have a distribution $p(x)$ and another distribution $g(x)$ from which it is easy to sample, called the \textbf{proposal distribution}, such that $\exists M>0 : Mg(x)\geq p(x), \forall x$, which of course implies that $\frac{p(x)}{Mg(x)}\leq 1$.
 
 Rejection sampling consists in the following algorithm:
 \begin{enumerate}
@@ -196,7 +196,7 @@ If a Markov Chain is ergodic, it means that there is always the possibility of g
     \begin{enumerate}
         \item $$\Pi(y) = \int p(y|x)\Pi(x)\,dx$$
         
-        which means that $\Pi$ is an \textbf{invariant measure} with respect to the Markov Chain dynamics defined bu the Transition Kernel $p(y|x)$
+        which means that $\Pi$ is an \textbf{invariant measure} with respect to the Markov Chain dynamics defined by the Transition Kernel $p(y|x)$
         \item $p_n(x) = p(x_n|x_0) \xrightarrow[n \to \infty]{} \Pi(x)$
         \item $\Pi$ is unique
     \end{enumerate}
@@ -233,9 +233,9 @@ We are now ready to tackle Markov Chain Monte Carlo: by requiring that the Marko
 
 \subsection*{Metropolis Hastings}
 
-Intuitively, the idea is that we want to sample from a distributino and we build an ergidic Markov Chain with a transition kernel such that the stationary distribution coincides with the one we want to sample from. 
+Intuitively, the idea is that we want to sample from a distribution and we build an ergodic Markov Chain with a transition kernel such that the stationary distribution coincides with the one we want to sample from. 
 
-Assume that we want to sample from $p(x) = \frac{1}{Z}\tilde{p}(x)$, where we know the unnormalized distirbution $\tilde{p}(x)$ but the normalization constant is too complicated to compute. We fix $q(x|y)$, the \textit{proposal kernel} of our Markov Chain, such that 
+Assume that we want to sample from $p(x) = \frac{1}{Z}\tilde{p}(x)$, where we know the unnormalized distribution $\tilde{p}(x)$ but the normalization constant is too complicated to compute. We fix $q(x|y)$, the \textit{proposal kernel} of our Markov Chain, such that 
 \begin{enumerate}
     \item It is easy to sample from $q(x|y)$
     \item It makes our Markov Chain ergodic
@@ -273,7 +273,7 @@ $$
 
 and so the regions with higher probability $p(y)>p(x)$ are more likely to be visited.
 
-Notice that we haven't defined in a full mathematical way the transition kernel of our Markov Chain here, but it can be derived bu the operational procedure given above. 
+Notice that we haven't defined in a full mathematical way the transition kernel of our Markov Chain here, but it can be derived by the operational procedure given above. 
 
 \newtheorem{Lemma}{Lemma}
 \begin{Lemma}
@@ -302,7 +302,7 @@ Performing some calculations we obtain
 
 $$
 \begin{array}{rl}
-    \min \left\{1, \frac{\tilde{p}(y)q(x|y)}{\tilde{p}(x)q(y|x)}\right\} \cdot q(y|x)p(x) &= \min {q(y|x)p(x), p(y)q(x|y)} \\
+    \min \left\{1, \frac{\tilde{p}(y)q(x|y)}{\tilde{p}(x)q(y|x)}\right\} \cdot q(y|x)p(x) &= \min \{q(y|x)p(x), p(y)q(x|y)\} \\
     &= \min \left\{\frac{p(x)q(y|x)}{p(y)q(x|y)}, 1\right\} \cdot q(x|y)p(y) \\
     &= \alpha(x|y)q(x|y)p(y) \\
     &= p(x|y)p(y)
@@ -357,7 +357,7 @@ Therefore we are choosing a coordinate and sample along that coordinate, keeping
     $$
 \end{proof}
 
-Gibbs Sampling algorithm can be generalized, for example, by sampling blocks instead of a single variable, i.e. we can sample $x_j, \dots, x_k \subseteq x$. Moreover, we could apply this even if we don't know explicitly how to sample from $p(x_i|x_{-i})$, for example by applying rejection sampling, or even a Metropolis-Hastings MCMC to smaple our conditional distribution (the latter strategy is called "Metropolis within Gibbs").
+Gibbs Sampling algorithm can be generalized, for example, by sampling blocks instead of a single variable, i.e. we can sample $x_j, \dots, x_k \subseteq x$. Moreover, we could apply this even if we don't know explicitly how to sample from $p(x_i|x_{-i})$, for example by applying rejection sampling, or even a Metropolis-Hastings MCMC to sample our conditional distribution (the latter strategy is called "Metropolis within Gibbs").
 
 \textbf{Remark.} 
 \begin{itemize}[label=$\blacktriangleright$, leftmargin=2em, itemindent=0em]
@@ -467,6 +467,16 @@ Then we have both a lower and an upper bound for our variance, both converging t
 
 $$
 \hat{R} := \sqrt{\frac{VAR^{+}[\Psi]}{W}}
+$$
+
+which can be monitored while running the MCMC simulations. Notice that $\hat{R}>1$ and that $\hat{R} \underset{n \to \infty}{\longrightarrow}1$. Heuristically, we can say that when $\hat{R}\leq1.1$ we have converged to our stationary distribution.
+
+\subsection*{Effective Sample Size}
+
+We may want to have some measure of efficiency of our statistics, i.e. we may want to compute $VAR[\bar{\Psi}]$. Notice the following: if $m\cdot n$ samples are independent then we know that 
+
+$$
+VAR[\bar{\Psi}] = \frac{VAR[\Psi]}{m\cdot n}
 $$
 
 but unfortunately this is not the case as we have already seen.
