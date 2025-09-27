@@ -1,0 +1,1155 @@
+\chapter{OpenMP}
+
+\section{Introduction}
+
+OpenMP is a standard API for shared-memory parallel programming. The name stands for \textbf{Open specifications for MultiProcessing}. It enables the development of multi-threaded programs with consistent, portable behavior by using a set of compiler directives embedded in the source code:
+
+\begin{itemize}
+    \item \textbf{Pragmas} (\texttt{\#pragma}) in C/C++
+    \item \textbf{Specially formatted comments} in Fortran
+\end{itemize}
+
+OpenMP supports both fine-grained and coarse-grained parallelism, ranging from loop-level parallelism to explicit assignment of tasks to threads.
+
+\subsection*{Threads and Processes}
+
+\begin{minipage}{0.6\textwidth}
+A \textbf{process} is an independent sequence of instructions and the ensemble of resources needed for their execution.
+A program needs much more than just its binary code (i.e. the list of ops to be executed): it needs to access to a protected memory space and to access system resources (e.g. files and network).
+A “process” is then a program that has been allocated with the necessary resources by the operating system.
+There may be different instances of the same program as different, independent processes.
+\end{minipage}%
+\begin{minipage}{0.4\textwidth}
+    \hfill
+    \includegraphics[width = 0.95\textwidth]{assets/process.png}
+\end{minipage}%
+
+\begin{minipage}{0.4\textwidth}
+    \includegraphics[width = 0.95\textwidth]{assets/threads.png}
+\end{minipage}%
+\begin{minipage}{0.6\textwidth}
+A \textbf{thread} is an independent instance of code execution within a process. There
+may be from one to many threads within the same process.
+Each thread shares the same code, memory address space and resources than its father process.
+
+While each thread has its own private stack for local variables and function calls (allocated within the process's address space), they share access to the process's heap and global data segments. In geneal, spawning threads inside a process is much less costly than creating processes.
+\end{minipage}%
+
+A thread can run either on the same computational units of its father process or on a different one.
+
+A computational unit nowadays amounts to a core, either inside the same CPU (socket) on which the father process runs, or inside a sibling socket in the same NUMA region.
+
+\begin{minipage}{0.48\textwidth}
+    \textbf{Shared-Memory (e.g., OpenMP)}
+    \begin{itemize}
+        \item A single process spawns multiple threads.
+        \item All threads share a common address space and can directly access shared variables.
+        \item Communication between threads occurs via shared variables in memory.
+        \item Synchronization is required to avoid race conditions (e.g., critical sections, barriers).
+        \item Typically used for parallelism within a single node (multi-core CPU).
+    \end{itemize}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{assets/omp9.png}
+        \caption{Shared-Memory Architecture}
+        \label{fig:shared_memory}
+    \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \textbf{Distributed-Memory (e.g., MPI)}
+    \begin{itemize}
+        \item Multiple independent processes are launched, each with its own memory space.
+        \item Processes cannot directly access each other's memory.
+        \item Communication occurs by explicit message passing (send/receive).
+        \item Synchronization is achieved via communication primitives (e.g., barriers, broadcasts).
+        \item Suitable for parallelism across multiple nodes in a cluster or supercomputer.
+    \end{itemize}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{assets/omp10.png}
+        \caption{Distributed-Memory Architecture}
+        \label{fig:distributed_memory}
+    \end{figure}
+\end{minipage}
+
+\vspace{1em}
+
+\noindent
+\textbf{Hybrid Programming:} Modern HPC applications often combine OpenMP and MPI to exploit both shared-memory and distributed-memory parallelism. For example, OpenMP is used for intra-node (within a node) parallelism, while MPI handles inter-node (across nodes) communication.
+
+\begin{observationblock}[MPI Shared Memory Extensions]
+    Since MPI~3.0, the standard introduced features to:
+    \begin{enumerate}
+        \item Allow shared-memory-like access among MPI processes running on the same node (using \plaintt{MPI\_Win\_allocate\_shared}).
+        \item Enable direct remote memory access (RMA) to other processes' memory, known as Remote Memory Access (one-sided communication).
+    \end{enumerate}
+    These features blur the strict boundary between shared and distributed memory, enabling more flexible hybrid programming models.
+\end{observationblock}
+
+\subsubsection{OpenMP programming model}
+
+The main advantages of a directive-based approach are the following ones:
+
+\begin{itemize}
+    \item \textbf{Abstraction}: Subtleties of pthread and hardware-specific aspects are hidden. You can focus on data and workflow much more easily.
+
+    \item \textbf{Efficiency}: The learning curve to achieve reasonable results is much  hallower.
+    The code’s design is easier, the result/effort ratio is  avourable with respect to pthread.
+
+    \item \textbf{Incremental} approach No need to re-write your whole code. You start  oncentrating on some sections only, following the suggestions from  rofiling.
+
+    \item \textbf{Portability}: The compiler will take care of this for you. You still  ave to develop a design able to adapt to different topologies.
+
+    \item \textbf{One source}: Through conditional compilation, serial and parallel  ersions can easily coexist.
+\end{itemize}
+
+The main logic behind OpenMP is to use a single master thread for serial operations and to spawn a team of threads to perform parallel work. This is called \textbf{\textit{fork-join} model}: a thread meets, at some point in its existence, a directive that activates the creation of a pool of children threads.
+
+\begin{minipage}{0.37\textwidth}
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/openmp.png}
+\end{minipage}%
+\begin{minipage}{0.63\textwidth}
+In OpenMP, threads operate by accessing and modifying shared memory regions. To prevent race conditions or situations where multiple threads attempt to read and write shared data simultaneously, synchronization mechanisms are employed, either explicitly (such as critical sections and locks) or implicitly (such as barriers at the end of parallel regions). Unlike distributed-memory paradigms, there is no explicit message-passing between threads; all communication occurs through shared variables.
+\end{minipage}%
+
+However, parallelizing code is not always straightforward. For example, if a loop contains dependencies between iterations (loop-carried dependencies), it can severely limit or even prevent parallel speedup. Therefore, careful management of shared and private variable attributes is essential to minimize race conditions and reduce the need for synchronization.
+
+Each thread executes its portion of the parallel workload in its own stack and private memory space, which are isolated from other threads and from the serial regions of the program. OpenMP also supports nested parallelism, allowing parallel regions to be created within other parallel regions if needed. Additionally, the number of threads used in a parallel region can be set dynamically, providing flexibility to adapt to different workloads or system resources.
+
+\subsection*{OpenMP Directives}
+
+An OpenMP directive is a specially-formatted pragma for C/C++ and comment for FORTRAN codes. Most of the directives apply to structured code block, i.e. a block with a single input and a single output points and no branch within it.
+
+The directives allows to:
+\begin{itemize}
+    \item create team of threads for parallel execution
+    \item manage the sharing of workload among threads
+    \item specify which memory regions (i.e. variables) are shared and which are private to each threads
+    \item drive the update of shared memory regions
+    \item synchronize threads and determine atomic/exclusive operations
+\end{itemize}
+
+\begin{codeblock}[language=C]
+#pragma omp parallel
+{
+    // This code block will be executed by multiple threads in parallel
+    ...
+}
+\end{codeblock}
+
+The lexical scope of structured blocks defines the static extent of an OpenMP parallel region. Every function call from within a parallel region determines the creation of a dynamic extent to which the same directives apply.
+
+\begin{codeblock}[language=C]
+// static extent:
+#pragma omp parallel
+{
+    double *array;
+    int N;
+    ...
+    sum = foo(array, N);
+    ...
+}
+
+// dynamic extent:
+double foo(double *A, int N) {
+    double mysum = 0;
+    #pragma parallel for reduction(+:sum) // "orphan" directive
+    for (int ii = 0; ii < N; ii++) {
+        mysum += A[ii];
+    }
+    return mysum;
+}
+\end{codeblock}
+
+The dynamic extent includes the original static extent and all the instructions and further calls along the call tree.
+
+\begin{observationblock}[Dynamic Extent]
+    The functions called in the dynamic extent can contain additional OpenMP directives.
+\end{observationblock}
+
+OpenMP directives can be \textbf{orphan}, i.e. they can appear in a dynamic extent without being enclosed in a parallel region. In this case, the directive applies to the current team of threads.
+\begin{warningblock}[Orphan Directives]
+    Orphan directives must be used with care, as they can lead to unexpected behavior if not properly managed within the context of the existing thread team.
+\end{warningblock}
+
+OpenMP is made of 3 components:
+\begin{enumerate}
+    \item \textbf{Compiler directives} give indication to the compiler about how to manage threads internals
+    \item \textbf{Run-time libraries} linked by the compiler
+    \item \textbf{Environment variables} set by the user, determine the behaviour of the omp library; for instance, the number of threads to be spawned or the requirements about the thread-cores-memory affinity
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/omp11.png}
+    \caption{OpenMP Toolbox}
+    \label{fig:omp_toolbox}
+\end{figure}
+
+\begin{tipsblock}[Conditional Compilation]
+    By default, when the compiler is instructed to activate the processing of OpenMP directives (\texttt{gcc -fopenmp} for example), it defines a macro that let you to conditionally compile sections of the code:
+    \begin{codeblock}[language=C]
+#ifdef _OPENMP
+my_thread_id = omp_some_function();
+#endif
+...
+    \end{codeblock}
+    This approach allows your code to remain portable and functional even when compiled without OpenMP support. It is especially useful for writing hybrid codes (e.g., MPI+OpenMP) or for debugging and performance comparisons between serial and parallel versions.
+\end{tipsblock}
+
+\section{Parallel Regions}
+
+As we have seen, the region starts at the opening \{ brace and ends at the closing \} one. An implicit synchronization barrier is present at the end of the region.
+
+The general OpenMP directive in C/C++ is:
+\begin{codeblock}[language = C]
+    #pragma omp <directive> [<clause> [, <clause> [ ... ]]]
+\end{codeblock}
+
+to associate multiple statements use a {} block:
+
+\begin{codeblock}[language = C]
+#pragma omp <directive> [<clause> [, <clause> [ ... ]]]
+{
+statement;
+statement;
+}
+\end{codeblock}
+
+with C++ syntax ( requires ≥ 5.1 )
+
+\begin{codeblock}[language = C]
+[[ omp :: <directive> [<clause> [, <clause> [ ... ]]] ]]
+[[ using omp : <directive> [<clause> [, <clause> [ ... ]]] ]]
+[[ omp :: sequence( [omp::<directive>... [, omp::<directive>...]] ) ]]
+\end{codeblock}
+
+A parallel region can be as short as a single line:
+\begin{codeblock}[language = C]
+#pragma omp parallel _some_clauses_here_
+single-line-here
+\end{codeblock}
+
+There are no limits on the size of the code included within \{...\}:
+\begin{codeblock}[language = C]
+#pragma omp parallel _some_clauses_here_
+{ … }
+\end{codeblock}
+
+The specific construct about for loops:
+\begin{codeblock}[language = C]
+#pragma omp parallel for _some_clauses_here_
+{ … }
+\end{codeblock}
+
+A more general work-sharing construct
+\begin{codeblock}[language = C]
+#pragma omp sections _some_clauses_here_
+{ … }
+\end{codeblock}
+
+This allows task-based parallelism
+\begin{codeblock}[language = C]
+#pragma omp task _some_clauses_here_
+{ … }\end{codeblock}
+
+\begin{observationblock}[Threads and Parallel Regions]
+    For efficiency reasons, it may be, and usually it is, that the threads are not created/killed at the begin/end of each region; instead, they are created at the begin of the run and kept sleeping outside of the parallel regions.
+\end{observationblock}
+
+\subsection*{The threads factory}
+
+When we create a parallel region, a pool of threads is created. Each one receives an ID, ranging from 0 to $n-1$, with $n$ threads. Their stack and IP are separated from the others' ones and from the father-process's one. 
+
+\begin{itemize}
+    \item \textbf{How large is the stack of each thread?} The default value is system dependent. However, we can control the size of the threads' stack using the environmental variable \texttt{OMP\_STACKSIZE: export OMP\_STACKSIZE=N}, where N is a number followed by a letter ('B', 'K', 'M', or 'G').
+    \item \textbf{How many threads can be created by a single process?} Also this is system dependent. On Linux it depends on the amout of total physical memory: basically, the maximum number of threads is the amount of physical memory divided by the memory amount needed to describe and run a thread, times a factor that accounts for the fact that you don't want all the memory allocated only to make the threads alive. One can change the behaviour of the OpenMP program by using the env variable \texttt{OMP\_THREAD\_LIMIT}.
+\end{itemize}
+
+\begin{warningblock}
+    When the threads are created, the space needed for their stack is also allocated. If that space is quite large, you may run out of memory. Conversely, if the stack is not large enough, you may incur into a segmentation fault error due to stack overflow.
+\end{warningblock}
+
+\subsection*{\texttt{parallel} directive}
+
+The \texttt{parallel} directive creates a parallel region, i.e. a team of threads is created and each thread executes the code within the structured block. 
+
+\begin{codeblock}[language = C]
+int nthreads;
+#pragma omp parallel 
+{
+    int myid = omp_get_thread_num();
+    #pragma single
+    int nthreads = omp_get_num_threads();
+    #pragma barrier 
+    printf("Hello from thread %d of %d\n", myid, nthreads);
+}
+\end{codeblock}
+
+One may also want to open a parallel region \textbf{only if} some condition is met. The condition must result in an integer value
+\begin{itemize}
+    \item $0 \rightarrow$ false, do not open the parallel region
+    \item $\neq 0 \rightarrow$ true, open the parallel region
+\end{itemize}
+
+\begin{codeblock}[language = C]
+int nthreads;
+#pragma omp parallel if(nthreads > 1)
+{
+    int myid = omp_get_thread_num();
+    #pragma single
+    int nthreads = omp_get_num_threads();
+    #pragma barrier 
+    printf("Hello from thread %d of %d\n", myid, nthreads);
+}
+\end{codeblock}
+
+or even open it with a given number $n$ of threads 
+\begin{codeblock}[language = C]
+int nthreads;
+#pragma omp parallel num_threads(nthreads)
+{
+    int myid = omp_get_thread_num();
+    #pragma single
+    int nthreads = omp_get_num_threads();
+    #pragma barrier 
+    printf("Hello from thread %d of %d\n", myid, nthreads);
+}
+\end{codeblock}
+
+\begin{warningblock}
+    The \texttt{barrier} directive is the most brutal synchronization concept in parallelism: when a thread meets a barrier, it stops and waits for all the other threads to meet the same barrier. Only when all the threads have reached the barrier, they are all released and can continue their execution.
+\end{warningblock}
+
+\subsection*{shared/private memory}
+
+Let's now start to clarify the meaning of “private” and “shared” memory, and how to specify what variables are either one.
+
+The basic rule is that everything that is defined in a serial region is inherited as shared in a parallel region that originates from the former serial region. Global variables are always shared (we'll see an exception)
+
+\begin{codeblock}[language = C]
+int i, j, k;
+double *array;
+
+#pragma omp parallel
+{
+    // i,j,k and array
+    double *array;
+
+    #pragma omp parallel
+    {
+        // i,j,k and array
+        // are shared here
+        ...
+    }
+}
+\end{codeblock}
+
+\subsubsection*{The \texttt{private} directive}
+
+You can specify that a list of variables that exists in the local stack at the moment of the creation of the parallel region are \textbf{private} to each thread inside the parallel region.
+
+\begin{codeblock}[language = C]
+int i, j, k;
+double *array;
+
+#pragma omp parallel private(i,k)
+{
+// j and array are shared here i and k are unique to each thread, they live in each thread's stack.
+
+// They are different than the original j and k, and array does NOT point to the region pointed by the original array pointer
+    ...
+}
+\end{codeblock}
+
+That means that the needed space will be reserved in the threads' stack to host variables of the same types. As such, those memory regions are different than the original ones, although within the parallel region those variables are referred in the source code with the same names.
+
+\begin{exampleblock}[Private variables]
+    \begin{codeblock}[language = C]
+int nthreads = 1;
+int my_thread_id = 0;
+
+#ifdef _OPENMP
+#pragma omp parallel
+{
+    my_thread_id = omp_get_thread_num();
+    #pragma omp master
+    nthreads = omp_get_num_threads();
+}
+#endif
+    \end{codeblock}
+
+    \begin{itemize}
+        \item all threads are writing in \texttt{my\_thread\_id}, in undefined order
+        \item only the master thread is writing in \texttt{nthreads}
+    \end{itemize}
+
+    The value of \texttt{my\_thread\_id} unpredictable, because it depends on the run-time order by which the threads access it and by each a thread accesses it again to write it.
+\end{exampleblock}
+
+\begin{tipsblock}[Private variables]
+    A private variable used in the parallel region refers to a memory region that is different than the same variable (outside) in the serial region: as such, this coding style looks only a source of confusion and lacks of cleariness.
+
+    It's highly recommended to avoid using the "private" directive and to use a different name for the private variable, or to use the \plaintt{threadprivate} directive (see below).
+\end{tipsblock}
+
+\subsubsection*{The \texttt{firstprivate} directive}
+
+If the clause \texttt{firstprivate} is used instead, every variable listed is private in the same sense than before, but its value is not randomic but it is \textit{initialized} at the value that the corresponding variable in the serial region has at the moment of entering in the parallel region.
+
+\begin{codeblock}[language = C]
+int i, j, k;
+double *array;
+array = (double*)malloc(...);
+#pragma omp parallel
+firstprivate(array)
+{
+// now array is unique to each thread, BUT each copy is initialized to the value that the original array has at the entry of the parallel region.
+
+// As such, now array can be used to access the previously allocated memory.
+...
+}
+\end{codeblock}
+    
+\subsubsection*{The \texttt{lastprivate} directive}
+
+The clause \texttt{lastprivate} pertains only to the for construct. When used, every variable listed is private in the same sense than before, and its value is not initialized.
+
+\begin{codeblock}[language = C]
+double last_result;
+
+#pragma omp parallel
+lastprivate(last_result)
+{
+...
+    #pragma omp for
+    for( int j = 0; j < some_value; j++ )
+    last_result = calculation( j, ...);
+    ...
+}
+
+other_calculations( last_result, ... );
+
+// at this point, last_result has the last value from the last iteration in the for loop in the parallel region
+\end{codeblock}
+
+What is affected is the value that the original variable, the one that is declared in the master thread's stack, has after the parallel region. It will have the value that the private copy of it has in the last iteration of the for loop.
+
+\subsubsection*{The \texttt{threadprivate} directive}
+
+The clause \texttt{threadprivate} applies to global variables and has a global scope. threadprivate variables are private variables that do exist all along the lifetime of the process. 
+
+I.e. they are private variables that do not die in between of two different parallel regions.
+
+\begin{codeblock}[language = C]
+int myN;
+double *array;
+#pragma omp threadprivate(myN, array)
+
+#pragma omp parallel
+{
+    // array does exist and it’s private
+    // to each thread
+    array = ... allocate memory...;
+}
+// .. something serial here..
+#pragma omp parallel
+{
+    // array does exist here and
+    // the allocated memory is available
+}
+\end{codeblock}
+
+\begin{warningblock}[Threadprivate and Dynamic Threads]
+    When using threadprivate, the dynamic thread creation is not allowed, i.e. the number of threads in each parallel region is constant.
+\end{warningblock}
+
+\subsubsection*{The \texttt{copyin} directive}
+
+The clause \texttt{copyin} applies to parallel and worksharing (e.g. for) constructs. This clause basically provides a way to perform a \textbf{broadcast of \texttt{threadprivate} variables} from the master thread (i.e. the thread 0) to the corresponding threadprivate variables of other threads.
+
+\begin{codeblock}[language = C]
+int golden_values[3];
+#pragma omp threadprivate(golden_values)
+
+for( int i = 0; i < N; i++ )
+{
+    get_golden_values();
+    #pragma omp parallel copyin(golden_values)
+    {
+        // each thread uses golden_values[]
+    }
+}
+\end{codeblock}
+
+The copying happens at the creation of the region, before the associated structured block is executed.
+
+\subsubsection*{The \texttt{copyprivate} directive}
+
+The clause \texttt{copyprivate} applies only to \texttt{single} construct.
+
+This clause provides a mechanism to propagate the values of private variables, including threadprivate, from a thread to the others inside a parallel region. 
+
+The copying is ultimated before any threads leave the implicit barrier at then end of the construct.
+
+\begin{codeblock}[language = C]
+#pragma omp parallel
+{
+    double seed[2];
+    
+    #pragma omp single copyprivate(seed)
+    {
+        // something happens here and the
+        // thread that executes this block
+        // initializes the seed[2] array
+    }
+    // at this point the values of the seed[2]
+    // array have been propagated to all the
+    // other threads
+}
+\end{codeblock}
+
+\subsection*{Controlling the number of threads}
+
+By default the number of threads spawned in a parallel region is the number of \textbf{cores} available. However, you can vary that number in several ways:
+\begin{itemize}
+    \item \texttt{OMP\_NUM\_THREADS} environmental variable
+    \item \texttt{\#pragma omp parallel num\_threads(n)} clause
+    \item \texttt{omp\_set\_num\_threads(n)} function
+\end{itemize}
+
+The last two work if \texttt{OMP\_DYNAMIC} variable is set to TRUE, otherwise the number of threads spawned is strictly equal to \texttt{OMP\_NUM\_THREADS}. This setting can be changed through \texttt{omp\_set\_dynamic(true)}.
+
+\subsection*{Specializing execution in parallel regions}
+
+\begin{itemize}
+    \item The \texttt{critical} directive ensures that only a thread at a time executes the block. All the threads will execute it, although in unspecified order. A barrier is present at the entry point and no one at the end point;
+    \item The \texttt{atomic} directive is like critical, but limited to a single update operation on a single variable (a single line);
+    \item The \texttt{single} directive ensures that only a single thread executes the block. The other threads skip it. There is an implicit barrier at the end of the block, unless \texttt{nowait} clause is used. There is an implicity synchronization at the end and only one thread is inside the region: all the others are waiting at the end of the region;
+    \item The \texttt{master} directive ensures that only the master thread (i.e. the thread with ID 0) executes the block. The other threads skip it. There is no implicit barrier at the end of the block. There is no explicit synchronization at all: only the thread 0 is inside the region, the others can be everywhere else. 
+\end{itemize}
+
+\begin{observationblock}[\texttt{mask} directive]
+    Since the \texttt{master} directive is now deprecated, it is recommended to use the \texttt{mask} directive instead.
+    \begin{codeblock}[language = C]
+#pragma omp parallel
+{
+    #pragma omp master
+    {
+        // code executed only by the master thread
+    }
+
+    #pragma omp masked [filter (integer expression)]
+    {
+        // code executed by all threads except the master thread
+    }
+}
+    \end{codeblock}
+
+    The \texttt{filter} clause allows to select which thread must execute the associated code block. No implicit barrier is set at the exit of the region. 
+\end{observationblock}
+
+\begin{tipsblock}[\texttt{atomic} vs \texttt{critical}]
+    When you deal with shared variables, enduring that the workflow maintains the semantic correctness of your code is fundamental. 
+    For instance, the assignment 
+    \[
+    a += b
+    \]
+    (where either $a,b$ or both are shared) is meaningful only if the value of $a,b$ or both does not change in the middle of the instruction itself. 
+    To avoid that, it is necessary to \textbf{protect} the sensible regions. 
+
+    An \texttt{atomic} directive has a much lower overhead than a \texttt{critical} one and must be preferred in the appropriate cases:
+    \begin{itemize}
+        \item \textbf{read}: causes an atomic read of the location designated by the expression;
+        \item \textbf{write}: causes an atomic write of the location designated by the expression;
+        \item \textbf{update}: causes an atomic read-modify-write operation on the location designated by the expression;
+        \item \textbf{capture}: combines an atomic read-modify-write operation with a separate assignment of the original value to a variable.
+    \end{itemize}
+
+    In OpenMP exists a unique global \texttt{critical} section. Hence, when we define a \texttt{critical} section, it is logically considered to be part of the global one. As a consequence only one thread can be inside any of the unnamed \texttt{critical} sections, which of course limits the performance when more than one region is present.
+
+    However, that can be cured by the \textbf{named regions}, i.e. by giving a name to the critical section:
+    \begin{codeblock}[language = C]
+#pragma omp critical
+{
+    // 'A' critical section
+}
+#pragma omp critical
+{
+    // 'B' critical section
+}
+    \end{codeblock}
+
+    In this case, two different critical sections are defined and two threads can be inside them at the same time.
+
+    Finally, since \texttt{atomic} protects memory regions while \texttt{critical} protects code regions, they are not mutually \textbf{exclusive}: a thread may be executing the critical region while another may be executing the atomic. 
+\end{tipsblock}
+
+\subsection*{The ordering of threads}
+
+The order by which the threads execute the code inside a parallel region is undefined. Consider the following example:
+\begin{codeblock}[language = C]
+#pragma omp parallel
+{
+    int myid = omp_get_thread_num();
+    printf("Hello from thread %d\n", myid);
+}
+\end{codeblock}
+How can we order the output of the threads so that they print their ID in increasing order?
+
+The solutions is using a \texttt{critical} directive, since it ensures that only one thread at a time executes the associated block and so creates a sort of "ordering". 
+\begin{codeblock}[language = C]
+#pragma omp parallel    
+{
+    int myid = omp_get_thread_num();
+    #pragma omp critical
+    {
+        printf("Hello from thread %d\n", myid);
+    }
+}
+\end{codeblock}
+
+However, the order is still undefined, since the order by which the threads enter in the critical section is undefined. A \texttt{while} loop can be used to enforce the order:
+\begin{codeblock}[language = C]
+#pragma omp parallel    
+{
+    int myid = omp_get_thread_num();
+    int done = 0;
+
+    while( !done ) {
+        #pragma omp critical
+        {
+            if( myid == next ) {
+                printf("Hello from thread %d\n", myid);
+                next++;
+                done = 1;
+            }
+        }
+    }
+}
+\end{codeblock}
+
+A third implementation is possible, using the clause \texttt{ordered} in a \texttt{for} construct:
+\begin{codeblock}[language = C]
+#pragma omp parallel
+{
+    int myid = omp_get_thread_num();
+    #pragma omp master
+    int nthreads = omp_get_num_threads();
+    #pragma omp barrier  // without this barrier, nthreads may be undefined
+
+    #pragma omp for ordered
+    for( int i = 0; i < nthreads; i++ ) {
+        #pragma omp ordered
+        {
+            printf("Hello from thread %d\n", myid);
+        }
+    }
+}
+\end{codeblock}
+
+\section{Working with Loops}
+
+Loops are one of the most common work structures in HPC, and vast amount of compute-intensive code resides in loops. In fact, up to version 2.x, OpenMP was essentially about quickly and effectively parallelizing loops without much effort. 
+
+\begin{minipage}{0.48\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{assets/omp12.png}
+        \caption{Loop Parallelism}
+        \label{fig:loop_parallelism}
+    \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    Splitting the work of a \texttt{for} loop amont the threads could easily be achieved by directly assigning the boundaries of the loop to each thread. However, OpenMP has dedicated constructs that offer easier and more flexible mechanisms to share the work within a \texttt{for} loop.
+\end{minipage}
+
+Let's start with a very simple loop:
+\begin{codeblock}[language = C]
+double *a;
+double sum=0;
+int N;
+
+#pragma omp parallel for implicit(none) shared(a,sum,N) private(i)
+for (int i=0; i<N; i++){
+    sum += a[i];
+}
+\end{codeblock}
+
+where:
+\begin{itemize}
+    \item \texttt{for} is a \textbf{work-sharing construct} that splits the iterations of the loop among the threads in the team;
+    \item \texttt{implicit(none)} forces the programmer to explicitly specify the sharing attributes of all variables in the parallel region;
+    \item \texttt{shared(a,sum,N)} specifies that the variables \texttt{a}, \texttt{sum}, and \texttt{N} are shared among all threads;
+    \item \texttt{private(i)} specifies that the loop variable \texttt{i} is private to each thread.
+\end{itemize}
+
+\begin{tipsblock}[\texttt{implicit(none)} clause]
+    The default poilcy for memory regions is actually that all the variables defined in serial regions at the moment of entering in the parallel region are shared. However, that is a \textbf{very} common source oof error since when you have lots of variables, you forgot what is what in the code. It may be a good practice to add \texttt{implicit(none)} to all your constructs so that to spot any error alike. 
+
+    Moreover, it is a good practice to declare the loop counter inside the \texttt{for} declaration, so that it is private by default.
+\end{tipsblock}
+
+How is the work assigned to the single threads?
+
+\begin{codeblock}[language = C]
+#pragma omp parallel for schedule(schedule-type)
+for (int i=0; i<N; i++){
+    sum += a[i];
+}
+\end{codeblock}
+
+\begin{itemize}
+    \item \texttt{schedule(static, chunk-size)}: the iteration is divided in chunks of size chunk-size (or in equal-size) distributed to threads in circular order;
+    \item \texttt{schedule(dynamic, chunk-size)}: the iteration is divided in chunks of size chunk-size (or 1) distributed to threads in no given order;
+    \item \texttt{schedule(guided, chunk-size)}: the iteration is divided in chunks of minimum chunk-size (or 1) distributed to threads in no given order like before. The chunk size is proportional to the number of still unassigned iterations divided by the number of threads;
+    \item \texttt{runtime-default}: the policy is set at runtime via the environmental variable \texttt{OMP\_SCHEDULE} or to a default implementation-dependent value.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/omp13.png}
+    \caption{\texttt{static} work assignment}
+    \label{fig:static_work_assignment}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/omp14.png}
+    \caption{\texttt{dynamic} work assignment}
+    \label{fig:dynamic_work_assignment}
+\end{figure}
+
+\begin{observationblock}[\texttt{static} vs \texttt{dynamic}]
+    \begin{itemize}
+        \item \texttt{static} assignment is (supposed to be) more effective when each iteration brings the same computational work, since the direct and predictable assignment has a smaller overhead;
+        \item in \texttt{dynamic} assignment chunks are assigned to the firsst free thread, so it is supposed to be more effective in the opposite case, i.e., when the computational load of each iteration is unpredictable. 
+    \end{itemize}
+    However, the overhead of the dynamic assignment is much larger than the static one, so that it may be convenient to use a chunk size larger than 1.
+\end{observationblock}
+
+\subsection*{Clauses for \texttt{for} construct}
+
+The \texttt{for} construct accepts the following clauses:
+\begin{itemize}
+    \item \texttt{private(list)}: vars in the list will be private to each thread; despite their name is the same our of the parallel region, they have different memory locations and die with the parallel region;
+    \item \texttt{firstprivate(list)}: the vars in the list are private and are initialized at the value that shared variables have in the begin of the parallel region;
+    \item \texttt{lastprivate(list)}: the vars in the list are private and are not initialized; at the end of the parallel region, the original vars (i.e. the ones in the serial region) will have the value that the private vars have at the end of the last iteration of the loop;
+    \item \texttt{reduction(op:list)}: possible operators are: \texttt{+,-,*,\&,|,\^,\&\&,||, max, min}; the initial value of vars is taken into account at the end of the parallel \texttt{for}; at the befin of the for, initialization values are 0 for \texttt{+,-}, 1 for \texttt{*}, false for \texttt{\&\&,||}, all bits 0 for \texttt{\&,|,\^}, the minimum representable value for \texttt{max} and the maximum representable value for \texttt{min};
+    \item \texttt{collapse(n)}: enable parallelization of multipla loops level (must be perfectly nested);
+    \item \texttt{nowait}: no implicit barrier at the end of the for;
+\end{itemize}
+
+\subsection*{Anatomy of a data race}
+
+\begin{codeblock}[language = C]
+#include <omp.h>
+double *a, sum=0;
+int N;
+
+#pragma omp parallel for 
+for (int i=0; i<N; i++){
+    sum += a[i];
+}
+\end{codeblock}
+
+In the code above, without the \texttt{atomic} directive, the assignment \texttt{sum += a[i];} determines a \textbf{data race}: between two synchronization points at least one thread writes to a data location from which another thread may read or write. A data race happens when at least two memory accesses
+\begin{itemize}
+    \item point to the same memory location;
+    \item are performed concurrently by different threads;
+    \item are not sync ops;
+    \item at least one is a write.
+\end{itemize}
+
+A \textbf{race condition} is a semantic error in the code. Due to the random ordering of events, it leads the fact that its behaviour is non-deterministic and the result is not correct.
+
+Let's now say that we solved the data race by using the \texttt{atomic} directive. \textbf{Does it scale? Surely not! Why?} 
+\begin{codeblock}[language = C]
+#include <omp.h>
+double *a, sum=0;
+int N;
+
+#pragma omp parallel for
+for (int i=0; i<N; i++){
+    #pragma omp atomic
+    sum += a[i];
+}
+\end{codeblock}
+
+Because the above solution makes the threads to wait for each other to frequently. A critical region has \textbf{synchronization points} at the start and at the end of critical regions, meaning that threads have to communicate with each other and decide who's waiting and who's not. 
+
+Other solutions are available obviously:
+\begin{enumerate}
+    \item use a \texttt{reduction} clause:
+    
+    \begin{codeblock}[language = C]
+#include <omp.h>
+double *a, sum=0;
+int N;
+
+#pragma omp parallel for reduction(+:sum)
+for (int i=0; i<N; i++){
+    sum += a[i];
+}
+\end{codeblock}
+
+    \item declaring a shared array for sum:
+    
+    \begin{codeblock}[language = C]
+#include <omp.h>
+double *a, sum=0;
+int N;
+
+#pragma omp master
+int nthreads = omp_get_num_threads();
+
+double sum[nthreads];
+
+#pragma omp parallel 
+{
+    int me = omp_get_thread_num();
+    #pragma omp for
+    for (int i=0; i<N; i++){
+        sum[me] += a[i];
+    }
+}
+\end{codeblock}
+
+    This scales \textbf{hardly}, since the values of \texttt{sum[nthreads]} reside in the same cache lines; hence, when a thread access and modify its location, to maintain the coherence the cache must write-back and reflush every time. This is the so called \textbf{false sharing} problem.
+    \begin{definitionblock}[False Sharing]
+        False sharing occurs when each thread explicitly accesses a memory location that is different than any other thread in the parallel pool BUT at least some of those memory locations are mapped on the same cache line. The effect of this is a very poor efficiency when the threads run on different cores. 
+
+        Note that false sharing is an issue when it happens a large amount of times. Having an array that stores values peculiar for each thread so that they are exposed to all the other threads that access them only once a while, is something very common and not an issue. 
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\textwidth]{assets/omp15.png}
+            \caption{False Sharing}
+            \label{fig:false_sharing}
+        \end{figure}
+        
+        If we concentrate only on 2 threads:
+        \begin{enumerate}
+            \item both threads read their target memory location;
+            \item the entire line is loaded up in the cache of both cores;
+            \item the line is flagged as "S" (shared) in both caches;
+            \item thread 0 writes its target location;
+            \item the line is flagged as "M" (modified) for thread 0 and "I" (invalid) for all the other threads;
+            \item thread 0 could write again on its target location without modifying the situation;
+            \item thread 1 wants to write its target location;
+            \item the entire cache line must be re-flushed to enforce cache-coherence because it is flagged as "I" for thread 1;
+            \item once thread 1 has written its target location, the entire cache line is flagged "M" for thread 1 and "I" for all the other threads.
+        \end{enumerate}
+    \end{definitionblock}
+
+    \item a final way that scales better is the following:
+    
+    \begin{codeblock}[language = C]
+#include <omp.h>
+double *a, sum=0;
+int N;
+int nthreads;
+
+#pragma omp master
+nthreads = omp_get_num_threads();
+
+double sum[nthreads*8];
+
+#pragma omp parallel 
+{
+    int me = omp_get_thread_num();
+    #pragma omp for
+    for (int i=0; i<N; i++){
+        sum[me*8] += a[i];
+    }
+}
+\end{codeblock}
+
+    where the factor 8 is used to ensure that each \texttt{sum[me*8]} resides in a different cache line (assuming a cache line of 64 bytes and a double of 8 bytes). However, this uses much more memory than needed and is hard-coded, hence not portable.
+\end{enumerate}
+
+\begin{observationblock}
+    When you declare an \texttt{omp for} inside an existing parallel region, there is a fundamental difference between the two codes here below. In the snippet A, the \texttt{for} is declared without the \texttt{parallel}, whereas in snippet B it is declared with the \texttt{parallel for}.
+    \begin{itemize}
+        \item in A, the \texttt{for} is shared among the threads that form the pool of the outer \texttt{parallel} region;
+        \item in B, \textbf{every thread of the pool} is creating a new \texttt{parallel} region and inside each of the new \texttt{parallel} regions the new pools of threads will execute the \texttt{for}. So, in case B, if there are $n$ threads in the outer \texttt{parallel} you will have $n$ \texttt{for} cycles executed.
+    \end{itemize}
+    \begin{minipage}{0.48\textwidth}
+        \begin{codeblock}[language = C]
+A
+#pragma omp parallel
+{
+    #pragma omp for
+    for( int i = 0; i < N; i++ ) {
+        ...
+    }
+}
+        \end{codeblock}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \begin{codeblock}[language = C]
+B
+#pragma omp parallel
+{
+    #pragma omp parallel for
+    for( int i = 0; i < N; i++ ) {
+        ...
+    }
+}
+        \end{codeblock}
+    \end{minipage}
+\end{observationblock}
+
+\section{Threads Affinity}
+
+As already mentioned, in modern architectures a unique central memory with a fixed bandwidth would be a major bottleneck in a system with a fast growing number of cores. The problem is solved by physically disjointing the memory in separated units (\textbf{memory banks}) each of which is connected to a socket; all the sockets are inter-connected so that each core can access all the memory and a cache-coherency system glues the data. This way, the memory bandwidth grows with the number of sockets, although the latency to access a memory location may vary depending on the core that is trying to access it and on the memory bank where that location resides. In fact, the major drawback is that the access time is no more \textbf{uniform}, with severe consequences on how to write and run the codes.
+
+OpenMP and the OS offer the capability to decise where each thread have to run, i.e. on which core and/or how the threads have to distribute on the available cores. 
+
+\begin{observationblock}[SMT]
+    Each core may have the capability of running more than one thread, which is called \textbf{Simultaneous Multithreading (SMT)}. This allows multiple threads to be executed in parallel on a single core, improving resource utilization and overall performance. We can either call \textbf{strands} or \textbf{hwthreads} the different threads that a physical core could run, as opposed to \textbf{swthreads} that indicates the OpenMP threads. 
+\end{observationblock}
+
+The placemenet of OpenMP threads on the available cores is called \textbf{threads affinity}. The default behaviour of OpenMP is to let the OS decide where to place each thread. However, that may lead to a non-optimal placement, with consequent performance degradation. As usual, what "efficient" means depends on the details of the specific case: for example if $n$ threads work on shared data, it would be more efficient if they share the L2 cache (run on the same socket), so that frequenty used data are at hands for all of them. Conversely, if $n$ threads work on independent memory segments, the most efficient choice is to maximize the memory bandwidth over the shortest core-to-ram-path.
+
+\begin{minipage}{0.48\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{assets/omp16.png}
+    \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    The aim is to have as few \textbf{remote memory accesses (RMA)} as possible. It depends on:
+    \begin{itemize}
+        \item \textbf{Where:} i.e. in what memory bank the data resides;
+        \item \textbf{Who:} which thread is accessing the data;
+        \item \textbf{What:} how is the workload distributed among the threads.
+    \end{itemize}
+\end{minipage}
+
+In principle, one wants to be able to distribute the work in an optimal way, i.e. without any resource contention, and to place the threads in an optimal way, i.e. minimizing the RMA. To do that, one must be able to place each OpenMP swthread to a dedicated computational resource and to grant it the fastest possible access to its own data. 
+\begin{itemize}
+    \item Placing the swthreads \textbf{distant} from each other:
+    \begin{enumerate}
+        \item increases the aggregate bandwidth if the data are placed accordingly;
+        \item results in a better utilization of each core's cache, since each core has its own cache;
+        \item may worsen the performance of synchronization constructs.
+    \end{enumerate}
+    \item Placing the swthreads \textbf{close} to each other:
+    \begin{enumerate}
+        \item decreases the latency of synchronization constructs;
+        \item decreases the aggregate bandwidth if the data are placed accordingly;
+        \item may worsen the cache performance depending on what operations are performed on the data.
+    \end{enumerate}
+\end{itemize}
+
+OpenMP offers the following mechanisms to control the threads affinity:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/omp17.png}
+\end{figure}
+
+\subsection*{PLACES}
+
+\textbf{Places} are where swthreads run. Places can be:
+\begin{itemize}
+    \item \textbf{threads:} each place corresponds to a hwthread, or strand, on cores;
+    \item \textbf{cores:} each place is a core;
+    \item \textbf{sockets:} each place is a socket, with its multiple cores;
+\end{itemize}
+
+\begin{exampleblock}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{assets/omp18.png}
+    \end{figure}
+    On a node the computational resources are identified as the physical threads numbered in a round-robin way. If there are $n_{sockets}$ with $n_{cores-per-socket}$ then there are
+    \[
+    n_{cores} = n_{sockets} \times n_{cores-per-socket}
+    n_{threads} = n_{cores} \times n_{hwthreads-per-core}
+    \]
+    The $n_{threads}$ are the computational resources available on the node; in this example we do refer to these IDs.
+
+    To pass to OpenMP the places definition, the easiest way is through the environmental variable \texttt{OMP\_PLACES}:
+    \begin{codeblock}[language = bash]
+export OMP_PLACES = { sockets | cores | threads }
+    \end{codeblock}
+
+    A \textbf{place} can be defined by an \textbf{unordered} set of comma-separated non-negative numbers enclosed in braces (the numbers are the IDs of the smallest unit of execution on that hardware, i.e. the hwthreads). For example:
+    \begin{itemize}
+        \item \texttt{{0,1}} defines a place made by hwt 0 and hwt 1; in the previous example, it corresponds to cores 0 and 1 of socket 0;
+        \item \texttt{{0,48}} defines a place made by hwt 0 and hwt 48; in the previous example, it corresponds to hwt and SMT hwt on core 0 of socket 0;
+        \item \texttt{{0,12,24,36}} defines a place made by hwt 0, 12, 24, and 36; in the previous example, it corresponds to hwt on cores 0 of sockets 0,1,2,3;
+        \item \texttt{{0,1},{1,49}} a list with two places;
+    \end{itemize}
+
+    \texttt{OMP\_PLACES} can be defined as an explicit \textbf{ordered} list of comma-separated places. Intervals can be used, specified as \texttt{start:counter:stride}:
+    \begin{itemize}
+        \item \texttt{{0,48},{1,49}} sets \texttt{OMP\_PLACES} to two places;
+        \item \texttt{{0:4:12}} sets \texttt{OMP\_PLACES} to four places, each made by a single hwthread, corresponding to hwthreads 0, 12, 24, and 36; same as \texttt{{0,12,24,36}};
+    \end{itemize}
+    The \texttt{!} operator can be used to exclude intervals. The places are \textbf{static}, meaning that there is no way to change it while the program is running. 
+
+    Finally, to pass to OpenMP the places definition:
+    \begin{codeblock}[language = bash]
+export OMP_PLACES = "{0,1},{1,49}"
+    \end{codeblock}
+\end{exampleblock}
+
+\subsection*{BINDINGS}
+
+The \textbf{binding} defines how the swthreads are mapped onto the places. The binding can be:
+\begin{itemize}
+    \item \texttt{NONE:} the placement is up to the OS;
+    \item \texttt{CLOSE:} the swthreads are placed onto places as close as possible to each other (assigned to consecutive places in a round-robin way);
+    \item \texttt{SPREAD:} the swthreads are placed onto places as evenly as possible, then the places are filled in a round-robin fashion;
+    \item \texttt{MASTER:} the swthreads run onto the same place as the master thread;
+\end{itemize}
+
+The binding can be set through the environmental variable \texttt{OMP\_PROC\_BIND}:
+\begin{codeblock}[language = bash]
+export OMP_PROC_BIND = { false | true | master | close | spread }
+\end{codeblock}
+where \texttt{false} is equivalent to ask no policy (i.e. "none") and to allow the OS to migrate the threads, while \texttt{true} is the same but forbids the migration.
+
+The binding can be set also through the clause \texttt{proc\_bind} in a non-persistent way:
+\begin{codeblock}[language = C]
+#pragma omp parallel proc_bind(policy)
+{
+    ...
+}
+\end{codeblock}
+where \texttt{policy} is one of the above.
+
+\subsubsection*{\texttt{CLOSE}}
+\begin{itemize}
+    \item $T \leq P$: there are sufficient places for a unique assignment. Swthreads are assigned to consecutive places by their thread IS. The first one is the master's place;
+    \item $T > P$: at least one place will execute more than one swthread. Swthreads are splitted in $P$ subsets ($S_{t_{i}}$), so that 
+        \[
+        floor(\frac{T}{P}) \leq S_{t_{i}} \leq ceiling(\frac{T}{P})
+        \]
+\end{itemize}
+
+\subsubsection*{\texttt{SPREAD}}
+\begin{itemize}
+    \item $T \leq P$: place list is splitted in $T$ subsets; each one contains at least $floor(\frac{P}{T})$ and at most $ceiling(\frac{P}{T})$ consecutive places. A thread is assigned to a partition then, starting from the master thread. Then, assignment proceeds by thread ID, and the threads are placed in the first place of the next subpartition;
+    \item $T > P$: place list is splitted in $P$ subsets, each of which contains only 1 place and $S_{t_i}$ threads with consecutive IDs. The number of threads in each subpartition is chosen so that 
+        \[
+        floor(\frac{T}{P}) \leq S_{t_{i}} \leq ceiling(\frac{T}{P})
+        \]
+    At least one place has more than one thread assigned to it. The first subset with $S_{t_0}$ contains thread 0 and runs on the place that hosts the master thread. 
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/omp19.png}
+    \caption{Threads Affinity Examples}
+    \label{fig:threads_affinity_examples}
+\end{figure}
+
+The OpenMP standard offers several \texttt{omp\_} library functions to deal with the affinity:
+
+\begin{table}
+    \centering
+    \begin{tabular}{|c|c|}
+        \hline
+        	\textbf{Scope} & \textbf{Function}  \\
+        \hline
+        	\textbf{Setting the affinity} & \texttt{omp\_bind\_clause()} \\
+        \hline
+        	\textbf{Getting the affinity} & \texttt{omp\_get\_proc\_bind()} \\
+        \hline 
+        	\textbf{Getting details on places} & \texttt{omp\_get\_num\_places()} \\
+        & \texttt{omp\_get\_place\_num()} \\
+        & \texttt{omp\_get\_place\_num\_procs()} \\
+        & \texttt{omp\_get\_place\_proc\_ids()} \\
+        \hline
+        	\textbf{Displaying the affinity} & \texttt{omp\_display\_affinity()} \\
+        & \texttt{omp\_get\_affinity\_format()} \\
+        & \texttt{omp\_set\_affinity\_format()} \\
+        & \texttt{omp\_capture\_affinity()} \\
+        \hline
+    \end{tabular}
+    \caption{OpenMP Affinity Library Functions}
+    \label{tab:omp_affinity_functions}
+\end{table}
+
+\subsection*{Memory allocation}
+
+It is possible to control on what physical memory the data will reside by carefully \textbf{touching data}.
+
+\begin{minipage}{0.48\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{assets/omp20.png}
+        \caption{Touching Data in SMP Systems}
+        \label{fig:touching_data}
+    \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    Suppose that you are operating on a SMP system similar to the one in Figure \ref{fig:touching_data}. Each socket is physically connected to a RAM bank, and then physically connected to other sockets. This way, the memory access is \textbf{not-uniform}: the bandwidth for a core to access a memory bank not physically connected to it is likely to be significantly smaller than that to access the closest bank.
+\end{minipage}
+
+The matter is: \textbf{who owns the data?}
+\begin{codeblock}[language = C]
+double *a = (double*)calloc(N, sizeof(double));
+
+for (int ii=0; ii<N; ii++){
+    a[ii] = initialize(ii);
+}
+
+#pragma omp parallel for reduction(+:sum)
+for (int i=0; i<N; i++){
+    sum += a[i];
+}
+\end{codeblock}
+
+In this way, all the data are physically paged in the memory bank of the core on which the master thread runs; its cache is also warmed-up; the other thread must access the memory bank 1 which is not the most suited for the bandwidth. This way, the cache of the thread that initialize (first touch) the data is warmed-up \textbf{and the data are allocated in the memory connected to it}.
+
+\begin{observationblock}
+    In the \textbf{touch-first} policy, the data pages are allocated in the physical memory that is the closest to the physical core which is running the thread that access the data first. If a single thread is initializing all the data, then all the data will reside in its memory and the number of remote accesses will be maximized.
+\end{observationblock}
+
+In the \textbf{touch-by-all} policy, the cache of each thread is warmed-up with the data it will use afterwards \textbf{and the data are allocated into each thread's memory}.
+
+\begin{codeblock}[language = C]
+double *a = (double*)malloc(N, sizeof(double));
+
+#pragma omp parallel for
+for (int ii=0; ii<N; ii++){
+    a[ii] = initialize(ii);
+}
+
+#pragma omp parallel for reduction(+:sum)
+for (int i=0; i<N; i++){
+    sum += a[i];
+}
+\end{codeblock}
+
+\begin{observationblock}[\texttt{malloc} vs \texttt{calloc}]
+    \begin{itemize}
+        \item \texttt{malloc} notifies that the required amount of memory will be used, and the memory occupancy of the process in the heap is grown accordingly; however, the actual mapping of the memory pages into the physical memory does not happen until the pages are actually touched (read or written). Moreover, the mapping is done only for the touched pages, not for the entire amount of memory.
+        \item \texttt{calloc} same as \texttt{malloc}, but with two differences: 
+        \begin{enumerate}
+            \item the memory is required to be physically contiguous, hence entirely on the same physical location;
+            \item all the memory is initialized to zero as a way to immediately touch it so that it is mapped onto a physical bank as soon as it is required.
+        \end{enumerate}
+    \end{itemize}
+\end{observationblock}
+
+If each thread touches as first the data it will operate on subsequently, those data are allocated in the physical memory that is the closest. Hence, each thread will have its data placed in the most convenient memory and the remote access will be minimized. 
+
+\begin{tipsblock}[Discover your topology]
+    There are some tools usually used on HPC platforms to discover the hardware topology of the node you are working on. The most common ones are:
+    \begin{itemize}
+        \item \texttt{numactl --hardware}: shows the NUMA nodes and the CPUs associated to each node;
+        \item \texttt{lscpu}: shows the CPU architecture;
+        \item \texttt{lstopo}: shows a graphical representation of the hardware topology;
+        \item \texttt{hwloc-ls}: shows a textual representation of the hardware topology.
+    \end{itemize}
+\end{tipsblock}

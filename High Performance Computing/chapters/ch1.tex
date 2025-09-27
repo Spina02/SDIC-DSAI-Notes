@@ -1,25 +1,261 @@
 \chapter{Introduction}
 
-\section{Base Concepts} \label{sec:base_concepts}
+\section{Priors}\label{sec:priors}
 
-High Performance Computing (HPC), also known as supercomputing, refers to computing systems with extremely high computatiional power that are able to solve hugely complex and demanding problems. \cite{europaHighPerformance}
+\subsection*{Expressing Performance}
 
-Often, high precision and accuracy are required in scientific and engineering simulations, which can be achieved by increasing the computational power of the system. This is where HPC comes into play, as it allows for the execution of large-scale \textbf{simulations} of complex problems in a reasonable amount of time. Simulations have become the key method for researching and developing innovative solutions in both scientific and engineering fields. They are especially prominent in leading domains such as the aerospace industry and astrophysics, where they enable the investigation and resolution of highly complex problems. However, the increasing reliance on simulation also introduces significant challenges related to complexity, scalability, and data management, which in turn impact the supporting IT infrastructure.
+Here we introduce a metrics to estimate the performance of a code in exploiting some of the CPU's resources. Specifically, we will focus on (i) how \textbf{fast} a code is and (ii) how \textbf{well} a code exploits the instruction-level parallelism capability of a CPU. More in detail, these metrics are more suited for loops, the main bottleneck of most scientific codes. 
 
-As scientific inquiry progresses along what is known as the Inference Spiral of System Science, the complexity of models intensifies and the influx of new data enriches these systems with additional insights. Consequently, this dynamic evolution necessitates ever increasing computational power to efficiently handle the enhanced simulations and data management challenges.
+A CPU's activity is regulated by an internal clock whose pace is of the order of billions of ticks per seconds. Consider that typically a CPU frequency is between 2 and 4 GHz, and if someone (like me) is not updated with physics, it means that a single cycle runs in $\frac{1}{\text{frequency}}$ seconds, meaning around $0.5 - 0.35\text{ ns}$.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.55\textwidth]{assets/research.png}
-    \caption{Research and Development}
-    \label{fig:research}
-\end{figure}
+Usually, one should consider retrieving different metrics and not a single one, and the wall clock time (wct) per se isn't the best metric. Instead, one should focus on quantifying the number of clock cycles spent on a single section since it is more informative than knowing how many seconds it required to execute. Thus, we are interested in knowing how much efficient our code is \textbf{per-element} and not per-iteration, since our implementation may be able to process more elements per iteration. 
+Basically, we have access to 3 different types of time:
+
+\begin{enumerate}
+    \item \textbf{Wall clock time (wct):} is the time you can find in your nearest physical clock and follows the \textit{POSIX} system, meaning it shows the number of seconds elapsed since the start of the Unix epoch at 1 January 1970 00:00:00 UT.
+    \item \textbf{System time (st):} is the amount of time the system as a \textit{whole} spent executing the code (it includes I/O, system calls, etc.)
+    \item \textbf{Process user-time (ut):} is the amount of time the CPU spent executing the code's instructions.
+\end{enumerate}
+
+How can one measure all these times? There are two main ways:
+
+\begin{itemize}
+    \item \textbf{Outside} the code, using \textit{perf} profiler of the \textit{time} command
+    \item \textbf{Inside} the code, using different functions:
+    \begin{itemize}
+        \item \texttt{gettimeofday()}: returns the time elapsed since the epoch in seconds and microseconds
+        \item \texttt{clock\_t clock()}: returns the number of clock ticks since the program
+        \item \texttt{int clock\_gettime(clockid\_t clk\_id, struct timespec *tp)}: returns the time of the specified clock clk\_id
+        \item \texttt{int getrusage(int who, struct rusage *usage)}: returns the resource usage for the calling process, its children, or the whole system
+    \end{itemize}
+\end{itemize}
+
+Consider as an example:
+\begin{exampleblock}
+    \begin{codeblock}[language=C]
+#define CPU_TIME (clock_gettime( CLOCK_PROCESS_CPUTIME_ID, &ts ), \
+                  (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9)
+...
+Tstart = CPU_TIME;
+// your code segment Here
+Time = CPU_TIME - Tstart;
+    \end{codeblock}
+\end{exampleblock}
+
+\begin{tipsblock}[Accumulation]
+    Note that running a program without \textbf{binding} it to a specific code and a specific memory bank may result in a non-optimal behaviour.
+    Thus, it is a good practice to ask the OS not to migrate the code using as an example \texttt{taskset} or \texttt{numactl}:
+    \begin{itemize}
+        \item \texttt{numactl -H} exposes the topology of the node 
+        \item \texttt{numactl --cpunodebin=n} bind the execution to code n
+        \item \texttt{numactl --membind=n} bind the memory to memory bank associated with core n 
+    \end{itemize}
+\end{tipsblock}
+
+\subsection*{Pointers in C}
+
+A \textbf{pointer} is essentially a variable (a memory location of fixed size like 8B in 64 bits systems) that points to a memory address. It can point to an integer (2B), a float (4B) or even an array of 10Gb of items. \textbf{De-referencing} a pointer means to get to the pointer variable, meaning the memory location that the variable occupies and getting the value stored in that memory location.
+
+The \textbf{memory} is essentially a long 1D string of bytes (8 bits) and every one of them can be uniquely identified by its distance from the byte 0.
+
+Remember that:
+\begin{itemize}
+    \item \textbf{char} $\rightarrow$ 1B
+    \item \textbf{short int} $\rightarrow$ 2B
+    \item \textbf{(long) int} $\rightarrow$ 4B
+    \item \textbf{long long int} $\rightarrow$ 8B
+    \item \textbf{floating-point single precision} $\rightarrow$ 4B
+    \item \textbf{floating-point double precision} $\rightarrow$ 8B
+\end{itemize}
+
+(Please refer to \href{run:./assets/What_every_computer_scientist_should_know_about_floating-point.pdf}{this PDF} for more details about floating point representation).
+
+\begin{exampleblock}[Pointers practice]
+    \begin{codeblock}[language=C]
+#include <stdio.h>
+
+char *c; // points to a char
+double *d; // points to a floating-point double precision number
+struct who_knows *w; // points to a struct who_knows
+
+c = 0x123456; // assign a value to a pointer variable
+	      // \* or c = &my_preferred_letter \* where &var is the address operator
+
+** ------------------------------------------------------------ **
+
+var = 123456 		// &var = 12
+
+ptr = (void*)&var 	// (void*) is a type cast that
+			// converts the pointer to a
+			// generic type
+			//
+			// ptr = 12
+			// *ptr = 123456
+    \end{codeblock}
+\end{exampleblock}
+
+\begin{exampleblock}[Pointer arithmetic]
+    \begin{codeblock}[language=C]
+#include <stdio.h>
+
+int main() {
+    int array[8];	// each element has size sizeof(int)
+			//
+        		// &array[i] = &array[0] + i*sizeof(int)
+			// &array[i] - &array[j] = (i-j)*sizeof(int)
+
+    for (int i=0; i<8; i++){
+        array[i] = i;	// assign a value
+    }
+
+    int *ptr1 = &array[0];	// should point to first address
+    int *ptr2 = &array[7];
+
+    printf("%d\n", *ptr1);	// prints 0
+    printf("%d\n", *ptr2);	// prints 7
+    printf("%p\n", &array[0]);  // prints 0x16f2a6d68
+
+    return 0;
+}
+    \end{codeblock}
+\end{exampleblock}
+
+\begin{exampleblock}[Allocating memory]
+    \begin{codeblock}[language=C]
+#include <stdio.h>
+#include <stdlib.h>	// for malloc
+
+int main() {
+	int array[8]	// stack allocation
+	int *array = malloc( sizeof(int) * 8 )	// heap allocation
+	free(array)	// must free manually
+
+	// to allocate multidimensional arrays:
+	// define array as a pointer to type**
+	int **array;
+
+	// allocate n pointers to int*
+	array = (int**)malloc( 8 * sizeof( int* ))
+
+	// for each pointer, allocate enough memory to retain m int
+	for (int i=0; i<8; i++)
+		array[i] = (int*)malloc( 8 * sizeof( int ));
+}
+    \end{codeblock} 
+\end{exampleblock}
+
+\begin{observationblock}[Pointers to functions]
+    How are \textbf{functions} represented in memory? A function is essentially a block of instructions, that are translated in machine code (a sequence of bytes) and stored in the memory. Variables are not called unless the function is called. 
+    Thus, a function can be pointed to by a pointer.
+    \begin{codeblock}[language=C]
+#include <stdio.h>
+#include <stdlib.h>
+
+int (*func)(); // pointer to a function that returns an int
+int (*func)(int, double); // pointer to a function that takes an int and a double as input and returns an int
+
+    \end{codeblock}
+\end{observationblock}
+\newpage
+\begin{exampleblock}[Pointers zoo]
+    What is \texttt{char **monster}? Well, simply a pointer to a pointer that points to a char. Recalling that a pointer is just a variable, and hence it has a memory address, a pointer to a pointer is just a variable that points to the memory address of another variable.
+    \begin{codeblock}[language=C]
+#include <stdio.h>
+#include <stdlib.h>	// for malloc
+
+int main() {
+	int x=42;			        // variable 42
+	int *ptr = &x;			    // ptr=address, *ptr=42
+	int **ptr_to_ptr = &ptr;	// ptr_to_ptr=address of address,
+					            // *ptr_to_ptr=address,
+					            // **ptr_to_ptr=42
+	printf("%p\n", ptr_to_ptr); 	// 0x16d5f6d80
+	printf("%p\n", *ptr_to_ptr);	// 0x16d5f6d8c
+	printf("%d\n", **ptr_to_ptr);	// 42
+}
+    \end{codeblock}
+    This is the how we access command-line arguments in C:
+    \begin{codeblock}[language=C]
+int main(int argc, char **argv) {
+    // argc is the number of arguments
+    // argv is a pointer to a pointer to arrays of char
+    // **argv is the first argument (the first string)
+}
+    \end{codeblock}
+    The command line arguments are strings, and in C strings are represented by arrays of characters. When a string is passed as argument to a function, it decays to a pointer to its first element. Command line arguments are an array of strings, which are arrays of characters: this is why we use \texttt{char **argv}.
+
+    Then we can define the Pointers zoo:
+    \begin{itemize}
+        \item \texttt{monster}: phrase (array of strings), ex. \texttt{"hello world"}
+        \item \texttt{*monster}: pointer to monster -> 1st string (\texttt{"hello"})
+        \item \texttt{**monster}: pointer to \texttt{*monster} -> 1st char of 1st string (\texttt{'h'})
+    \end{itemize}
+    so that \texttt{*monster = "hello"}, \texttt{*(monster+1) = "world"}, \texttt{**monster = 'h'}, \texttt{*(*monster+1) = 'e'} and so on.
+\end{exampleblock}
+
+\subsection*{INT representation}
+
+\begin{codeblock}[language=C]
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char **argv){
+	int a = atoi(*(argv+1));	// atoi converts string command line args to int
+	int b = atoi(*(argv+2));
+	printf("%d x %d = %d\n", a, b, a*b);
+}
+\end{codeblock}
+
+\texttt{./int\_repr 100000 21000 -> 2100000000}
+
+\texttt{./int\_repr 100000 22000 -> -1594967296}
+
+Why is that? Essentially there is an \textbf{overflow} in the representation of integers. In C, an integer is typically represented using 4 bytes (32 bits) in a format called \textbf{two's complement}. This format allows for the representation of both positive and negative integers, 
+but it has a limited range and if the result of an operation exceeds this range, it wraps around, leading to unexpected results.
+
+\section{HPC Basic Concepts} \label{sec:hpc_basic_concepts}
+
+\textbf{\textit{High Performance Computing}} (HPC), also known as \textbf{\textit{supercomputing}}, refers to computing systems with extremely high computational power that are able to solve hugely complex and demanding problems. \cite{europaHighPerformance}
+
+Often, high precision and accuracy are required in scientific and engineering simulations, which can be achieved by increasing the computational power of the system. This is where HPC comes into play, as it allows for the execution of large-scale \textbf{simulations} of complex problems in a reasonable amount of time. Simulations have become the key method for researching and developing innovative solutions in both scientific and engineering fields. They are especially prominent in leading domains such as the aerospace industry and astrophysics, where they enable the investigation and resolution of highly complex problems. However, the increasing reliance on simulation also introduces significant \textbf{challenges related to complexity, scalability, and data management}, which in turn impact the supporting IT infrastructure.
+
+As scientific inquiry progresses along what is known as the \textit{Inference Spiral of System Science}, the complexity of models intensifies and the influx of new data enriches these systems with additional insights. Consequently, this dynamic evolution necessitates ever increasing computational power to efficiently handle the enhanced simulations and data management challenges.
+
+\begin{minipage}[H]{0.6\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.85\textwidth]{assets/research.png}
+        \caption{Research and Development}
+        \label{fig:research}
+    \end{figure}
+\end{minipage}%
+\begin{minipage}[H]{0.4\textwidth}
+    \begin{table}[H]
+        \centering
+        \renewcommand{\arraystretch}{1.15}
+        \begin{tabular}{lcc}
+            \hline
+            \textbf{Prefix} & \textbf{Symbol} & \textbf{Value} \\
+            \hline
+            Yotta & Y & $10^{24}$ \\
+            Zetta & Z & $10^{21}$ \\
+            Exa & E & $10^{18}$ \\
+            Peta & P & $10^{15}$ \\
+            Tera & T & $10^{12}$ \\
+            Giga & G & $10^9$ \\
+            Mega & M & $10^6$ \\
+            Kilo & K & $10^3$ \\
+            \hline
+        \end{tabular}
+        \caption{Prefixes in HPC}
+    \end{table}
+\end{minipage}
 
 \begin{observationblock}
 In today’s world, larger and larger amounts of data are constantly being generated, from 33 zettabytes globally in 2018 to an expected 181 zettabytes in 2025. This exponential growth is driving a shift towards data-intensive applications, making HPC indispensable for processing and analyzing these vast datasets efficiently. Consequently, HPC is key to unlocking valuable insights that benefit citizens, businesses, researchers, and public administrations. \cite{europaHighPerformance}
 \end{observationblock}
 
-\subsection{What is High Performance Computing?} \label{sec:what_is_hpc}
+\subsection*{What is High Performance Computing?} \label{sec:what_is_hpc}
 
 High Performance Computing (HPC) involves using powerful \textcolor{red}{servers, clusters, and supercomputers}, along with \textcolor{blue}{specialized software, tools, components, storage, and services}, to solve computationally intensive \textcolor{ForestGreen}{scientific, engineering, or analytical tasks}. 
 
@@ -32,11 +268,9 @@ Key elements of the HPC ecosystem include:
     \item \textbf{\textcolor{ForestGreen}{Applications}:} Scientific, engineering, and analytical tasks that leverage high computational power.
 \end{itemize}
 
-\textbf{People in HPC}
-
 Human capital is by far the most important aspect in the HPC landscape. Two crucial roles include HPC providers, who plan, install, and manage the resources, and HPC users, who leverage these resources to their fullest potential. The mixing and interplaying of these roles not only enhances individual competence but also drives overall advancements in high-performance computing.
 
-\subsection{Performance and metrics} \label{sec:performance}
+\subsection*{Performance and metrics} \label{sec:performance}
 
 \textbf{Performance} in the realm of high-performance computing is a multifaceted concept that extends far beyond a mere measure of speed. While terms such as “how fast” something operates are often used to describe performance, they tend to be vague. Many factors contribute to the overall performance of a system, and the interpretation of these factors can vary depending on the specific context and objectives of the computational task. Performance, therefore, remains a complex and central issue in the field of HPC, as it involves more than just the raw computational speed.
 
@@ -46,7 +280,7 @@ To further clarify the distinction, consider that performance can be seen as a m
 
 Ultimately, the challenge lies in understanding and optimizing both aspects. A successful HPC system is one that not only achieves high computational throughput but also enhances the productivity of the developers who create and refine the applications. This balance is essential for advancing the capabilities of high-performance computing in both research and production environments.
 
-\subsubsection{Number Crunching on CPU} \label{sec:number_crunching}
+\subsubsection*{Number Crunching on CPU} \label{sec:number_crunching}
 
 When evaluating the performance of a high-performance computing (HPC) system, one of the most fundamental metrics is the rate at which floating point operations are executed. This rate is typically expressed in millions (Mflops) or billions (Gflops) of operations per second. In essence, it quantifies how many calculations, such as additions and multiplications, the system is capable of performing every second.
 
@@ -58,7 +292,7 @@ $$
 
 This formula provides an upper bound on the computational power of the system. However, it is important to note that this is a best-case scenario estimate and does not always reflect the performance achievable in real applications.
 
-\subsubsection{Sustained (Peak) Performance} \label{sec:sustained}
+\subsubsection*{Sustained (Peak) Performance} \label{sec:sustained}
 
 While the theoretical peak performance offers insight into the maximum potential of an HPC system, the actual performance observed during real-world operations is better captured by the sustained (or peak) performance. In practice, several factors such as memory bandwidth limitations, communication latencies, and input/output overhead can prevent a system from reaching its theoretical maximum.
 

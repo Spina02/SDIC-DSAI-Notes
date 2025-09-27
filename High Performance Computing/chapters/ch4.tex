@@ -1,0 +1,447 @@
+\chapter{Parallel Computing}
+
+Why do we need parallel computing? There are two main reasons:
+\begin{itemize}
+    \item To solve problems faster and/or bigger problems in the same time
+    \item To solve problems that could not fit in the memory addressable by a single computational unit 
+\end{itemize}
+
+In general, we have two types of problems:
+\begin{enumerate}
+    \item \textbf{Embarassingly paralell problems}: The problem solution for each data point is completely independent of the solution for any another data point (tiny fraction in the real world). If a single processing unit was applied to the problem's solution, performing the task $T$ for each data point subsequently, we would have a \textbf{serial} solution that would take $N\times \delta t$ run-time, where $N$ is the size of our data set and $\delta t$ is the same needed for a single data-point. Applying more than one processing unit, each one would solve the problem for a data point, and the overall run-time would be $\dfrac Np \times \delta t$, where $p$ is the number of processing units. The speedup would be $S = \dfrac{N\times \delta t}{\dfrac Np \times \delta t} = p$. The efficiency would be $E = \dfrac Sp = 1$. This is the ideal case.
+    
+    \begin{observationblock}[Concurrency vs Parallelism]
+        People often confuse \textbf{concurrency} with \textbf{parallelism}. The first one is achieved with expensive many-cores CPUs and large amount of RAM, launching many separate instances of code as data points. The second, instead, is achieved when the code execution runs on more than one processing unit, tackling the entire data set and managing the processing units to cooperatively solve the problem.
+    \end{observationblock}
+
+    \item \textbf{All the rest}
+\end{enumerate}
+
+Let's now take into consideration the fact that the run-time for each data point is \textbf{not constant}. Then, how we spread the data points among the processing units may strongly affect the overall run-time, since \textbf{the overall run-time is determined by the slowest processing unit}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.8\textwidth]{assets/omp1.png}
+    \caption{Load balancing}
+    \label{fig:load_balancing}
+\end{figure}
+
+From that it descends that ideally the slowest must progress at the same time than the fastest, i.e., we do not have any \textbf{imbalance}.
+
+\begin{tipsblock}[Work-imbalance]
+    The \textbf{work-imbalance} is the measure of how different the computational load is among our players (it is 0 when the work is perfectly spread, almost never the case). 
+    It is a fundamental metrics to characterize the performance of our code, or the different sections of it, so one should always instrument his code to track it.
+\end{tipsblock}
+
+\subsection*{Domain decomposition}
+
+How data is distributed among the processing units may be sub-optimal. How we decide which data point are processed by each processing unit is called \textbf{domain decomposition} and depends on the nature of the data and their availability. However, there is not a general optimal way to perform it: it strongly depends on the nature of both the computational problem and of the data. 
+
+\begin{itemize}
+    \item When the work-load is presumably uniform among the data points, just go for the simplest decomposition possible to minimize the overhead due to the decomposition itself. \textbf{Trivial random decomposition} may serve quite well in these cases.
+    \item When the work-load is dependent on the properties of the data and those properties change in time during the computation, there is not a general rule. One may, as an example, sort the data by computational intendity and distribute them to different players so to achieve an even work-load with a minimum imbalance; then, repeating the procedure as often as needed while the data evolves during a multi-step computation.
+\end{itemize}
+
+\begin{minipage}{0.45\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width = \textwidth]{assets/omp2.png}
+        \caption{Sorting data by computational load.}
+        \label{fig:sorting_data_by_computational_load}
+    \end{figure}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width = \textwidth]{assets/omp3.png}
+        \caption{Round-robin distribution of data.}
+        \label{fig:round_robin}
+    \end{figure}
+\end{minipage}
+
+when the work-load is strongly dependent on the properties of the data, and moreover those propertie change in time during the computation, there is not a general rule.
+
+You can, for instance, sort your data by computational intensity and distribuite them to the different players, so to achieve an even work-load wirth a minimum imbalance; then, repeating the procedure as often as needed while the data evolves during a multi-step computation.
+
+\subsection*{Functional decomposition}
+
+Often, our computation is made of several different "sections". Let's call them \textbf{tasks}.
+There will be, in general, a dependency graph among the tasks: some will be completely independent of any other, some will be dependent on 1, 2 or more "previous" tasks and will feed some "subsequent" tasks.
+Then, you may decompose not the data but the tasks among your workers. In general, that requires some synchronization to manage the dependencies.
+
+\textbf{Functional decomposition} is, as domain decomposition, a technique used to break down a complex problem into smaller subproblems. This time, the decomposition is based on the functions or operations that need to be performed. 
+
+Almost always, an optimal choice is a mix of both domain and functional decomposition. At least to fit the data in the memory, data are distributed among tasks so that to find the best trade-off among the desired work-load and the constraints of memory-load.
+Then, some phases require a distributed parallelism (the computation on the data requires a communication that involves all data). Once all the communication among players has been done, every player performs the computation on its data, possibly by distributing tasks among sub-players. Think to sub-players as the threads and to players as MPI tasks, which leads to the concept of \textbf{hybrid parallelism}.
+
+\begin{minipage}{0.45\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width = \textwidth]{assets/omp4.png}
+    \end{figure}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+    Let's suppose the code has 3 algorithms (colors) and that each player has 3 sub-players (color intensity) that run different tasks on the data. \textcolor{darkgreen}{Dark green} indicates inter-player communication and \textcolor{lightgreen}{light green} indicates inter-task data exchange or synchronization. White dotted segments indicates idle spinning of a task. 
+\end{minipage}
+
+\subsection*{Shared vs Distributed Paradigms}
+
+\begin{definitionblock}[What is parallel computing?]
+    \begin{enumerate}
+        \item A \bfit{parallel computer} s a computational system that offers simultaneous access to many computational units fed by memory units. The computational units are required to be able to co-operate in some way, meaning exchanging data and instructions with the other computational units.
+        \item \bfit{Parallel processing} is the ensemble of techniques and algorithms that makes you able to actually use a parallel computer to successfully and efficiently solve a problem.
+    \end{enumerate}
+\end{definitionblock}
+
+The parallel processing is expressed by \textbf{software entities} that have an increasing level of granularity (processes, threads, routines, loops, instructions..)
+
+The software entities run on underlying \textbf{computational hardware entities} (as processors, cores, accelerators)
+
+The data to be processed/created live travels in \textbf{storage hardware entities} (as Memory, caches, NVM, networks, DMA)
+
+The exploitation/access of hardware resources (computational and storage) is \textbf{concurrent} among software entities
+
+\subsubsection*{Shared vs Distribuited Memory}
+
+Shared-memory programming leverages a common memory accessible to all computational units, thus facilitating direct data exchange without explicit communication routines. In contrast, distributed-memory programming relies on explicit communication, often via message passing, to exchange data since each unit has its own local memory. This distinction reflects both the physical memory layout and the programming approach.
+
+\paragraph{Distributed Memory}
+A typical programming paradigm is the message-passing approach, where processes communicate via “messages” and each process has its own memory space.
+Communication can happen either over the network (different protocols are possible at hardware/middleware level) or via shared memory techniques if the communicating processes can directly access the same memory. The user, however, still treats the process as if it were using message passing, and the actual communication is managed by the middleware.
+
+A well-known standard is MPI (Message-Passing Interface). Since version~2.0, MPI has provided interfaces for direct memory access, mimicking shared-memory mechanisms.
+
+\paragraph{Shared Memory}
+A typical programming paradigm is multi-threading, where multiple threads concurrently access the same virtual address space. There are no “messages”; communications and synchronizations must be directly managed in shared memory.
+
+A very widely used high-level standard is OpenMP (openmp.org), or Open
+Multi-Processing. On all platforms, a very low-level threading library is available. On POSIX systems it is named \texttt{pthread}.
+
+On some systems, a software middleware can hide the physical details from the programmer and expose the memory of all nodes as a unified shared memory. In reality, remote memory access may still happen over the network under the hood.
+
+The two programming paradigms can easily be fused together in a hybrid approach, where each node runs an MPI process and each process spawns multiple threads to exploit the cores of the node.
+
+\begin{tipsblock}[MPI or OpenMP?]
+    Opt at the beginning for a distributed memory paradigm (MPI) since it is more general and practical. It has the advantage that it can be used on a single node as well as on multiple nodes, while OpenMP is limited to a single node. Moreover, MPI can be combined with OpenMP if needed. Of course, it will cost some effort. Later also OpenMP can be exploited to further speed up the code.
+
+    For the cases in which you need a quick impact on your code's performance for runs that fit on single-node, then OpenMP is a good choice. Multi-threading for many problems offers an easier parallel point of view and if properly implemented it may deliver very good performance boosts. 
+\end{tipsblock}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l p{5cm} p{5cm}}
+        \toprule
+        \textbf{} & \textbf{OpenMP} & \textbf{MPI} \\
+        \midrule
+        \textbf{Standard specifications} & \href{https://www.openmp.org}{openmp.org} & \href{https://www.mpi-forum.org/}{mpi-forum.org} \\
+        \midrule
+        \textbf{Implementations} & the C/C++/Fortran compilers implement themselves the standard up to some version. You switch on the OpenMP with a command-line option (e.g. \texttt{-fopenmp} for \textit{gcc}) & There are many implementations of the MPI, basically are a compiler wrapper and a library that interacts with lower-level library that manages the network. \\
+        \midrule
+        \textbf{Usage} & Compile the code with \texttt{cc -fopenmp -o} \texttt{executable code.c} & Compile the code with \texttt{mpicc -o executable code.c} and run it with \texttt{mpirun -n <num\_processes>} \texttt{./executable} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The \textbf{Flynn’s taxonomy} helps in
+understanding the logical subdivision
+of parallel systems, but it is no more
+up-to date; it mainly refers to HW
+capabilities but in 60yrs the HW
+evolved a lot and today we can
+imagine it refers to a mix of HW and
+SW
+
+\begin{figure}[H]
+    \centering
+    \caption{Flynn's Taxonomy}
+    \includegraphics[width = 0.7\textwidth]{assets/flynn_taxanomy.png}
+\end{figure}
+
+\begin{itemize}
+\item \textbf{SISD} - Single Instruction on Single Data
+\item \textbf{MISD} - Multiple Instructions on Single Data
+\item \textbf{SIMD} - Single Instruction on Multiple Data
+\item \textbf{MIMD} - Multiple Instructions on Multiple Data
+\end{itemize}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l p{5cm} p{5cm}}
+        \toprule
+        \textbf{SISD} & A Von Neumann CPU & no parallelism at all\\
+        \midrule
+        \textbf{MISD} & On a superscalar CPU, different ports executing different read on the same data & ILP on same data and multiple tasks or threads operating on the same data \\
+        \midrule
+        \textbf{SIMD} & Any vector-capable hardware, the vector register on a core, a GPU, a vector processor, an FPGA, ... & data parallelism through vector instructions and operations \\
+        \midrule
+        \textbf{MIMD} & Every multi-core/processor system; on a superscalar CPUs, different ports executing different ops on different data & ILP on different data and multiple tasks or threads executing different code on different data \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection*{HPC components}
+
+We can now refine our HPC definition:
+
+\begin{definitionblock}[HPC]
+    High Performance Computing (HPC) is the use of servers, clusters, and supercomputers - plus associated software, tools, components, storage, and services - for scientific, engineering, or analytical tasks that are particularly intensive in computation, memory usage, or data management.
+
+    HPC is used by scientists and engineers both in research and in production across industry, government and academia.
+\end{definitionblock}
+
+The essential elements of a supercomputer are the following:
+\begin{itemize}
+    \item a large number of \textbf{computational nodes};
+    \item one or more \textbf{switch-based networks} that interconnect the nodes together;
+    \item a \textbf{storage}: usually there are 3 storage areas that are home, a huge long-term resident storage and a fast parallel FS for production;
+    \item some \textbf{login nodes} to access the system;
+    \item some \textbf{parallel schedulers} to manage the jobs.
+\end{itemize}
+
+\subsubsection*{The node topology}
+
+In old times all the cores of the cpu were connected to a Front Side Bus, which was a single bus connected at the same time a North Bridge and a South Bridge. The North Bridge was connected to the CPU and the RAM, while the South Bridge was connected to the I/O devices. 
+
+Nowadays, he NorthBridge has been moved inside the cpu and there are many (2-8) lanes that connect the cpu to the DRAM bank(s). The SouthBridge is what is called “the chipset”
+
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width = \textwidth]{assets/node_topology.png}
+    %\caption{Node Topology} 
+    %\label{fig:node_topology}
+\end{minipage}
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \includegraphics[width = 0.9\textwidth]{assets/real_node.png}
+    %\caption{Real Node topology} 
+    %\label{fig:real_node_topology}
+\end{minipage}
+
+\subsubsection*{The overall topology}
+
+Many ($\approx 10-10^5$) nodes are connected by a switch-based network, whose topology may vary significantly. The details can severely affect overall performance. Typical figures for latency and bandwidth are around 1\,\textmu s and 100\,\text{Gbit/s}, respectively. The most common standards are InfiniBand and OmniPath.
+
+\begin{figure}[H]
+    \centering
+    \caption{Flynn's Taxonomy}
+    \includegraphics[width = 0.5\textwidth]{assets/overall_topology.png}
+\end{figure}
+
+Note that on a supercomputer there is a hybrid approach to memory placement:
+\begin{itemize}
+    \item The memory on a single node can be accessed directly by all its cores. This is called \textbf{shared memory}. The processes running on those cpu share a unique physical address space that is mapped on memory physically distributed on the memory banks. Moreover, read and write are simple memory accesses and the process communicate using the shared memory;
+    \item When using many nodes together, a process cannot directly access the memory on a different node; it must issue a request. This is known as \textbf{distributed memory}. The physical address space is separated and private to the processes that run on a given cpu. The processes running on different cpu communicate through messages that travel on a linking network.
+\end{itemize}
+
+These concepts describe physical memory accessibility but also refer to programming paradigms, as discussed later.
+
+There are two fundamental types of shared-memory:
+\begin{enumerate}
+    \item if the access to every RAM location is equally costly for all CPUs, the system is \textbf{Uniform Memory Access (UMA)};
+    \item if the cost of RAM access depends on the location, then the system is said to be \textbf{Non-Uniform Memory Access (NUMA)}.
+\end{enumerate}
+
+In \textbf{UMA} systems, all the CPUs are connected to the DRAM banks through a common connection and for each CPU the cost fr accessing any DRAM memory location is independent on the memory location itself. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.6\textwidth]{assets/uma.png}
+    \caption{UMA architecture}
+\end{figure}
+
+When we are in a \textbf{NUMA} architecture, the memory is not shared among all the cores. Each core has its own memory bank, and the access to the memory is not uniform. This means that some cores can access their own memory bank faster than others.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 0.6\textwidth]{assets/numa.png}
+    \caption{NUMA architecture}
+\end{figure}
+
+In this case, if a core wants to access the memory of another core, it has to go through a switch and it will take longer.
+$$
+\begin{array}{c|cccccccc}
+    & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+    \hline
+    0 & 10 & 12 & 12 & 12 & 30 & 30 & 30 & 30 \\
+    1 & 12 & 10 & 12 & 12 & 30 & 30 & 30 & 30 \\
+    2 & 12 & 12 & 10 & 12 & 30 & 30 & 30 & 30 \\
+    3 & 12 & 12 & 12 & 10 & 30 & 30 & 30 & 30 \\
+    4 & 30 & 30 & 30 & 30 & 10 & 12 & 12 & 12 \\
+    5 & 30 & 30 & 30 & 30 & 12 & 10 & 12 & 12 \\
+    6 & 30 & 30 & 30 & 30 & 12 & 12 & 10 & 12 \\
+    7 & 30 & 30 & 30 & 30 & 12 & 12 & 12 & 10 \\
+\end{array}
+$$
+The one in the table are the relative "distances" between the nodes. 
+This distance is not the physical distance, but a figure of merit that takes into account the time it takes to access the memory of the other cores.
+
+The first four cores (0, 1, 2, 3) are in the same socket and they can access their own memory bank in 10 cycles and the memory of the other cores in 12 cycles. But when they access the memory of the other socket (4, 5, 6, 7), it takes 30 cycles.
+
+\subsubsection*{Cache Coherence}
+
+Cache coherence ensures that multiple cores sharing data in separate caches observe a consistent view of memory. This is crucial in multi-core architectures, where performance can degrade significantly if data synchronization is poorly managed. In particular:
+\begin{itemize}
+    \item When a memory location is accessed by two or more cores, each core typically holds that location in its private caches. If one core updates the data, it must be propagated to other caches holding a copy.
+    \item When a thread is migrated from one core to another, its original cached data may still reside on the previous core, requiring updates or invalidations to keep the caches consistent.
+\end{itemize}
+
+Such synchronization overhead can be a severe performance bottleneck if data is frequently updated by multiple cores. Concurrent writing and migrating data between caches are two common sources of delays because hardware-level consistency mechanisms kick in often.
+
+To address these issues, most modern systems use the \textbf{MESI} (Modified, Exclusive, Shared, Invalid) protocol (successor to the MSI protocol and precursor to MESOI). Its states are:
+
+\begin{itemize}
+    \item\textbf{Modified (M):} The core has exclusively modified this cache line, and no other core has a valid copy.
+    \item\textbf{Exclusive (E):} The core owns the cache line exclusively, but there have been no modifications yet. No other core holds a copy.
+    \item\textbf{Shared (S):} Multiple cores share the cache line. Write attempts require notifying other cores or changing the state.
+    \item\textbf{Invalid (I):} The cache line is invalid because another core modified it, or it is simply not in use.
+\end{itemize}
+
+\begin{exampleblock}[MESI]
+    Suppose three threads (on three different cores) share a variable representing the wall-clock time. A “timer” thread (Thread0) updates this variable periodically, while the other two threads (Thread1 and Thread2) read its value. The MESI protocol ensures all cores see a consistent value even though the data is replicated in each core’s local cache.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width = 0.6\textwidth]{assets/omp7.png}
+        \caption{MESI protocol example}
+    \end{figure}
+
+    \begin{minipage}{0.45\textwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width = \textwidth]{assets/omp8.png}
+        \end{figure}
+    \end{minipage}%
+    \begin{minipage}{0.45\textwidth}
+        \begin{itemize}
+            \item $^0$ Core 0 is the only one using the value, that is then \textbf{E}xclusive;
+            \item $^1$ A signal is issued to "the memory", which recognizes that the only valid copy is in the Core 0 cache. That value is copied back into the shared memory, and from there it is copied in the cache. Everybody now has a valid copy, then \textbf{S}hared;
+            \item $^2$ A signal about the change is issued to all the interested actors because their values are now \textbf{I}nvalid. 0's copy is instead \textbf{M}odified.
+        \end{itemize}
+    \end{minipage}%
+\end{exampleblock}
+
+\subsection*{Parallel Performance}
+
+Has we have seen, «performance» is a tag that can stand for many things.
+
+In this frame, with «performance» we mean the relation between the computational requirements and the computational resources needed to meet those requirements.
+
+$$
+\text{\textbf{Performance}} \approx \dfrac 1{resources},
+\qquad
+\text{\textbf{Performance ratio}} \approx \dfrac {resource_1}{resource_2}
+$$
+
+where the resources are the time, the hardware (CPU, memory, etc.) and, if we want, money.
+
+\subsubsection*{Key factors}
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+$n$: & problem size \\
+$p$: & number of computing units \\
+$T_s(n)$: & Serial run-time for a problem of size $n$ \\
+$T_p(n)$: & Parallel run-time with $p$ processors for a problem of size $n$ \\
+$f_n$: & Intrinsic sequential fraction of the problem \\
+$k(n,t)$: & Overhead of the parallel algorithm \\
+\textbf{Speedup}: & $S(n,p) = \dfrac{T_s(n)}{T_p(n)}$ \\[1em]
+\textbf{Efficiency}: & $E(n,p) = \dfrac{S(n,p)}{p} = \dfrac{T_s(n)}{p T_p(n)}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The sequential execution time for a problem of size $n$ is
+$$
+T_s(n) = T_s(n) \times f_n + T_s(n) \times (1 - f_n)
+$$
+
+Assuming that the parallel fraction of the computation is perfectly parallel, meaning that its run time scales as 1/p, then we can express the parallel execution time as:
+
+$$
+T_p(n) = T_s(n,1) \times f_n + \dfrac{T_s(n)}{p}\times (1 - f_n)
+$$
+
+and then:
+
+\begin{center}
+\begin{tabular}{lll}
+    \textbf{Speedup}: & $S(n,p) = \dfrac{T_s(n)}{T_p(n)} = \dfrac{1}{f + \frac{1-f}p}$
+    &
+    $\lim_{p \gg 1} S(n,p) = \dfrac 1f$
+    \\
+    \textbf{Efficiency}: & $E(n,p) = \dfrac{S(n,p)}{p} = \dfrac 1{f (p-1) + 1}$
+    &
+    $\lim_{p \gg 1} E(n,p) = 0$
+    \\
+\end{tabular}
+\end{center}
+
+\subsubsection*{Amdahl's Law}
+
+If $f$ is the fraction of the code which is intrinsically sequential, the speedup is 
+
+\[
+S_p(n,t) \leq \frac{1}{f + \frac{1-f}{p}} \leq \frac{1}{f}
+\]
+
+i.e. the serial fraction is severely limiting the achievable speedup.
+
+Is that a problem? Yes, if $f$ is not small enough. Actually, tens of years ago there was a huge debate about whether or not a huge effort towards developing massive parallelism was in order or not.
+
+\begin{warningblock}
+    There are some significant issues in the Amdhal's law:
+    \begin{itemize}
+        \item No matter of how many processes $p$ are used, the maximum achievable speedup is determined by $f$ (and is quite low for ordinary problems);
+        \item The problem size $n$ is kept fixed when estimating the possible speedup while the number of processes increases (strong scaling);
+        \item The parallel overhead $k(n,t)$ is not considered, which leads to an optimistic estimate of the speedup, and usually $\frac{p(n)}{t} > k(n,t)$;
+        \item The fraction of sequential part may decrease when the problem size increases.
+    \end{itemize}
+\end{warningblock}
+
+\subsubsection*{Gustafson-Barsis' Law}
+
+Normally, when you increase the problem's size, the parallelizable part increases way more than the sequential part. If we consider the workload as the sum 
+
+\[
+w = a + b
+\]
+
+where $a$ and $b$ being the serial and the parallel work, and we assign the same amount of workload to every process, that would amount to a serial run-time
+
+\[
+T_s \propto a + p\times b 
+\]
+
+while it still takes 
+
+\[
+T_p \propto a + b 
+\]
+
+using $p$ processes. Hence the speedup is $\frac{[a + p\times b]}{[a + b]}$, which if $f_n = \frac{a}{a + b}$ we can rewrite as the Gustafson's law for the speedup:
+
+\[
+S_{p_G}(n,p) = p - (p-1)f_n \leq p
+\]
+
+\begin{observationblock}[Parallel overhead]
+    Both Amdahl's and Gustafson's laws lead us to two different concepts of \textbf{scalability}, which is the ability of a parallel system to increase its efficiency when the number of processes and/or size of the problem get larger.
+    \begin{itemize}
+        \item \textbf{Strong scalability} is the ability to reduce the time-to-solution for a fixed-size problem by increasing the number of processes. Amdahl's law applies to this case.
+        \item \textbf{Weak scalability} is the ability to solve larger problems in the same time by increasing both the problem size and the number of processes proportionally. Gustafson's law applies to this case.
+    \end{itemize}
+
+    In parallel computing, there may be several sources of overhead due to the parallelization itself. Hence, if $k(n,t)$ is the overhead of some kind, $t_s$ and $t_p$ the run-time for the serial and the parallel part, the parallel run-time can be written as 
+    \[
+    T_p(n,p) = t_s + \frac{t_p}{p} + k(n,p)
+    \]
+
+    A simple way to measure the parallel overhead is to consider the distance between the code's scaling and the perfect scaling.
+
+    \[
+    T_s(n) - T_p(n,p) = t_s + t_p - t_s - \frac{t_p}{p} - k(n,p)
+    \]
+
+    which becomes for large $p$ $\approx t_p - k(n,p)$.
+\end{observationblock}
