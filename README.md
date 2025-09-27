@@ -40,19 +40,19 @@
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Programming/main.pdf">Advanced Programming</a></td>
       <td><strong><span style="color: lime;">[DONE]</span></strong></td>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/refs/heads/main/Stochastic%20Modeling%20and%20Simulation/main.pdf">Stochastic Modeling and Simulation</a></td>
-      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
+      <td><strong><span style="color: yellow;">[REV]</span></strong></td>
     </tr>
     <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Global%20and%20Multi-Objective%20Optimisation/main.pdf">Global and Multi-Objective Optimisation</a></td>
-      <td><strong><span style="color: orange;">[WIP]</span></strong></td>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Galaxies%20and%20Astrophysics/main_it.pdf">Introduction to Galaxies and Astrophysics</a></td>
+      <td><strong><span style="color: lime;">[DONE]</span></strong></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Intro%20to%20Cosmology%20and%20Astrophysics/main_it.pdf">Introduction to Cosmology and Astrophysics</a></td>
       <td><strong><span style="color: orange;">[WIP]</span></strong></td>
     </tr>
   </tbody>
 </table>
 
 
-<!-- <table>
+<table>
   <thead>
     <tr>
       <th colspan="4" style="text-align: center;">2° year</th>
@@ -72,4 +72,4 @@
       <td></td>
     </tr>
   </tbody>
-</table> -->
+</table>
