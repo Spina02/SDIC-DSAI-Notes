@@ -1,0 +1,105 @@
+\chapter{Tokenization}
+
+\section{Basics}
+
+NLP deals with computer readable text. 
+
+\paragraph{Problem.} computer readable text is of variable format:
+\begin{enumerate}
+    \item "This is an interesting lecture"
+    \item "This lecture is cool :)\#nlp proc"
+    \item "This lecture is also inter-interesting"
+    \item The same sentence written in chinese, japanese, arabic, etc.
+\end{enumerate}
+
+There is the need for \textbf{standardization}. Regular Expressions ($\sim$ 1950 Kleen) are a way to describe patterns in strings. 
+
+\begin{exampleblock}[Find all sentences starting with "the"]
+    \begin{enumerate}
+        \item \plaintt{/the/} $\rightarrow$ matches "the" anywhere in the string (but not "The")
+        \item \plaintt{/[Tt]the/} $\rightarrow$ matches "the" or "The"
+        \item \plaintt{/\b[Tt]he\b} $\rightarrow$ \missing{explanation}
+        \item \plaintt{/[\^a-zA-Z][Tt]he[\^a-zA-Z]/} $\rightarrow$
+        \item Solve the fact that this misses beginning or end of a line 
+    \end{enumerate}
+\end{exampleblock}
+
+*For more information on Regular Expressions look at \cite{jurafskyspeech}.
+
+\paragraph{Basic entities} Computer readable text is collected in \textbf{Corpora}.
+\begin{definitionblock}[Corpus]
+    The \textbf{Corpus} is a collector of computer readable text (or speech). See for example a document, a novel, ...
+\end{definitionblock}
+
+Corpora may vary for different elements:
+\begin{itemize}
+    \item Length: \# bytes to store it;
+    \item Language: phonemic (It, En, ...), syllabic (Arabic, Japanese), morphosyllabic (Chinese):
+    \begin{itemize}
+        \item Different languages with same character system;
+        \item Same language, same character systems but different dialect or slang (ex. "I don't" $\rightarrow$ "Iont");
+    \end{itemize}
+    \item Genre: written and spoken genre;
+    \item Demographic characteristics;
+    \item Time;
+\end{itemize}
+
+Standardization comes with \textbf{Datasheets} (T.Gebru) or \textbf{Data Statement} (Bendor). Important is the \textit{motivation} for that collection, the \textit{situation}, the \textit{language-variety}, \textit{speaker/writer demographics}, the \textit{collection process} and the \textit{annotation}. 
+This is done to make it \textbf{reproducible} for others.
+
+The unit we would like to focus on are \textbf{WORDS}. A word is the single distinct meaningful element of speech or writing, typically shown with spaces on either side when written or printed and saw with others in a portion of text.
+
+Again, \textbf{problems} arise:
+\begin{itemize}
+    \item Punctuation: usually considered as a word (",", ".", ":", ...);
+    \item Utterance: like "uh", "um", "ah", ...;
+\end{itemize}
+Actual elementary parts of a corpus will be defined/deduced but he corpus itself.
+
+\textbf{Word Types} are the distinct words in a corpus ($\mathcal{V}$ is the vocaboulary). Capitalization is sometimes considered and sometimes not, depends on the situation. 
+\textbf{Word Instances} represent a measure of length, indicating how many total words in a corpus there are ($N$). \textbf{Word Counting} indicates how many times a single and distinct word is repeated in a corpus.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        & $|\mathcal{V}|$ & $N$ \\
+        \hline
+        Shakespeare & 31k & 884k \\
+        Google n-grams & 13M & 1B \\
+        Wikipedia & ? & 4.9B \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\begin{definitionblock}[Herdant's Law]
+    $|\mathcal{V}| = k|\mathcal{C}|^{\beta} $ with $k>0$ and $0<\beta<1$.
+\end{definitionblock}
+
+A big problem is the cardinality of the vocaboulary, making tasks like next token prediction almost impossible to solve.
+\begin{enumerate}
+    \item A first solution is to reduce the vocaboulary size by using \textbf{Stemming} or \textbf{Lemmatization}: Stemming reduces words to their base or root form (e.g., "running" $\rightarrow$ "run"), while lemmatization considers the context and converts words to their meaningful base form (e.g., "better" $\rightarrow$ "good").
+    \item A better solution is to use \textbf{Subword Tokenization}, breaking words into smaller units (subwords) that can be combined to form words. This approach helps manage the vocabulary size while still capturing meaningful components of words. Examples include Byte Pair Encoding (BPE) and WordPiece.
+    \begin{definitionblock}[BPE]
+        \textbf{Byte-Pair-Encoding} is a procedure that, given a new sentence, divides it into subwords and then encodes it as a sequence of tokens. The algorithm starts with a base vocabulary of characters and iteratively merges the most frequent pairs of tokens to create new subword tokens, until a predefined vocabulary size is reached.    
+
+        \textbf{Example}: corpus is made of (A,B,D,C,A,B,E,C,A,B).
+        \begin{itemize}
+            \item (AB D C AB E C AB), $\mathcal{V} = \{A,B,C,D,E,AB\}$;
+            \item (AB D CAB E CAB), $\mathcal{V} = \{A,B,C,D,E,AB,CAB\}$;
+            \item $\dots$
+            \item \textbf{k} times;
+        \end{itemize}
+    \end{definitionblock}
+\end{enumerate}
+
+Once we have that, how do we perform \textbf{inference}?
+
+\begin{itemize}
+    \item Start from characters ($|\mathcal{C}_{test}|$)
+    \item Merge them into subwords
+    \item Merge subwords into other subwords
+    \item ... 
+\end{itemize}
+
+\paragraph{Distance} The usual measure of distance used in NLP is the \textbf{Edit Distance} (or Levenshtein distance). It is defined as the minimum number of operations required to transform one string into another, where the allowed operations are insertion, deletion, or substitution of a single character.
