@@ -1,2 +1,135 @@
-\chapter{Lecture 1}
+\chapter{Introduction}
 
+\vspace{-1em}
+
+When we observe the sky, we perceive it as a 2D surface, even though celestial objects actually exist in 3D space. To bridge this gap and measure distances in astronomy it is used a set of techniques known as the \textit{distance ladder}. It consists of different methods, where each one relies on a specific physical phenomenon and is calibrated using the preceding method in the ladder. Only recently have precise instruments like ESA's Hipparcos (1989) and Gaia (2013) satellites enabled highly accurate stellar parallax measurements, with Gaia mapping distances to over a billion stars.
+
+\vspace{-0.5em}
+
+\section{Reference Systems}
+
+To describe the position of an object in the sky, we need to define a reference system. For this purpose, astronomers often imagine all celestial objects as lying on a vast, imaginary \textit{celestial sphere}, centered on the observer. Although this model has ancient origins, it remains extremely useful today. Since the celestial sphere is considered to have an infinite radius, we can ignore the small shifts caused by the Earth's rotation and orbit.
+
+\subsection{The Equatorial System}
+
+The equatorial coordinate system is defined by selecting a reference parallel and a reference meridian. The Earth's rotational axis remains nearly constant over time, so the equatorial plane (which is perpendicular to this axis) serves as a stable basis for a coordinate system that does not depend on the observer’s location or the time of observation.
+
+The celestial equator is the great circle where the celestial sphere meets the equatorial plane. The axis of this circle points toward the celestial poles. In the northern hemisphere, the north celestial pole is almost exactly aligned with the Earth's rotational axis and lies about one degree from Polaris.
+
+\vspace{0.2em}
+
+\begin{minipage}{0.55\textwidth}
+    The angle between a star and the celestial equator (the equatorial plane) remains unchanged by the Earth's daily rotation. This angle is called the \bfit{declination} $\delta$ ($-90^\circ < \delta < +90^\circ$).
+    For the second coordinate, we also need a fixed direction that is independent of the Earth's rotation. This direction is defined by the \textit{vernal equinox} (\Aries), which is the point on the celestial sphere where the Sun's path (the ecliptic) crosses the celestial equator at the moment of the spring equinox. The second coordinate is then defined as the angle measured eastward along the celestial equator from the vernal equinox. This angle is called the \bfit{right ascension} $\alpha$ (or R.A.), with values ranging from $0$ to $24$ hours.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+
+    \vspace{-1.5em}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{assets/eq-sys.png}
+        \caption{\centering The Equatorial System \cite{karttunen}}
+    \end{figure}
+\end{minipage}
+
+\vspace{0.5em}
+
+The \textit{sidereal time}, often denoted by $\Theta$, measures the angle between the local meridian (The great circle on the celestial sphere that passes through both the celestial poles and the zenith of the observer) and the vernal equinox, increasing as the Earth rotates. For any celestial object, there is a simple and important relationship:
+$$
+\Theta = h + \alpha
+$$
+
+\subsection{The Azimuthal System or Horizontal System}
+
+The azimuthal (or horizontal) system is defined relative to the observer's specific position on Earth. Its reference plane is the local \textit{horizon} (the plane tangent to the Earth at the observer's location). Where this plane meets the celestial sphere forms the visible horizon. The point directly overhead is the \textit{zenith}; the point directly beneath is the \textit{nadir}.
+
+
+\begin{minipage}{0.55\textwidth}
+    
+    Great circles passing through the zenith are called \textit{verticals}, and each one meets the horizon at a right angle. As the Earth rotates, stars appear to rise in the east, reach their highest point (culminate) when they cross the \textit{meridian} (the vertical circle connecting north, zenith, and south) and set in the west. The intersection points of the meridian with the horizon define the north and south directions.
+
+    In this system, one coordinate is the \bfit{altitude} (or elevation), $a$, the angle between the horizon and the object along its vertical circle. Altitude ranges from $-90^\circ$ to $+90^\circ$, and is positive above the horizon.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+
+\vspace{-2em}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{assets/az-sys.png}
+        \caption{The Azimuthal System \cite{karttunen}}
+    \end{figure}
+
+    \vspace{0.1em}
+\end{minipage}
+
+\vspace{-0.2em}
+
+The second coordinate is the \bfit{azimuth}, $A$: the angle measured along the horizon from a fixed reference direction to the object's vertical circle. The reference is often north or south, and by convention the angle is measured clockwise (see tip below).
+
+Since this system depends on both the observer's position and the time, the coordinates of the same star will be different for different observers and at different moments. For this reason, horizontal coordinates are not used in star catalogues.
+
+\begin{tipsblock}[Azimuth direction]
+  There are different conventions for the reference direction and sense of azimuth, so it is always important to verify which one is being used. Here, we measure azimuth clockwise from the south, as is common in astronomy.
+\end{tipsblock}
+
+\subsection{The Galactic System}
+
+\begin{minipage}{0.55\textwidth}
+    For studies of the Milky Way Galaxy, the most natural reference plane is the plane of the Milky Way itself. Because the Sun lies very close to this plane, it is convenient to place the origin of the galactic coordinate system at the Sun.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+
+    \vspace{-1em}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{assets/gal-sys.png}
+        \vspace{-1.5em}
+
+        \caption{\centering The Galactic System \cite{karttunen}}
+    \end{figure}
+\end{minipage}
+
+\vspace{0.2em}
+
+The \bfit{galactic longitude} $l$ is measured counterclockwise (analogous to right ascension) along the galactic plane, starting from the direction of the center of the Milky Way, which lies in the constellation Sagittarius. The \bfit{galactic latitude} $b$ is measured from the galactic plane: it is positive towards the north galactic pole and negative towards the south. 
+
+\begin{observationblock}[Coordinate precision]
+ If right ascension is given in hours, we need to provide one additional decimal place in seconds compared to the declination, to preserve equivalent angular accuracy. For example:
+\begin{center}
+03$^\mathrm{h}$ 42$^\mathrm{m}$ 35.63$^\mathrm{s}$ \hspace{1em} +42$^\circ$ 32$'$ 35.4$''$
+\end{center}
+\end{observationblock}
+
+\subsection{Coordinate perturbations}
+
+Even for a star fixed relative to the Sun, its observed coordinates may shift due to various perturbing effects. While altitude and azimuth change with Earth's rotation, even right ascension and declination are subject to small variations over time.
+
+
+
+\subsubsection{Precession and nutation}
+
+\vspace{-1.5em}
+
+\begin{minipage}{0.77\textwidth}
+    The Earth's rotational axis is not fixed in space; instead, it traces out a slow circular motion around the north pole of the ecliptic. This gradual change, known as \bfit{precession}, causes the celestial poles and equator to shift over time, completing one cycle roughly every 25,800 years. 
+
+    In addition to precession, the axis also exhibits smaller, periodic oscillations called \bfit{nutation}. Nutation is primarily caused by the gravitational pull of the Moon (and, to a lesser extent, the Sun) on Earth's equatorial bulge, resulting in a "nodding" motion superimposed upon the smoother precessional path. This causes short-term, cyclical variations in the Earth's orientation, with a principal period of about 18.6 years. Both precession and nutation must be taken into account for precise astronomical coordinate systems.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.2\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/coord-pert.png}
+    \caption{\centering Precession and nutation}
+\end{figure}
+\end{minipage}
+
+\subsubsection{Aberration}
+
+\subsubsection{Atmospheric refraction}
+
+\subsubsection{Parallax}
