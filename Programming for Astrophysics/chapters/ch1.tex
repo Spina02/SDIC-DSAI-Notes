@@ -1,43 +1,25 @@
 \chapter{Introduction}
 
-Operating systems (OS) are the core software that manage a computer's hardware and software resources. Among the most widely used are Microsoft Windows, Apple's macOS, and the open-source Linux. While they differ in many aspects, both macOS and Linux are part of the \bfit{Unix-like} family of operating systems. 
+Operating systems (OS) are the core software that manage a computer's hardware and software resources. Among the most widely used are Microsoft Windows, Apple's macOS, and the open-source Linux. While they differ in many aspects, both macOS and Linux are part of the \bfit{Unix-like} family of operating systems. These systems are renowned for their stability, security, and a powerful command-line interface known as the \bfit{shell}.
 
-These systems are renowned for their stability, security, and a powerful command-line interface known as the \bfit{shell}. This chapter provides an introduction to the Unix shell, exploring its fundamental role in interacting with the system.
+This chapter provides an introduction to the Unix shell, exploring its fundamental role in interacting with the system.
 
-\section{What is a shell?}
+\subsubsection{File System}
 
-The shell is the primary interface between users and the computer's core system. When you type commands in a terminal, the shell interprets these instructions and communicates with the operating system to execute them. It serves as a crucial layer that makes complex system operations accessible through simple text commands.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{assets/shell.png}
-    \caption{The Unix Shell}
-    \label{fig:shell}
-\end{figure}
-
-\begin{definitionblock}[Shell]
-    A shell is a program that provides the traditional, text-only user interface for Linux and other UNIX-like operating systems. Its primary function is to read commands that are typed into a console […] and then execute (i.e., run) them. The term shell derives its name from the fact that it is an outer layer of an operating system. A shell is an interface between the user and the internal parts of the OS (at the very core of which is the kernel). 
-    \hfill \textit{\href{http://www.linfo.org/shell.html}{\textasciitilde Linfo}}
-\end{definitionblock}
-
-\subsection{File System}
-
-The file system organizes files and directories on a computer. It is a crucial component of the operating system that allows users to store, retrieve, and manage data efficiently. In unix-like systems, the file system is organized in a hierarchical structure.
+A crucial component of the operating system is the file system, which organizes files and directories on a computer. It is a crucial component of the operating system that allows users to store, retrieve, and manage data efficiently. In unix-like systems, the file system is organized in a hierarchical structure.
 
 \vspace{-0.5em}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{assets/filesystem.png}
+    \includegraphics[width=0.8\textwidth]{assets/filesystem.png}
     \caption{The File System}
     \label{fig:filesystem}
 \end{figure}
 
-\vspace{-2em}
-
 \subsubsection{Path}
 
-Each file and directory is identified by a unique path, which is a sequence of directories and files.
+A path specifies the unique location of a file or directory within the file system's hierarchy. Paths can be \bfit{absolute}, starting from the root directory (\texttt{/}), or \bfit{relative} to the current working directory.
 
 \vspace{0.5em}
 
@@ -49,6 +31,8 @@ Each file and directory is identified by a unique path, which is a sequence of d
     \end{tabular}
 \end{center}
 
+\vspace{1em}
+
 \begin{exampleblock}[Example of a path]
     \begin{itemize}
         \item a file in the user's Desktop: \plaintt{/home/user/Desktop/file.txt} or \plaintt{\textasciitilde/Desktop/file.txt}
@@ -58,9 +42,40 @@ Each file and directory is identified by a unique path, which is a sequence of d
     \end{itemize}
 \end{exampleblock}
 
+\section{The Unix Shell}
+
+\subsubsection{What is a shell?}
+
+The shell is the primary interface between users and the computer's core system. When you type commands in a terminal, the shell interprets these instructions and communicates with the operating system to execute them, making complex system operations accessible through simple commands.
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/shell.png}
+    \caption{The Unix Shell}
+    \label{fig:shell}
+\end{figure}
+
+\vspace{-1.5em}
+
+\begin{definitionblock}[Shell]
+    A shell is a program that provides the traditional, text-only user interface for Linux and other UNIX-like operating systems. Its primary function is to read commands that are typed into a console […] and then execute (i.e., run) them. The term shell derives its name from the fact that it is an outer layer of an operating system. A shell is an interface between the user and the internal parts of the OS (at the very core of which is the kernel). 
+    \hfill \textit{\href{http://www.linfo.org/shell.html}{\textasciitilde Linfo}}
+\end{definitionblock}
+
+\subsection{Basic Commands}
+
+A command is nothing more than a program that is executed by the shell. The usual syntax is:
+\begin{codeblock}[language=bash, numbers=none]
+command [options] [arguments]
+\end{codeblock}
+
+The options can be passed setting the corresponding flag e.g. \texttt{-h} for help.
+
 \subsubsection{Navigation Commands}
 
-It is possible to navigate through (and manage files and directories) the file system using the following commands:
+It is possible to navigate and manage files or directories using the following commands:
 
 \vspace{0.5em}
 
@@ -81,20 +96,74 @@ It is possible to navigate through (and manage files and directories) the file s
         \bottomrule
     \end{tabular}
 \end{center}
-\end{minipage}
-\begin{minipage}{0.35\textwidth}
-\centering
-\textbf{Recursive Commands:}
-\vspace{0.5em}
+\end{minipage}%
+\begin{minipage}{0.40\textwidth}
+% \centering
+\textbf{Recursive Commands}
+\vspace{0.4em}
 
 \texttt{rm}, \texttt{cp} and many other commands can be used recursively into a folder using the flag \texttt{-r} (recursive).
-\end{minipage}
 
-\vspace{0.5em}
+\vspace{0.8em}
+
+\textbf{Help Flag} 
+
+\vspace{0.4em}
+
+Many commands support the \texttt{--help} flag to display information about the command and its usage.
+\end{minipage}
 
 \begin{tipsblock}[Hidden Files]
     Hidden files are files that are not shown by default when listing the contents of a directory. They are usually marked with a dot (.) at the beginning of their name. e.g. \plaintt{.config}
 \end{tipsblock}
+
+\subsubsection{Searching Tools}
+
+Unix-like systems provide powerful tools for searching files and content. These tools often support regular expressions (regex), which are patterns used to match character combinations in text.
+
+\subsubsection{File Search Commands}
+
+\begin{center}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{c l l}
+        \toprule
+        \textbf{Command} & \textbf{Description} & \textbf{Example} \\
+        \midrule
+        \texttt{find} & Search for files and directories & \texttt{find /home -name "*.txt"} \\
+        \texttt{locate} & Fast file search using database & \texttt{locate filename} \\
+        \texttt{grep} & Search text within files & \texttt{grep "pattern" file.txt} \\
+        \texttt{which} & Find location of executable & \texttt{which gcc} \\
+        \texttt{whereis} & Find binary, source, and manual pages & \texttt{whereis python} \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\subsubsection{Wildcards and Pattern Matching}
+
+Wildcards are special characters that represent one or more characters in a filename or text string:
+
+\begin{center}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{c l l}
+        \toprule
+        \textbf{Character} & \textbf{Name} & \textbf{Description} \\
+        \midrule
+        \texttt{*} & asterisk & Matches zero or more characters \\
+        \texttt{?} & question mark & Matches exactly one character \\
+        \texttt{[]} & brackets & Matches any single character within brackets \\
+        \texttt{[!]} & negated brackets & Matches any character not in brackets \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\begin{exampleblock}[Wildcard Examples]
+    \begin{itemize}
+        \item \texttt{*.txt}: matches all files ending with .txt
+        \item \texttt{file?.c}: matches file1.c, file2.c, but not file10.c
+        \item \texttt{[abc]*}: matches files starting with a, b, or c
+        \item \texttt{[!0-9]*}: matches files not starting with digits
+    \end{itemize}
+\end{exampleblock}
 
 \subsubsection{Operators}
 
@@ -116,21 +185,275 @@ Commands can be combined using operators to manipulate input and output streams:
     \end{tabular}
 \end{center}
 
+\subsection{Environment Variables}
 
+Environment variables are dynamic values that affect the behavior of processes and programs running on the system. They provide a way to pass configuration information to applications without hardcoding values into the program. These variables are stored in the system's environment and can be accessed by any process.
 
-% spiegare come funzionano le variabili di ambiente (PATH, HOME, USER, etc.)
+\begin{center}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{c l l}
+        \toprule
+        \textbf{Variable} & \textbf{Description} & \textbf{Example} \\
+        \midrule
+        \texttt{PATH} & Colon-separated list of dirs to search for executables & \texttt{/usr/bin:/bin:/usr/sbin} \\
+        \texttt{HOME} & Path to the user's home directory & \texttt{/home/username} \\
+        \texttt{USER} & Current username & \texttt{username} \\
+        \texttt{SHELL} & Path to the current shell & \texttt{/bin/bash} \\
+        \texttt{PWD} & Current working directory & \texttt{/home/username/Desktop} \\
+        \bottomrule
+    \end{tabular}
+\end{center}
 
+To view environment variables, use the \texttt{env} command or \texttt{echo \$VARIABLE\_NAME}. To set a variable temporarily, use \texttt{export VARIABLE\_NAME=value}. For permanent changes, modify configuration files like \texttt{.bashrc} or \texttt{.bash\_profile}.
 
-% searching tools regex (ls, find, locate, grep, etc.) 
-% *, ?, [], ^, $ escape (\)
+\subsection{File Permissions}
 
-% permissions - chmod, chown, chgrp
+Unix-like systems use a permission system to control access to files and directories. Each file has three types of permissions: read (r), write (w), and execute (x). These permissions are assigned to three categories of users: owner (user), group, and others.
 
-% context switch, multiprocessing, fork, exec, source
+\subsubsection{Permission Structure}
 
-%config files: bashrc, bash_profile
+File permissions are displayed using a 10-character string where the first character indicates the file type, and the remaining nine characters represent permissions for owner, group, and others:
 
-% head, tail ...
+\begin{center}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{c l l}
+        \toprule
+        \textbf{Character} & \textbf{Position} & \textbf{Meaning} \\
+        \midrule
+        \texttt{-} & 1st & Regular file \\
+        \texttt{d} & 1st & Directory \\
+        \texttt{r} & 2nd, 5th, 8th & Read permission \\
+        \texttt{w} & 3rd, 6th, 9th & Write permission \\
+        \texttt{x} & 4th, 7th, 10th & Execute permission \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\vspace{0.5em}
+
+For instance, \texttt{-rwxr-xr--} means:
+
+\begin{minipage}[t]{0.5\linewidth}
+    \begin{itemize}
+        \item Regular file (-)
+        \item Owner: read, write, execute (rwx)
+    \end{itemize}
+\end{minipage}%
+\begin{minipage}[t]{0.5\linewidth}
+    \begin{itemize}
+        \item Group: read, execute (r-x)
+        \item Others: read only (r--)
+    \end{itemize}
+\end{minipage}
+
+\subsubsection{Octal Notation}
+
+Permissions can be represented numerically using octal notation: 
+
+\begin{center}
+    \renewcommand{\arraystretch}{1}
+    \begin{tabular}{l c c}
+        (\texttt{r}) Read & \textbf{4} & \texttt{100} \\
+        (\texttt{w}) Write & \textbf{2} & \texttt{010} \\
+        (\texttt{x}) Execute & \textbf{1} & \texttt{001} \\
+    \end{tabular}
+\end{center}
+
+By summing these values for each user category (owner, group, and others), we get a three-digit code. For example, \texttt{rwx} permissions translate to $4+2+1=7$, and \texttt{r-x} to $4+0+1=5$. Thus, a full permission string like \texttt{rwxr-xr-x} can be concisely represented as 755.
+
+Common combinations include: \textbf{755} (\texttt{rwxr-xr-x}), \textbf{644} (\texttt{rw-r--r--}), and \textbf{600} (\texttt{rw-------}).
+
+\subsubsection{Permission Commands}
+
+\begin{center}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{c l l}
+        \toprule
+        \textbf{Command} & \textbf{Description} & \textbf{Example} \\
+        \midrule
+        \texttt{chmod} & Change file permissions & \texttt{chmod 755 script.sh} \\
+        \texttt{chown} & Change file ownership & \texttt{chown user:group file.txt} \\
+        \texttt{chgrp} & Change group ownership & \texttt{chgrp staff file.txt} \\
+        \texttt{umask} & Set default permissions & \texttt{umask 022} \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\todo{notes about file viewing and text processing, few words about multiprocessing and context switching}
+
+% \subsection{Process Management}
+
+% Process management is fundamental to understanding how Unix-like systems handle program execution. A process is an instance of a running program, and the system manages multiple processes through various mechanisms.
+
+% \subsubsection{Context Switching and Multiprocessing}
+
+% Context switching refers to the process by which the CPU switches from executing one process to another. This allows the system to appear to run multiple programs simultaneously, even on single-core systems. The operating system saves the current state of a process (including CPU registers, program counter, and memory management information) and loads the saved state of another process.
+
+% Multiprocessing involves running multiple processes concurrently, which can occur through:
+% \begin{itemize}
+%     \item \textbf{Time-sharing}: Rapidly switching between processes to give the illusion of simultaneous execution
+%     \item \textbf{Parallel processing}: Actually running processes simultaneously on multiple CPU cores
+%     \item \textbf{Multiprogramming}: Keeping multiple programs in memory and switching between them
+% \end{itemize}
+
+% \subsubsection{Process Creation}
+
+% Unix-like systems provide several mechanisms for creating new processes:
+
+% \begin{center}
+%     \renewcommand{\arraystretch}{1.1}
+%     \begin{tabular}{c l l}
+%         \toprule
+%         \textbf{Function} & \textbf{Description} & \textbf{Use Case} \\
+%         \midrule
+%         \texttt{fork()} & Creates a new process by duplicating the current one & Process spawning \\
+%         \texttt{exec()} & Replaces the current process with a new program & Program execution \\
+%         \texttt{source} & Executes commands from a file in the current shell & Script loading \\
+%         \bottomrule
+%     \end{tabular}
+% \end{center}
+
+% \begin{exampleblock}[Fork and Exec Example]
+%     \begin{codeblock}[language=C]
+% #include <unistd.h>
+% #include <stdio.h>
+
+% int main() {
+%     pid_t pid = fork(); // Create a new process
+    
+%     if (pid == 0) {
+%         // Child process
+%         printf("Child process\n");
+%         execl("/bin/ls", "ls", "-l", NULL); // Replace with ls command
+%     } else if (pid > 0) {
+%         // Parent process
+%         printf("Parent process\n");
+%     } else {
+%         // Error
+%         perror("fork");
+%     }
+%     return 0;
+% }
+%     \end{codeblock}
+% \end{exampleblock}
+
+% The \texttt{fork()} system call creates an exact copy of the current process, while \texttt{exec()} family of functions replaces the current process image with a new program. The combination of these two calls is the standard way to create new processes in Unix systems.
+
+% \subsection{Configuration Files}
+
+% Configuration files allow users to customize their shell environment and system behavior. These files contain commands and settings that are executed when the shell starts or when specific events occur.
+
+% \subsubsection{Shell Configuration Files}
+
+% Different shells use different configuration files, and the execution order varies:
+
+% \begin{center}
+%     \renewcommand{\arraystretch}{1.1}
+%     \begin{tabular}{c l l}
+%         \toprule
+%         \textbf{File} & \textbf{Shell} & \textbf{When Executed} \\
+%         \midrule
+%         \texttt{.bashrc} & Bash & Every interactive shell startup \\
+%         \texttt{.bash\_profile} & Bash & Login shell startup only \\
+%         \texttt{.profile} & All shells & Login shell startup (fallback) \\
+%         \texttt{.bash\_logout} & Bash & Shell exit \\
+%         \bottomrule
+%     \end{tabular}
+% \end{center}
+
+% \begin{tipsblock}[Configuration File Hierarchy]
+%     The typical execution order for bash is:
+%     \begin{enumerate}
+%         \item \texttt{.bash\_profile} (login shells only)
+%         \item \texttt{.bashrc} (interactive shells)
+%         \item \texttt{.profile} (if .bash\_profile doesn't exist)
+%     \end{enumerate}
+    
+%     Many users source \texttt{.bashrc} from \texttt{.bash\_profile} to ensure consistent behavior across login and non-login shells.
+% \end{tipsblock}
+
+% \subsubsection{Common Configuration Tasks}
+
+% Configuration files are commonly used for:
+
+% \begin{itemize}
+%     \item Setting environment variables (\texttt{export PATH=\$PATH:/new/path})
+%     \item Creating command aliases (\texttt{alias ll='ls -l'})
+%     \item Defining shell functions
+%     \item Setting shell options (\texttt{set -o vi})
+%     \item Customizing the command prompt (\texttt{PS1})
+% \end{itemize}
+
+% \begin{exampleblock}[Sample .bashrc Content]
+%     \begin{codeblock}[language=bash]
+% # Add custom directory to PATH
+% export PATH="$PATH:$HOME/bin"
+
+% # Create useful aliases
+% alias ll='ls -alF'
+% alias la='ls -A'
+% alias l='ls -CF'
+% alias grep='grep --color=auto'
+
+% # Set editor preference
+% export EDITOR=vim
+
+% # Custom prompt
+% PS1='\u@\h:\w\$ '
+%     \end{codeblock}
+% \end{exampleblock}
+
+% \subsection{File Viewing and Text Processing}
+
+% Unix-like systems provide numerous tools for viewing and processing file contents. These commands are essential for examining data, logs, and text files efficiently.
+
+% \subsubsection{File Viewing Commands}
+
+% \begin{center}
+%     \renewcommand{\arraystretch}{1.1}
+%     \begin{tabular}{c l l}
+%         \toprule
+%         \textbf{Command} & \textbf{Description} & \textbf{Example} \\
+%         \midrule
+%         \texttt{cat} & Display entire file content & \texttt{cat file.txt} \\
+%         \texttt{head} & Display first lines of file & \texttt{head -n 10 file.txt} \\
+%         \texttt{tail} & Display last lines of file & \texttt{tail -n 5 file.txt} \\
+%         \texttt{less} & Interactive file viewer & \texttt{less large\_file.txt} \\
+%         \texttt{more} & Simple paged file viewer & \texttt{more file.txt} \\
+%         \texttt{wc} & Count lines, words, characters & \texttt{wc -l file.txt} \\
+%         \bottomrule
+%     \end{tabular}
+% \end{center}
+
+% \subsubsection{Text Processing Commands}
+
+% \begin{center}
+%     \renewcommand{\arraystretch}{1.1}
+%     \begin{tabular}{c l l}
+%         \toprule
+%         \textbf{Command} & \textbf{Description} & \textbf{Example} \\
+%         \midrule
+%         \texttt{cut} & Extract columns from text & \texttt{cut -d',' -f1,3 data.csv} \\
+%         \texttt{paste} & Merge lines from multiple files & \texttt{paste file1 file2} \\
+%         \texttt{sort} & Sort lines in file & \texttt{sort -n numbers.txt} \\
+%         \texttt{uniq} & Remove duplicate lines & \texttt{uniq sorted.txt} \\
+%         \texttt{tr} & Translate or delete characters & \texttt{tr 'a-z' 'A-Z'} \\
+%         \texttt{sed} & Stream editor for text processing & \texttt{sed 's/old/new/g' file.txt} \\
+%         \bottomrule
+%     \end{tabular}
+% \end{center}
+
+% \begin{exampleblock}[Combining Commands]
+%     These commands are often combined using pipes for powerful text processing:
+    
+%     \texttt{cat access.log | grep "404" | cut -d' ' -f1 | sort | uniq -c | sort -nr}
+    
+%     This pipeline finds all 404 errors, extracts IP addresses, sorts them, counts occurrences, and displays them in descending order.
+% \end{exampleblock}
+
+% \begin{tipsblock}[Following Files]
+%     The \texttt{tail -f} command is particularly useful for monitoring log files in real-time, as it continues to display new lines as they are added to the file.
+% \end{tipsblock}
 
 
 
@@ -219,11 +542,73 @@ A library is a collection of pre-compiled code, such as functions and data struc
 
 The difference between the two is that the static library is linked directly into the executable at compile time, while the shared library is loaded at runtime.
 
-%% types
+\subsection{Data Types}
 
-% int vs float
+C provides several fundamental data types to represent different kinds of data. Understanding these types is crucial for writing efficient and correct programs.
 
-% floating point: exponent and mantissa
+\todo{notes about data types}
+
+% \subsubsection{Integer Types}
+
+% Integer types represent whole numbers and come in different sizes:
+
+% \begin{center}
+%     \renewcommand{\arraystretch}{1.1}
+%     \begin{tabular}{c l l}
+%         \toprule
+%         \textbf{Type} & \textbf{Size (bytes)} & \textbf{Range} \\
+%         \midrule
+%         \texttt{char} & 1 & -128 to 127 (signed) or 0 to 255 (unsigned) \\
+%         \texttt{short} & 2 & -32,768 to 32,767 \\
+%         \texttt{int} & 4 & -2,147,483,648 to 2,147,483,647 \\
+%         \texttt{long} & 8 & -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 \\
+%         \texttt{long long} & 8 & Same as long on most systems \\
+%         \bottomrule
+%     \end{tabular}
+% \end{center}
+
+% \subsubsection{Floating-Point Types}
+
+% Floating-point types represent real numbers with decimal points:
+
+% \begin{center}
+%     \renewcommand{\arraystretch}{1.1}
+%     \begin{tabular}{c l l}
+%         \toprule
+%         \textbf{Type} & \textbf{Size (bytes)} & \textbf{Precision} \\
+%         \midrule
+%         \texttt{float} & 4 & ~7 decimal digits \\
+%         \texttt{double} & 8 & ~15 decimal digits \\
+%         \texttt{long double} & 16 & ~19 decimal digits \\
+%         \bottomrule
+%     \end{tabular}
+% \end{center}
+
+% \subsubsection{Floating-Point Representation}
+
+% Floating-point numbers are represented using the IEEE 754 standard, which stores numbers in three parts:
+
+% \begin{itemize}
+%     \item \textbf{Sign bit}: Indicates positive (0) or negative (1)
+%     \item \textbf{Exponent}: Represents the power of 2 to multiply by
+%     \item \textbf{Mantissa (Significand)}: The significant digits of the number
+% \end{itemize}
+
+% For a 32-bit float: 1 sign bit + 8 exponent bits + 23 mantissa bits.
+
+% \begin{exampleblock}[Floating-Point Example]
+%     The number 12.5 in binary floating-point representation:
+%     \begin{itemize}
+%         \item Sign: 0 (positive)
+%         \item Exponent: 10000010 (130 in decimal, representing 2³)
+%         \item Mantissa: 10010000000000000000000 (1.5625 in decimal)
+%         \item Result: 1.5625 × 2³ = 12.5
+%     \end{itemize}
+% \end{exampleblock}
+
+% \begin{observationblock}[Floating-Point Precision]
+%     Floating-point arithmetic can introduce precision errors due to the binary representation. For example, 0.1 cannot be exactly represented in binary floating-point, leading to small rounding errors in calculations.
+% \end{observationblock}
 
 %% loops
 
@@ -312,9 +697,80 @@ Conditional compilation is used to compile code only if a certain condition is m
 #endif
 \end{codeblock}
 
-% brief note about pointers (as arrays), cache miss, etc.
-%...
-%...
+\todo{notes about pointers}
+
+% \subsection{Pointers and Memory Management}
+
+% Pointers are one of the most powerful and fundamental features of C. A pointer is a variable that stores the memory address of another variable, allowing direct manipulation of memory.
+
+% \subsubsection{Pointer Basics}
+
+% \begin{codeblock}[language=C]
+% int x = 42;        // Declare and initialize an integer
+% int *ptr = &x;     // Declare a pointer and assign address of x
+% int value = *ptr;  // Dereference ptr to get the value (42)
+% \end{codeblock}
+
+% In this example:
+% \begin{itemize}
+%     \item \texttt{\&x} gets the address of variable \texttt{x}
+%     \item \texttt{*ptr} dereferences the pointer to access the value
+%     \item \texttt{ptr} itself contains the memory address
+% \end{itemize}
+
+% \subsubsection{Pointers and Arrays}
+
+% In C, arrays and pointers are closely related. An array name is essentially a pointer to the first element:
+
+% \begin{codeblock}[language=C]
+% int arr[5] = {1, 2, 3, 4, 5};
+% int *ptr = arr;        // Same as &arr[0]
+% int first = *ptr;      // Gets arr[0] = 1
+% int second = *(ptr+1); // Gets arr[1] = 2
+% \end{codeblock}
+
+% \begin{exampleblock}[Array Indexing]
+%     The expressions \texttt{arr[i]} and \texttt{*(arr+i)} are equivalent. This is why array indexing starts at 0 in C.
+% \end{exampleblock}
+
+% \subsubsection{Memory Layout and Cache Considerations}
+
+% Understanding memory layout is crucial for performance optimization. Modern computers use hierarchical memory systems:
+
+% \begin{itemize}
+%     \item \textbf{Registers}: Fastest, smallest storage
+%     \item \textbf{L1/L2/L3 Cache}: Fast, limited size
+%     \item \textbf{RAM}: Main memory, larger but slower
+%     \item \textbf{Disk}: Persistent storage, slowest
+% \end{itemize}
+
+% \begin{observationblock}[Cache Misses]
+%     When accessing memory sequentially (as with arrays), the processor can prefetch data into cache, making access very fast. Random access patterns can cause cache misses, significantly slowing down programs. This is why sequential access to arrays is generally faster than random access.
+% \end{observationblock}
+
+% \subsubsection{Dynamic Memory Allocation}
+
+% C provides functions for dynamic memory management:
+
+% \begin{codeblock}[language=C]
+% #include <stdlib.h>
+
+% // Allocate memory
+% int *arr = (int*)malloc(5 * sizeof(int));
+
+% // Use the memory
+% for(int i = 0; i < 5; i++) {
+%     arr[i] = i * 2;
+% }
+
+% // Free memory when done
+% free(arr);
+% arr = NULL; // Good practice to prevent dangling pointers
+% \end{codeblock}
+
+% \begin{tipsblock}[Memory Management]
+%     Always free dynamically allocated memory to prevent memory leaks. Set pointers to \texttt{NULL} after freeing to avoid dangling pointer errors.
+% \end{tipsblock}
 
 \subsection{Functions}
 
