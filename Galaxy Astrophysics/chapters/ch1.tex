@@ -10,7 +10,7 @@ When we observe the sky, we perceive it as a 2D surface, even though celestial o
 
 To describe the position of an object in the sky, we need to define a reference system. For this purpose, astronomers often imagine all celestial objects as lying on a vast, imaginary \textit{celestial sphere}, centered on the observer. Although this model has ancient origins, it remains extremely useful today. Since the celestial sphere is considered to have an infinite radius, we can ignore the small shifts caused by the Earth's rotation and orbit.
 
-\subsection{The Equatorial System}
+   \subsection{The Equatorial System}
 
 The equatorial coordinate system is defined by selecting a reference parallel and a reference meridian. The Earth's rotational axis remains nearly constant over time, so the equatorial plane (which is perpendicular to this axis) serves as a stable basis for a coordinate system that does not depend on the observer’s location or the time of observation.
 
@@ -108,28 +108,216 @@ The \bfit{galactic longitude} $l$ is measured counterclockwise (analogous to rig
 
 Even for a star fixed relative to the Sun, its observed coordinates may shift due to various perturbing effects. While altitude and azimuth change with Earth's rotation, even right ascension and declination are subject to small variations over time.
 
-
-
 \subsubsection{Precession and nutation}
 
-\vspace{-1.5em}
+\vspace{-0.5em}
 
 \begin{minipage}{0.77\textwidth}
-    The Earth's rotational axis is not fixed in space; instead, it traces out a slow circular motion around the north pole of the ecliptic. This gradual change, known as \bfit{precession}, causes the celestial poles and equator to shift over time, completing one cycle roughly every 25,800 years. 
+    The Earth's rotational axis is not fixed in space; instead, it traces out a slow circular motion around the north pole of the ecliptic. This slow motion, known as \bfit{precession}, causes the celestial poles 
+    and equator to shift over time, completing a full cycle roughly every 25,800 years. As a result, the coordinates of stars change slowly: star catalogues must specify the equinox, or reference epoch, to which their coordinates refer.
 
-    In addition to precession, the axis also exhibits smaller, periodic oscillations called \bfit{nutation}. Nutation is primarily caused by the gravitational pull of the Moon (and, to a lesser extent, the Sun) on Earth's equatorial bulge, resulting in a "nodding" motion superimposed upon the smoother precessional path. This causes short-term, cyclical variations in the Earth's orientation, with a principal period of about 18.6 years. Both precession and nutation must be taken into account for precise astronomical coordinate systems.
+    \vspace{0.5em}
+
+    Superimposed upon precession is a smaller, periodic oscillation of the axis called \bfit{nutation}. It is primarily caused by the gravitational pull of the Moon (and, to a lesser extent, the Sun) on Earth's equatorial bulge. This results in a short-term "nodding" motion, with the main period being about 18.6 years, as the Moon's orbital plane precesses.
 \end{minipage}%
 \hfill
 \begin{minipage}{0.2\textwidth}
 \begin{figure}[H]
+    \vspace{-1em}
     \centering
     \includegraphics[width=\textwidth]{assets/coord-pert.png}
     \caption{\centering Precession and nutation}
 \end{figure}
 \end{minipage}
 
+\vspace{0.5em}
+
+Mathematically, the precessional motion can be described using the concept of torque:
+$$
+\vec{\Tau} = \dfrac{d\vec{L}}{dt}
+$$
+where $\vec{L}$ is the angular momentum of the Earth, and $\vec{\Tau}$ is the torque exerted mainly by the gravitational attraction of the Moon and Sun on the equatorial bulge. The change in angular momentum, $\Delta \vec{L}$, is perpendicular to $\vec{L}$, leading to a precession of the axis direction (rather than a change in tilt angle):
+
+$$
+\Delta \vec{L} \perp \vec{L}
+\qquad \text{and} \qquad
+\vec{\Tau} \perp \vec{L}
+$$
+
+Both precession and nutation must be taken into account for precise astronomical coordinate systems, since they cause the celestial coordinate grid to shift over time.
+
+\begin{observationblock}[The vernal equinox point]
+    The vernal equinox point (\Aries) is not fixed in space. Due to the precession of Earth's axis, it gradually shifts westward along the ecliptic by approximately $50.25''$ (arcseconds) per year. This slow drift means that the celestial coordinate system itself must be periodically updated to a reference epoch in star catalogs and astronomical calculations.
+\end{observationblock}
+
 \subsubsection{Aberration}
+
+Since the Earth is moving, the direction to a star appears to be shifted by a small angle due to the Earth's velocity. This effect is called \bfit{aberration}.
+
+We cn distinguish two types of aberration:
+
+\begin{itemize}
+    \item \textbf{Annual aberration} is caused by the Earth's orbital motion around the Sun. This effect leads to a maximum apparent displacement of about $20.5''$ (arcseconds) in the direction of Earth's motion.
+    \item \textbf{Diurnal (daily) aberration} is caused by the Earth's rotation about its axis. This produces a much smaller maximum displacement, about $0.32''$.
+\end{itemize}
+
+This phenomenon is usually already taken into account in the coordinates of the stars, so it is not necessary to correct for it.
 
 \subsubsection{Atmospheric refraction}
 
+Since light is refracted by the atmosphere, the direction of an object differs from the true direction by an amount depending on the atmospheric conditions along the line of sight.
+
+If the object is not too far from the zenith, the atmosphere between the object and the observer can be approximated by a stack of parallel layers, each of which has a certain index of refraction $n_i$.
+
+\vspace{0.3em}
+
+\begin{minipage}{0.63\textwidth}
+
+    The zenith distance $z$ of the object and the observed distance $z_{obs}$ are related by the following equation:
+
+    \vspace{-0.4em}
+
+    $$
+    n_0 \cdot \sin z_{obs} = n_1 \cdot \sin z_1 = ... = 1 \cdot \sin z
+    $$
+    where $n_i$ are the indices of refraction of the different layers.
+
+    Let $R = z - z_{obs}$ be the \textit{refraction angle}. It holds that:
+
+    \vspace{-0.4em}
+
+    $$
+    \begin{array}{cl}
+    n_0 \cdot \sin z_{obs} & = \sin z = \sin (z_{obs} + R) \\[0.5em]
+    & = \underbracket[0.5px][0.2em]{\sin R}_{\sim R} \cos z_{obs} + \underbracket[0.5px][0.2em]{\cos R}_{\sim 1} \sin z_{obs} \\[0.5em]
+    \scriptsize \text{(for small $R$)} \quad & \approx \sin z_{obs} + R \cos z_{obs}
+    \end{array}
+    $$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+\begin{figure}[H]
+    \vspace{-1em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/refraction.png}
+
+    \vspace{-0.5em}
+    \caption{\centering \small Refraction \cite{karttunen}}
+\end{figure}
+\end{minipage}
+
+\vspace{0.5em}
+
+In addition to refraction, Earth's atmosphere also absorbs electromagnetic radiation, significantly impacting astronomical observations across various wavelengths:
+
+\begin{itemize}
+    \item The \textbf{Troposphere} ($0-10\,\mathrm{km}$), the lowest atmospheric layer, is composed primarily of $H_2O$, $CO_2$, $CO$, $N_2$, and $O_2$. These molecules here strongly absorb light in the \textbf{infrared (IR)} region.
+    \item The \textbf{Stratosphere} ($10-80\,\mathrm{km}$) contains a significant concentration of ozone ($O_3$), which efficiently absorbs light in both the \textbf{ultraviolet (UV)} and \textbf{X-ray} regions.
+    \item The \textbf{Ionosphere} ($80-500\,\mathrm{km}$) is a region rich in ionized particles; it absorbs \textbf{radio waves}.
+\end{itemize}
+
+Beyond Earth's atmosphere, the \textbf{interstellar medium (ISM)}, composed of gas and dust, also absorbs and scatters electromagnetic radiation, particularly at \textbf{X-ray} and \textbf{UV} wavelengths.
+
+\vspace{-0.8em}
+
+\begin{figure}[H]
+    \centering
+    \centering
+    \begin{minipage}{0.7\textwidth}
+        \includegraphics[width=\textwidth]{assets/absorption.png}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.28\textwidth}
+        \captionof{figure}{
+            Atmospheric and interstellar absorption and transmission at different wavelengths: the top band shows the electromagnetic spectrum, followed by typical solar radiation at Earth; the third band displays atmospheric transmission with main absorption features (defining optical, infrared, and radio windows), while the bottom highlights interstellar absorption, especially by hydrogen, limiting UV and parts of the radio spectrum.
+        }
+    \end{minipage}
+    \vspace{-0.5em}
+\end{figure}
+
+\vspace{-0.8em}
+
+\begin{observationblock}[Zone of Avoidance]
+The \textbf{Zone of Avoidance} is the region near the Galactic plane ($|\alpha|\lesssim 10^\circ$) where absorption by dust and bright stars make optical observations of extragalactic objects very difficult.
+\end{observationblock}
+
 \subsubsection{Parallax}
+
+If we observe an object from different points, we see it in different directions. The difference of the observed directions is called the \bfit{parallax}. The parallax effect highly depends on the distance of the object. The closer the object, the greater the parallax.
+
+Since the Earth is moving, if an observer observes a star after an interval of time, he will be looking at the object from a different angle. We can distinguish two kinds of parallax:
+
+\begin{itemize}
+    \item \textbf{Diurnal (daily) parallax} is due to the change of direction due to the daily rotation of the Earth. The diurnal parallax also depends on the latitude of the observer; if the position is not specified, it is assumed to be at the equator.
+    
+    \item \textbf{Annual parallax} is due to the Earth's orbital motion around the Sun. The annual parallax is the maximum parallax effect and it is used to measure the distance of the stars.
+\end{itemize}
+
+\vspace{-0.8em}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.55\textwidth}
+        \includegraphics[width=\textwidth]{assets/parallax.png}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.43\textwidth}
+        \vspace{0.5em}
+        \captionof{figure}{The parallax $\pi$ is the angle subtended by the Earth's equatorial radius as seen from the object \cite{karttunen}}
+    \end{minipage}
+\end{figure}
+
+\begin{warningblock}[Parallax correction]
+    Usually, parallax correction is not taken into account in the coordinates of the star catalogues.
+\end{warningblock}
+
+
+\begin{minipage}{0.62\textwidth}
+    Over time, "parallax" and "distance" have practically become synonymous in astronomy, especially in the context of photometric parallax. In fact, parallax serves as the foundation for one of the most widely used units for astronomical distances: the parsec.
+
+    \vspace{0.5em}
+    
+    A \textbf{parsec} (pc) is defined as the distance at which an astronomical object would exhibit a parallax angle of $1''$ (one arcsecond), when measured from two points separated by 1 astronomical unit, that is, from opposite sides of Earth's orbit around the Sun six months apart. 
+
+    \vspace{0.5em}
+    
+    Numerically, one parsec is approximately $3.26$ light-years, or about $3.086 \times 10^{16}$ meters.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \vspace{-0.7em}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/parallax-2.png}
+    \vspace{-0.5em}
+    \caption{\centering Parallax $\pi$ of a star $S$ is the angle subtended by the radius of the orbit of the Earth \cite{karttunen}}
+\end{figure}
+\end{minipage}
+
+\vspace{0.5em}
+
+Over time, advancements in astronomical instrumentation have enabled increasingly precise measurements of stellar parallax, allowing us to probe greater distances:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Method/Instrument} & \textbf{Parallax Precision} & \textbf{Distance Limit} \\
+        \midrule
+        From Earth & $\pi \approx 0.01^{\prime\prime}$ & up to $\sim$30~pc \\
+        Hipparcos satellite & $\pi \approx 0.001^{\prime\prime}$ & up to $\sim$1000~pc \\
+        Gaia mission & $\pi \approx 2 \cdot 10^{-4}\,^{\prime\prime}$ & up to $\sim$5000~pc (5~kpc) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\vspace{-1em}
+\begin{observationblock}[Parallax measurement]
+The objects with the largest measured parallaxes are some of the stars nearest to the Sun. Some notable examples include:
+
+\begin{itemize}
+    \item In 1838, Bessel measured the parallax of 61 Cygni: $\pi = 0.29^{\prime\prime}$
+    \item Proxima Centauri, the closest star to the Sun: $\pi = 0.75^{\prime\prime}$
+\end{itemize}
+\end{observationblock}
+

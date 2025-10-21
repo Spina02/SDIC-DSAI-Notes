@@ -843,61 +843,190 @@ free(values);
 \end{tipsblock}
 
 \newpage
-
 \subsection{Linked Lists}
 
-A linked list is a dynamic data structure that consists of a sequence of nodes, where each node contains a value and a pointer to the next node.
+\begin{minipage}{0.6\textwidth}
+A \textbf{linked list} is a \textit{dynamic} data structure that consists of a sequence of nodes, where each node contains a \textit{value} and a \textit{pointer} to the next node.
 
-There are also doubly linked lists, where each node contains a value and pointers to both the next and the previous node, allowing traversal in both directions.
-
-A simple (singly) linked list node can be defined as follows:
-
+There are also \textbf{doubly linked lists}, where each node contains a value and pointers to both the next and the previous node, allowing traversal in both directions.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
 \begin{codeblock}[language=C, numbers=none]
-struct Node {
-    int value;
-    struct Node *next;
+typedef struct Node {
+  int data;
+  struct Node *next;
+  // doubly linked list
+  // struct Node *prev;
 };
 \end{codeblock}
+\end{minipage}
 
-Here's how to create a simple linked list of 10 elements and print their values:
+\vspace{0.5em}
 
-\begin{codeblock}[language=C, numbers=none]
-struct Node ip, *ipc;
+Here are some functions to create, print and free a linked list (to generalize, I made some of them iterative, some recursive):
 
-int main(void) {
-    struct Node *head = NULL, *current = NULL;
-
-    // Create the list
-    for (int i = 0; i < 10; i++) {
-        struct Node *node = malloc(sizeof *node);
-        if (!node) {// handle with error & cleanup }
-        node->value = i;
-        node->next = NULL;
-
-        if (!head) {
-            head = node;
-        } else {
-            current->next = node;
-        }
-        current = node;
+\begin{codeblock}[language=C]
+// Return a pointer to a new node with the given data
+Node* create_node(int data) {
+    Node *newNode = (Node*) malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("Error: unable to allocate memory.\n");
+        exit(1);
     }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
 
-    // Print the list
-    for (struct Node *tmp = head; tmp != NULL; tmp = tmp->next) {
-        printf("%d\n", tmp->value);
-    }
+// Insert a new node at the beginning of the list
+void insert_at_head(Node **head, Node *node_to_insert) {
+    node_to_insert->next = *head;
+    *head = node_to_insert;
+}
 
-    // Free the list recursively
-    void free_list(struct Node *node) {
-        if (node) {
-            free_list(node->next);
-            free(node);
-        }
-    }
-    return 0;
+// Print the list
+void print_list(Node *head) {
+    for (Node *curr = head; curr != NULL; curr = curr->next)
+        printf("%d ", curr->data);
+    printf("\n");
+}
+
+// Free the list
+void free_list(Node *head) {
+    if (head == NULL) return;
+    free_list(head->next);
+    free(head);
 }
 \end{codeblock}
 
 \begin{warningblock}[Memory management]
-    Always free the nodes you allocate with \plaintt{malloc} when you no longer need them to avoid memory leaks.
+    Always \plaintt{free} the nodes you allocate when you no longer need them to avoid memory leaks.
 \end{warningblock}
+
+\subsubsection{Advantages and disadvantages}
+
+\textbf{Pros:} The size of a linked list can be changed dynamically at runtime. Inserting and deleting elements is efficient, especially in doubly linked lists.
+
+\textbf{Cons:} Access to the $n$-th element is slow, as you need to traverse the list from the beginning. Each node also requires extra memory for its pointer(s), which increases memory usage.
+
+\subsection{Binary Trees}
+
+\begin{minipage}{0.58\textwidth}
+A \textbf{binary tree} is a hierarchical data structure in which each node contains a \textit{data} and has at most two child nodes, typically referred to as the \textit{left} and \textit{right} child. Each node also stores pointers to these children, creating a branching structure that is fundamentally different from the linear nature of arrays or linked lists.
+
+\vspace{0.3em}
+
+A particularly common type is the \textbf{Binary Search Tree} (BST), which imposes an ordering: for any given node, all values in its left subtree are less, and all values in its right one are greater. This property allows for efficient searching, insertion, and deletion operations, typically in $O(\log n)$ for balanced trees.
+
+\vspace{0.3em}
+
+A binary tree in C can be defined with a structure where each node stores data and pointers to its left and right children.
+    
+The entire tree is represented by a pointer to its root node. If it is empty, its pointer is set to \texttt{NULL}.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[
+        every node/.style = {circle, draw, minimum size=0.9cm, font=\normalsize},
+        level distance=1.2cm,
+        level 1/.style={sibling distance=3cm},
+        level 2/.style={sibling distance=1.5cm}
+        ]
+        \node {8}
+            child {node {3}
+                child {node {1}}
+                child {node {6}
+                    child {node {4}}
+                    child {node {7}}
+                }
+            }
+            child {node {10}
+                child[missing] % No left child for 10, keeps position
+                child {node {14}
+                    child {node {13}}
+                    child[missing] % No right child for 14, keeps position
+                }
+            };
+    \end{tikzpicture}
+    \captionof{figure}{Binary search tree}
+    \label{fig:binary-tree-example}
+\end{figure}
+
+\begin{codeblockmp}[language=C, numbers=none]
+struct Node {
+    int data;
+    struct Node *left;
+    struct Node *right;
+};
+\end{codeblockmp}
+
+\end{minipage}
+
+\vspace{0.5em}
+
+To process all the nodes in a binary tree, \textbf{recursive} traversal is widely used. The main orders are:
+\begin{itemize}[noitemsep]
+    \item \textbf{Inorder}: Visit the left subtree, then the root, then the right subtree.
+    \item \textbf{Preorder}: Visit the root, then the left subtree, then the right subtree.
+    \item \textbf{Postorder}: Visit the left subtree, then the right subtree, then the root.
+\end{itemize}
+
+\vspace{0.2em}
+
+Below is an example of how to add a new element to a binary search tree:
+
+\vspace{-0.5em}
+
+\begin{codeblock}[language=C]
+struct Node* add(struct Node* p, int v) {
+    if (p == NULL) { // If the tree is empty, create a new node
+        p = (struct Node *) malloc(sizeof *p);
+        p->data = v;
+        p->left = p->right = NULL;
+    }
+    // If the value is less than the current node, go left
+    else if (v < p->data) {
+        p->left = add(p->left, v);
+    }
+    // If the value is greater than the current node, go right
+    else if (v > p->data) {
+        p->right = add(p->right, v);
+    } else { /* The value is already present, do nothing */ }
+    return p;
+}
+\end{codeblock}
+
+\subsubsection{Advantages and disadvantages}
+
+\textbf{Pros:} Binary search trees (especially if balanced) allow for fast operations: searching, insertion, and deletion are all $O(\log n)$ on average. They also keep data automatically sorted, which makes ordered traversals straightforward.
+
+\textbf{Cons:} If the tree becomes unbalanced (e.g., when many values are inserted in sorted order), performance degrades to $O(n)$. Extra care or specific algorithms are needed to keep it balanced.
+
+
+\subsection{Hash Tables}
+
+Suppose we have a collection of elements, each associated with a unique key, and we want to efficiently store and retrieve them by key—ideally in constant time. A powerful solution for this is the \textbf{hash table}.
+
+A \textbf{hash table} is a data structure that organizes data based on a computed index, so that insertion, deletion, and lookup operations can be performed very efficiently (typically with average-case $O(1)$ time complexity). Instead of searching through a list, we use a \textit{hash function} to compute an index (or "address") in an array (the "table") where the element should be stored.
+
+The basic idea is as follows:
+\begin{itemize}
+    \item A \textbf{hash function} transforms a key (which can be a string, number, etc.) into an integer, which is then mapped to one of the available array indices.
+    \item Each position in the array is called a \bfit{bucket} or \bfit{slot}.
+    \item Ideally, each key maps to a unique index. However, since there are more possible keys than buckets, multiple keys may map to the same index, a situation known as a \textbf{collision}.
+    \item To handle collisions, each bucket can store a list (or another structure) of all elements whose keys hash to the same index. This method is known as \textbf{chaining}.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/hash-table.png}
+    \caption{Hash table}
+    \label{fig:hash-table}
+\end{figure}
+
+\textbf{Pros:} Very fast operations (search, insert, delete) with average $O(1)$ time—performance stays the same even if you have 100 or 10 million elements. The fastest data structure for lookups.
+
+\textbf{Cons:} No ordering: data is scattered pseudo-randomly, so there's no way to print elements in order. Efficiency depends entirely on the quality of the hash function—a poor hash produces lots of collisions and slows everything down.
