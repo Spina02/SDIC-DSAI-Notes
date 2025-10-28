@@ -1,0 +1,520 @@
+\newpage
+
+\missing{Lecture 21/10/2025}
+
+\chapter{Lecture 23/10/2025}
+
+\missing{Start of the lecture}
+
+% Mass of $E_s$:
+
+% \begin{enumerate}
+%     \item \textbf{Kinematic of stars}: 
+%     \item \textbf{Hot gas}: $T_x \rarr M$
+% \end{enumerate}
+
+\section{Spiral Galaxies}
+
+\begin{center}
+\begin{tabular}{l|cccc}
+    \toprule
+    & $S_a$ & $S_b$ & $S_c$ & $S_d$ \\
+    \midrule
+    $M_B$ & $-17 - 23$ & $-17 - 23$ & $-16 -22$ & $-15 -20$\\
+    $M/M_{\odot}$ & $10^{9-12}$ & $10^{9-12}$ & $10^{9-12}$ & $10^{8-10}$\\
+    $V_{max}$ & $163 - 367$ & $163 - 367$ & $99 - 304$ & $99 - 304$ \\
+    $L_{bulge}/L_{tot}$ & $0.3$ & $0.13$ & $0.05$ & ?\\
+    $B-V$ & $0.75$ & $0.64$ & $0.52$ & $0.47$\\
+    $M_{gas}/M_{B} $ & $0.04$ & $0.08$ & $0.16$ & $0.25$\\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+
+Another important parameter is the \textbf{Opening angle} $\theta_0$, which is the angle between the major axis of the galaxy and the line of sight.
+
+We can distinguish "grand design" and "flocculent" galaxies.
+
+\begin{tabular}{cccc}
+    \toprule
+    Surface & brightness & profile & M/L\\
+    \midrule
+    Bulge & $2^{1/4}$ & low & $\sim 5 \dfrac{M_d}{L_\odot}$\\
+    Disk & expo & low & $\sim 3\dfrac{M_\odot}{L_\odot}$\\
+    \bottomrule
+\end{tabular}
+
+There exists "Bulges" and "Pseudobulges".
+
+We know very few pseudobulges.
+
+Bulges have law of E
+
+Pseudobulges have exopnential profile -> rotation
+
+Freeman Law:
+
+$\mu_0 \sim const$
+
+$$
+\mu_0 =  21.52 \pm 0.39 \qquad (S_a \rightarrow S_c)
+$$
+
+$$
+\mu_0 =  22.61 \pm 0.39 \qquad (S_d)
+$$
+
+\todo{How evolution can change the spiral}:
+
+\textbf{Stelar Halo}
+
+MW, M31 $\Rightarrow$ $\rho \propto r^{-3}$
+
+If a galaxy is nearby and it is edge-on, we can see a thick disk.
+
+the size of the disk  is $\mu_B \sim 22.5 mag/arcsec^2$
+
+Another important law is the \textbf{Law of Star Formation Rate} (Schmidt-Kennicutt Law):
+
+$$
+\sum_{SFR} \propto \sum_{gas}^N
+$$
+
+$$
+\dfrac{M_\odot}{y kpc^2}
+$$
+
+\subsubsection{Surface photometry bias}
+
+If we observe a portion of a galaxy, and we must "look through" a portion of the galaxy we will see a redder light than observing it from an angle where we don't have to "look through" any portion of the galaxy.
+
+% add plot 2 of my handwritten notes
+
+The same happens for the bulge.
+
+Let's suppose a spiral with no dust: if we observe a "face-on" galaxy, we will see a brighter galaxy than observing the same galaxy "edge-on".
+
+If we consider a very dusty spiral instead, we will notice that the galaxy appears with a similar brightness in both face-on and edge-on views, due to the dust.
+
+% add plot 3 of my handwritten notes
+
+% Disney observed that $L \propto D^2$ -> not true?
+% add plot 4 of my handwritten notes - Disney
+
+\subsubsection{Rotation curves}
+
+The rotation curve is the curve that shows the velocity of the stars in the galaxy as a function of the distance from the center of the galaxy.
+
+\dots
+
+A part of this velocity is related to the baryonic mass.
+
+% add plot 5 of my handwritten notes
+
+We can decompose the velocity:
+
+DM Halo
+disk
+
+% add plot 6 of my handwritten notes
+
+% talk aboutmaximum disk hypothesis
+
+If $\dfrac ML \sim stars$ We do not need to consider Dark Matter in the disk.
+If $\dfrac ML \gg stars$ We need to consider Dark Matter in the disk.
+
+In general, the max velocity is higher if the luminosity is higher.
+If we pick galaxies with the same luminosity, the max velocity is higher for the galaxies with the higher mass. % (or lower?)
+
+% missing something here
+
+arms:
+
+grand design -> density moves (internal)
+$S_c$ flocculent -> tidal interaction (external)
+
+
+\subsection{Virial Theorem}
+
+[karttunen demonstration]
+
+If a system is virialized, the following equation holds:
+
+$$
+2T + U = 0
+$$
+
+where T is the kinetic energy and U is the potential energy.
+
+Suppose we have a system of $n$ point masses $m_i$ with radius vectors $r_i$ and velocities $\dot r_i$. We define a quantity $A$ (the “virial” of the system) as follows:
+
+$$
+A = \sum_{i=1}^n m_i \dot r_i \cdot r_i
+$$
+
+Time derivative:
+
+$$
+\dot A = \sum_{i=1}^n (\underbrace{m_i \dot r_i \cdot \dot r_i}_{2T} + \underbrace{m_i \ddot r_i \cdot r_i}_{F_i})
+$$
+
+$$
+\dot A = 2T + \sum_{i=1}^n n F_i \cdot r_i
+$$
+
+Time average:
+
+$$
+\langle \dot A \rangle = \dfrac 1\tau \int_0^\tau \dot A dt = \langle 2T \rangle + \langle \sum_{i=1}^n F_i \cdot r_i \rangle
+$$
+
+If the system remains bounded—that is, none of the particles escapes—all positions $\vec r_i$ and velocities $\dot{\vec r}_i$ stay finite. In this case, the virial $A$ does not grow without bound, and the integral in the previous equation also remains finite. When we consider an increasingly long timespan ($\tau \to \infty$), the time average $\langle \dot A \rangle$ approaches zero, and we obtain:
+
+$$
+\langle 2T \rangle + \langle \sum_{i=1}^n F_i \cdot r_i \rangle = 0
+$$
+
+where $F_i$ is the garvitational force:
+
+$$
+\vec F_i = -G m_i \sum_{j = 1, j \neq i}^n m_j \dfrac {\vec r_i - \vec r_j}{r_{ij}^3}
+$$
+
+where $r_{ij} = |\vec r_i - \vec r_j|$.
+
+The latter term od the viral theorem becomes:
+
+$$
+\begin{array}{rl}
+\sum_{i=1}^n F_i \cdot r_i 
+& = -G \sum_{i=1}^n \sum_{j = 1, j \neq i}^n m_i m_j \dfrac {r_i - r_j}{r_{ij}^3} \cdot r_i\\
+& = -G \sum_{i=1}^n \sum_{j = i + 1}^n m_i m_j \dfrac {r_i - r_j}{r_{ij}^3} (r_i - r_j)
+\end{array}
+$$
+
+Which is obtained combnining:
+
+$$
+\begin{array}{rl}
+(1) & = -G \sum_{i=1}^n \sum_{j = 1, j \neq i}^n m_i m_j \dfrac {\vec r_i - \vec r_j}{r_{ij}^3} \cdot \vec r_i\\
+(2) & = -G \sum_{j = 1}^n \sum_{i = 1, i \neq j}^n m_i m_j \dfrac {\vec r_j - \vec r_i}{r_{ji}^3} \cdot \vec r_j\\
+(3) & = -G \sum \sum m_i m_j \dfrac {\vec r_i - \vec r_j}{r_{ij}^3} (- \vec r_j)
+\end{array}
+$$
+
+\dots (maybee missing something)
+
+we get:
+
+$$
+\sum_{i=1}^n \vec F_i \vec r_i = -G \sum_{i=1}^n \sum_{j = i + 1}^n \dfrac{m_i m_j}{r_{ij}} = U
+$$
+
+From the virial theorem we want to derive \bfit{observational quantities}.
+
+$$
+\sum_i m_i (v_i - \langle v \rangle)^2 - G \sum_{i > j} \dfrac{m_i m_j}{r_{ij}} = 0
+$$
+
+$$
+\underbrace{\boxed{\dfrac{\sum_i m_i (v_i - \langle v \rangle)^2}{\sum_i m_i}}}_{\text{velocity dispersion}} - G \underbrace{\boxed{\dfrac{\sum_{i > j} \dfrac{m_i m_j}{r_{ij}}}{(\sum_i m_i)(\sum_i m_i)}}}_{\equiv \frac 1{R_v} \text{viral radius}} \sum_i m_i = 0
+$$
+
+\dots
+
+2D position, 1D observations
+
+$$
+\sigma^2_v - G \dfrac{M}{R_v} = 0
+$$
+
+$$
+M = \dfrac{\sigma^2_v R_v}{G}
+$$
+
+If the system is spherical, we can use the projected radius to get the virial radius.
+
+$$
+\sigma^2_v = 3 \sigma^2_{v, los}
+$$
+
+Therefore, we have:
+
+$$
+R_v = \dfrac {\pi}2 R_{v, projected}
+$$
+
+$$
+M = \dfrac{3\pi}2 \dfrac{\sigma^2_{v, los} R_{v, projected}}{G}
+$$
+
+\textbf{Segregation effect:} Some objects behaves differently: not always mass is proportional to luminosity. Therefore we need to use the formula above.
+
+Sometimes we will see "tensorial virial theorem", and "generalized virial theorem".
+
+\begin{observationblock}[Virial Theorem validity]
+The viral theorem is valid if the mass follows the same distribution of light, buth this is not always the case.
+\end{observationblock}
+
+The definition of the \textbf{viral radius} (or better, the \textit{radius of the virial theorem}) is:
+
+$$
+R_v = \dfrac {n^2}{\sum_{i>j} \dfrac{1}{r_{ij}}}
+$$
+
+The \textbf{harmonic radius} is:
+
+$$
+R_H = \dfrac{n(n-1)/2}{\sum_{i>j} \dfrac{1}{r_{ij}}}
+$$
+
+\subsubsection{Scaling relations - Spiral galaxies}
+
+The \textbf{Trully-Fisher relation} allows us to relate the luminosity of a galaxy to its velocity dispersion.
+
+$$
+L \propto V_{max}^\alpha \qquad \alpha \sim 4
+$$
+
+Calibrated TF relation fron nearby galaxies.
+
+For distant galaxies, we can obtain the redshift from the spectrum, and the rotation velocity (and, in particular,  $V_{max}$). Then we can calculate $M$, and then the distance from $m - M$.
+
+\begin{itemize}
+    \item For nearby galaxies we can use cepheids to calculate de distance
+    \item For very far galaxies we can use the Hubble law
+    \item For the ones in the middle we can use the TF relation
+\end{itemize}
+
+
+VT + Spiral structure -> T-F relation
+
+$$
+\mathcal{M} \propto \dfrac{V^2_{max}R}{G} \left( \times \dfrac{L}{\mathcal M} \right)
+$$
+
+so we get:
+
+$$
+L \propto \left( \dfrac{\mathcal{M}}{L} \right)^{-1} \dfrac{V^2_{max}R}{G}
+$$
+
+$$
+L \propto \left( \dfrac{\mathcal{M}}{L} \right)^{-2} \dfrac{R^2}{L G^2} v_{max}^4
+$$
+
+$$
+L^2 \propto \left( \dfrac{\mathcal{M}}{L} \right)^{-2} \dfrac{R^2}{G^2} v_{max}^4
+$$
+
+$$
+L \propto \left( \dfrac{\mathcal{M}}{L} \right)^{-2} \left(\dfrac 1{\langle I \rangle G^2} \right) v_{max}^4
+$$
+
+$$
+\dfrac{\mathcal{M}}{L} \sim const
+$$
+
+\subsubsection{The Faber-Jackson relation}
+
+% not properly working
+
+\subsubsection{The fundamental plane}
+
+$$
+(R_e, \sigma_0, \langle I \rangle_e)
+$$
+
+$$
+R_e \propto \sigma_0^{1.4} \langle I \rangle_e^{-0.85}
+$$
+
+Virial Theorem + Kormendy Relation -> Fundamental Plane
+
+$$
+R_e \propto \langle I \rangle_e^{-0.82} + \dfrac{\mathcal{M}}{L} \propto \mathcal{M}^{0.2}
+$$
+
+\subsubsection{The $D_n - \sigma$ Relation}
+
+Be $D_n$ the diameter of an ellipse within the average surface brightness $I_n$ corresponds to a value of $20.75 mag/arcsec^2$.
+
+We have thet:
+
+$$
+D_n \propto \sigma_0^{1.33}
+$$
+
+Spectrum -> $\sigma_0$ -> $D_n$ -> distance
+
+\subsubsection{Boh}
+
+\begin{enumerate}
+    \item Luminous galaxies $\rightarrow$ Hubble types
+    \item Elliptical $\neq$ Spiral galaxies
+    \begin{itemize}
+        \item morphology
+        \item kinematics
+        \item gas content
+        \item SF (= color)
+    \end{itemize}
+    \item Kinematics
+    \begin{itemize}
+        \item Spiral: ordered $m^+$, $V_{max}$
+        \item Ellipticals: random $m$, $\sigma_v$
+    \end{itemize}
+\end{enumerate}
+
+\newpage
+
+\section{Lecture 28/10/2025}
+
+\subsubsection{Galaxies' luminosity function}
+
+The luminosity function $(\Phi(L))$ is the number of galaxies per unit volume per unit luminosity.
+$$
+v = \int_{-\infty}^{\infty} \Phi(M)dM = \int_0^\infty \Phi(L)dL
+$$
+
+We encounter different problems:
+
+\begin{itemize}
+    \item what's the distance of a cluster of galaxies?
+    \item large scale structure
+    \item Maluquist bias - limited surveys in $m$
+\end{itemize} 
+
+\todo{reproduce plot in the notebook}
+
+During the years, multiple attempts to solve the problem have been made:
+
+\begin{itemize}
+    \item Press-Schechter (74) halos -> Mass function
+    \item Schechter (79) -> Luminosity function
+\end{itemize}
+
+$$
+\Phi(L) = \left( \dfrac{\Phi^*}{L^*} \right) \left( \dfrac{L}{L^*} \right)^{\alpha} e^{-\left( \frac{L}{L^*} \right)}
+$$
+
+where $\alpha \sim -1$
+
+thypical B-band:
+
+$$
+\Phi^* = 1.6 \cdot 10^{-2} \{ h ^{+3}\}
+$$
+
+$$
+M^*_B = -19.7 + 5 \log h \quad \Leftarrow \quad L^*_B = 1.2 \cdot 10^{10} h^{-2} L_{\odot, B}
+$$
+
+Therefore, $\alpha = -1.07$
+
+For K-band:
+
+$$
+\Phi^*_K = 1.6 \cdot 10^{-2} Mpc^{-3}
+$$
+
+$$
+M^*_K = -23.1
+$$
+
+therefore, $\alpha = -0.9$
+
+\begin{observationblock}[$h^{+3}$]
+    $h^{+3}$ is used to rescale the luminosity function. At first it was related to $\Omega_m \sim 1$, nowadays it is not so easy to determine, and it depends on $H_0$.
+\end{observationblock}
+
+$$
+L_{tot} = \int_0^\infty dL \Phi(L) L = \Phi^* L^* \Gamma(2 + \alpha)
+$$
+
+which is finite for $\alpha \geq -2$
+
+$$
+N_{tot} = \int_0^\infty \Phi(L) dL
+$$
+
+which is finite for $\alpha > -1$
+
+The 60\% of $L_{tot}$ is contained in the range $0.22 L^* < L < 1.6 L^*$
+
+The 90\% of $L_{tot}$ is contained in the range $0.1 L^* < L < 2.3 L^*$
+
+Typical luminosity of galaxies is $\Phi^* \sim 2 \cdot 10^{-2} Mpc^{-3}$, with an average separation of $4 Mpc$.
+
+In clusters, the density is way higher than in the field (the rest of the universe). In fact, the average distance between galaxies is $\sim 1-2 Mpc$.
+
+\subsubsection{Specific Luminosity Function}
+
+LF for morphological types:
+
+\begin{minipage}{0.49\textwidth}
+    \textbf{Field}
+
+    \todo{put here plot (a) sheet G14 Fig 3.51}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+    \textbf{Clusters}
+
+    \todo{put here plot (b) sheet G14 Fig 3.51}
+\end{minipage}
+
+In general it is valid $L_{s\emptyset} > L_{sa}$ - Lenticular galaxies are brighter than spiral galaxies.
+
+Effects due to evolution of galaxies:
+
+A merge of spiral galaxies can result in an elliptical galaxy $\qquad S + S \rightarrow E$
+
+% $In \rightarrow dE$ % what is this?
+
+\begin{minipage}{0.49\textwidth}
+    \textbf{Groups}
+    \begin{itemize}
+        \item $N \lesssim 50$ galaxies
+        \item $M \lesssim 3\cdot 10^{13} M_{\odot}$
+        \item $T_x \sim 1 \rightarrow 3 KeV$
+        \item $\sigma_v \sim 200 \rightarrow 300 km/s$    
+    \end{itemize}
+\end{minipage}%
+\begin{minipage}{0.40\textwidth}
+    \textbf{Clusters}
+    \begin{itemize}
+        \item $N \gtrsim 50$ galaxies
+        \item $M \gtrsim 3\cdot 10^{14} M_{\odot}$
+        \item $T_x \sim 4 \rightarrow 10 KeV$
+        \item $\sigma_v \sim 400 \rightarrow 1000 km/s$
+    \end{itemize}
+\end{minipage}
+
+$$
+R_{Abell} = 1.5 h_{100}^{-1} Mpc \quad \rightarrow \quad 1.5 \cdot \dfrac{100}{70} h_{70}^{-1} M_r
+$$
+
+Both are composed mainly by:
+
+\begin{itemize}
+    \item Stars $\sim 3-5\%$
+    \item Hot gas ($3\cdot 10^7 K$) $\sim 15-20\%$
+    \item Dark Matter $\sim 80\%$
+\end{itemize}
+
+
+\subsubsection{Galaxy distribution}
+
+The following figure shows the distribution of galaxies in the universe.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/gal-distribution.jpg}
+\end{figure}
+
+Some structures are "real", such as the \textit{Great Wall}, others are "apparent", such as the \textit{Finger of God}. % explain why
+
+\begin{tipsblock}[Galaxy distribution]
+    In high redshift zones, the galaxies seem to be less dense than in low redshift zones. This is because the farthest galaxies have a lower apparent magnitude than the nearest ones.
+\end{tipsblock}
+
+% plots from slidesGalaxiesNew and slidesGalaxiesBlanton, slidesGalsKinematics, slidesSEDznew
