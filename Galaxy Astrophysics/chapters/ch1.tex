@@ -104,11 +104,13 @@ The \bfit{galactic longitude} $l$ is measured counterclockwise (analogous to rig
 \end{center}
 \end{observationblock}
 
-\subsection{Coordinate perturbations}
+\section{Coordinate perturbations}
 
 Even for a star fixed relative to the Sun, its observed coordinates may shift due to various perturbing effects. While altitude and azimuth change with Earth's rotation, even right ascension and declination are subject to small variations over time.
 
-\subsubsection{Precession and nutation}
+\vspace{-0.6em}
+
+\subsection{Precession and nutation}
 
 \vspace{-0.5em}
 
@@ -116,7 +118,7 @@ Even for a star fixed relative to the Sun, its observed coordinates may shift du
     The Earth's rotational axis is not fixed in space; instead, it traces out a slow circular motion around the north pole of the ecliptic. This slow motion, known as \bfit{precession}, causes the celestial poles 
     and equator to shift over time, completing a full cycle roughly every 25,800 years. As a result, the coordinates of stars change slowly: star catalogues must specify the equinox, or reference epoch, to which their coordinates refer.
 
-    \vspace{0.5em}
+    \vspace{0.3em}
 
     Superimposed upon precession is a smaller, periodic oscillation of the axis called \bfit{nutation}. It is primarily caused by the gravitational pull of the Moon (and, to a lesser extent, the Sun) on Earth's equatorial bulge. This results in a short-term "nodding" motion, with the main period being about 18.6 years, as the Moon's orbital plane precesses.
 \end{minipage}%
@@ -126,35 +128,37 @@ Even for a star fixed relative to the Sun, its observed coordinates may shift du
     \vspace{-1em}
     \centering
     \includegraphics[width=\textwidth]{assets/coord-pert.png}
-    \caption{\centering Precession and nutation}
+    \caption{\centering \small Precession and nutation \cite{karttunen}}
 \end{figure}
 \end{minipage}
 
-\vspace{0.5em}
-
 Mathematically, the precessional motion can be described using the concept of torque:
+
+\vspace{-0.4em}
+
 $$
 \vec{\Tau} = \dfrac{d\vec{L}}{dt}
 $$
 where $\vec{L}$ is the angular momentum of the Earth, and $\vec{\Tau}$ is the torque exerted mainly by the gravitational attraction of the Moon and Sun on the equatorial bulge. The change in angular momentum, $\Delta \vec{L}$, is perpendicular to $\vec{L}$, leading to a precession of the axis direction (rather than a change in tilt angle):
+
+\vspace{-0.4em}
 
 $$
 \Delta \vec{L} \perp \vec{L}
 \qquad \text{and} \qquad
 \vec{\Tau} \perp \vec{L}
 $$
-
 Both precession and nutation must be taken into account for precise astronomical coordinate systems, since they cause the celestial coordinate grid to shift over time.
 
 \begin{observationblock}[The vernal equinox point]
     The vernal equinox point (\Aries) is not fixed in space. Due to the precession of Earth's axis, it gradually shifts westward along the ecliptic by approximately $50.25''$ (arcseconds) per year. This slow drift means that the celestial coordinate system itself must be periodically updated to a reference epoch in star catalogs and astronomical calculations.
 \end{observationblock}
 
-\subsubsection{Aberration}
+\subsection{Aberration}
 
 Since the Earth is moving, the direction to a star appears to be shifted by a small angle due to the Earth's velocity. This effect is called \bfit{aberration}.
 
-We cn distinguish two types of aberration:
+We can distinguish two types of aberration:
 
 \begin{itemize}
     \item \textbf{Annual aberration} is caused by the Earth's orbital motion around the Sun. This effect leads to a maximum apparent displacement of about $20.5''$ (arcseconds) in the direction of Earth's motion.
@@ -163,7 +167,7 @@ We cn distinguish two types of aberration:
 
 This phenomenon is usually already taken into account in the coordinates of the stars, so it is not necessary to correct for it.
 
-\subsubsection{Atmospheric refraction}
+\subsection{Atmospheric refraction}
 
 Since light is refracted by the atmosphere, the direction of an object differs from the true direction by an amount depending on the atmospheric conditions along the line of sight.
 
@@ -223,25 +227,25 @@ Beyond Earth's atmosphere, the \textbf{interstellar medium (ISM)}, composed of g
 \begin{figure}[H]
     \centering
     \centering
-    \begin{minipage}{0.7\textwidth}
+    \begin{minipage}{0.68\textwidth}
+        \centering
         \includegraphics[width=\textwidth]{assets/absorption.png}
     \end{minipage}%
     \hfill
-    \begin{minipage}{0.28\textwidth}
+    \begin{minipage}{0.31\textwidth}
         \captionof{figure}{
-            Atmospheric and interstellar absorption and transmission at different wavelengths: the top band shows the electromagnetic spectrum, followed by typical solar radiation at Earth; the third band displays atmospheric transmission with main absorption features (defining optical, infrared, and radio windows), while the bottom highlights interstellar absorption, especially by hydrogen, limiting UV and parts of the radio spectrum.
+            Atmospheric and interstellar absorption and transmission at different wavelengths: the top band shows the electromagnetic spectrum, followed by typical solar radiation at Earth; the third band displays atmospheric transmission with main absorption features (defining optical, infrared, and radio windows), while the bottom highlights interstellar absorption, especially by hydrogen, limiting UV and parts of the radio spectrum. \cite{karttunen}
         }
     \end{minipage}
-    \vspace{-0.5em}
 \end{figure}
 
-\vspace{-0.8em}
+\vspace{-1em}
 
 \begin{observationblock}[Zone of Avoidance]
 The \textbf{Zone of Avoidance} is the region near the Galactic plane ($|\alpha|\lesssim 10^\circ$) where absorption by dust and bright stars make optical observations of extragalactic objects very difficult.
 \end{observationblock}
 
-\subsubsection{Parallax}
+\subsection{Parallax}
 
 If we observe an object from different points, we see it in different directions. The difference of the observed directions is called the \bfit{parallax}. The parallax effect highly depends on the distance of the object. The closer the object, the greater the parallax.
 
@@ -320,4 +324,200 @@ The objects with the largest measured parallaxes are some of the stars nearest t
     \item Proxima Centauri, the closest star to the Sun: $\pi = 0.75^{\prime\prime}$
 \end{itemize}
 \end{observationblock}
+
+\subsection{Observations from Satellites}
+
+Observing from space-based telescopes and satellites provides several significant advantages over ground-based astronomical observations:
+
+\begin{itemize}
+    \item \textbf{Absence of Atmospheric Refraction:} Earth's atmosphere bends and distorts incoming starlight, limiting positional accuracy. Satellites, outside the atmosphere, avoid these effects entirely, resulting in sharper, more reliable measurements.
+    \item \textbf{No Gravitational Flexure:} In orbit, instruments are effectively weightless, removing distortions caused by gravitational sagging that affect even the best ground-based observatories.
+    \item \textbf{Sharper Images:} Space telescopes are unaffected by atmospheric blurring, so resolution is limited only by their optics (Airy disk), not by seeing.
+    \item \textbf{Stable Observational Conditions:} Space offers a stable thermal and radiation environment, allowing for superb calibration and highly repeatable measurements across long timescales.
+\end{itemize}
+
+As a result, satellite missions such as \textit{Hipparcos} and \textit{Gaia} have revolutionized parallax measurements with unprecedented accuracy and reach.
+
+Furthermore, since a star's observed flux ($F$) diminishes with the square of its distance ($d$) from us ($ F \propto d^{-2} $), uncertainties in distance measurements are amplified in the derived fluxes. If the fractional uncertainty in distance is $\frac{\Delta d}{d}$, then the corresponding fractional uncertainty in the flux is:
+
+\vspace{-0.4em}
+
+$$
+\frac{\Delta F}{F} \approx 2 \cdot \frac{\Delta d}{d}
+$$
+E.g., if the parallax-based distance has a relative uncertainty of $20\%$ $(\frac{\Delta d}{d} \sim 0.2)$, the resulting uncertainty in the flux is $\frac{\Delta F}{F} \sim 40\%$, underlining the importance of minimizing distance errors.
+\vspace{-0.4em}
+
+\section{Positional Astronomy}
+
+\vspace{-0.5em}
+
+\begin{minipage}{0.68\textwidth}
+    Any space motion can be decomposed into two components: the \bfit{radial velocity} (line-of-sight, $v_r$), directed along the observer's line of sight, and the \bfit{tangential velocity} ($v_t$), perpendicular to it.
+    
+    \vspace{-0.4em}
+
+    $$
+    v = \sqrt{{v_t}^2 + {v_r}^2}
+    $$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \vspace{-0.4em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/velocities.png}
+\end{figure}
+\end{minipage}
+
+
+As the universe is expanding, many extragalactic objects are moving away from us, and their light is observed to be shifted towards longer (redder) wavelengths. This is known as the \bfit{redshift} $(z)$. \ \ This phenomenon is fundamentally similar to the Doppler effect for sound. 
+
+To understand the shift in wavelength, consider a source emitting electromagnetic waves with period $T$. If the source were at rest with respect to the observer, the emitted wavelength would be:
+
+\vspace{-0.6em}
+$$
+\lambda_0 = cT
+$$
+
+\vspace{-0.8em}
+
+where $c$ is the speed of light.
+
+If the source moves at velocity $v$ relative to the observer (positive when receding, negative when approaching), during the same period $T$ it covers a distance $s' = vT$ relative to the observer.
+
+\begin{minipage}{0.62\textwidth}
+Thus, the observed wavelength $\lambda$ becomes:
+
+$$
+\lambda = cT + vT = (c + v)T
+$$
+
+The change in wavelength is given by:
+
+$$
+\Delta \lambda = \lambda - \lambda_0 = (c + v)T - cT = vT
+$$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+
+    \vspace{-0.7em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/redshift.png}
+    \caption{\centering Wavelength shift \cite{karttunen}}
+\end{figure}
+\end{minipage}
+
+\vspace{0.4em}
+
+\subsection{Redshift}
+
+We define the \bfit{redshift} $z$ as the fractional change:
+$$
+z = \frac{\Delta \lambda}{\lambda_0} = \frac{vT}{cT} = \frac{v}{c}
+$$
+This result applies when $v \ll c$ (non-relativistic limit). 
+
+For high velocities (e.g., distant galaxies or quasars), use the relativistic expression:
+$$
+z = \sqrt{\frac{1 + \frac{v}{c}}{1 - \frac{v}{c}}} - 1
+$$
+which for $v \ll c$ reduces to the previous, linear relation.
+
+In most stellar and galactic contexts, velocities are much smaller than the speed of light ($v_{stars} = 2-400\,\mathrm{km/s}$, $v_{galaxies} \sim 10^3\,\mathrm{km/s}$, while $c = 3 \cdot 10^5\,\mathrm{km/s}$), so the non-relativistic approximation is sufficient.
+
+\vspace{0.4em}
+
+An observed redshift generally has two main contributions: a kinematic term from the galaxy's peculiar motion ($z_{\mathrm{kin}}$) and a cosmological term from the expansion ($z_{\mathrm{cosm}}$).
+
+In a galaxy cluster, individual galaxies show slightly different observed redshifts $z_i$ from both peculiar motions and expansion. The mean over $N$ members defines the cluster redshift:
+$$
+z_{\text{cluster}} = \frac{1}{N} \sum_{i=1}^N z_i
+$$
+where $N$ is the number of measured galaxies.
+
+Since peculiar velocities roughly average to zero in the cluster frame, this identifies the cosmological redshift:
+$$
+z_{\text{cluster}} = z_{\text{cosm}}
+$$
+
+For each galaxy in the cluster, we can define its ``rest-frame'' (or peculiar) redshift:
+$$
+z_{\mathrm{rf}} = \frac{z_{\mathrm{obs}} - z_{\text{cluster}}}{1 + z_{\text{cluster}}}
+$$
+Here, $z_{\mathrm{obs}}$ is the total observed redshift for an individual galaxy, $z_{\text{cluster}}$ is the cosmological redshift of the cluster, and $z_{\mathrm{rf}}$ quantifies the galaxy's motion relative to the cluster frame.
+
+\subsection{Proper motion}
+
+Proper motion $\mu$, $[\mu] = [\text{arcsec/year}]$, quantifies a star's apparent angular motion on the sky relative to the Sun, most evident for nearby or high-velocity objects.
+
+A star's space velocity splits into a \bfit{radial velocity} ($v_r$) and a \bfit{tangential velocity} ($v_t$). The tangential velocity results in the proper motion, which can be measured by taking plates at intervals of several 
+years or decades.
+$$
+\tan{\dfrac{\alpha}{2}} \sim \dfrac {x/2}{d}
+\qquad \Rightarrow \qquad 
+\mu \sim \dfrac{v_t}{d}
+$$
+
+Thus, the tangential velocity follows from the proper motion and the distance:
+
+$$
+v_t = 4.74\, \mu\, d
+$$
+
+where:
+
+\begin{center}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{>{\centering\arraybackslash}m{3.5cm} >{\centering\arraybackslash}m{3.5cm} >{\centering\arraybackslash}m{3.5cm}}
+        $[v_t] = \text{km/s}$ & $[d] = \text{pc}$ & $[\mu] = \text{arcsec/year}$ \\
+    \end{tabular}
+\end{center}
+
+The proper motion $\mu$ is usually described in terms of two components: one along the declination direction, $\mu_\delta 
+= \Delta \delta / 1\,\mathrm{year}$, and one along the right ascension direction.
+
+\begin{minipage}{0.62\textwidth}
+    However, to properly express the motion in right ascension, we need to take into account that lines of right 
+    ascension (hour circles) get closer together as you move away from the celestial equator towards the poles. 
+    Therefore, the component in right ascension is written as $\mu_\alpha \cos \delta$, with $\mu_\alpha = \Delta \alpha / 1\,\mathrm{year}$, where the factor of $\cos \delta$ adjusts for this effect.
+
+    The total proper motion is then:
+
+    $$
+    \mu = \sqrt{\mu_\delta^2 + \mu_\alpha^2 \cos^2 \delta}
+    $$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \vspace{-0.7em}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/proper-motion.png}
+    \caption{\centering Proper motion \cite{karttunen}}
+    \end{figure}
+\end{minipage}
+
+\begin{observationblock}[Barnard's Star]
+    Barnard's Star exhibits the highest known proper motion of any star, moving across the sky at a remarkable rate of $\mu = 10.34\ \mathrm{arcsec/year}$.
+\end{observationblock}
+
+\section{Magnitudes}
+
+\begin{minipage}{0.62\textwidth}
+Let us assume we have some radiation passing through a surface element $d A$. Some of the radiation will leave $d A$ within a solid angle $d\omega$; the angle between $d\omega$ and the normal to the surface is denoted by $\theta$. The amount of energy with frequency in the range $[\nu, \nu + d\nu]$ entering this solid angle in time $dt$ is:
+$$
+d E_\nu = I_\nu \cos \theta \ d A \ d\nu \ d\omega \ dt
+$$
+Here, the coefficient $I_\nu$ is the specific intensity of the radiation at the frequency $\nu$ in the direction of the solid angle $d\omega$. 
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{assets/flux.png}
+    \end{figure}
+\end{minipage}
 
