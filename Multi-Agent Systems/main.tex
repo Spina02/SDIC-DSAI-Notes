@@ -1,0 +1,61 @@
+\documentclass[a4paper,12pt]{report}
+
+%%%%%%%%%%%%
+% packages %
+%%%%%%%%%%%%
+
+\usepackage{../template/pkgs}
+\usepackage{../template/styles}
+\usepackage{../template/frames}
+\usepackage{../template/macros}
+\definecolor{darkgreen}{rgb}{0.0, 0.4, 0.0}
+\definecolor{lightgreen}{rgb}{0.56, 0.93, 0.56}
+
+%%%%%%%%%%%%%%
+% Title Page %
+%%%%%%%%%%%%%%
+
+\institute{UniTs - University of Trieste}
+\faculty{Data Science and Artificial Intelligence}
+\department{mathematics informatics and geosciences}
+\title{Multi-Agent Systems}
+\author{Christian Faccio}
+\lecturer{Prof. Fraile Beneyto, Raúl}
+\date{\today}
+\githublink{christianfaccio}
+\email{christianfaccio@outlook.it}
+\license{\CCBYNCSA}
+
+%%%%%%%%%%%%
+% document %
+%%%%%%%%%%%%
+
+\AtBeginDocument{
+  \setlength{\parskip}{0.4em}
+}
+
+\nocite{*}
+\addbibresource{./references.bib}
+
+\begin{document}
+
+% Pagina di copertina
+\maketitle
+
+% Abstract
+\include{chapters/abstract}
+
+% Indice
+\toc
+
+% Chapters
+\includechapters
+\include{chapters/gama}
+
+% Bibliography
+\printbibliography
+
+\end{document}
+
+
+
