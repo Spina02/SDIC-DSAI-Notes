@@ -1,0 +1,134 @@
+\chapter{OpenMP}
+
+
+
+\section{Tasks}
+
+A \textbf{task} in OpenMP represents an independent unit of work, comprising a well-defined set of instructions or operations that can be executed asynchronously. Tasks enable the efficient decomposition of complex computations into smaller, manageable pieces that can be scheduled and executed in parallel by different threads. This \textbf{task abstraction} allows for flexible parallelism beyond the constraints of loop-based parallel regions, supporting dynamic workloads with unpredictable execution paths.
+
+\textbf{Data Abstraction} refers to the encapsulation of logically uniform pieces of information (such as arrays, objects, or structures) that may be accessed concurrently by multiple threads. Proper management of data abstraction is essential to avoid race conditions and ensure consistency, especially when multiple tasks access shared data out-of-order. Mechanisms such as data dependencies, synchronization constructs, and memory models are employed to manage safe and efficient concurrent access.
+
+Tasks often interact through shared data, giving rise to dependencies. These dependencies form a \textbf{task dependency graph}, where nodes are tasks and directed edges represent data dependencies (i.e., one task must complete before another can start due to shared data). It is crucial that this graph is \textbf{acyclic} ensuring there are no circular wait conditions or deadlocks, and allowing the runtime system to correctly schedule and execute tasks respecting all required data dependencies.
+
+It is sometimes possible to parallelize a workflow that is irregular or depends on runtime conditions using OpenMP \bfit{sections}. However, solutions built with sections often become convoluted and difficult to manage, and, more importantly, the intrinsic rigidity of the sections construct makes it nearly impossible to express truly dynamic patterns of parallelism.
+
+Since version 3.0, OpenMP introduced the \textbf{task} construct, which provides an elegant and flexible way to handle precisely these kinds of problems—where execution flow is irregular and only determined at runtime. When defining a task, OpenMP internally creates a "unit of work," bundling together all necessary code, data, and local variables. This work is then scheduled for execution at some future point. 
+
+Behind the scenes, OpenMP employs a queuing system to orchestrate the assignment of these tasks to the available threads, efficiently balancing the workload and enabling dynamic parallelism.
+
+We have a main thread which generates tasks and a pool of threads which execute them. As soon as they are free, the free threads pickup one queued task each, and execute it. In the same way, when the main thread finishes to create tasks, it picks up one of the queued tasks and executes it.
+
+To make it clearer: creating tasks does not mean creating threads. The tasks are “units of work” that are assigned to the running threads. The pool of threads is unaltered(unless, of course, there is nested parallelism involved) and mapped onto the underlying physical cores.
+
+....
+
+
+The management of tasks in OpenMP involves three main key concepts: the data environment, creation and execution, and synchronization and dependence. The \textbf{data environment} refers to how data is assigned to each task, and how the framework distinguishes between shared and private variables within task contexts. \textbf{Creation and execution} concerns when tasks are generated, how many tasks are created, who is responsible for their execution, and whether there is any prioritization among them. Finally, \textbf{synchronization and dependence} focuses on the ways tasks are coordinated, including how tasks are synchronized, scheduled, and whether they depend on the results or completion of other tasks. A robust understanding and careful management of these aspects is essential for writing correct and efficient parallel code using OpenMP's tasking model.
+
+\begin{codeblock}[language = C]
+int main( int argc, char **argv )
+{
+    #pragma omp parallel
+    {
+    #pragma omp single
+    {
+        printf( " »Yuk yuk, here is thread %d from "
+                "within the single region\n", omp_get_thread_num() );
+        #pragma omp task
+        {
+        printf( "\tHi, here is thread %d "
+                "running task A\n", omp_get_thread_num() );
+        }
+        #pragma omp task
+        {
+        printf( "\tHi, here is thread %d "
+                "running task B\n", omp_get_thread_num() );
+        }
+    }
+    printf(" :Hi, here is thread %d after the end "
+            "of the single region, I was stuck waiting "
+            "all the others\n", omp_get_thread_num() );
+    }
+    return 0;
+}
+\end{codeblock}
+
+
+\subsubsection{Scheduler points}
+
+\begin{itemize}
+    \item \textbf{barrier}: either implicit or explicit.
+
+    all tasks reated by any thread in the current parallel region are guaranteed to complete after the barrier exits.
+
+    \item \textbf{taskwait}:
+
+    all children tasks are completed, the encountering task is suspended until that is true it does not apply to descendants: i.e. it includes only direct children tasks.
+
+    \item \textbf{taskgroup}:
+
+    All descendant tasks are guaranteed to be completed at the exit of the taskgroup region (see later); it baheves as an implicit omp barrier.
+\end{itemize}
+
+\subsubsection{Scope of variables}
+
+in the code above, we called \texttt{omp\_get\_thread\_num()} multiple times because it is a thread-local variable. If we had declared it as a global variable, it would have been shared by all threads and the output would have been the same for all threads (the one who enters the single region).
+
+The main point to consider here is that by its very nature, the tasks' creation is driven by the coeval data context and is not related to the values that any variable will have in the future at the moment of their execution.
+
+As such, the rule-of-thumb is \textbf{data, unless otherwise stated, are
+copied in local copies so that to preserve the data context at
+the moment of creation}.
+
+\begin{codeblock}[language = C]
+...
+#pragma omp single
+{
+    int me = omp_get_thread_num();
+    printf( " »Yuk yuk, here is thread %d from "
+            "within the single region\n", me );
+    #pragma omp task
+    {
+    printf( "\tHi, here is thread %d "
+            "running task A\n", me );
+    }
+    #pragma omp task
+    {
+    printf( "\tHi, here is thread %d "
+            "running task B\n", me );
+    }
+}
+...
+\end{codeblock}
+
+here \texttt{me} will have always the same value, also if different threads will execute the tasks. This is a \textbf{very common error to avoid}.
+
+Let's remind the following rules:
+
+\begin{itemize}
+    \item When a variable is shared on the task creation the storage used is that referred with that name at the point where the task was created
+    \item When a variable is private on the task creation the references to it (inside the task code region) use the uninitialized storage that is created when the task is executed
+    \item When a variable is firstprivate on a task creation the references to it inside the task code region are to the new storage that is created and initialized with the value of the existing storage of that name when the task is created    
+\end{itemize}
+
+\dots
+
+With the \texttt{untied} clause, you are signalling that this task, if
+ever suspended, can be resumed by any free thread. The default is the opposite, a task to be tied to the thread that initially starts it.
+
+If untied, you must take care of the data environment, for instance, no \texttt{threadprivate} variables can be used, nor the thread number, and so on.
+
+
+-----------------------------
+
+locks
+
+\begin{codeblock}[language = C]
+    // set the lock, blocking
+    omp_set_lock(&lock);
+    // set the lock, non-blocking
+    omp_test_lock(&lock);
+
+    // unset the lock
+    omp_unset_lock(&lock);
+\end{codeblock}

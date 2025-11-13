@@ -1,0 +1,59 @@
+\documentclass[a4paper,12pt]{report}
+
+%%%%%%%%%%%%
+% packages %
+%%%%%%%%%%%%
+
+\usepackage{../template/pkgs}
+\usepackage{../template/styles}
+\usepackage{../template/frames}
+\usepackage{../template/macros}
+
+\usepackage{multirow}
+
+%%%%%%%%%%%%%%
+% Title Page %
+%%%%%%%%%%%%%%
+
+\institute{UniTs - University of Trieste}
+\faculty{Scientific and Data Intensive Computing}
+\department{mathematics informatics and geosciences}
+\title{Advanced High Performance Computing}
+\author{Andrea Spinelli}
+\lecturer{Prof. Luca Tornatore}
+\date{\today}
+\githublink{Spina02}
+\email{andreaspinelli2002@gmail.com}
+\license{\CCBYNCSA}
+
+%%%%%%%%%%%%
+% document %
+%%%%%%%%%%%%
+
+\AtBeginDocument{
+  \setlength{\parskip}{0.4em}
+}
+
+\addbibresource{./references.bib}
+
+\begin{document}
+
+% Pagina di copertina
+\maketitle
+
+% Abstract
+\include{chapters/abstract}
+
+% Indice
+\toc
+
+% Chapters
+\includechapters
+
+% Bibliography
+\printbibliography
+
+\end{document}
+
+
+

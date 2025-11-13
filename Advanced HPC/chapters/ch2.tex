@@ -1,0 +1,223 @@
+\chapter{Vector Types}
+
+It is possible to use a vector type (not present in standard C, but commonly accepted by compilers) to declare a vector of a given type.
+
+\begin{codeblock}[language=C]
+typedef type name __attribute__((vector_size,(bytes)));
+\end{codeblock}
+
+where:
+\begin{itemize}
+    \item \textbf{type}: the basic type for every element of the vector.
+    \item \textbf{name}: the name with which you will refer to the type in your code.
+    \item \textbf{bytes}: the number of bytes of the vector.
+\end{itemize}
+
+\begin{codeblock}[language=C]
+/* Declare a vector of 4 doubles */
+typedef double v4d __attribute__((vector_size,(4*sizeof(double))));
+/* Declare a vector of 8 doubles */
+typedef double v8d __attribute__((vector_size,(8*sizeof(double))));
+/* Declare a vector of 4 integers */
+typedef int v4i __attribute__((vector_size,(4*sizeof(int))));
+\end{codeblock}
+
+It is not possible to access the elements of a vector type directly, in the same way as you cannot access a single byte of a double.
+
+\begin{codeblock}[language=C]
+typedef union {
+    v4d v;
+    double d[VD_SIZE];
+} v4d_u;
+\end{codeblock}
+
+\section{Memory Alignment}
+
+It is mandatory that memory regions accessed by vector instructions are aligned.
+
+\dots
+
+To allocate memory in an aligned way, we can use C11 and POSIX functions:
+
+\begin{itemize}
+    \item \textbf{C11}:
+    \texttt{void *aligned\_alloc(size\_t alignment, size\_t size);}
+    \item \textbf{POSIX}:
+    \texttt{void *posix\_memalign(void **memptr, size\_t alignment, size\_t size);}
+\end{itemize}
+
+It is also possible to use a static allocation (i.e. variables or automatic arrays):
+
+\begin{codeblock}[language=C, numbers=none]
+__attribute__((aligned(base))) <var>;
+\end{codeblock}
+
+And it is also possible to assume that the memory is aligned:
+
+\begin{codeblock}[language=C, numbers=none]
+assume_aligned(<array>, base);
+\end{codeblock}
+
+
+\begin{exampleblock}[Working with vectors]
+    Let's re-implement the following loop using the vector types and check what changes in the generated assembler code and in the run-time.
+
+    \begin{codeblock}[language=C, morekeywords=double, morekeywords=restrict]
+double kernel( double *restrict A, double *restrict B, double *restrict C, int N ) {
+    double sum = 0;
+    for ( int i = 0; i < N; i++ )
+        sum += A[i]*B[i] + C[i];
+    return sum;
+}
+\end{codeblock}
+
+At first we need to define the appropriate vector variables:
+
+\begin{codeblock}[language=C, firstnumber=7, morekeywords=v4df, morekeywords=v4df_u]
+#define VD_SIZE 4
+typedef double v4df __attribute__((vector_size(VD_SIZE*sizeof(double))));
+typedef union {
+    v4df v;
+    double d[VD_SIZE];
+} v4df_u;
+
+v4df *VA = (v4df *) A;
+v4df *VB = (v4df *) B;
+v4df *VC = (v4df *) C;
+
+v4df vsum = {0};
+\end{codeblock}
+
+Now we can actually implement the sum:
+
+\begin{codeblock}[language=C, firstnumber=19, morekeywords=v4df, morekeywords=v4df_u]
+int N4 = N&0xFFFFFFFC;
+
+for (int i = 0; i < N4; i++) {
+    vsum += VA[i] * VB[i] + VC[i];
+}
+
+v4df_u *vsum_u = (v4df_u *) &vsum;
+vsum_u->v[0] += vsum_u->v[1] + (vsum_u->v[2] + vsum_u->v[3]);
+
+for (int i = N4; i < N; i++) {
+    sum += A[i]*B[i] + C[i];
+}
+
+sum += vsum_u->v[0];
+
+return sum;
+\end{codeblock}
+\end{exampleblock}
+
+\newpage
+
+\subsection{Conditional evaluation}
+
+When our code contains conditional statements, we need to pay special attention if we want to use vector types. Vectorization is usually only possible if the condition is simple and the code inside the conditional is not too complex, for example a single operation or a small sequence of straightforward instructions.
+
+
+\begin{codeblock}[language=C]
+void kernel( double * restrict A, double * restrict B, const int N ) {
+    for ( int i = 0; i < N; i++ )
+        if ( A[i] < B[i] ) swap(A, B);
+    return;
+}
+\end{codeblock}
+
+Actually this code can be easily fully vectorized by the compiler itself with the appropriate compilation flags. The idea is to create a mask of the condition and then use it to select the appropriate values.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/conditional.png}
+    \caption{Conditional evaluation \cite{ADV_HPC}}
+    \label{fig:conditional}
+\end{figure}
+
+To efficiently handle conditionals in vectorized code, we first implement the mask logic. The ternary operator is particularly well-suited for expressing such element-wise conditional assignments:
+
+\begin{codeblock}[language=C]
+void kernel( double *A, double *B, int N ) {
+    // element-wise swap of A and B so that
+    // A[i] > B[i] for every i
+
+    for ( int i = 0; i < N; i++ ) {
+        double min = (A[i]>B[i] ? B[i] : A[i]);
+        double max = (A[i]>=B[i] ? A[i] : B[i]);
+        A[i] = max;
+        B[i] = min; 
+    }
+    return;
+}
+\end{codeblock}
+
+Now we can vectorize the code using the vector types and the mask logic.
+
+\begin{codeblock}[language=C]
+dvector_t *vA = (dvector_t *)__builtin_assume_aligned(A, VALIGN);
+dvector_t *vB = (dvector_t *)__builtin_assume_aligned(B, VALIGN);
+
+int VN = (N/DVSIZE)&0xFFFFFFFC;
+IVDEP
+LOOP_VECTORIZE
+LOOP_UNROLL_N(4)
+for ( int i = 0; i < VN; i++ ) {
+    dvector_t a = vA[i];
+    dvector_t b = vB[i];
+    llvector_t keep = (vA[i]>=vB[i]);
+    vA[i] = (dvector_t)(((llvector_t)a & keep) | 
+            ((llvector_t)b & ~keep));
+    vB[i] = (dvector_t)(((llvector_t)b & keep) | 
+            ((llvector_t)a & ~keep));
+}
+
+int j = VN*DVSIZE;
+process ( &A[j], &B[j], N-j+1);
+\end{codeblock}
+
+\subsection{Vectorization by OpenMP SIMD directive}
+
+\begin{codeblock}[language=C]
+#pragma omp simd [clause [[,] clause] ...]
+\end{codeblock}
+
+The clauses are:
+
+\begin{itemize}
+    \item \texttt{private(list)} and \texttt{lastprivate(list)}: they have exatly the same meaning as in “thread-related” OpenMP
+
+    The execution instances in this context are the SIMD lanes; hence, an instance of every private variables is created per SIMD lane.
+
+    \item \texttt{reduction(identifier: list)};
+    \item \texttt{collapse(n)};
+    \item \texttt{simdlen(length)};
+    \item \texttt{safelen(length)}: It is used to specify at the compiler the maximum length not having dependences inside the loop;
+
+    \begin{codeblock}[language=C]
+#pragma omp simd safelen(8)
+for (int i = 0; i < N; i++) {
+    a[i] = pow(b[i-k], 3.14); // here the compiler does not know a priori 
+}
+\end{codeblock}
+
+    \item \texttt{linear(list[: linear-step])};
+    \item \texttt{aligned(list[ : alignment ])};
+\end{itemize}
+
+\subsection{The omp SIMD functions}
+
+In general, every non-linear element in the execution flow is at high risk a disruption in the vectorization. Function call above all, but also, for instance, conditionals.
+
+penMP SIMD offers the possibility of automatically build vector version of code segments through the declare simd directive. These functions can then be called from a simd loop.
+
+the possible clauses are:
+
+\begin{itemize}
+    \item \texttt{uniform}: when listed as uniform, a parameter is intended to be invariant for all the concurrent calls to the function, i.e. all the simd lanes will observe the same value
+    \item \texttt{linear}: at odds, being linear means that a parameter changes linearly with the indicated step
+    \item \texttt{simdlen}: retains the same meaning as in the simd directive
+    \item \texttt{aligned}: as exactly the meaning than in normal code
+    \item \texttt{inbranch}: informs the compiler that the function will be called from in a conditional branch.
+    \item \texttt{notinbranch}: informs the compiler that the function will not be called from in a conditional branch.
+\end{itemize}
+

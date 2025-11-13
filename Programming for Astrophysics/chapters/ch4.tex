@@ -1,0 +1,166 @@
+\chapter{Makefile}
+
+A Makefile is a file that contains a set of rules for building a project. It is used to automate the build process and to make it easier to maintain the project.
+
+The syntax of a Makefile is:
+
+\begin{codeblock}[language=make, numbers=none]
+target: dependencies
+    command
+\end{codeblock}
+
+where:
+\begin{itemize}
+    \item \texttt{target}: is the name of the target to be built.
+    \item \texttt{dependencies}: are the dependencies of the target.
+    \item \texttt{command}: is the command to be executed to build the target.
+\end{itemize}
+
+It is possible to concatenate rules adding them as requirements for the target. The following one shows an example of a Makefile that builds a program made of two modules: \texttt{main.c} and \texttt{math\_ops.c}.
+
+It is a common practice to add a \texttt{clean} target to the Makefile to remove the compiled files and the executable.
+
+\begin{exampleblock}[Example of a Makefile]
+\begin{codeblock}[language=make, numbers=none]
+calculator: main.o math_ops.o
+    gcc -o calculator main.o math_ops.o
+
+main.o: main.c math_ops.h
+    gcc -c main.c
+
+math_ops.o: math_ops.c math_ops.h
+    gcc -c math_ops.c
+
+clean:
+    rm -f calculator main.o math_ops.o
+\end{codeblock}
+\end{exampleblock}
+
+It is possible to use the \texttt{make} command to build the project. The following command will build the project:
+\begin{codeblock}[language=bash, numbers=none]
+make
+
+# Output:
+gcc -c main.c -o main.o
+gcc -c math_ops.c -o math_ops.o
+gcc -o calculator main.o math_ops.o
+\end{codeblock}
+
+Note the chaining of the commands to build the project.
+
+\subsubsection{Variables}
+
+It is possible to define variables in the Makefile to avoid repeating the same value multiple times.
+
+A variable can be defined and used in the Makefile with the following syntax:
+\begin{codeblock}[language=make, numbers=none]
+VARIABLE = value
+\end{codeblock}
+
+and used in the Makefile with the following syntax:
+\begin{codeblock}[language=make, numbers=none]
+$(variable) 
+# or 
+${variable}
+\end{codeblock}
+
+\begin{exampleblock}[Example of a Makefile with variables]
+\begin{codeblock}[language=make, numbers=none]
+# Compiler
+CC = gcc
+
+# Compiler Flags
+CFLAGS = -Wall -Wextra -O2
+
+# Libraries Flags
+LDFLAGS = -lm
+
+# Target name
+TARGET = calculator
+
+# Objects
+OBJS = main.o math_ops.o
+
+# Build rules
+$(TARGET): $(OBJS)
+    $(CC) -o $(TARGET) $(LDFLAGS) $(OBJS)
+
+\%.o: \%.c
+    $(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+    rm -f $(TARGET) $(OBJS)
+\end{codeblock}
+\end{exampleblock}
+
+Automatic variables:
+
+\begin{itemize}
+    \item \texttt{\$@}: is the name of the target.
+    \item \texttt{\$<}: is the name of the first dependency.
+    \item \texttt{\$\^}: is the names of all the dependencies.
+    \item \texttt{\$?}: is the names of dependencies newer than the target.
+\end{itemize}
+
+A complete Makefile:
+
+\begin{codeblock}[language=make, numbers=none]
+# Compiler
+CC = gcc
+
+# Directories
+SRC_DIR = src
+INC_DIR = include
+OBJ_DIR = obj
+BIN_DIR = bin
+
+# Base flags
+CFLAGS_COMMON = -Wall -Wextra -Iinclude
+LDFLAGS = -lm
+
+# Debug flags
+CFLAGS_DEBUG = $(CFLAGS_COMMON) -g -O0 -DDEBUG
+# Release flags
+CFLAGS_RELEASE = $(CFLAGS_COMMON) -O3 -DNDEBUG
+
+# Default to release
+CFLAGS = $(CFLAGS_RELEASE)
+
+# Files
+TARGET = $(BIN_DIR)/nbody
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+DEPS = $(OBJS:.o=.d)
+
+# Default target
+all: $(TARGET)
+
+# Debug build
+debug: CFLAGS = $(CFLAGS_DEBUG)
+debug: clean $(TARGET)
+
+# Release build (default)
+release: CFLAGS = $(CFLAGS_RELEASE)
+release: $(TARGET)
+
+# Create directories
+$(shell mkdir -p $(OBJ_DIR) $(BIN_DIR))
+
+# Build executable
+$(TARGET): $(OBJS)
+    $(CC) -o $(TARGET) $(OBJS) $(LDFLAGS)
+
+# Pattern rule
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+    $(CC) $(CFLAGS) -MMD -MP -c $< -o $@
+
+# Include dependencies
+-include $(DEPS)
+
+# Clean
+clean:
+    rm -rf $(OBJ_DIR) $(BIN_DIR)
+
+# Phony targets
+.PHONY: all debug release clean
+\end{codeblock}
