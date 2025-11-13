@@ -1037,7 +1037,7 @@ The basic idea is as follows:
 
 \subsubsection{Direct Input and Output (I/O) Functions}
 
-In C, not all file operations need to be strictly sequential (from start to end). Sometimes, you need to read or write data at specific positions inside a file—this is known as \bfit{random access} or \textbf{direct I/O}.
+In C, not all file operations need to be strictly sequential (from start to end). Sometimes, you need to read or write data at specific positions in a file, this is known as \bfit{random access} or \textbf{direct I/O}.
 
 Direct I/O functions allow programs to jump to (seek), read from, or write to arbitrary positions in a file. This is especially useful for binary files or large datasets structured in fixed-size records.
 
@@ -1045,27 +1045,21 @@ Here are the most important functions:
 
 \begin{itemize}
     \item \texttt{fread(void *ptr, size\_t size, size\_t nobj, FILE *stream)}:
-    
     Reads up to \plaintt{nobj} objects of size \plaintt{size} from the file referenced by \plaintt{stream} into memory at \plaintt{ptr}. Returns the number of objects actually read (can be less than \plaintt{nobj} at EOF or on error).
     
     \item \texttt{fwrite(const void *ptr, size\_t size, size\_t nobj, FILE *stream)}:
-    
     Writes \plaintt{nobj} objects of size \plaintt{size} from memory at \plaintt{ptr} to the file referenced by \plaintt{stream}. Returns the number of objects written.
     
     \item \texttt{fseek(FILE *stream, long offset, int origin)}:
-    
     Moves the file position indicator to a given location. \plaintt{origin} can be \plaintt{SEEK\_SET} (beginning), \plaintt{SEEK\_CUR} (current position), or \plaintt{SEEK\_END} (end of file).
     
     \item \texttt{ftell(FILE *stream)}:
-
     Returns the current position in the file.
     
     \item \texttt{rewind(FILE *stream)}:
-
     Convenient function to set the file position back to the beginning (same as \plaintt{fseek(stream, 0L, SEEK\_SET)}).
     
     \item \texttt{fgetpos(FILE *stream, fpos\_t *ptr)}, \texttt{fsetpos(FILE *stream, const fpos\_t *ptr)}:
-
     Save or restore a file position using a special type (\plaintt{fpos\_t}). Useful for marking positions in a file to come back to later.
 \end{itemize}
 

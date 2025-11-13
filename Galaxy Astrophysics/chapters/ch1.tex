@@ -451,7 +451,7 @@ Here, $z_{\mathrm{obs}}$ is the total observed redshift for an individual galaxy
 
 \subsection{Proper motion}
 
-Proper motion $\mu$, $[\mu] = [\text{arcsec/year}]$, quantifies a star's apparent angular motion on the sky relative to the Sun, most evident for nearby or high-velocity objects.
+\bfit{Proper motion} ($\mu$) is a star's apparent angular motion across the sky relative to the Sun, measured in arcseconds per year. This motion is most evident for nearby stars or those with large \textit{peculiar motions} (different from the Sun's motion).
 
 A star's space velocity splits into a \bfit{radial velocity} ($v_r$) and a \bfit{tangential velocity} ($v_t$). The tangential velocity results in the proper motion, which can be measured by taking plates at intervals of several 
 years or decades.
@@ -467,7 +467,7 @@ $$
 v_t = 4.74\, \mu\, d
 $$
 
-where:
+where 4.74 is a conversion factor to convert $v_t$ in km/s, since the other units are:
 
 \begin{center}
     \renewcommand{\arraystretch}{1.1}
@@ -506,18 +506,77 @@ The proper motion $\mu$ is usually described in terms of two components: one alo
 
 \section{Magnitudes}
 
-\begin{minipage}{0.62\textwidth}
-Let us assume we have some radiation passing through a surface element $d A$. Some of the radiation will leave $d A$ within a solid angle $d\omega$; the angle between $d\omega$ and the normal to the surface is denoted by $\theta$. The amount of energy with frequency in the range $[\nu, \nu + d\nu]$ entering this solid angle in time $dt$ is:
+\begin{minipage}{0.58\textwidth}
+Consider the energy from radiation passing through a surface element $d A$. Let this energy propagate into a solid angle $d\omega$ at an angle $\theta$ to the surface normal. The amount of energy within the frequency range $[\nu, \nu + d\nu]$ that passes into this solid angle in a time interval $dt$ is:
 $$
 d E_\nu = I_\nu \cos \theta \ d A \ d\nu \ d\omega \ dt
 $$
-Here, the coefficient $I_\nu$ is the specific intensity of the radiation at the frequency $\nu$ in the direction of the solid angle $d\omega$. 
+Here, the coefficient $I_\nu$ is the \textit{specific intensity of the radiation} at the frequency $\nu$ in the direction of the solid angle $d\omega$. 
 \end{minipage}%
 \hfill
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.4\textwidth}
+
+    \vspace{-0.7em}
     \begin{figure}[H]
         \centering
-        \includegraphics[width=\textwidth]{assets/flux.png}
+        \includegraphics[width=0.93\textwidth]{assets/flux.png}
+        \caption{\centering $I_\nu$ is the energy through $dA$ into $d\omega$, direction $\theta$ \cite{karttunen}}
     \end{figure}
 \end{minipage}
 
+In other words, the specific intensity is the amount of energy passing through a surface element in a given direction, per unit area, per unit time, per unit frequency and per unit solid angle:
+\medskip
+$$
+[I_\nu] = \text{Wm}^{-2} \text{Hz}^{-1} \text{Sterad}^{-1}
+$$
+
+The \bfit{Surface Brightness} ($SB$) is used to describe the brightness of an extended object in the sky:
+\medskip
+$$
+SB = \dfrac{Flux}{Solid\ Angle}
+$$
+
+The \bfit{total intensity} $I$ is obtained by integrating $I_\nu$ over all frequencies:
+\medskip
+$$
+I = \int_0^\infty I_\nu d\nu
+$$
+
+From an observational standpoint, a more practical quantity is the \bfit{flux density}, often simply called \bfit{flux}, which represents the power of radiation received per unit area. The monochromatic flux density $F_\nu$ is the energy passing through a surface element per unit area, per unit time, and per unit frequency:\
+\medskip
+$$
+F_\nu = \frac{1}{dA \, d\nu \, dt} \int_S dE_\nu = \int_S I_\nu \cos \theta \, d\omega, \qquad [F_\nu] = \text{W\,m}^{-2} \text{Hz}^{-1}
+$$
+
+Analogously, the \bfit{total flux} $F$ is obtained by integrating over all frequencies:
+\medskip
+$$
+F = \int_0^\infty F_\nu d\nu = \int_S I \cos \theta \, d\omega, \qquad [F] = \text{W\,m}^{-2}
+$$
+
+Observed flux densities are usually very small, so a more convenient unit is often used, particularly in radio astronomy: the \bfit{Jansky} (Jy), defined as:
+$1 \text{Jy} = 10^{-26} \text{W\,m}^{-2} \text{Hz}^{-1}$.
+
+The \bfit{luminosity} $L$ of an object is the power emitted by the object throughout a closed surface surrounding it, and it is given by:
+
+$$
+L = \int_{\Sigma} F \, dA
+$$
+
+For a star radiating into a solid angle $\omega$, the luminosity is expressed as $L = \omega r^2 F$, where $F$ is the observed flux density at a distance $r$. When the radiation is isotropic, $\omega = 4\pi$, thus $L = 4\pi r^2 F$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{assets/luminosity.png}
+    \caption{\centering Luminosity \cite{karttunen}}
+\end{figure}
+
+So:
+
+$$
+L = F \propto \dfrac 1{d^2}
+$$
+
+$$
+[L] = W
+$$

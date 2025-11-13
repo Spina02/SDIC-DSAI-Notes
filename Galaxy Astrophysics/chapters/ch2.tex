@@ -1,3 +1,5 @@
+\chapter{Raw notes (To be rewritten)}
+
 \newpage
 
 \missing{Lecture 21/10/2025}
@@ -518,3 +520,806 @@ Some structures are "real", such as the \textit{Great Wall}, others are "apparen
 \end{tipsblock}
 
 % plots from slidesGalaxiesNew and slidesGalaxiesBlanton, slidesGalsKinematics, slidesSEDznew
+
+\newpage
+
+\chapter{Lecture 30/10/2025}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/distance-ladder.png}
+    \caption{\centering The distance ladder}
+\end{figure}
+
+\missing{something}
+
+$$
+\Delta R = R_1 - R_0 = p \int_{T_0}^{T_1} v(t) dt
+$$
+
+$$
+m_1 - m_0 = M_1 - M_0 = -5 [\log (R_0 + \Delta R) - \log R_0] = -10 [\log T_1 - \log T_0]
+$$
+
+$$
+R_0 = f(m_0, m_1, \Delta R, T_0, T_1)
+$$
+
+Surface Brightness Fluctuations (SBF):
+
+$$
+z \sim 0 \qquad \rightarrow \qquad SB \sim const
+$$
+
+Galaxy nearby have a small number $N$ of stars, while galaxies far away have a large number $N$ of stars.
+
+The poissonian error goes $\sim \sqrt{N}$
+
+The relative error is $\sim \dfrac{\sqrt{N}}{N}$
+
+Supernovae: you can obtain $\Delta t \sim L_{max}$ from the light curve. $L_{max}$ results in the absolute magnitude of the supernova, summing up the apparent magnitude of the supernova we can find the distance modulus.
+
+Hubble law (1928):
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/hubble-law.png}
+    \caption{\centering Hubble law (1929)}
+\end{figure}
+
+$$
+v = H_0 d
+$$
+
+what is $H_0$?
+
+In 1990:
+
+\begin{itemize}
+    \item \textbf{optical} $H_0 = 50 \; \frac{km}{s}/Mpc$
+    \item \textbf{x-ray} $H_0 = 100 \; \frac{km}{s}/Mpc$
+\end{itemize}
+
+CMB (MW background cosmology): $H_0 \sim 70 \; \frac{km}{s}/Mpc$
+
+$$
+H_0 = h \cdot 100 \; \frac{km}{s}/Mpc
+$$
+
+\missing{something}
+
+\begin{observationblock}[Cluster in Hubble's Law]
+    In the Hubble's Law graph, the "vertical" spread of data points, depicted as clusters known as the "Finger of God", arises from galaxy clusters' peculiar velocities. These formations do not reflect any true spatial structure in the universe.
+\end{observationblock}
+
+\subsubsection{Distant Clusters}
+
+$$
+E(z) = \dfrac{H(z)}{H_0}
+$$
+
+closure of the universe:
+
+$$
+\rho_c = \dfrac{3 H_0^2}{8 \pi G}
+$$
+
+Galaxies in principle are expanding, at some point they are in a region where the average density is higher than the critical density, and they start to collapse.
+
+$$
+\langle \rho \rangle > \rho_c \qquad \Rightarrow \qquad \langle \rho \rangle = 20 \rho_c
+$$
+
+In order to define a size of a cluster, we have to define radius such as $R_{200}$.
+
+\newpage
+
+$\gtrsim 50\%$ of the galaxies stays in groups, not in clusters.
+
+$\sim 5\%$ of the galaxies stays in clusters.
+
+In the local group there are about 35-50 galaxies. $L < L^*$
+
+\begin{center}
+\begin{tabular}{cccc}
+ & MW & M31 & M33\\
+$L^*$ & $SB_{bc}$ & $S_b$ & $S_c$\\
+$M_B$ & $-20$ & $-21.2$ & $-18.9$
+\end{tabular}
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/local-group.jpg}
+    \caption{\centering Local group \cite{grebel}}
+\end{figure}
+
+$$
+V \sim - 120 Km/s, \qquad D = 770 Kpc, \qquad \text{collisions in } 6 \cdot 10^9 years
+$$
+
+The mass of the Local Group is:
+
+$$
+M \sim 3 \cdot 10^12 M_\odot
+$$
+
+We can use a two body model to calculate the mass of the Local Group.
+
+$$
+M_{LG} = M_{MW} + M_{M31} \sim 90\% L_{LG} \sim 90\% M_{LG}
+$$
+
+Let's consider at $t = 0$ the two galaxies are very close to each other and they are moving far away from each other.
+
+they will reach a maximum distance $r_max$ at time $t_max$ where $v_max = 0$. Then they start to collapse again.
+
+$$
+\dfrac 12 M v^2 - \dfrac{G M^2}{r} = c
+$$
+
+$$
+C = - \dfrac{G M^2}{r_max}
+$$
+
+$$
+\dfrac 12 \left( \dfrac{dr}{dt} \right)^2 = \dfrac {G M}{r} - \dfrac{G M}{r_max}
+$$
+
+$$
+(dt)^2 = \dfrac{(dr)^2}{2 GM} \left( \dfrac{1}{\dfrac{1}{r} - \dfrac{1}{r_max}} \right)
+$$
+
+$$
+dt = \dfrac{dr}{\sqrt{2 GM}} \dfrac{1}{\sqrt{\dfrac{1}{r} - \dfrac{1}{r_max}}}
+$$
+
+$$
+t_max = \int_0^{t_{max}} dt = \int_0^{r_{max}} \dfrac{dr}{\sqrt{2 GM \sqrt{\dfrac{1}{r} - \dfrac{1}{r_max}}}} = \dfrac {\pi}{2} \dfrac{r_{max}^{3/2}}{\sqrt{2 GM}}
+$$
+
+where the result is obtained using the Wolfram rule:
+$$
+\int_0^a \dfrac 1{\sqrt{\frac 1x - \frac 1a}} dx = \dfrac {\pi}{2} a^{3/2}
+$$
+
+Thus, $r_max$ is obtained by solving the equation:
+
+$$
+r_{max} = \left( \dfrac{2 \sqrt{2 G M}}{\pi} t_{max} \right)^{2/3}
+$$
+
+$$
+\dfrac {v^2}2 = \dfrac {G M}{r} - \dfrac 12 \left( \dfrac{ \pi GM}{t_max} \right)^{2/3}
+$$
+
+$$
+v = f(M, t_{max}) \quad \rightarrow \quad M = f(\nu, t_{max}) = 3 \cdot 10^12 M_{\odot}
+$$
+
+\missing{something}
+
+$$
+t_{max} \sim \dfrac{T_0}{2} + \dfrac {D_{obs}}{2 V_{obs}} \sim 10^10 years
+$$
+
+Sculptor Group has a distance of 1.8 Mpc and it is composed by 6 galaxies
+
+M81 group has a distance of 3.5 Mpc and it is composed by 8 galaxies 
+
+Virgo cluster has a distance of 16 Mpc and it is composed by 250 galaxies, it occupies 10° of space in the sky. Its most important galaxy is M87.
+
+Coma Cluster has a distance of 90Mpc, a redshift of $z \sim 0.03$
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Topics from Schneider - pag 223 and following
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+
+\subsection{Catalogues of clusters}
+
+optical: Sovradensity of galaxies
+
+An important catalog of galaxy clusters is the \textit{Zwicky catalogue} (1961-68), which contains more clusters, but for which the applied selection criteria are considered less reliable.
+
+The \textit{Abell catalogue} (1958-89) contains $N_{gal} \ge 50$ galaxies.
+
+Those 50 galaxies have a magnitude in the following range:
+$$
+m_3 \le m \le m_3 + 2
+$$
+
+But also a radius such that:
+
+$$
+\theta_A = \dfrac{1.7'}{z}
+$$
+
+Therefore:
+
+$$
+R_{Abel} = 1.5 h^{-1} Mpc
+$$
+
+The \textit{Abell Corwin \& Olowin catalogue} (ACO) contains around 4000 clusters (with a small redshift $z < 0.2$)
+
+\subsubsection{Problems with the catalogues}
+
+The selection of galaxy clusters from an overdensity of galaxies on the sphere is not without problems, in particular if these catalogs are to be used for statistical purposes.
+
+We have two main problems:
+
+We need to define two quantities:
+
+\begin{itemize}
+    \item \textbf{Completeness}: $\dfrac{N_{obs}}{N_{true}} \le 1$
+    \item \textbf{Purity}: $\dfrac{N_{obs} - N_{false}}{N_{obs}} \le 1$
+\end{itemize}
+
+A galaxy cluster is a three-dimensional object, whereas galaxy counts on images are necessarily based on the projection of galaxy positions onto the sky.
+
+Therefore, projection effects are inevitable. Random overdensities on the sphere caused by line-of-sight projection may easily be classified as clusters. These so-called \textit{projection effects} are the most serious problem with the catalogues.
+
+\subsection{Morphological Classification}
+
+The morphological classification of galaxy clusters by Rood and Sastry is defined by several categories:
+
+\begin{itemize}
+    \item \textbf{cD}: Clusters categorized as cDs are characterized by the dominance of a central \textit{cD galaxy}.
+    \item \textbf{B}: Clusters categorized as Bs are distinguished by a \bfit{binary} system of bright galaxies at their center.
+    \item \textbf{L}: Clusters categorized as Ls exhibit a nearly \bfit{linear} alignment of their dominant galaxies.
+    \item \textbf{C}: Clusters categorized as Cs are identified by a \bfit{single core} of galaxies.
+    \item \textbf{F}: Clusters categorized as Fs are described as having a \bfit{flat} galaxy distribution.
+    \item \textbf{I}: Clusters categorized as Is are notable for their \bfit{irregular} distribution.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/morph-class.png}
+    \caption{\centering Morphological classification by Rood and Sastry \cite{schneider}}
+\end{figure}
+
+\missing{a lot of stuff}
+
+Modern Catalogues
+
+Bautz-Morgan: 
+
+sovraddensity of galaxies
+
+Color magnitude diagram
+
+\dots
+
+\begin{itemize}
+    \item sovraddensity of galaxies
+    \item color magnitude diagram
+\end{itemize}
+
+\dots
+
+Max BCG catalog (SDSS survey):
+
+This catalog is 90\% pure and 85\% complete. $M \ge 10^{14} M_{\odot}$
+
+\begin{itemize}
+    \item red sequence
+    \item dominant central galaxy
+    \item radial profile of galaxies distribution
+\end{itemize}
+
+\subsection{Groups}
+
+\begin{itemize}
+\item \textbf{Loose Groups}
+
+They are the most common type of groups, they include almost the 50\% of the galaxies.
+
+\item \textbf{Compact Groups}
+
+They are very rare.
+
+This is the case where we have a high density of galaxies, and they are all close to each other.
+
+$$
+t_{dyn} \sim \dfrac{R}{\sigma_v} \sim 0.02 H_0^{-1}
+$$
+
+\item \textbf{Fossil Groups}
+
+$$
+\Delta m_{12} \ge 2 mag
+$$
+
+\begin{tipsblock}[Fossil Groups]
+The name fossil depends of the fact that a researcher thought it was the first group ever formed in the universe.
+\end{tipsblock}
+
+
+% seen plots in slidespaperICL
+
+\end{itemize}
+
+
+\chapter{Lecture 04/11/2025}
+
+\missing{Start of the lecture}
+
+The Inter Cluster Medium (ICM) is the hot gas that fills the space between the clusters. Between 1920 and 1933 were discovered the first X-ray sources.
+
+Telescopes:
+
+\begin{itemize}
+    \item X-ray (mono source, then extended source)
+    \item UMURU
+    \item Einstein
+    \item Rosat
+    \item Chandra
+    \item XMM
+    \item E-Rosat
+    \item Athena
+\end{itemize}
+
+Athena to study the motion of the gas in some clusters
+
+$$
+L_X \sim 10^{43-45} erg/s
+$$
+
+FF emission: Bremsstrahlung
+
+\begin{itemize}
+    \item Groups $kT \sim 1-3 KeV$
+    \item Clusters $kT \sim 10-12 KeV$ (at least $> 4-5 KeV$)
+\end{itemize}
+
+
+
+$$
+E_\nu \equiv \dfrac {dL}{dV d\nu}
+$$
+
+$$
+e_\nu^{ff} \propto \underbrace{n_e n_i}_{n_e^2} T^{-1/2} e ^{-\frac{h\nu}{kT}}
+$$
+
+\todo{insert plots from paper sheets A2 (right column)}
+
+$$
+E \propto \sqrt{T} n_e^2 \qquad KT \gtrsim 5 KeV
+$$
+
+ff+bf+bb:
+$$
+E \propto T^{-0.6} n_e^2 \qquad KT \le 2 KeV
+$$
+
+\textbf{Rosat} has a sensibility range of $0.1-2.4 KeV$. It is very useful to measure the mass of a cluster.
+
+If the gas is homogeneous, we have: $\langle n_e^2 \rangle = \langle n_e \rangle^2$, but if the mass is not homogeneous, we have: $\langle n_e^2 \rangle \neq \langle n_e \rangle^2$.
+
+From observations we can note that the gas mass is much smaller than the stellar mass: $M_gas \sim 5-10 M_{\star}$. An important indicator is the following ratio:
+
+$$
+\dfrac{M_{gas} \ (\sim 15 - 20\% M_{tot})}{M_{\star} \ (\sim 3-5\% M_{tot})}
+$$
+
+The higher is the total mass $M_{tot}$, the higher is the ratio $\dfrac{M_{gas}}{M_{\star}}$.
+
+A conclusion is that clusters are richer in gas, while groups are richer in stars. Follows that the clusters retain better the gas, and the groups are more efficient in forming stars.
+
+Since $e_x \propto n_e^2$, the x-ray emission comes from the core of the cluster, therefore you can have a better view of where the cluster is in space (for distances $< 1 Mpc$). There is still the problem of the flux limit.
+
+\subsubsection{Clusters morphology}
+
+We can find different morphologies for the clusters:
+
+\begin{itemize}
+    \item \textbf{Unimodal Clusters}: they have a single peak in the x-ray emission.
+    \item \textbf{Bimodal Clusters}: they have two peaks in the x-ray emission.
+\end{itemize}
+
+We can talk further about substructures in the clusters.
+
+\textbf{Unimodal clusters}
+
+$\beta-model$
+
+\begin{itemize}
+    \item 3 dimensional profile:
+
+    $$
+    \rho_{gas}(r) = \rho_{0, gas} \left( 1 + \left( \dfrac{r}{\beta r_{c, gas}} \right)^2 \right)^{-\frac{3}{2} \beta_{fit, gas}}
+    \qquad \Rightarrow \qquad 
+    r^{-2} \beta_{fit, gas} = \dfrac 23
+    $$
+
+    \item 2 dimensional profile:
+    
+    $$
+    \Sigma_{gas}(R) = \Sigma_{0, gas} \left( 1 + \left( \dfrac{r}{\beta R_{c, gas}} \right)^2 \right)^{-\frac{3}{2} \beta_{fit, gas} + \frac 12}
+    \qquad \Rightarrow \qquad 
+    R^{-1}
+    $$
+    
+    \item observed profile:
+    
+    $$
+    S_x = S_{x, 0} \left( 1 + \left( \dfrac{r}{\beta R_{c, gas}} \right)^2 \right)^{-3 \beta_{fit, gas} + \frac 12}
+    \qquad \Rightarrow \qquad 
+    S_x = \int \rho_{gas}^2
+    $$
+\end{itemize}
+
+We have a typical ICM density of:
+$$
+n_e \sim \dfrac{1 \cdot 10^{-3}}{cm^{-3}}
+$$
+
+Cooling Flows (or, in older literature, Cool Cores) are clusters with a high density of gas in the center, characterized by a big emission in the center.
+
+$$
+t_{cool} = \dfrac {\mu}{e_ff} \sim \underline{8.5 \cdot 10^{10} yr} \left( \dfrac{n_e}{10^{-3} cm^{-3}} \right) \left( \dfrac{T_{gas}}{10^8 K} \right)
+$$
+
+Which is bigger than the Hubble time $t_H \sim 13 \cdot 10^{9} yr$, therefore we have no cooling.
+
+$$
+\omega = \dfrac 32 n_e k T
+$$
+
+$$
+E^{ff} \propto n_e^2 T^{1/2}
+$$
+
+The center of some clusters can have high $n_e$ and a lower $t_{cool} < t_H$, therefore we have a cooling core. In these kind of clusters we can observe star formation from the gas.
+
+These kind of clusters have no big Surface Brightness \dots
+
+\missing{something about No Cool Core and Mergers}
+
+\subsubsection{Sunyaev-Zel'dovich Effect}
+
+% page 252 of Schneider's book
+
+The Sunyaev-Zel'dovich Effect is a small distortion of the Cosmic Microwave Background Radiation (CMBR) due to the interaction with the ICM.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/s-z-effect.png}
+    \caption{\centering Sunyaev-Zel'dovich Effect \cite{schneider}}
+\end{figure}
+
+In the Rayleigh-Jeans domain of the CMB spectrum, thus at wavelengths larger than about 1 mm, photons are effectively removed by the SZ effect. For the change in specific intensity in the RJ part, one obtains:
+
+$$
+\dfrac {\Delta I_\nu^{RJ}} {I_\nu^{RJ}} = -2 y
+$$
+
+where $y$ is the \bfit{Compton-y parameter}:
+
+$$
+y =\int_0^\infty dl \dfrac{kT_{gas}}{m_e c^2} \sigma_T n_e
+$$
+
+and $\sigma_T$ the Thomson cross-section for electron scattering:
+
+$$
+\sigma_T = \dfrac{8 \pi}{3} \left( \dfrac{e^2}{m_e c^2} \right)^2
+$$
+
+therefore:
+\begin{itemize}
+    \item $y \propto$ optical depth
+    \item $y \propto n_e$ 
+    \item $y \propto T_{gas}$ 
+\end{itemize}
+
+So y can be a proxy for cluster mass.
+
+$$
+\theta = \dfrac R{D_A}, \quad d\theta = \dfrac{dR}{D_A}
+$$
+$$
+sz-eff = \int d^2 \theta y = \dfrac 1{D_A^2} \int d^2 Ry \propto \dfrac 1{D_A^2} \int dV n_e T_{gas}
+$$
+
+$$
+Y_{sz} \equiv M_{gas} \cdot T_{gas}
+$$
+
+\subsubsection{Radio extended emission}
+
+There are galaxies with very large radio halos ($\sim 1 Mpc$ in size).
+
+Radio Relics -> elongated halos, polarized light
+
+synchrotron emission:
+
+We have a (very weak) magnetic field $B$ (\le 1 $\mu G$) and a gamma factor $\gamma \sim 10^4$
+
+
+% primary electron models (?)
+For instance, if $\gamma = 300$, then the electron energy is $E = \gamma m_e c^2 \sim 150 MeV$.
+
+But if we consider a time $T_{life} = 10^9$ its energy will be fewer and fewer.
+% ???
+
+protons instead have a shorter lifetime. 
+% no from astrophysical
+
+Bimodal clusters mergers can result in:
+\begin{itemize}
+    \item \textbf{Shocks}: 
+    \begin{itemize} 
+        \item $v_{rel} \sim 1-2 \cdot 10^3 km/s$
+        \item gravitational energy: $10^64 erg$
+        \item dissipation: $3 \cdot 10^63 erg$
+    \end{itemize}
+
+    \item \textbf{Turbulence}:
+    \begin{itemize}
+        \item ...
+    \end{itemize}
+\end{itemize}
+
+\missing{last few minutes of the lecture}
+
+\chapter{Lecture 06/11/2025}
+
+\subsubsection{Frequencies}
+
+VLA instruments works at a frequency of 1.4 GHz. while LOFAR has a range of 300-800 MHz.
+
+They allow us to study phenomena such as mergers, with ratios 1:1 to 1:10.
+
+They allow us also to study AGN and their radio emission. There are three main models:
+
+\begin{itemize}
+    \item primary electrons models: not good because it (something with the scale)
+    \item primary electron reacceleration models: good because it explains the radio emission of some clusters.
+    \item secondary electron reacceleration models: no evidence of it.
+\end{itemize}
+
+\subsubsection{Galaxies and X-ray emission} % schneider book page 246
+
+Sarazin 1986-88 did a lot of studies and pubblications about the X-ray emission of galaxies.
+
+\textbf{ICM}
+
+We assume that the gas in the cluster is adiabatic (= isotropic)
+
+We remember that for an ideal gas it holds that:
+
+$$
+pV = n_{mol} R T = n_{mol} \mathcal{N} \dfrac R{\mathcal R} T
+$$
+
+so we get:
+
+$$
+pV = N K_B T \qquad \Rightarrow \qquad p = \dfrac{N K_B T}{V}
+$$
+
+
+$$
+\rho_{gas} = \rho = n \langle m \rangle = n \mu m_p
+$$
+
+we can define $\mu$ as the mean atomic mass:
+
+$$
+\mu \equiv \dfrac{\langle m \rangle}{m_p} \sim 0.6
+$$
+
+therefore, we get:
+
+$$
+\boxed{p = \rho \dfrac{K_B T}{\mu m_p}}
+$$
+
+in an isothermal situation, we have:
+
+$$
+p = k \rho
+$$
+
+And in an adiabatic situation, we have:
+
+$$
+p = k^i \rho^{\gamma}
+$$
+
+where $\gamma = \dfrac{c_p}{c_v} = \dfrac{5}{3}$ for a monatomic gas.
+
+\textbf{Hydrostatic equilibrium}
+
+We can observe that the cluster is in hydrostatic equilibrium:
+
+$$
+t_{sc} = \dfrac{2 R_A}{c_s},
+\qquad \qquad
+c_s^2 = \left.\dfrac{dp}{d\rho} \right|_{\rho = \rho_0}
+$$
+where $c_s$ is the sound speed:
+
+$$
+c_s \sim \sqrt {\dfrac p \rho} = \sqrt {\dfrac{n K_B T}{\mu m_p}} \sim \sqrt{1000 km/s}
+$$
+
+Therefore we observe a value of $t_sc$ smaller than the Hubble time (time of the universe):
+
+$$
+t_{sc} \sim 7 \cdot 10^8 yr < 13 \cdot 10^9 yr = t_H
+$$
+
+---
+
+$$
+\vec \nabla p = - \rho \vec \nabla \phi
+$$
+
+sphere:
+
+$$
+\dfrac {dp}{dr} = - \rho \dfrac {G M(r)}{r^2}
+$$
+
+to convince us:
+
+$$
+p = \dfrac FA \quad \Rightarrow \quad \dfrac px = \dfrac FV
+$$
+
+so 
+
+$$
+\vec \nabla p \cdot V = -m \vec \nabla \phi
+\qquad \Rightarrow \qquad
+\vec \nabla p = - \rho \vec \nabla \phi
+$$
+
+Coming back, we have:
+
+$$
+\dfrac{GM(r)}{r^2} =  - \dfrac 1{\rho} \dfrac{K}{\mu m_p} \left( \rho \dfrac{dT}{dr} + T \dfrac{d\rho}{dr} \right)
+$$
+
+$$
+M(r) = - \dfrac 1{G} \left( \dfrac{KT}{\mu m_p} \right) r \left[ \dfrac{d \ln \rho_{gas}}{d \ln r} + \dfrac{d \ln T}{d \ln r} \right]
+$$
+
+In a 3D situation, we have:
+
+$$
+\rho_{gas}(r) = \rho_{gas, 0} \left( 1 + \left( \dfrac{r}{r_{c, gas}} \right)^2 \right)^{-\frac{3}{2} \underbrace{\beta_{fit, gas}}_{\sim 2/3}}
+$$
+
+where, if $ r \gg r_{c, gas} $, we have $\rho \to r^{-2}$.
+
+For galaxies, we have - Jeans Equation:
+
+$$
+M(r) = - \dfrac 1{G} \sigma_r^2 r \left[ \dfrac{d \ln \rho_{gas}}{d \ln r} + \dfrac{d \ln \sigma_r^2}{d \ln r} + 2 \beta \right]
+$$
+
+Where the factor $\beta$ is called \textit{the velocity anisotropy parameter}.
+
+$$
+\beta(r) = 1 - \dfrac{\sigma_{\tau}^2}{\sigma_r^2}, 
+\qquad \qquad \text{where } \ \ 
+\sigma_{\tau}^2 = \dfrac {\sigma_{\theta}^2 + \sigma_{\phi}^2}2
+$$
+
+for an isotropic orbit, gas is a collisional component, therefore we have:
+
+$$
+\boxed{\beta(r) = 0}
+$$
+
+so the \textit{number density} of a galaxy is:
+
+$$
+\rho_{gal}(r) = \rho_{gal, 0} \left( 1 + \left( \dfrac{r}{r_{c, gal}} \right)^2 \right)^{-\frac{3}{2} \beta_{fit, gal}}
+$$
+
+historically, $\beta_{fit, gal} = 1$ was used.
+
+
+We can derive the Jeans Equation for galaxies:
+
+$$
+\dfrac{-KT}{\mu m_p} \dfrac{d \ln \rho_{gal}}{d r} = - \sigma_r^2 \dfrac{d \ln \rho_{gal}}{d r} - \dfrac{2 \beta \sigma_r^2}{r}
+$$
+
+$$
+\dfrac{\dfrac{d \ln \rho_{gal}}{d r}}{\dfrac{d \ln \rho_{gal}}{d r} + \dfrac{2 \beta}{r}} = - \dfrac{\sigma_r^2}{\dfrac{KT}{\mu m_p}}
+$$
+
+so we get:
+
+$$
+\beta_{spec} = \dfrac{\sigma_{LOS}^2}{\dfrac{KT}{\mu m_p}}
+$$
+
+$$
+\dfrac{d \ln \rho_{gal}}{d r} = \dfrac 1\rho \dfrac{d \rho}{dr} = ... = - 3 \beta_{fit} \left( 1 + \left(\dfrac{r}{r_0} \right)^2 \right)^{-1}r
+$$
+
+where, for $r \gg r_0$, we have $- 3 \beta_{fit} r^{-1}$.
+
+\missing{few calculations of the end of the first beta problem}
+
+\subsubsection{Second beta problem}
+
+The second $\beta$ problem still does not have commonly accepted solutions.
+
+$$
+\beta_{spec} = \dfrac{\sigma_{LOS}^2}{\dfrac{KT}{\mu m_p}} \sim 1
+$$
+
+The energy per unit mass for galaxies and for gas is the same.
+
+equilibrium of energy for unit mass:
+
+$$
+\dfrac 12 m v^2 = \dfrac 32 KT
+$$
+
+in 1D:
+
+$$
+\dfrac 12 3 \sigma_{1D}^2 = \dfrac 32 KT
+$$
+
+Violent relaxation - Lynden-Bell (1967) % schneider book page 235:
+
+They proposed that galaxies and gas forms together clusters, and they are in violent relaxation.
+
+We can observe that the beta fitted is not the same as the beta spec. % plot on red notebook
+
+solutions:
+
+\begin{itemize}
+    \item \textbf{dynamical friction}: more important in groups
+    \item \textbf{Inter-groups medium}: the energy of AGN is smaller than the energy of the ICM, but $T_{AGN} \sim T_{IGM}$ % so AGNs heats the ICM (?)
+    \item \textbf{member selection in groups}
+\end{itemize}
+
+\subsubsection{Galaxies in clusters}
+
+Morphology density relation - Dressler (1980) 
+
+Color-density relation
+
+BCG: Brightest Cluster Galaxy
+
+cD galaxies: E + light envelope (ICL = Inter-Cluster Light)
+
+\dots
+
+$v_{BCG} \sim \bar v$
+
+coevolution of clusters and BCG (which is inside)
+
+---
+
+hypothesis of BCG formation:
+
+\begin{itemize}
+    \item \textbf{merger}: cannibalism dynamics
+    \item \textbf{no-limit tidal radius}: ...
+    \item \textbf{cool core}: ...
+\end{itemize}
+
+...
+
+we have two types of segregation:
+
+\begin{itemize}
+    \item \textbf{Luminosity segregation in position}: more evident in clusters with a high density of galaxies
+    \item \textbf{Luminosity segregation in velocity}: even a smaller effect ...
+\end{itemize}
+
+% plot in the red notebook

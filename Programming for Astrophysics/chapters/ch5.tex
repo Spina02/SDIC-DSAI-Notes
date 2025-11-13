@@ -1,0 +1,65 @@
+\chapter{Solving Ordinary Differential Equations (ODEs)}
+
+Ordinary Differential Equations (ODEs) are differential equations that involve only one independent variable. They are used to model many physical systems, such as the motion of a particle in a potential field, the flow of a fluid, or the behavior of a circuit.
+
+Problems involving ordinary differential equations (ODEs) can always be reduced to the study of sets of first order differential equations. For example the second-order equation:
+
+$$
+\dfrac{d^2 y}{dx^2} + q(x) \dfrac{dy}{dx} = r(x) 
+\qquad \Rightarrow \qquad
+\begin{cases}
+    \dfrac{dy}{dx} = z(x)\\
+    \dfrac{dz}{dx} = r(x) -q(x)z(x)
+\end{cases}
+$$
+
+We usually need initial conditions (as many as the order of the differential equation) to solve a differential equation.
+
+
+\subsubsection{Euler's method}
+
+\subsubsection{Midpoint method}
+
+$$
+\begin{array}{rcl}
+    k_1 & = & h f(x_n, y_n)\\
+    k_2 & = & h f(x_n + \frac 12 h, y_n + \frac 12 k_1)\\
+    y_{n+1} & = & y_n + k_2 + O(h^3)
+\end{array}
+$$
+
+\subsubsection{Runge-Kutta 4}
+
+RK3 is not stable, therefore we use RK4.
+
+$$
+\begin{array}{rcl}
+    k_1 & = & h f(x_n, y_n)\\
+    k_2 & = & h f(x_n + \frac 12 h, y_n + \frac 12 k_1)\\
+    k_3 & = & h f(x_n + \frac 12 h, y_n + \frac 12 k_2)\\
+    k_4 & = & h f(x_n + h, y_n + k_3)\\
+    y_{n+1} & = & y_n + \frac 16 (k_1 + 2k_2 + 2k_3 + k_4) + O(h^5)
+\end{array}
+$$
+
+This method requires to choose an appropriate step size $h$ to ensure the accuracy of the solution.
+
+There exist a variant of this method that consider a variable step size $h_n$ for each step.
+
+the general idea is to estimate the solution of the equation at order $h^4$ and $h^5$ and use their difference to control the error.
+
+We can define the scaled error as:
+$$
+\sqrt{\dfrac 1N \sum_{i=0}^{N-1} \left( \dfrac{\Delta_i}{scale_i} \right)^2}
+$$
+
+We accept the step if $\text{\texttt{err}}<1$. 
+
+If \texttt{err} is much smaller than one the we can \textbf{increase} the integration step!
+
+There are several methods to evaluate the integration step size given the error scaling as $O(h^5)$, e.g.:
+
+$$
+h_0 = h_1 \left| \dfrac {\Delta_0}{\Delta_1} \right|^{0.2}
+$$
+
