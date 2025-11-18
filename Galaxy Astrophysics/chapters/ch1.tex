@@ -12,9 +12,9 @@ To describe the position of an object in the sky, we need to define a reference 
 
    \subsection{The Equatorial System}
 
-The equatorial coordinate system is defined by selecting a reference parallel and a reference meridian. The Earth's rotational axis remains nearly constant over time, so the equatorial plane (which is perpendicular to this axis) serves as a stable basis for a coordinate system that does not depend on the observer’s location or the time of observation.
+The \textbf{equatorial system} is defined by selecting a reference parallel and a reference meridian. The Earth's rotational axis remains nearly constant over time, so the equatorial plane (which is perpendicular to this axis) serves as a stable basis for a coordinate system that does not depend on the observer’s location or the time of observation.
 
-The celestial equator is the great circle where the celestial sphere meets the equatorial plane. The axis of this circle points toward the celestial poles. In the northern hemisphere, the north celestial pole is almost exactly aligned with the Earth's rotational axis and lies about one degree from Polaris.
+The \bfit{celestial equator} is the great circle where the celestial sphere meets the equatorial plane. The axis of this circle points toward the celestial poles. In the northern hemisphere, the north celestial pole is almost exactly aligned with the Earth's rotational axis and lies about one degree from Polaris.
 
 \vspace{0.2em}
 
@@ -40,9 +40,9 @@ $$
 \Theta = h + \alpha
 $$
 
-\subsection{The Azimuthal System or Horizontal System}
+\subsection{The Altazimuthal System or Horizontal System}
 
-The azimuthal (or horizontal) system is defined relative to the observer's specific position on Earth. Its reference plane is the local \textit{horizon} (the plane tangent to the Earth at the observer's location). Where this plane meets the celestial sphere forms the visible horizon. The point directly overhead is the \textit{zenith}; the point directly beneath is the \textit{nadir}.
+The \textbf{azimuthal (or horizontal) system} is defined relative to the observer's specific position on Earth. Its reference plane is the local \textit{horizon} (the plane tangent to the Earth at the observer's location). Where this plane meets the celestial sphere forms the visible horizon. The point directly overhead is the \textit{zenith}; the point directly beneath is the \textit{nadir}.
 
 
 \begin{minipage}{0.55\textwidth}
@@ -75,6 +75,39 @@ Since this system depends on both the observer's position and the time, the coor
   There are different conventions for the reference direction and sense of azimuth, so it is always important to verify which one is being used. Here, we measure azimuth clockwise from the south, as is common in astronomy.
 \end{tipsblock}
 
+\subsection{The Ecliptic System}
+
+The \textbf{ecliptic system} takes the Earth's orbital plane, the \bfit{ecliptic}, as its fundamental reference. On the celestial sphere, the ecliptic is the great circle traced out by the Sun over the course of a year. This system is especially useful for mapping the positions of Solar System bodies.
+
+The ecliptic and equatorial planes meet along the line pointing toward the \textit{vernal equinox} (\Aries), which serves as the zero point for both coordinate systems; at that moment, the Sun's coordinates are $\alpha = 0$ and $\delta = 0$. The two coordinates in this system are:
+
+
+\begin{minipage}{0.52\textwidth}
+    \begin{itemize}
+        \item The \bfit{ecliptic latitude}, $\beta$, gives the angular distance from the ecliptic plane:
+        $$
+        -90^\circ \le \beta \le +90^\circ
+        $$
+        \item The \bfit{ecliptic longitude}, $\lambda$, measures the angle eastward (counterclockwise) from the vernal equinox:
+        $$
+        0^\circ \le \lambda \le 360^\circ
+        $$
+    \end{itemize}
+    
+\end{minipage}%
+\hfill
+\begin{minipage}{0.47\textwidth}
+    \vspace{-1em}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{assets/ecliptic-sys.png}
+
+        \vspace{-0.2em}
+        \caption{The Ecliptic System \cite{karttunen}}
+    \end{figure}
+\end{minipage}
+
+
 \subsection{The Galactic System}
 
 \begin{minipage}{0.55\textwidth}
@@ -102,6 +135,13 @@ The \bfit{galactic longitude} $l$ is measured counterclockwise (analogous to rig
 \begin{center}
 03$^\mathrm{h}$ 42$^\mathrm{m}$ 35.63$^\mathrm{s}$ \hspace{1em} +42$^\circ$ 32$'$ 35.4$''$
 \end{center}
+ 
+\begin{tipsblock}[Units]
+    Because $1\,\mathrm{AU/yr} = 4.74047\,\mathrm{km\,s^{-1}}$ and at $1\,\mathrm{pc}$ an AU subtends $1''$, we obtain
+    $v_t[\mathrm{km\,s^{-1}}] = 4.74047\, \mu[''/\mathrm{yr}]\, d[\mathrm{pc}]$.
+    Catalogues often list $\mu$ in mas/yr; equivalently
+    $v_t[\mathrm{km\,s^{-1}}] = 4.74047\, \mu[\mathrm{mas/yr}]\, d[\mathrm{kpc}]$.
+\end{tipsblock}
 \end{observationblock}
 
 \section{Coordinate perturbations}
@@ -220,6 +260,10 @@ In addition to refraction, Earth's atmosphere also absorbs electromagnetic radia
     \item The \textbf{Ionosphere} ($80-500\,\mathrm{km}$) is a region rich in ionized particles; it absorbs \textbf{radio waves}.
 \end{itemize}
 
+\begin{observationblock}[Absorption and observations]
+    The atmosphere blocks most IR, UV, and X-ray radiation, allowing only specific \textit{windows} in the optical and radio. Thus, observations in these wavelengths must be done from space.
+\end{observationblock}
+
 Beyond Earth's atmosphere, the \textbf{interstellar medium (ISM)}, composed of gas and dust, also absorbs and scatters electromagnetic radiation, particularly at \textbf{X-ray} and \textbf{UV} wavelengths.
 
 \vspace{-0.8em}
@@ -257,7 +301,7 @@ Since the Earth is moving, if an observer observes a star after an interval of t
     \item \textbf{Annual parallax} is due to the Earth's orbital motion around the Sun. The annual parallax is the maximum parallax effect and it is used to measure the distance of the stars.
 \end{itemize}
 
-\vspace{-0.8em}
+\vspace{-0.4em}
 
 \begin{figure}[H]
     \centering
@@ -271,13 +315,17 @@ Since the Earth is moving, if an observer observes a star after an interval of t
     \end{minipage}
 \end{figure}
 
+\vspace{-0.4em}
+
+Astronomers typically express parallax angles in arcseconds for convenience. To convert a parallax measured in radians to arcseconds, we use the relation $\omega'' = 206265 \, \omega~[\text{rad}]$, where $206265$ is the number of arcseconds in one radian.
+
 \begin{warningblock}[Parallax correction]
     Usually, parallax correction is not taken into account in the coordinates of the star catalogues.
 \end{warningblock}
 
 
 \begin{minipage}{0.62\textwidth}
-    Over time, "parallax" and "distance" have practically become synonymous in astronomy, especially in the context of photometric parallax. In fact, parallax serves as the foundation for one of the most widely used units for astronomical distances: the parsec.
+    Over time, "parallax" and "distance" have practically become synonymous in astronomy, especially in the context of photometric parallax. In fact, it is the foundation for one of the most widely used units for astronomical distances: the parsec.
 
     \vspace{0.5em}
     
@@ -289,7 +337,7 @@ Since the Earth is moving, if an observer observes a star after an interval of t
 \end{minipage}%
 \hfill
 \begin{minipage}{0.35\textwidth}
-    \vspace{-0.7em}
+    \vspace{-1.7em}
     \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{assets/parallax-2.png}
@@ -301,6 +349,8 @@ Since the Earth is moving, if an observer observes a star after an interval of t
 \vspace{0.5em}
 
 Over time, advancements in astronomical instrumentation have enabled increasingly precise measurements of stellar parallax, allowing us to probe greater distances:
+
+\vspace{-0.5em}
 
 \begin{table}[H]
     \centering
@@ -315,7 +365,7 @@ Over time, advancements in astronomical instrumentation have enabled increasingl
     \end{tabular}
 \end{table}
 
-\vspace{-1em}
+\vspace{-1.3em}
 \begin{observationblock}[Parallax measurement]
 The objects with the largest measured parallaxes are some of the stars nearest to the Sun. Some notable examples include:
 
@@ -330,7 +380,7 @@ The objects with the largest measured parallaxes are some of the stars nearest t
 Observing from space-based telescopes and satellites provides several significant advantages over ground-based astronomical observations:
 
 \begin{itemize}
-    \item \textbf{Absence of Atmospheric Refraction:} Earth's atmosphere bends and distorts incoming starlight, limiting positional accuracy. Satellites, outside the atmosphere, avoid these effects entirely, resulting in sharper, more reliable measurements.
+    \item \textbf{Absence of Atmospheric Refraction:} Earth's atmosphere bends and distorts incoming starlight; outside the atmosphere, these effects are avoided, resulting in more reliable measurements.
     \item \textbf{No Gravitational Flexure:} In orbit, instruments are effectively weightless, removing distortions caused by gravitational sagging that affect even the best ground-based observatories.
     \item \textbf{Sharper Images:} Space telescopes are unaffected by atmospheric blurring, so resolution is limited only by their optics (Airy disk), not by seeing.
     \item \textbf{Stable Observational Conditions:} Space offers a stable thermal and radiation environment, allowing for superb calibration and highly repeatable measurements across long timescales.
@@ -341,10 +391,11 @@ As a result, satellite missions such as \textit{Hipparcos} and \textit{Gaia} hav
 Furthermore, since a star's observed flux ($F$) diminishes with the square of its distance ($d$) from us ($ F \propto d^{-2} $), uncertainties in distance measurements are amplified in the derived fluxes. If the fractional uncertainty in distance is $\frac{\Delta d}{d}$, then the corresponding fractional uncertainty in the flux is:
 
 \vspace{-0.4em}
-
+\small
 $$
 \frac{\Delta F}{F} \approx 2 \cdot \frac{\Delta d}{d}
 $$
+\normalsize
 E.g., if the parallax-based distance has a relative uncertainty of $20\%$ $(\frac{\Delta d}{d} \sim 0.2)$, the resulting uncertainty in the flux is $\frac{\Delta F}{F} \sim 40\%$, underlining the importance of minimizing distance errors.
 \vspace{-0.4em}
 
@@ -353,7 +404,7 @@ E.g., if the parallax-based distance has a relative uncertainty of $20\%$ $(\fra
 \vspace{-0.5em}
 
 \begin{minipage}{0.68\textwidth}
-    Any space motion can be decomposed into two components: the \bfit{radial velocity} (line-of-sight, $v_r$), directed along the observer's line of sight, and the \bfit{tangential velocity} ($v_t$), perpendicular to it.
+    Any space motion can be decomposed into two components: the \bfit{radial velocity} (line-of-sight, LOS, $v_r$), directed along the observer's line of sight, and the \bfit{tangential velocity} ($v_t$), perpendicular to it.
     
     \vspace{-0.4em}
 
@@ -361,15 +412,13 @@ E.g., if the parallax-based distance has a relative uncertainty of $20\%$ $(\fra
     v = \sqrt{{v_t}^2 + {v_r}^2}
     $$
 \end{minipage}%
-\hfill
-\begin{minipage}{0.3\textwidth}
-    \vspace{-0.4em}
+\begin{minipage}{0.32\textwidth}
+    \vspace{-2em}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{assets/velocities.png}
 \end{figure}
 \end{minipage}
-
 
 As the universe is expanding, many extragalactic objects are moving away from us, and their light is observed to be shifted towards longer (redder) wavelengths. This is known as the \bfit{redshift} $(z)$. \ \ This phenomenon is fundamentally similar to the Doppler effect for sound. 
 
@@ -390,7 +439,7 @@ If the source moves at velocity $v$ relative to the observer (positive when rece
 Thus, the observed wavelength $\lambda$ becomes:
 
 $$
-\lambda = cT + vT = (c + v)T
+\lambda = s + s' = cT + vT = (c + v)T
 $$
 
 The change in wavelength is given by:
@@ -410,7 +459,7 @@ $$
 \end{figure}
 \end{minipage}
 
-\vspace{0.4em}
+% \vspace{0.4em}
 
 \subsection{Redshift}
 
@@ -425,24 +474,21 @@ $$
 z = \sqrt{\frac{1 + \frac{v}{c}}{1 - \frac{v}{c}}} - 1
 $$
 which for $v \ll c$ reduces to the previous, linear relation.
-
 In most stellar and galactic contexts, velocities are much smaller than the speed of light ($v_{stars} = 2-400\,\mathrm{km/s}$, $v_{galaxies} \sim 10^3\,\mathrm{km/s}$, while $c = 3 \cdot 10^5\,\mathrm{km/s}$), so the non-relativistic approximation is sufficient.
 
 \vspace{0.4em}
 
-An observed redshift generally has two main contributions: a kinematic term from the galaxy's peculiar motion ($z_{\mathrm{kin}}$) and a cosmological term from the expansion ($z_{\mathrm{cosm}}$).
+An observed redshift generally has two main contributions: a \bfit{kinematic} term $z_{\mathrm{kin}}$ from the galaxy's peculiar motion and a \bfit{cosmological} term $z_{\mathrm{cosm}}$ from the expansion; they do \textbf{not} add linearly.
 
-In a galaxy cluster, individual galaxies show slightly different observed redshifts $z_i$ from both peculiar motions and expansion. The mean over $N$ members defines the cluster redshift:
+In a cluster of $N$ galaxies, individual galaxies show slightly different observed redshifts $z_i$ from both peculiar motions and expansion. The mean over $N$ members defines the cluster redshift:
 $$
 z_{\text{cluster}} = \frac{1}{N} \sum_{i=1}^N z_i
 $$
-where $N$ is the number of measured galaxies.
 
 Since peculiar velocities roughly average to zero in the cluster frame, this identifies the cosmological redshift:
 $$
 z_{\text{cluster}} = z_{\text{cosm}}
 $$
-
 For each galaxy in the cluster, we can define its ``rest-frame'' (or peculiar) redshift:
 $$
 z_{\mathrm{rf}} = \frac{z_{\mathrm{obs}} - z_{\text{cluster}}}{1 + z_{\text{cluster}}}
@@ -460,14 +506,15 @@ $$
 \qquad \Rightarrow \qquad 
 \mu \sim \dfrac{v_t}{d}
 $$
-
 Thus, the tangential velocity follows from the proper motion and the distance:
 
+\vspace{-1.2em}
 $$
 v_t = 4.74\, \mu\, d
 $$
 
-where 4.74 is a conversion factor to convert $v_t$ in km/s, since the other units are:
+\vspace{-0.4em}
+where $4.74$ converts to km/s when using the units below:
 
 \begin{center}
     \renewcommand{\arraystretch}{1.1}
@@ -479,26 +526,33 @@ where 4.74 is a conversion factor to convert $v_t$ in km/s, since the other unit
 The proper motion $\mu$ is usually described in terms of two components: one along the declination direction, $\mu_\delta 
 = \Delta \delta / 1\,\mathrm{year}$, and one along the right ascension direction.
 
-\begin{minipage}{0.62\textwidth}
+\vspace{-0.5em}
+
+\begin{minipage}{0.64\textwidth}
     However, to properly express the motion in right ascension, we need to take into account that lines of right 
     ascension (hour circles) get closer together as you move away from the celestial equator towards the poles. 
-    Therefore, the component in right ascension is written as $\mu_\alpha \cos \delta$, with $\mu_\alpha = \Delta \alpha / 1\,\mathrm{year}$, where the factor of $\cos \delta$ adjusts for this effect.
+    Therefore, the component in right ascension is written as $\mu^*_{\alpha} = \mu_\alpha \cos \delta$, with $\mu_\alpha = \Delta \alpha / 1\,\mathrm{year}$, where the factor of $\cos \delta$ adjusts for this effect.
 
     The total proper motion is then:
-
+    \small
     $$
-    \mu = \sqrt{\mu_\delta^2 + \mu_\alpha^2 \cos^2 \delta}
+    \mu = \sqrt{\mu_\delta^2 + \mu_\alpha^2 \cos^2 \delta} \qquad \text{or} \qquad \mu = \sqrt{\mu_\delta^2 + (\mu^*_{\alpha})^2}
     $$
+    \normalsize
 \end{minipage}%
 \hfill
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.34\textwidth}
     \vspace{-0.7em}
     \begin{figure}[H]
     \centering
     \includegraphics[width=0.9\textwidth]{assets/proper-motion.png}
+
+    \vspace{-0.5em}
     \caption{\centering Proper motion \cite{karttunen}}
     \end{figure}
 \end{minipage}
+
+\vspace{-0.5em}
 
 \begin{observationblock}[Barnard's Star]
     Barnard's Star exhibits the highest known proper motion of any star, moving across the sky at a remarkable rate of $\mu = 10.34\ \mathrm{arcsec/year}$.
@@ -506,49 +560,70 @@ The proper motion $\mu$ is usually described in terms of two components: one alo
 
 \section{Magnitudes}
 
-\begin{minipage}{0.58\textwidth}
-Consider the energy from radiation passing through a surface element $d A$. Let this energy propagate into a solid angle $d\omega$ at an angle $\theta$ to the surface normal. The amount of energy within the frequency range $[\nu, \nu + d\nu]$ that passes into this solid angle in a time interval $dt$ is:
+\subsection{Intensity, Flux Density and Luminosity}
+
+\textbf{Photometry} quantifies how bright an object appears by connecting physical quantities such as specific intensity, flux and luminosity with the logarithmic magnitude scale used in astronomy.
+
+\vspace{0.5em}
+
+\begin{minipage}{0.62\textwidth}
+Consider the energy from radiation passing through a surface element $d A$. Let this energy propagate into a solid angle $d\omega$ at an angle $\theta$ to the surface normal. The amount of \bfit{energy} within the frequency range $[\nu, \nu + d\nu]$ that passes into this solid angle in a time interval $dt$ is:
 $$
 d E_\nu = I_\nu \cos \theta \ d A \ d\nu \ d\omega \ dt
 $$
-Here, the coefficient $I_\nu$ is the \textit{specific intensity of the radiation} at the frequency $\nu$ in the direction of the solid angle $d\omega$. 
+Here, the coefficient $I_\nu$ is the \bfit{specific intensity of the radiation} at the frequency $\nu$ in the direction of the solid angle~$d\omega$. 
+
+\medskip
+
+In other words, the specific intensity is the amount of energy passing through a surface element in a given direction, per unit area, per unit time, per unit frequency and per unit solid angle:
 \end{minipage}%
 \hfill
-\begin{minipage}{0.4\textwidth}
-
-    \vspace{-0.7em}
+\begin{minipage}{0.36\textwidth}
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.93\textwidth]{assets/flux.png}
+        \includegraphics[width=0.96\textwidth]{assets/flux.png}
         \caption{\centering $I_\nu$ is the energy through $dA$ into $d\omega$, direction $\theta$ \cite{karttunen}}
     \end{figure}
 \end{minipage}
 
-In other words, the specific intensity is the amount of energy passing through a surface element in a given direction, per unit area, per unit time, per unit frequency and per unit solid angle:
-\medskip
-$$
-[I_\nu] = \text{Wm}^{-2} \text{Hz}^{-1} \text{Sterad}^{-1}
-$$
+\begin{minipage}{0.62\textwidth}
+    \vspace{-1em}
+    $$
+    [I_\nu] = \text{Wm}^{-2} \text{Hz}^{-1} \text{Sterad}^{-1}
+    $$
 
-The \bfit{Surface Brightness} ($SB$) is used to describe the brightness of an extended object in the sky:
+    \vspace{1em}
+
+    The \textbf{Surface Brightness} ($SB$) is used to describe the brightness of an extended object in the sky:
 \medskip
 $$
 SB = \dfrac{Flux}{Solid\ Angle}
 $$
 
-The \bfit{total intensity} $I$ is obtained by integrating $I_\nu$ over all frequencies:
+The \textbf{total intensity} $I$ is obtained by integrating $I_\nu$ over all frequencies:
 \medskip
 $$
 I = \int_0^\infty I_\nu d\nu
 $$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.36\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.96\textwidth]{assets/solid-angle.png}
+        \caption{\centering Solid angle $d\omega$ \cite{karttunen}}
+    \end{figure}
+\end{minipage}
 
-From an observational standpoint, a more practical quantity is the \bfit{flux density}, often simply called \bfit{flux}, which represents the power of radiation received per unit area. The monochromatic flux density $F_\nu$ is the energy passing through a surface element per unit area, per unit time, and per unit frequency:\
+\medskip
+
+From an observational standpoint, a more practical quantity is the \textbf{flux density}, often simply called \bfit{flux}, which represents the power of radiation received per unit area. The monochromatic flux density $F_\nu$ is the energy passing through a surface element per unit area, per unit time, and per unit frequency:\
 \medskip
 $$
 F_\nu = \frac{1}{dA \, d\nu \, dt} \int_S dE_\nu = \int_S I_\nu \cos \theta \, d\omega, \qquad [F_\nu] = \text{W\,m}^{-2} \text{Hz}^{-1}
 $$
 
-Analogously, the \bfit{total flux} $F$ is obtained by integrating over all frequencies:
+Analogously, the \textbf{total flux} $F$ is obtained by integrating over all frequencies:
 \medskip
 $$
 F = \int_0^\infty F_\nu d\nu = \int_S I \cos \theta \, d\omega, \qquad [F] = \text{W\,m}^{-2}
@@ -557,26 +632,169 @@ $$
 Observed flux densities are usually very small, so a more convenient unit is often used, particularly in radio astronomy: the \bfit{Jansky} (Jy), defined as:
 $1 \text{Jy} = 10^{-26} \text{W\,m}^{-2} \text{Hz}^{-1}$.
 
-The \bfit{luminosity} $L$ of an object is the power emitted by the object throughout a closed surface surrounding it, and it is given by:
+\begin{minipage}{0.64\textwidth}
+    The \bfit{luminosity} $L$ of an object is the power emitted by the object throughout a closed surface surrounding it, and it is given by:
+    $$
+    L = \int_{\Sigma} F \, dA
+    $$
+    For a spherically symmetric source radiating into a solid angle $\omega$, the flux measured at distance $r$ is related to luminosity by
+    $$
+    L = \omega r^2 F,
+    $$
+    In the most common case of isotropic emission ($\omega = 4\pi$), this reduces to
+    $$
+    L = 4\pi r^2 F.
+    $$
+\end{minipage}%
+% \hfill
+\begin{minipage}{0.36\textwidth}
+    \begin{figure}[H]
 
+        \vspace{-1.2em}
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/luminosity.png}
+        
+        \vspace{-0.5em}
+        \caption{\centering Luminosity \cite{karttunen}}
+    \end{figure}
+\end{minipage}
+
+\vspace{0.5em}
+\begin{observationblock}[Inverse square law]
+    Unlike the surface brightness, the observed flux from a source decreases as the square of the distance from the observer, this is known as the \textbf{inverse square law}:
+
+    $$
+    F = \frac{L}{4\pi r^2} \propto \frac{1}{r^2}
+    $$
+
+    The SI unit of luminosity is the watt (W), where $1~\text{W} = 1~\text{J}~\text{s}^{-1}$. Astronomers often compare stellar luminosity to the solar luminosity, $L_\odot \approx 3.828 \times 10^{26}~\text{W}$.
+\end{observationblock}
+
+\subsection{Apparent Magnitude}
+
+Historically, the brightness of stars was classified by eye into a few \textit{magnitude classes}: the brightest stars were assigned to the first magnitude, while faint stars visible to the naked eye were placed in the sixth magnitude. To describe this on a precise scale, astronomers define the \textbf{apparent 
+magnitude}.
+
+Only differences in magnitude are physically meaningful, and they relate directly to the ratio of fluxes. The difference in apparent magnitude between two sources with fluxes $f_1$ and $f_2$ and magnitudes $m_1$ and $m_2$ is defined as the \bfit{Pogson relation}:
 $$
-L = \int_{\Sigma} F \, dA
+m_1 - m_2 = -2.5 \log_{10} \left( \frac{f_1}{f_2} \right)
 $$
 
-For a star radiating into a solid angle $\omega$, the luminosity is expressed as $L = \omega r^2 F$, where $F$ is the observed flux density at a distance $r$. When the radiation is isotropic, $\omega = 4\pi$, thus $L = 4\pi r^2 F$.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\textwidth]{assets/luminosity.png}
-    \caption{\centering Luminosity \cite{karttunen}}
-\end{figure}
-
-So:
-
+Equivalently, the flux ratio can be written as:
 $$
-L = F \propto \dfrac 1{d^2}
+\frac{f_1}{f_2} = 10^{-0.4\,(m_1 - m_2)}
 $$
 
+\subsubsection{Spectral Energy Distribution}
+
+\begin{minipage}{0.58\textwidth}
+The flux we detect from an astronomical source is spread over a range of energies or wavelengths. The \textbf{spectral energy distribution} (SED) describes the flux density as a function of either frequency, $f_\nu$ (measured in $\mathrm{W\,m^{-2}\,Hz^{-1}}$), or wavelength, $f_\lambda$ (measured in $\mathrm{W\,m^{-2}\,nm^{-1}}$). The SED encodes important physical information about the source, such as its temperature, composition, and emission mechanisms.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \vspace{-1em}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.96\textwidth]{assets/sed.png}
+    \end{figure}
+\end{minipage}
+
+% TODO check this section
+
+\subsubsection{Why do we use the apparent magnitude?}
+
+It is not always possible to measure the monochromatic flux of a source directly, because the detected signal is modified by the atmosphere, filters and the telescope+detector response. In a given photometric band, the measured flux $f$ is the source spectral energy distribution $f_\nu$ weighted by the total system throughput:
 $$
-[L] = W
+f = \int_0^\infty f_\nu\, T_\nu\, F_\nu\, R_\nu\, d\nu
 $$
+where $f_\nu$ is the flux density from the source above the atmosphere. The other factors describe the response of each element in the optical path:
+\begin{itemize}
+    \item \textbf{Atmospheric transmission} $T_\nu$:
+    
+    Quantifies how the atmosphere absorbs and scatters incoming light before it reaches the ground. 
+    
+    \vspace{0.5em}
+    \begin{minipage}{0.58\textwidth}
+        The transmission decreases exponentially with increasing airmass $a$ (the path length through the atmosphere), following $T_\nu = e^{-\tau_\nu a}$, where $\tau_\nu$ is the optical depth at frequency $\nu$. The airmass is given by $a = \frac{1}{\cos(z)}$, with $z$ the zenith angle.
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.38\textwidth}
+    % \begin{figure}[H]
+        \centering
+        \begin{tikzpicture}[scale=1.3]
+            % Draw two horizontal lines (horizon)
+            \draw[thick] (-0.7,0) -- (3.5,0);
+            \draw[thick] (-0.7,1.2) -- (3.5,1.2);
+
+            % Observer's position (origin)
+            \fill (1.0,0) circle (2pt);
+
+            % Zenith direction (vertical dashed)
+            \draw[dashed] (1.0,0) -- (1.0,1.5);
+
+            % Star 1 (drawn as an asterisk)
+            \node at (1.0,1.5) {\large $\ast$};
+            % \node[above] at (1.0,1.55) {\small 1};
+
+            % Star 2 (drawn as an asterisk)
+            \node at (2.3,1.5) {\large $\ast$};
+            % \node[above] at (2.3,1.55) {\small 2};
+
+            % Zenith vector for star 2
+            \draw[dashed] (1.0,0) -- (2.3,1.5);
+
+            % z rotation between vertical and direction to star 2
+            \draw[->, thick] (1.0,-0.2) ++(0,0.9) arc (90:50:0.7);
+            \node at (1.3,0.92) {$z$};
+
+            % Azimuth angles
+            % \draw[->] (1.0,0) ++(-0.1,-0.2) arc (-120:0:0.22);
+            \node at (0.76,0.2) {$a_0$};
+
+            % \draw[->] (1.0,0) ++(0.2,-0.13) arc (-35:35:0.36);
+            \node at (1.38,0.15) {$a$};
+        \end{tikzpicture}
+    % \end{figure}
+    \end{minipage}
+
+    \vspace{0.5em}
+
+    Atmospheric extinction consists of both absorption and scattering by molecules and aerosols. 
+    It increases with airmass and is typically parameterized using a linear relation in magnitudes:
+    $$
+        m(z) = m_0 + k a
+    $$
+    where $m(z)$ is the observed magnitude at zenith angle $z$, $m_0$ is the magnitude outside the atmosphere (zero airmass), $k$ is the extinction coefficient (which depends on wavelength and atmospheric conditions), and $a$ is the airmass, given by $a = 1/\cos(z)$. Alternatively, the airmass can also be expressed as $a = \alpha x$ for more precise geometric corrections, with $\alpha$ a proportionality constant and $x$ a path-length factor.
+
+    An important process in atmospheric extinction is \textbf{Rayleigh scattering}: the scattering of light by small molecules. Rayleigh scattering is much stronger at shorter wavelengths (blue light), making the sky blue and causing stronger extinction for bluer astronomical sources.
+
+    \item \textbf{Filter response} $F_\nu$: 
+    
+    Describes the transmission curve of the photometric filter, which determines how efficiently the filter transmits light at each frequency or wavelength. The effective bandpass and central wavelength are defined by this curve. In practice, we often use the \textbf{effective (mean) wavelength}, defined as:
+    $$
+        \lambda_\mathrm{eq} = \frac{\int \lambda\,T_\lambda\,F_\lambda\,R_\lambda\, d\lambda}{\int T_\lambda\,F_\lambda\,R_\lambda\, d\lambda}
+    $$
+    where the integrals are performed over the bandpass and $T_\lambda$, $F_\lambda$, $R_\lambda$ are the atmospheric, filter, and detector response curves, respectively. The full width at half maximum (FWHM) is often used to characterize the width of the filter's transmission profile.
+
+    The observed magnitude is defined through a band-integrated flux, and differences in magnitude between two sources are given by the Pogson relation:
+    $$
+        m - m_0 = -2.5\log_{10}\left(\frac{f}{f_0}\right)
+    $$
+    where $m_0$ is the magnitude of a reference source (usually Vega or for the AB system, a flux density of $f_0 = 3.63 \times 10^{-20}$ erg s$^{-1}$ cm$^{-2}$ Hz$^{-1}$).
+
+    Today, most photometric systems standardize magnitudes using either the Vega system or the AB system. In the AB system, by definition, $V_\mathrm{AB} = V_\mathrm{vega}$ for the $V$ band (to within a small offset).
+
+    \item \textbf{Telescope and detector response} $R_\nu$: 
+    
+    Represents the overall efficiency of the instrument, including the optics, mirrors, and detector (such as a CCD), and accounts for the quantum efficiency and reflective losses at each stage. Accurate knowledge of $R_\nu$ is essential for reliable photometry.
+
+    \begin{itemize}
+        \item \textbf{Photographic plates}: Early photographic plates had relatively poor photometric accuracy, with typical uncertainties around $\Delta m \approx 0.03$ mag.
+        \item \textbf{CCD (Charge-Coupled Devices)}: Modern CCDs revolutionized photometry, offering uncertainties as low as $\Delta m \approx 0.001$ mag thanks to their high quantum efficiency and linear response.
+        \item \textbf{Photoelectric photometry}: Also widely used, providing precise measurements of incident flux using the photoelectric effect.
+    \end{itemize}
+\end{itemize}
+
+\begin{observationblock}[K-correction]
+    For galaxies at significant cosmological distances, one must apply a \textit{K-correction} to account for the fact that their observed light is redshifted due to cosmic expansion. This correction allows us to compare the intrinsic properties of galaxies as if observed in the same rest-frame photometric band.
+\end{observationblock}

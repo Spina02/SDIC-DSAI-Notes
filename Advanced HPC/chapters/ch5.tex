@@ -1,0 +1,298 @@
+\chapter{OpenACC}
+
+\begin{codeblock}[language=C]
+#pragma acc <directive> <clauses>
+\end{codeblock}
+
+\texttt{\#pragma} in C/C++ is what's known as a "compiler hint." These are very similar to programmer comments, however, the compiler will actually read our pragmas. 
+
+Pragmas are a way for the programmer to "guide" the compiler, without running the chance damaging the code. If the compiler does not understand the pragma, it can ignore it, rather than throw a syntax error.
+
+\texttt{acc} is an addition to our pragma. It speciﬁes that this is an OpenACC pragma. Any non-OpenACC compiler will ignore this pragma. Even the nvc/nvc++ compiler can be told to ignore them. (which lets us run our parallel code sequentially!)
+
+\texttt{directives} are commands in OpenACC that will tell the compiler to do some action. For now, we will only use directives that allow the compiler to parallelize our code.
+
+
+\texttt{clauses} are additions/alterations to our directives. These include (but are not limited to) optimizations. The way that I prefer to think about it: directives describe a general action for our compiler to do (such as, paralellize our code), and clauses allow the programmer to be more speciﬁc (such as, how we speciﬁcally want the code to be parallelized)
+
+\subsubsection{Directives}
+
+\begin{itemize}
+\item \texttt{parallel}: a parallel region of code. The compiler generates a parallel kernel for that region. Each gang will execute the entire loop.
+
+\begin{codeblock}[language=C]
+#pragma acc parallel
+{
+    for (int i = 0; i < N; i++)
+        A[i] = B[i] + C[i];
+}
+\end{codeblock}
+
+\item \texttt{loop}: dentiﬁes a loop that should be distributed across threads. Parallel and loop are often placed together
+
+\begin{codeblock}[language=C]
+#pragma acc parallel
+{
+    #pragma acc loop
+    for (int i = 0; i < N; i++)
+        A[i] = B[i] + C[i];
+}
+\end{codeblock}
+
+\item \texttt{kernels} a parallel region of code. It allows the programmer to step back, and rely solely on the compiler.
+
+\begin{codeblock}[language=C]
+// example of a kernel that performs two different operations
+#pragma acc kernels
+{
+    for (int i = 0; i < N; i++)
+        A[i] = B[i] + C[i];
+
+    for (int i = 0; i < N; i++)
+        D[i] = A*x[i] + B*y[i];
+}
+
+// loop independent: the compiler can parallelize the loop
+#pragma acc kernels loop independent
+{
+    for (int i = 0; i < N; i++)
+        A[i] = B[i] + C[i];
+}
+\end{codeblock}
+\end{itemize}
+
+\subsubsection{Compiling flags}
+
+\begin{center}
+    \begin{tabular}{ll}
+        \hline
+        \textbf{Flag} & \textbf{Description}\\
+    \hline
+    \texttt{-acc} & enable OpenACC targeting device \\
+    \texttt{-acc=host} & generate an executable that will run serially on the host CPU \\
+    \texttt{-acc=multicore} & parallelize for a multicore CPU \\
+    \texttt{-acc=gpu -gpu=cc80} & map OpenACC parallelism to an NVIDIA GPU, compile targeting compute capability \\
+    \texttt{-gpu=managed} & place all allocatables in CUDA Unified Memory \\
+    \texttt{-gpu=pinned} & use CUDA pinned memory for all allocatables \\
+    \texttt{-Minfo=accall} & compiler diagnostics for OpenACC \\
+    \texttt{export NVCOMPILER\_ACC\_NOTIFY=1|2|3} & environment variable for NOTIFY \\
+    \hline
+    \texttt{-mp} & enable OpenMP targeting device \\
+    \texttt{-mp=gpu} & to generate an executable that will run serially on the host CPU \\
+    \texttt{-gpu=cc80} & map OpenACC parallelism to an NVIDIA GPU, compile targeting compute capability \\
+    \texttt{-gpu=managed} & place all allocatables in CUDA Unified Memory \\
+    \texttt{-gpu=pinned} & use CUDA pinned memory for all allocatables \\
+    \texttt{-Minfo=accall} & Compiler diagnostics for OpenACC \\
+    \texttt{export NVCOMPILER\_ACC\_NOTIFY = 1|2|3} & Environment variable for NOTIFY \\
+    \hline
+\end{tabular}
+\end{center}
+
+\dots
+
+\newpage
+
+\section{Data Management in OpenACC}
+
+Below are examples of how different OpenACC data clauses control the movement and allocation of data between the CPU (host) and GPU (device):
+
+\textbf{1. Allocating memory on the GPU}
+
+\begin{codeblock}[language=C]
+int *A = (int*) malloc(N * sizeof(int));
+#pragma acc parallel loop
+{
+    for (int i=0; i<N; i++) A[i] = 0;
+}
+\end{codeblock}
+
+In this snippet, memory for array \texttt{A} is allocated on the host using \texttt{malloc}. The OpenACC pragma without any explicit data clause does not allocate or manage the corresponding device memory. If \texttt{A} is not already present on the device, the compiler may implicitly manage this, but it's best to use data directives for clarity and control.
+
+\textbf{2. \texttt{copy(A[0:N])} -- Copy data from host to device and back}
+
+\begin{codeblock}[language=C]
+for (int i=0; i<N; i++) A[i] = 0;
+#pragma acc parallel loop copy(A[0:N])
+{
+    for (int i=0; i<N; i++) A[i] = 1;
+}
+\end{codeblock}
+
+The \texttt{copy(A[0:N])} clause tells the compiler to allocate space for array \texttt{A} on the GPU. Before the kernel runs, the data from the host (CPU) \texttt{A} is copied to the device (GPU). When the parallel region ends, the (possibly updated) data is copied back from device to host. This is useful when the GPU kernel is both reading from and writing to \texttt{A}, and you need to preserve the changes on the host after execution.
+
+\textbf{3. \texttt{copyin(A[0:N])} and \texttt{copyout(B[0:N])} -- Directional data transfer}
+
+\begin{codeblock}[language=C]
+#pragma acc parallel loop copyin(A[0:N]) copyout(B[0:N])
+{
+    for (int i=0; i<N; i++) B[i] = A[i];
+}
+\end{codeblock}
+
+Here, \texttt{copyin(A[0:N])} means the data for \texttt{A} will be copied from the host to the device before the parallel region begins, but any modifications to \texttt{A} on the device are not copied back. \texttt{copyout(B[0:N])} means a fresh array \texttt{B} is allocated on the device, and after the region completes, the contents are copied from device to host. This is suitable when you need only to read from \texttt{A} on the device and produce output in \texttt{B}.
+
+\subsubsection{Data region constructs}
+
+\dots
+
+\subsubsection{Unstructured data}
+
+\dots
+
+\section{Loop Optimization}
+
+\subsubsection{Seq clause}
+
+If we are in a situation where we have nested loops but we want to parallelize the outer loops, but not the inner one, we can use the \texttt{SEQ} clause.
+
+\begin{codeblock}[language=C]
+#pragma acc parallel loop
+for (int i = 0; i < N; i++) {
+    #pragma acc loop
+    for (int j = 0; j < M; j++) {
+        #pragma acc loop seq
+        for (int k = 0; k < K; k++) {
+            A[i][j][k] = B[i][j][k] * C[i][j][k];
+        }
+    }
+}
+\end{codeblock}
+
+If we want to parallelize the outer loop, but not the inner one, we can use the \texttt{SEQ} clause.
+
+\subsubsection{Collapse clause}
+
+If you want to combine the next $N$ tightly nested loops into a single loop, you can use the \texttt{collapse} clause. It is extremely useful for increasing memory locality, as well as creating larger loop to expose more parallelism.
+
+\begin{codeblock}[language=C]
+#pragma acc parallel loop collapse(2)
+for (int i = 0; i < N; i++) {
+    for (int j = 0; j < M; j++) {
+        // code
+    }
+}
+\end{codeblock}
+
+\subsubsection{Tile clause}
+
+If you want to parallelize a loop but you want to divide it into smaller chunks, you can use the \texttt{tile} clause. It is extremely useful for increasing memory locality, as well as executing multiple tiles simultaneously.
+
+\begin{codeblock}[language=C]
+#pragma acc parallel loop tile(32,32)
+for (int i = 0; i < 128; i++) {
+    for (int j = 0; j < 128; j++) {
+        // code
+    }
+}
+\end{codeblock}
+
+\begin{observationblock}[Note]
+    Similar to the \plaintt{collapse} clause, the inner loops should not have the \plaintt{loop} directive.
+\end{observationblock}
+
+\subsubsection{Reduction clause}
+
+\dots
+
+\section{GPU Hardware Hierarchy}
+
+We have seen that the GPU is a very parallel machine, but it is not a single core machine. It's architechture is composed on Gangs, Workers and Vectors.
+
+\begin{itemize}
+    \item \textbf{Gang}: Multiple gangs will be generated, and loops iterations will be spread across the gangs. Gangs are independent of each other. There is no way to for the programmer to know exactly how many gangs are running at a given time.
+    \item \textbf{Worker}: To have multiple vectors within a gang. It splits up one large vector into multiple smaller vectors. It is an intermediate level between the low-level parallelism implemented in vector and group of threads. It is useful when our inner parallel loops are very small, and will not benefit from having a large vector.
+    \item \textbf{Vector}: Lowest level of parallelism. Every gang will have at least 1 vector. Threads work in lockstep (SIMD/SIMT parallelism).
+\end{itemize}
+
+\begin{codeblock}[language=C]
+#pragma acc parallel loop gang
+for (int i = 0; i < N; i++)
+    #pragma acc loop worker
+    for (int j = 0; j < M; j++)
+        #pragma acc loop vector
+        for (int k = 0; k < K; k++)
+            // code
+\end{codeblock}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/gwv.png}
+    \caption{Gang, Worker and Vector Hierarchy}
+    \label{fig:gwv-hierarchy}
+\end{figure}
+
+\begin{tipsblock}[Rule of 32]
+    The rule of thumb to decide the gang, worker and vector sizes when programming for NVIDIA GPUs is to use a vector length that is a multiple of 32.
+\end{tipsblock}
+
+\missing{good and bad example of usage}
+
+\section{OMP vs ACC}
+
+OpenMP and OpenACC both provide high-level, directive-based approaches for parallel programming, allowing the developer to easily control how loops and computations are parallelized through the use of clauses. These models enable the compiler to map code onto multiple levels of parallelism, such as teams of threads or gangs, workers, and vectors, across different hardware architectures.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|l|l|l|l|}
+        \hline
+        \textbf{OpenACC} & \textbf{CUDA} & \textbf{Mapping to NVIDIA GPU} & \textbf{OpenMP} \\
+        \hline
+        Parallel/Kernel & Kernel & GPU & Parallel \\
+        \hline
+        Gang & Thread block & SMs & Team \\
+        \hline
+        Worker & Thread & SP or Compute unit & Thread \\
+        \hline
+        Vector & Warp (32 threads) & 32-wide thread & SIMD \\
+        \hline
+    \end{tabular}
+    \caption{Comparison of Parallel Hierarchy: OpenACC, CUDA, NVIDIA GPU, and OpenMP}
+    \label{tab:parallel-hierarchy-comparison}
+\end{table}
+
+In theory (according to the standards) the implementation of the levels adapt to the hardware, but in reality some compilers struggle with certain parallelisation levels:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|rl|}
+        \toprule
+        \textbf{OpenACC} & \textbf{OpenMP} \\
+        \midrule
+        \plaintt{acc parallel}        & \plaintt{omp target teams} \\
+        \plaintt{acc loop gang}       & \plaintt{omp distribute} \\
+        \plaintt{acc loop worker}     & \plaintt{omp parallel loop} \\
+        \plaintt{acc loop vector}     & \plaintt{omp simd} \\
+        \plaintt{acc declare}         & \plaintt{omp declare target} \\
+        \plaintt{acc data}            & \plaintt{omp target data} \\
+        \plaintt{acc update}          & \plaintt{omp target update} \\
+        \plaintt{copy/copy\_in/copy\_out} & \plaintt{map(to/from/tofrom:...)} \\
+        \bottomrule
+    \end{tabular}
+    \caption{OpenACC to OpenMP Directive and Clause Correspondence}
+    \label{tab:openacc-to-openmp}
+\end{table}
+
+
+\begin{minipage}{0.49\textwidth}
+    \textbf{OMP Parallel}
+
+    \begin{itemize}
+        \item Creates a team of threads
+        \item Very well-defined how the number of threads is chosen
+        \item May synchronize within the team
+        \item Data races are the user's responsibility
+    \end{itemize}
+\end{minipage}
+\begin{minipage}{0.49\textwidth}
+    \textbf{ACC Parallel}
+
+    \begin{itemize}
+        \item Creates 1 or more gangs to workers
+        \item Compiler free to choose number of gangs, workers and vector lengths
+        \item May not synchronize between gangs
+        \item Data races are not allowed
+    \end{itemize}
+\end{minipage}
+
+...
+
