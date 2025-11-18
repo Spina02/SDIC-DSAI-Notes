@@ -1,0 +1,189 @@
+\chapter{How to use Gama Platform}
+
+In this chapter we will see how to use Gama Platform to create multi-agent simulations. Gama is an open-source platform for building spatially explicit agent-based simulations. It provides a user-friendly interface and a powerful modeling language that allows users to create complex models with ease.
+The generality of the agent-based approach advocated by GAMA is accompanied by a high degree of openness, which is manifested, for example, in the development of plugins designed to meet specific needs, or by the possibility of calling GAMA from other software or languages (such as R or Python)
+
+\begin{itemize}
+    \item \textbf{Data-driven models}: GAMA offers the possibility to load and manipulate easily GIS (Geographic Information System) data in the models, in order to make them the environment of artificial agents;
+    \item \textbf{GAML}: it is possible to create a simulated world, declare agent species, assign behaviors to them and display them and their interactions. GAML also offers all the power needed by advanced modelers: being an agent-oriented language coded in Java, it offers the possibility to build integrated models with several modeling paradigms, to explore their parameter space and calibrate them and to run virtual experiments with powerful visualization capabilities, all without leaving the platform;
+    \item \textbf{Declarative User Interface}: The 3D displays are provided with all the necessary support for realistic rendering. A rich set of instructions makes it easy to define graphics for more dashboard-like presentations.
+\end{itemize}
+
+\section{Platform}
+
+For more information and for visual examples, please refer to the official website: \url{https://gama-platform.github.io/}
+
+GAMA consists of a single application that is based on the RCP architecture provided by Eclipse. Within this single application software, often referred to as a platform, users can undertake, without the need of additional third-parties softwares, most of the activities related to modeling and simulation.
+
+\subsection{Installation}
+
+\begin{enumerate}
+    \item \textbf{Download} $\rightarrow$ Go to the \href{https://gama-platform.org/download}{download page} and pick the correct version for your operating system (Windows, MacOS, Linux);
+    \item \textbf{Install} $\rightarrow$ Follow the installation instructions for your operating system;
+    \item \textbf{Launch Gama}
+\end{enumerate}
+
+\begin{observationblock}[Docker]
+    Note that a Docker image of GAMA exists to execute GAMA Headless inside a container.
+    
+    \begin{enumerate}
+        \item Install docker on your system;
+        \item Pull the GAMA's docker you want to use (e.g. \plaintt{docker pull gamaplatform/gama:latest});
+        \item Run this GAMA's docker with your headless command (e.g. \plaintt{docker run gamaplatform/gama:latest -help}).
+    \end{enumerate}
+\end{observationblock}
+
+Note that GAMA can also be launched in two different other ways:
+\begin{itemize}
+    \item In a so-called headless mode (i.e. without a user interface, from the command line, in order to conduct experiments or to be run remotely);
+    \item From the terminal, using a path to a model file and the name or number of an experiment, in order to allow running this experiment directly.
+    
+    \begin{itemize}
+        \item \plaintt{Gama.app/Contents/MacOS/Gama path\_to\_a\_model\_file\#experiment\_name\_or\_number} on Mac OS X
+        \item \plaintt{Gama path\_to\_a\_model\_file\#experiment\_name\_or\_number} on Linux
+        \item \plaintt{Gama.exe path\_to\_a\_model\_file\#experiment\_name\_or\_number} on Windows
+    \end{itemize}
+\end{itemize}
+
+GAMA will ask you to choose a workspace in which to store your models and their associated data and settings. The workspace can be any folder in your filesystem on which you have read/write privileges. If you want GAMA to remember your choice next time you run it (it can be handy if you run Gama from the command line), simply check the corresponding option.
+
+The main window is then composed of several parts, which can be \textbf{views} or \textbf{editors}, and are organized in a \textbf{perspective}. GAMA proposes 2 main perspectives: \textit{Modeling}, dedicated to the creation of models, and \textit{Simulation}, dedicated to their execution and exploration. Other perspectives are available if you use shared models. The default perspective in which GAMA opens is \textit{Modeling}.
+
+It is composed of a central area where GAML editors are displayed, which is surrounded by a Navigator view on the left-hand side of the window, an Outline view (linked with the open editor), the Problems view, which indicates errors and warnings present in the models stored in the workspace and an interactive console, which allows the modeler to try some expressions and get an immediate result.
+
+\subsection{Workspace, Projects and Models}
+
+The workspace is a directory in which GAMA stores all the current projects on which the user is working, links to other projects, as well as some meta-data like preference settings, the current status of the different projects, error markers, and so on.
+Except when running in headless mode, GAMA cannot function without a valid workspace.
+The workspace is organized in 4 categories, which are themselves organized into projects.
+
+The projects present in the workspace can be either directly stored within it (as sub-directories), which is usually the case when the user creates a new project, or linked from it (so the workspace will only contain a link to the directory of the project, supposed to be somewhere in the filesystem or on the network). A same project can be linked from different workspaces.
+
+GAMA models files are stored in these projects, which may contain also other files (called resources) necessary for the models to function.
+
+\begin{observationblock}[Project and Model Status]
+    All the projects and models have an icon with a red or green circle on it. This eases to locate models containing compilation errors (red circle) and projects that have been successfully validated (green circle).
+\end{observationblock}
+
+n the Navigator, models are organized in four different categories: Models library, Plugin models, Test models, and User models. This organization is purely logical and does not reflect where the models are actually stored in the workspace (or elsewhere). Whatever their actual location, model files need to be stored in projects, which may contain also other files (called resources) needed for the models to function (such as data files). A project may, of course, contain several model files, especially i
+
+\begin{itemize}
+    \item \textbf{Library models}: This category represents the models that are shipped with each version of GAMA. They do not reside in the workspace but are considered as linked from it. This link is established every time a new workspace is created. Their actual location is within a plugin (msi.gama.models) of the GAMA application;
+    \item \textbf{Plugin models}: This category represents the models that are related to a specific plugin (additional or integrated by default). The corresponding plugin is shown between parenthesis;
+    \item \textbf{Test models}: These models are unit tests for the GAML language: they aim at testing each element of the language to check whether they produce the expected result. The aim is to avoid regression after evolutions of the software. They can be run from the validation view;
+    \item \textbf{User models}: This category regroups all the projects that have been created or imported in the workspace by the user. Each project can be actually a folder that resides in the folder of the workspace (so they can be easily located from within the filesystem) or a link to a folder located anywhere in the filesystem (in case of a project importation). Any modification (addition, removal of files...) made to them in the file system (or using another application) is immediately reflected in the Navigator and vice-versa.
+    \begin{tipsblock}
+        Model files, although it is by no means mandatory, usually reside in a sub-folder of the project called \texttt{models}. Similarly, all the test models are located in the \texttt{tests} folder.
+    \end{tipsblock}
+\end{itemize}
+
+\begin{warningblock}
+    It may happen, on some occasions, that the library of models is not synchronized with the version of GAMA that uses your workspace. This is the case if you use different versions of GAMA to work with the same workspace. In that case, it is required that the library be manually updated. This can be done using the "Update library" item in the contextual menu.
+\end{warningblock}
+
+Each model is presented as a node in the navigation workspace, including Experiment buttons and/or a Contents node and/or a Uses node and/or a Tags node and/or an Imports node.
+
+Although GAML files are just plain text files, and can, therefore, be produced or modified in any text processor, using the dedicated GAML editor offers many advantages, among which the live display of errors and model statuses. A model can actually be in four different states, which are visually accessible above the editing area:
+\begin{itemize}
+    \item Functional (grey color);
+    \item Experimentable (green color);
+    \item InError (red color);
+    \item InImportedError (red color).
+\end{itemize}
+
+In its initial state, a model is always in the Functional state (when it is empty), which means it compiles without problems, but cannot be used to launch experiments. If the model is created with a skeleton, it is Experimentable. 
+
+\subsection{Running Experiments}
+
+Running an experiment is the only way, in GAMA, to execute simulations on a model. Experiments can be run in different ways.
+\begin{itemize}
+    \item The first, and most common way, consists in launching an experiment from the Modeling perspective, using the user interface proposed by the simulation perspective to run simulations;
+    \item The second way, detailed on this page, allows to automatically launch an experiment when opening GAMA, subsequently using the same user interface;
+    \item The last way, known as running headless experiments, does not make use of the user interface and allows to manipulate GAMA entirely from the command line.
+\end{itemize}
+
+All three ways are strictly equivalent in terms of computations (with the exception of the last one omitting all the computations necessary to render simulations on displays or in the UI).
+
+There are two ways to run a GAMA experiment in headless mode: using a dedicated bash wrapper (recommended) or directly from the command line.
+\paragraph{Bash Wrapper} 
+The file can be found in the headless directory located inside the GAMA's installed folder. It is named gama-headless.sh on macOS and Linux, or gama-headless.bat on Windows.
+\begin{codeblock}[language=bash]
+    bash gama-headless.sh [m/c/t/hpc/v] $1 $2
+\end{codeblock}
+Where:
+\begin{itemize}
+    \item \$1 input parameter file : an xml file determining experiment parameters and attended outputs;
+    \item \$2 output directory path : a directory which contains simulation results (numerical data and simulation snapshot);
+    \item options \plaintt{[-m/c/t/hpc/v]}
+    \begin{itemize}
+        \item \plaintt{-m} memory : memory allocated to gama
+        \item \plaintt{-c} : console mode, the simulation description could be written with the stdin
+        \item \plaintt{-t} : tunneling mode, simulation description are read from the stdin, simulation results are printed out in stdout
+        \item \plaintt{-hpc} nb\_of\_cores : allocate a specific number of cores for the experiment plan;
+        \item \plaintt{-v} : verbose mode. trace are displayed in the console
+    \end{itemize}
+\end{itemize}
+
+\paragraph{Java Command}
+\begin{codeblock}
+    java -cp \$GAMA_CLASSPATH -Xms512m -Xmx2048m -Djava.awt.headless=true org.eclipse.core.launcher.Main -application msi.gama.headless.id4 \$1 \$2
+\end{codeblock}
+
+Where:
+\begin{itemize}
+    \item \plaintt{\$GAMA\_CLASSPATH GAMA} classpath: contains the relative or absolute path of jars inside the GAMA plugin directory and jars created by users;
+    \item \plaintt{\$1} input parameter file: an XML file determining experiment parameters and attended outputs;
+    \item \plaintt{\$2} output directory path: a directory which contains simulation results (numerical data and simulation snapshot).
+\end{itemize}
+
+\section{Model Creation}
+
+A GAMA model is composed of three types of sections:
+\begin{enumerate}
+    \item \plaintt{global}: this section, that is unique, defines the "world" agent, a special agent of a GAMA model. It represents all that is global to the model: dynamics, variables, actions. In addition, it allows to initialize the simulation (init block);
+    \item \plaintt{species} and \plaintt{grid}: these sections define the species of agents composing the model. Grid is defined in the following model step "vegetation dynamic";
+    \item \plaintt{experiment}: these sections define the execution context of the simulations. In particular, it defines the input (parameters) and output (displays, files...) of a model.
+\end{enumerate}
+
+\paragraph{Species} A species represents a "prototype" of agents: it defines their common properties. A species definition requires the definition of three different elements:
+\begin{itemize}
+    \item the internal state of its agents (attributes). In addition to the attributes the modeler explicitly defines, species "inherits" other attributes called "built-in" variables;
+    \item their behavior;
+    \item how they are displayed (aspects). In order to display our prey agents we define two attributes: \plaintt{size} and \plaintt{color}.
+\end{itemize}
+
+\paragraph{Global} The \plaintt{global} section represents a specific agent, called \plaintt{world}. Defining this agent follows the same principle as any agent and is, thus, defined after a species. The world agent represents everything that is global to the model: dynamics, variables... It allows to initialize simulations (\plaintt{init} block): the world is always created and initialized first when a simulation is launched (before any other agents). The geometry (\plaintt{shape}) of the \plaintt{world} agent is by default a square with 100m for side size, but can be redefined if necessary.
+
+The \plaintt{init} section of the global block allows initializing the model which is executing certain commands, here we will create \plaintt{nb\_preys\_init} number of prey agents. We use the statement \plaintt{create} to create agents of a specific species: \plaintt{create species\_name + }:
+\begin{itemize}
+    \item \plaintt{number}: number of agents to create (int, 1 by default);
+    \item \plaintt{from}: GIS file to use to create the agents (optional, string or file);
+    \item \plaintt{returns}: list of created agents (list)
+\end{itemize}
+
+\paragraph{Experiment} An \plaintt{experiment} block defines how a model can be simulated (executed). Several experiments can be defined for a given model. They are defined using : \plaintt{experiment exp\_name type: gui/batch { [input] [output]}}:
+\begin{itemize}
+    \item \plaintt{gui}: experiment with a graphical interface, which displays its input parameters and outputs;
+    \item \plaintt{batch}: Allows to set up a series of simulations (w/o graphical interface).
+\end{itemize}
+
+Experiments can define (input) parameters. A parameter definition allows to make the value of a global variable definable by the user through the graphic interface.
+\begin{codeblock}[language=bash]
+    parameter title var: global_var category: cat;
+\end{codeblock}
+Where:
+\begin{itemize}
+    \item \plaintt{title}: the name of the parameter as it will appear in the interface (string);
+    \item \plaintt{var}: the name of the global variable associated with this parameter (string);
+    \item \plaintt{category}: the category in which this parameter will appear in the interface (string, optional).
+\end{itemize}
+
+Output blocks are defined in an experiment and define how to visualize a simulation (with one or more display blocks that define separate windows). Each display can be refreshed independently by defining the facet \plaintt{refresh} nb (int) (the display will be refreshed every nb steps of the simulation).
+Each display can include different layers (like in a GIS):
+\begin{itemize}
+    \item Agents species: \plaintt{species my\_species aspect: my\_aspect};
+    \item Agents lists: \plaintt{agents layer\_name value: agents\_list aspect: my\_aspect};
+    \item Images: \plaintt{image image\_file};
+    \item Charts.
+\end{itemize}
+
