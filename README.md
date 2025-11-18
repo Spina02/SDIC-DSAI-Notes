@@ -75,7 +75,7 @@
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Programming%20for%20Astrophysics/main.pdf">Programming for Astrophysics</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Multi-Agent%20Systems/main.pdf">Multi-Agent Systems</a></td>
-      <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
+      <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
     </tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Galaxy%20Astrophysics/main.pdf">Galaxy Astrophysics</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
