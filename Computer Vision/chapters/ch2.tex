@@ -273,4 +273,505 @@ Moreover, there are two approaches for sensing color:
 
 \section{Camera Model}
 
-\subsection{Camera Calibration}
+The \textbf{simplified model} of a camera is based on the pinhole camera, where the image plane is placed in front of the pinhole to avoid the inversion of the image. 
+
+\begin{minipage}{0.48\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{assets/ch2/18.png}
+        \caption{Simplified pinhole camera model.}
+        \label{fig:simplified_pinhole_camera}
+    \end{figure}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \begin{itemize}
+        \item $(X,Y,Z)$ is the world reference frame, centered in $\mathcal{C} \in \mathcal{F}$;
+        \item The $Z$ axis corresponds to the optical axis;
+        \item $(u,v)$ is the image frame, centered in the intersection between the optical axis and the image plane;
+        \item $u$ and $v$ are oriented as $X$ and $Y$;
+        \item The perspective projection is a map $\mathbb{R}^3 \to \mathbb{R}^2$ such that 
+        \[
+        (x,y,z) \rightarrow \left(-\frac{fx}{z}, -\frac{fy}{z}\right)
+        \]
+        \item The map is nonlinear (due to the division by $z$);
+        \item A linear map can be recovered by using homogeneous coordinates.
+    \end{itemize}
+\end{minipage}
+
+\textbf{Homogeneus coordinates} allow to add \textbf{improper points} (points ad infinite) to the usual Euclidean plane (or space). The basic idea is to represent a point $(x,y)$ of the plane as a triplet (u,v,w) of real numbers, in such a way that:
+\[
+x = \frac{u}{w} \quad \text{and} \quad y = \frac{v}{w}
+\]
+where $w \neq 0$. The triplet (u,v,w) is called the \textbf{homogeneous representation} of the point (x,y). The null triplet (0,0,0) does not represent any point. Moreover, any two triplets (u,v,w) and (ku,kv,kw), with $k \neq 0$, represent the same point (x,y).
+
+\begin{definitionblock}[Projective plane]
+    The \textbf{projective plane} $\mathbb{P}^2$ is the set of equivalence classes of non-zero triplets (u,v,w), where two triplets are equivalent if they differ by a non-zero scale factor $k$. 
+    \[
+    (u,v,w) \sim \lambda(u,v,w) \quad \forall \lambda \neq 0
+    \]
+    The projective plane includes all points in the Euclidean plane (where $w \neq 0$) as well as points at infinity (where $w = 0$).
+\end{definitionblock}
+
+A similar definition holds for the \textbf{projective space} $\mathbb{P}^3$, where points are represented by quadruplets (X,Y,Z,W) and two quadruplets are equivalent if they differ by a non-zero scale factor $k$.
+
+\begin{exampleblock}
+    Consider the vector $(x',y',0)$. We have points that specify a direction but are at an infinite distance from focal point. So,
+    \[
+    \begin{pmatrix}
+    x' \\
+    y' \\
+    0
+    \end{pmatrix} \to \begin{pmatrix}
+    \frac{x'}{0} \\ 
+    \frac{y'}{0} \\
+    \end{pmatrix} \to \begin{pmatrix}
+    \infty \\
+    \infty
+    \end{pmatrix}
+    \]
+    Points whose last coordinate is zero are said to be \textbf{improper}.
+\end{exampleblock}
+
+Improper points represent a point at infinite along a direction specified by the non-zero coordinates. Points whose last coordinate is not zero, are said to be \textbf{proper}. To represent them, we can simply "add" a coordinate. With no loss of generality it may be taken as equal to 1, obtaining the so called \textbf{augmented vector}.
+\[
+(x,y) \to \begin{bmatrix}
+x \\
+y \\
+1
+\end{bmatrix}
+\quad 
+(x,y,z) \to \begin{bmatrix}
+x \\
+y \\
+z \\
+1
+\end{bmatrix}
+\] 
+
+Converting from homogeneus coordinates to Cartesian coordinates is called \textbf{dehomogenization} and amounts to dividing by th elast coordinate:
+\[
+\begin{bmatrix}
+u \\
+v \\
+w
+\end{bmatrix} \to \begin{bmatrix}
+\frac{u}{w} \\
+\frac{v}{w}
+\end{bmatrix}
+\quad
+\begin{bmatrix} 
+\frac{u}{w} \\
+\frac{v}{w} \\
+1
+\end{bmatrix}
+\]
+
+\subsection{Transformations} 
+Let the augmented vector corresponding to $x$ be denoted by $\bar{x}$. 
+\begin{itemize}
+    \item \textbf{Translation}: a translation of $t$ may be written as 
+    \[
+    x' = x + t 
+    \]
+    or 
+    \[
+    x' = \left[I | t\right]\bar{x}
+    \] 
+    or 
+    \[
+    \bar{x}' = \begin{bmatrix}
+    I & t \\
+    0^T & 1
+\end{bmatrix} \bar{x}
+    \]   
+    \item \textbf{Rotation and translation} (rigid body motion):
+    \[
+    x' = Rx + t 
+    \]
+    or 
+    \[
+    x' = \left[R | t\right]\bar{x}
+    \]
+    or
+    \[
+    \bar{x}' = \begin{bmatrix}
+    R & t \\
+    0^T & 1
+\end{bmatrix} \bar{x}
+    \]
+    where $R$ is an orthonormal matrix, thus $RR^T = R^TR = I$ and $\det(R) = 1$. 
+    \begin{observationblock}
+        There is also $\det(R) = -1$, which encodes a \textbf{mirroring} effect, not allowed in rigid transformations.
+    \end{observationblock}
+    In the 2D case, given the angle $\theta$ of rotation, $R$ takes the form 
+    \[R = \begin{bmatrix}
+    \cos \theta & -\sin \theta \\
+    \sin \theta & \cos \theta
+    \end{bmatrix}\]
+    where $R$ is a rotation matrix.
+    \item \textbf{Similarity transformation} (where $s$ is the scale factor):
+    \[
+    x' = sRx + t 
+    \]
+    or 
+    \[
+    x' = \left[sR | t\right]\bar{x}
+    \]
+    or
+    \[
+    \bar{x}' = \begin{bmatrix}
+    sR & t \\
+    0^T & 1
+\end{bmatrix} \bar{x}
+    \]
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/ch2/19.png}
+    \caption{2D Transformations}
+    \label{fig:transformations}
+\end{figure}
+
+Let $m$ and $m'$ be the vectors of homogeneous coordinates of $M$ (w.r.t. the camera frame) and $M'$ (w.r.t. the image frame):
+\[
+m = \begin{bmatrix}
+x \\
+y \\
+z \\
+1
+\end{bmatrix}, \quad
+m' = \begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix}
+\]
+Then 
+\[
+z \begin{bmatrix}
+u \\
+v \\    
+1
+\end{bmatrix} = \begin{bmatrix}
+    -\frac{fx}{z} \\ 
+    -\frac{fy}{z} \\
+    1
+\end{bmatrix} = \begin{bmatrix}
+    -fx \\ 
+    -fy \\
+    z
+\end{bmatrix} = \underbrace{\begin{bmatrix}
+    -f & 0 & 0 & 0 \\
+    0 & -f & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+\end{bmatrix}}_{\text{Projection Matrix}} \begin{bmatrix}
+x \\
+y \\
+z \\
+1
+\end{bmatrix}
+\]
+
+Thus, in matrix notation 
+\[
+m' = \frac{1}{z} Pm 
+\]
+
+or equivalently 
+\[
+m' \sim Pm
+\]
+where $\sim$ means equality up to a scale factor.
+
+\subsection{General Model}
+\begin{minipage}{0.48\textwidth}
+    For a more general camera model we need to consider:
+    \begin{itemize}
+        \item the rigid transformation from the world reference frame to the camera frame;
+        \item the \textbf{pixelization} (from meters to pixel, in the image reference frame);
+        \item The pixelization amounts to a \textbf{rescaling} followed by a translation:
+        \[
+        V = \begin{bmatrix}
+            -k_u & 0 & u_0 \\ 
+            0 & -k_v & v_0 \\
+            0 & 0 & 1 \\
+        \end{bmatrix}
+        \]
+        where $(u_0, v_0)$ are the coordinates (in pixels) of $\mathcal{C'}$;
+        \item $k_u$ and $k_v$ the reciprocal of the pixel size along $u$ and $v$:
+        \[
+        k_u = \frac{1}{s_u} \quad k_v = \frac{1}{s_v} \quad \left[\text{pixel}\times m^{-1}\right]
+        \]
+    \end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/ch2/20.png}
+        \caption{General camera model.}
+        \label{fig:general_camera_model}
+    \end{figure}
+\end{minipage}
+
+\vspace{0.5cm}
+
+Thus the new $P$ taking into account the sensor is:
+\[
+P = \begin{bmatrix}
+    -k_u & 0 & u_0 \\
+    0 & -k_v & v_0 \\
+    0 & 0 & 1 \\
+\end{bmatrix} \begin{bmatrix}
+    -f & 0 & 0 & 0 \\
+    0 & -f & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+\end{bmatrix} = \begin{bmatrix}
+    f k_u & 0 & -u_0 & 0 \\
+    0 & f k_v & -v_0 & 0 \\
+    0 & 0 & 1 & 0 \\
+\end{bmatrix} = K\left[I | 0\right]
+\]
+where, by posing $fk_u = \alpha_u$ and $fk_v = \alpha_v$, we have 
+\[
+K = \begin{bmatrix}
+    \alpha_u & 0 & u_0 \\
+    0 & \alpha_v & v_0 \\
+    0 & 0 & 1 \\
+\end{bmatrix} \quad \text{and} \quad \left[I | 0\right] = \begin{bmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 1 & 0 \\
+\end{bmatrix}
+\]
+
+\begin{itemize}
+    \item $K$ is the \textbf{calibration matrix};
+    \item $K$ describes the camera intrinsics (those parameters that depend on the camera itself, as opposite to the camera's pose in space, which are called extrinsics);
+    \item Notice that $K$ is upper triangular.
+\end{itemize}
+
+Let's now take into account the rigid transformation from the world reference frame to the camera frame and the pixelization. Let $m_c$ be the vector of homogeneous coordinates of $M$ with respect to the camera reference frame and let 
+\[
+G = \begin{bmatrix}
+    R & t \\
+    0^T & 1 \\
+\end{bmatrix}
+\]
+be the rigid body motion from the world frame to the camera frame (a rotation $R$ followed by a translation $t$). It follows that 
+\[
+m_c = G m
+\]
+The matrix $G$ represents the camera extrinsics. The perspective projection is thus:
+\[
+m' \sim K\left[I | 0\right] Gm 
+\]
+The perspective projection matrix in the general case is 
+\[
+P = K\left[I | 0\right] G = K\left[R | t\right]
+\]
+By partitioning $R$ and $t$ row-wise:
+\[
+R = \begin{bmatrix}
+r_1^T \\
+r_2^T \\
+r_3^T \\
+\end{bmatrix}, \quad t = \begin{bmatrix}
+t_1 \\
+t_2 \\
+t_3 \\
+\end{bmatrix}
+\]
+we obtain 
+\[
+P = \begin{bmatrix}
+    \alpha_u r_1^T + u_0 r_3^T & \alpha_u t_1 + u_0 t_3 \\
+    \alpha_v r_2^T + v_0 r_3^T & \alpha_v t_2 + v_0 t_3 \\
+    r_3^T & t_3 \\
+\end{bmatrix}
+\]
+
+\begin{observationblock}
+    \begin{enumerate}
+        \item A more general form of $K$ takes into account a further intrinsic parameter (the skew angle between the $u$ and $v$ axes, usually very close to $\frac{\pi}{2}$), thus 
+        \[
+K = \begin{bmatrix}
+    \alpha_u & \alpha_u \cot \theta & u_0 \\
+    0 & \frac{\alpha_v}{\sin \theta} & v_0 \\
+    0 & 0 & 1 \\
+\end{bmatrix}
+        \]
+        \item $P$ is defined up to a scale factor (for $\lambda \neq 0$, $\lambda P$ results in the same projection as $P$). A prospective projection matrix is said to be \textit{normalized} if has the form 
+        \[
+        \begin{bmatrix}
+            * & * & * & \vline & * \\
+            * & * & * & \vline & * \\
+            \hline
+            & a^T & & \vline & * \\
+        \end{bmatrix}
+        \]
+        \item $P$ has 12 entries, but (due to the scale factor) 11 degrees of freedom. Indeed, it depends on $6+5=11$ independent parameters (6 extrinsic and 5 intrinsic).
+        \item Partitioning $P$ row-wise
+        \[
+        P = \begin{bmatrix}
+            p_1^T \\
+            p_2^T \\
+            p_3^T \\
+        \end{bmatrix}
+        \]
+        we get 
+        \[
+        m' = Pm = \begin{bmatrix}
+            p_1^T m \\
+            p_2^T m \\
+            p_3^T m \\
+        \end{bmatrix} \rightarrow^{\text{back to inhomogeneous}} \begin{cases}
+            u = \frac{p_1^T m}{p_3^T m} \\
+            v = \frac{p_2^T m}{p_3^T m} \\
+        \end{cases}
+        \]
+        where $u$ and $v$ are the Cartesian coordinates of point $M'$ in the image plane. Thus the last pair or equations is the generalization of the basic perspective projection equations.
+    \end{enumerate}
+\end{observationblock}
+
+\newtheorem{theorem}{Theorem}
+\begin{theorem}
+    Let $P = \left[Q | q\right]$ be $3\times 4$ matrix and let $q_i^t, i=1,2,3$ denote the rows of $Q$.
+    \begin{itemize}
+        \item A necessary and sufficient condition for $P$ to be a perspective projection matrix is that 
+        \[
+        \det(Q) \neq 0
+        \]
+        \item A necessary and sufficient condition for $P$ to be a zero-skew perspective projection matrix is that 
+        \[
+        \det(Q) \neq 0 \quad \text{and} \quad (q_1 \times q_3)^T(q_2 \times q_3) = 0
+        \]
+    \end{itemize}
+\end{theorem}
+
+\subsection*{Center of Projection}
+
+\begin{minipage}{0.48\textwidth}
+    The focal plane $\mathcal{F}$ contains the points that are projected to the infinite (because the straight line through $C$ does not intersect the image plane). Thus its equation is
+    \[
+    p_3^T x = 0
+    \]
+    This is the equation of the focal plane and all points that satisfy it are in the focal plane, meaning that their projection goes to infinity. The planes $p_1^T x = 0$ and $p_2^T x = 0$ project to the axes $u = 0$ and $v = 0$, respectively. 
+
+    The center of projection $C$ belongs to all the three planes, thus it is defined by 
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\textwidth]{assets/ch2/21.png}
+        \caption{Center of projection.}
+        \label{fig:center_of_projection}    
+    \end{figure}
+\end{minipage}
+
+\[
+\begin{cases}
+p_1^T x = 0 \\
+p_2^T x = 0 \\
+p_3^T x = 0 \\
+\end{cases}
+\]
+In other words, $C$ is represented (in homogeneous coordinates) by the kernel of $P$. 
+
+$P$ has rank 3 by construction (both $K$ and $R$ are invertible) hence, by the Rank-Nullity Theorem 
+\[
+\text{dim}(\text{Ker}(P)) = 4 - \text{rank}(P) = 4 - 3 = 1
+\]
+Let
+\[
+\tilde{c} = \left[x_C y_C z_C\right]^t
+\]
+be the vector of the Cartesian coordiantes of $C$ w.r.t. the world frame. We can write 
+\[
+P_c = \left[Q | q\right] \begin{bmatrix}
+\tilde{c} \\
+1
+\end{bmatrix} = 0
+\]
+then, solving for $\tilde{c}$ we get
+\[
+\tilde{c} = -Q^{-1} q
+\]
+
+\subsection*{Optical Ray}
+\begin{minipage}{0.48\textwidth}
+    The optical ray of an image point $M'$ is the locus of points in space that project onto $M'$. May be expressed as the line through $C$ and a point $\alpha$ located at infinity that projects onto $M'$ 
+    \[
+\alpha = \begin{bmatrix}
+    Q^{-1} m' \\
+    0
+    \end{bmatrix}
+    \]
+    thus a parametrics representation (in homogeneous coordinates) of the optical ray is 
+    \[
+    m = c + \lambda\begin{bmatrix}
+    Q^{-1} m' \\
+    0
+    \end{bmatrix}, \quad \lambda \in \mathbb{R}
+    \]
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\textwidth]{assets/ch2/22.png}
+        \caption{Optical ray.}
+        \label{fig:optical_ray}
+    \end{figure}
+\end{minipage}
+
+\begin{advancedblock}[Depth of a point]
+    Consider a point $M$ whose Cartesian coordinates w.r.t. the world reference frame are $\tilde{m} = \left[x_M y_M z_M\right]^T$. The projection equation with explicit scale factor $\zeta$ is 
+    \[
+    \zeta m' = Pm 
+    \]
+    Representing $M$ in homogeneous coordinates as $m = \left[\tilde{m}^T 1\right]^T$ we get 
+    \[
+    \begin{bmatrix}
+    \zeta u \\
+    \zeta v \\
+    \zeta z \\
+    \end{bmatrix} = P \begin{bmatrix}
+        \tilde{m} \\    
+        1 \\
+    \end{bmatrix} 
+    \]
+    If $P$ is normalized, we obtain, from the third scalar equation, that
+    \[
+    \zeta = r_3^T \tilde{m} + t_3
+    \]
+    Recalling that $m_c = Gm$, it follows that $\zeta$ is the third coordinate of $M$ w.r.t. the camera frame or the distance from $M$ to the focal plane (depth of the point $M$). In other words, if
+    \begin{enumerate}
+        \item the last homogeneous coordinate is chosen as 1;
+        \item $P$ is normalized;
+    \end{enumerate}
+    then the last homogeneous projected coordinate $\zeta$ is the depth of the point. 
+\end{advancedblock}
+
+\section{Camera Calibration}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/23.png}
+    \caption{Camera calibration.}
+    \label{fig:camera_calibration}
+\end{figure}
+
+Camera calibration is the process of estimating the intrinsic and extrinsic parameters of a camera. This is typically done by capturing images of a known calibration pattern (e.g., a checkerboard) from different viewpoints and using these images to solve for the camera parameters.
+\begin{itemize}
+    \item \textbf{Camera calibration problem}: estimate intrinsic and extrinsic camera parameters, based on some measurements;
+    \item \textbf{Calibration pattern}: a 3D object of known geometry and generating image features which can be located accurately;
+    \item Parameters may be estimated based on a set of known 3D-2D correspondences;
+    \item \textbf{Direct methods}: formulate a problem in which the camera parameters are the unknowns;
+    \item \textbf{Indirect methods}: first estimate the projection matrix $P$ and then decompose it to get intrinsic and extrinsic parameters.
+\end{itemize}
+
+\subsection{Direct Linear Transform}

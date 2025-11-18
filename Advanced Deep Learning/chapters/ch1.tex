@@ -2,15 +2,99 @@
 
 \section{Math of Kernels}
 
-\subsection{Aronszajn's Theorem}
+%\subsection{Aronszajn's Theorem}
 
-\begin{theorem}
-    (Aronszajn 1950) $K$ is a positive definite kernel on the set $\mathcal{X}$ \textbf{if and only if} there exists a Hilbert space $\mathcal{H}$ and a map $\phi: \mathcal{X} \to \mathcal{H}$ such that
-    \[
-        K(x,x') = \langle \phi(x), \phi(x') \rangle_{\mathcal{H}} \quad \forall x,x' \in \mathcal{X}
-    \]
-    where $\langle \cdot, \cdot \rangle_{\mathcal{H}}$ is the inner product in $\mathcal{H}$.
-\end{theorem}
+%\begin{theorem}
+%    (Aronszajn 1950) $K$ is a positive definite kernel on the set $\mathcal{X}$ \textbf{if and only if} there exists a Hilbert space $\mathcal{H}$ and a map $\phi: \mathcal{X} \to \mathcal{H}$ such that
+%    \[
+%        K(x,x') = \langle \phi(x), \phi(x') \rangle_{\mathcal{H}} \quad \forall x,x' \in \mathcal{X}
+%    \]
+%    where $\langle \cdot, \cdot \rangle_{\mathcal{H}}$ is the inner product in $\mathcal{H}$.
+%\end{theorem}
 
-\missing{Correct theorem}
+%\missing{Correct theorem}
 
+\section{Blackboard 30/09/2025}
+
+\[
+\alpha^* = \argmin{\alpha \in \mathcal{R}^n} || y - K\alpha||_2^2 + \lambda \alpha^T K\alpha \quad \left[K\right]_{ij} = K(x_i, x_j)
+\]
+
+then:
+\begin{align}
+    \frac{\partial}{\partial \alpha} ||y - K\alpha||_2^2 &= \frac{\partial}{\partial \alpha_i} \alpha^T K\alpha \\
+    &= \sum_q K_{iq}\alpha_q + \sum_{pq}\alpha_p K_{pi} \\
+    &= \left[K\alpha\right]_i + \left[K^T\right]_{ip}\alpha_p \\
+    &= 2\left[K_{\alpha}\right]_i \\
+    &= \frac{\partial}{\partial \alpha}\left(y - K\alpha\right)^T \left(y - K\alpha\right) \\
+    &= \frac{\partial}{\partial \alpha} \left(\underbrace{-\alpha^T K^T y - y^T K\alpha}_{-2\alpha^T K^T y} + \alpha^T K^T K\alpha\right) \\
+    &= 2K^T \left(K\alpha - y\right)
+\end{align}
+
+so now 
+\begin{align}
+    \frac{\partial}{\partial \alpha} &= \frac{K}{n}\left(K\alpha - y\right) + \lambda K\alpha = 0 \\
+    &= \frac{K}{n}\left(K\alpha - y + n\lambda\alpha\right) = 0
+\end{align}
+
+and finally 
+\begin{align}
+    \alpha = \left(k + n\lambda I\right)^{-1}y 
+\end{align}
+
+\subsection{Kernel PCA demonstration}
+
+suppose to have 
+\[
+\left\{x_i\right\}_{i=1}^n \quad x_i \in \mathcal{R}^d 
+\]
+
+and we want to find a projection on a lower dimensional space $\mathcal{R}^k$ with $k<d$.
+We calculate the covariance matrix:
+\[
+C = \frac{1}{n}\sum_{i=1}^n x_i x_i^T = \frac{1}{n}XX^T \quad X = \left[x_1, \ldots, x_n\right]
+\]
+and we want to find the eigenvalues and eigenvectors of $C$:
+\[
+C v_i = \lambda_i v_i
+\]
+
+the usual trick is to create a map $\phi: \mathcal{R}^d \to \mathcal{H}$ and then compute the covariance matrix in $\mathcal{H}$:
+\[
+C_{\phi} = \frac{1}{n}\sum_{i=1}^n \phi(x_i)\phi(x_i)^T
+\]
+
+we want to solve the eigenvalue problem:
+\[
+C_{\phi} v_i = \lambda_i v_i
+\]
+so let's now prove that $v$ can be expressed as a linear combination of the $\phi(x_i)$:
+\begin{align}
+    C_{\phi} v_i &= \lambda_i v_i \\
+    \frac{1}{n}\sum_{i=1}^n \phi(x_i)\phi(x_i)^T v_i &= \lambda_i v_i \\
+    \frac{1}{n}\sum_{i=1}^n \phi(x_i) \underbrace{\langle \phi(x_i), v_i \rangle}_{\alpha_i} &= \lambda_i v_i \\
+    v_i &= \frac{1}{n\lambda_i} \sum_{i=1}^n \alpha_i \phi(x_i)
+\end{align}
+
+we can now substitute this expression in the eigenvalue problem:
+\begin{align}
+    C_{\phi} v_i &= \lambda_i v_i \\
+    \frac{1}{n}\sum_{j=1}^n \phi(x_j)\phi(x_j)^T \left(\frac{1}{n\lambda_i}\sum_{k=1}^n \alpha_k \phi(x_k)\right) &= \lambda_i \left(\frac{1}{n\lambda_i}\sum_{k=1}^n \alpha_k \phi(x_k)\right) \\
+    \frac{1}{n^2\lambda_i} \sum_{j=1}^n \sum_{k=1}^n \alpha_k \phi(x_j) \underbrace{\langle \phi(x_j), \phi(x_k) \rangle}_{K_{jk}} &= \frac{1}{n} \sum_{k=1}^n \alpha_k \phi(x_k)
+\end{align}
+we can now multiply both sides by $\phi(x_i)$ and use the kernel trick:
+\begin{align}
+    \frac{1}{n^2\lambda_i} \sum_{j=1}^n \sum_{k=1}^n \alpha_k K_{ij} K_{jk} &= \frac{1}{n} \sum_{k=1}^n \alpha_k K_{ik} \\
+    \frac{1}{n\lambda_i} \sum_{j=1}^n K_{ij} \underbrace{\left(\frac{1}{n}\sum_{k=1}^n K_{jk}\alpha_k\right)}_{(K\alpha)_j} &= (K\alpha)_i \\
+    \frac{1}{n\lambda_i} (K^2 \alpha)_i &= (K\alpha)_i
+\end{align}
+so we have to solve the eigenvalue problem:
+\[
+K \alpha_i = n\lambda_i \alpha_i
+\]
+and then we can find the projection of a new point $x$ as:
+\begin{align}
+    \langle v_i, \phi(x) \rangle &= \left\langle \frac{1}{n\lambda_i} \sum_{j=1}^n \alpha_j \phi(x_j), \phi(x) \right\rangle \\
+    &= \frac{1}{n\lambda_i} \sum_{j=1}^n \alpha_j \underbrace{\langle \phi(x_j), \phi(x) \rangle}_{K(x_j, x)} \\
+    &= \frac{1}{n\lambda_i} \sum_{j=1}^n \alpha_j K(x_j, x)
+\end{align}
