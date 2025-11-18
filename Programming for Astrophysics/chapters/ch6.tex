@@ -1,0 +1,122 @@
+\chapter{Particle-Mesh}
+
+We want to integrate equations for the evolutions of a colisionless fluid acting under the action of gravity. The equations governing the system are the Vlasov-Poisson:
+
+$$
+\begin{cases}
+    \dfrac{\partial f}{\partial t} + v \cdot \dfrac{\partial f}{\partial x} - \nabla V \cdot \dfrac{\partial f}{\partial v} = 0 \\
+    \nabla^2 V = 4\pi G (\rho - \bar \rho)
+\end{cases}
+$$
+
+where the distribution function $f(x, v, t)$ depends on the position $x$, the velocity $v$ and the time $t$. The density is given by:
+
+$$
+\rho(x, t) = \int f(x, v, t) dv
+$$
+
+Such equations (in 3D) lives in a 6D+1 dimensions, and their direct integration (using e.g. Boltzmann codes) is highly inefficient.
+
+Thus, we can obtain the momentum equation by multiplying VP equations by v and integrating over velocities:
+
+$$
+\dfrac{\partial \langle v \rangle}{\partial t} + \langle v \rangle \cdot \nabla \langle v \rangle = - \nabla V - \dfrac{1}{\rho} \nabla \cdot \mathbb{P}_J
+$$
+
+where the pressure tensor $\mathbb{P}_J$ is given by:
+
+$$
+\mathbb{P}_J \equiv \rho \sigma^2_{ij} = \rho (\langle v_i v_j \rangle - \langle v_i \rangle \langle v_j \rangle)
+$$
+
+
+\begin{enumerate}
+    \item We estimate the density field on a grid, as the sum of the mass of the particles in the grid cells, divided by the volume of the grid cells.
+
+    \item The density field is then transformed to the Fourier space.
+
+    \item The gravitational potential is then computed using the green function of the Laplacian.
+
+    \item The gravitational potential is then transformed back to the real space and forces are evaluated.
+
+    \item Forces (on the mesh) are then interpolated to the particles.
+
+    \item The particles velocities are then updated using the forces, with a chosen time step.
+
+    \item The particles positions are then updated using a leap-frog integrator.
+
+    \item Cycle is repeated until the desired time is reached.
+\end{enumerate}
+
+To make the computation more stable, we need to normalize the units of the simulation. Commonly used units are (in \plaintt{cgs} units):
+
+\begin{itemize}
+    \item UnitVel = $10^5$ km/s
+    \item UnitMass = 1.989 $\times 10^{43} kg (10^{10}M_\odot)$
+    \item UnitLength = 3.085678 $\times 10^{21}$ (1 kpc)
+\end{itemize}
+
+We need the following initial conditions to start the simulation:
+
+\begin{itemize}
+    \item \texttt{N\_points}:The number of particles.
+    \item \texttt{N\_grid}: FFT grid size.
+    \item \texttt{BoxLength}: Length of the box (in kpc).
+    \item \texttt{A\_deltaPar}: Maximum density contrast allowed.
+    \item ...
+\end{itemize}
+
+Other options are available, such as \texttt{H0}, \texttt{rho\_crit}, etc.
+
+We will evolve a sinuisodal density contrast:
+
+$$
+\delta = A \sin(x \cdot 2\pi / L - \pi / 2)
+$$
+
+$A$ will be small because the initial density contrast must be linear. Velocities will be set to zero.
+
+Note that using physical UoM means that we have a 3D distribution with only radial (1D) perturbations. Clearly, in reality this setup would not be stable against perturbations in the other two spherical coordinates.
+
+\subsubsection{Density computation}
+
+
+
+\dots
+
+\subsubsection{Force computation and interpolation}
+
+After computing the gravitational potential $V$ on the computational grid, the next step is to derive the force field experienced by each particle. The force in one dimension is given by the negative gradient of the potential:
+
+$$
+F = -\nabla V
+$$
+
+On a discrete grid, we can approximate this derivative using central finite differences, resulting in the following expression for the force at grid point $i$:
+
+$$
+F_i = -\frac{V_{i+1} - V_{i-1}}{2\Delta x}
+$$
+
+where $\Delta x$ is the grid spacing. Using a symmetric (central) difference avoids introducing directional biases in the force calculation and ensures second-order accuracy.
+
+However, the physical particles in the simulation typically do not reside exactly at grid points. To obtain the force acting on each particle at its location $x_p$, we interpolate the force from the grid to the particle position using the same mass-assignment (interpolation) scheme used during the density assignment step. This is crucial to guarantee momentum conservation and minimize numerical artifacts such as "self-forces" (forces that a particle erroneously exerts on itself):
+
+$$
+F_p = \sum_{i=1}^{N_\text{grid}} W(x_p - x_i) F_i
+$$
+
+Here, $W(x_p - x_i)$ is the interpolation (assignment) kernel, such as the Nearest-Grid-Point (NGP), Cloud-In-Cell (CIC), or higher-order schemes, evaluated at the distance between the particle and the grid point. Using identical interpolation for both density and force steps ensures consistency and preserves the overall symmetries of the simulation.
+
+\subsubsection{Leap Frog}
+
+At this point we have the acceleration acting on each particle and we can update velocities and positions:
+
+$$
+v_i^{t+1/2 \Delta t} = v_i^{t-1/2 \Delta t} + (F_i/m_i) * \Delta t
+$$
+
+$$
+x_i^{t+ \Delta t} = x_i^{t} +  v_i^{t+1/2 \Delta t} \Delta t
+$$
+
