@@ -69,8 +69,8 @@
     <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Programming%20for%20Astrophysics/main.pdf">Programming for Astrophysics</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
-      <td>...</td>
-      <td></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/0ca11f29eb79e57ff68307a5ff08da38e7f15db9/Advanced%20HPC/main.pdf">Advanced HPC</a></td>
+      <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
     </tr>
     <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Galaxy%20Astrophysics/main.pdf">Galaxy Astrophysics</a></td>
