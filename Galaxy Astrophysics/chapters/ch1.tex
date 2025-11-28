@@ -672,30 +672,34 @@ $1 \text{Jy} = 10^{-26} \text{W\,m}^{-2} \text{Hz}^{-1}$.
 
 \subsection{Apparent Magnitude}
 
-Historically, the brightness of stars was classified by eye into a few \textit{magnitude classes}: the brightest stars were assigned to the first magnitude, while faint stars visible to the naked eye were placed in the sixth magnitude. To describe this on a precise scale, astronomers define the \textbf{apparent 
-magnitude}.
+Historically, stellar brightness was estimated by eye into a few \textit{magnitude classes}: the brightest stars were called first magnitude and the faintest visible to the naked eye sixth magnitude. In modern usage, the \textbf{apparent magnitude} of a source is defined by
+$$
+m = -2.5 \log_{10} \left( \frac{f}{f_0} \right)
+$$
+where $f$ is the measured flux in a given photometric band and $f_0$ is the corresponding \emph{reference flux}. In the \textbf{Vega system}, $f_0$ is the flux of Vega in that band, so Vega is defined to have $m=0$. A widely used alternative is the \textbf{AB system}, in which the zero point corresponds to a constant specific flux density of $3631\,\text{Jy}$ (i.e. $\approx 3.63 \times 10^{-20}\ \text{erg\,s}^{-1}\,\text{cm}^{-2}\,\text{Hz}^{-1}$) for all bands; in this system Vega is not the reference. Furthermore, for the AB system, the zero point is defined such that $V_\mathrm{AB} = V_\mathrm{vega}$ for the $V$ band (to within a small offset).
 
-Only differences in magnitude are physically meaningful, and they relate directly to the ratio of fluxes. The difference in apparent magnitude between two sources with fluxes $f_1$ and $f_2$ and magnitudes $m_1$ and $m_2$ is defined as the \bfit{Pogson relation}:
+More generally, the difference in apparent magnitude between two sources with fluxes $f_1$ and $f_2$ (magnitudes $m_1$ and $m_2$) is given by the \bfit{Pogson relation}:
 $$
 m_1 - m_2 = -2.5 \log_{10} \left( \frac{f_1}{f_2} \right)
 $$
+so an increase of five magnitudes corresponds to a factor of 100 decrease in flux (one magnitude corresponds to a factor of $10^{0.4} \approx 2.512$).
 
-Equivalently, the flux ratio can be written as:
+Equivalently, the flux ratio can be written as
 $$
 \frac{f_1}{f_2} = 10^{-0.4\,(m_1 - m_2)}
 $$
 
 \subsubsection{Spectral Energy Distribution}
 
-\begin{minipage}{0.58\textwidth}
+\begin{minipage}{0.55\textwidth}
 The flux we detect from an astronomical source is spread over a range of energies or wavelengths. The \textbf{spectral energy distribution} (SED) describes the flux density as a function of either frequency, $f_\nu$ (measured in $\mathrm{W\,m^{-2}\,Hz^{-1}}$), or wavelength, $f_\lambda$ (measured in $\mathrm{W\,m^{-2}\,nm^{-1}}$). The SED encodes important physical information about the source, such as its temperature, composition, and emission mechanisms.
 \end{minipage}%
 \hfill
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.43\textwidth}
     \vspace{-1em}
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.96\textwidth]{assets/sed.png}
+        \includegraphics[width=0.97\textwidth]{assets/sed.png}
     \end{figure}
 \end{minipage}
 
@@ -708,20 +712,23 @@ $$
 f = \int_0^\infty f_\nu\, T_\nu\, F_\nu\, R_\nu\, d\nu
 $$
 where $f_\nu$ is the flux density from the source above the atmosphere. The other factors describe the response of each element in the optical path:
+
+\medskip
+
 \begin{itemize}
     \item \textbf{Atmospheric transmission} $T_\nu$:
     
     Quantifies how the atmosphere absorbs and scatters incoming light before it reaches the ground. 
     
     \vspace{0.5em}
-    \begin{minipage}{0.58\textwidth}
+    \begin{minipage}{0.56\textwidth}
         The transmission decreases exponentially with increasing airmass $a$ (the path length through the atmosphere), following $T_\nu = e^{-\tau_\nu a}$, where $\tau_\nu$ is the optical depth at frequency $\nu$. The airmass is given by $a = \frac{1}{\cos(z)}$, with $z$ the zenith angle.
     \end{minipage}%
     \hfill
     \begin{minipage}{0.38\textwidth}
     % \begin{figure}[H]
         \centering
-        \begin{tikzpicture}[scale=1.3]
+        \begin{tikzpicture}[scale=1.5]
             % Draw two horizontal lines (horizon)
             \draw[thick] (-0.7,0) -- (3.5,0);
             \draw[thick] (-0.7,1.2) -- (3.5,1.2);
@@ -766,23 +773,57 @@ where $f_\nu$ is the flux density from the source above the atmosphere. The othe
     $$
     where $m(z)$ is the observed magnitude at zenith angle $z$, $m_0$ is the magnitude outside the atmosphere (zero airmass), $k$ is the extinction coefficient (which depends on wavelength and atmospheric conditions), and $a$ is the airmass, given by $a = 1/\cos(z)$. Alternatively, the airmass can also be expressed as $a = \alpha x$ for more precise geometric corrections, with $\alpha$ a proportionality constant and $x$ a path-length factor.
 
+    \medskip
+
     An important process in atmospheric extinction is \textbf{Rayleigh scattering}: the scattering of light by small molecules. Rayleigh scattering is much stronger at shorter wavelengths (blue light), making the sky blue and causing stronger extinction for bluer astronomical sources.
+
+    \medskip
 
     \item \textbf{Filter response} $F_\nu$: 
     
-    Describes the transmission curve of the photometric filter, which determines how efficiently the filter transmits light at each frequency or wavelength. The effective bandpass and central wavelength are defined by this curve. In practice, we often use the \textbf{effective (mean) wavelength}, defined as:
+    Describes the transmission curve of the photometric filter, which determines how efficiently the filter transmits light at each frequency or wavelength. The effective bandpass and central wavelength are defined by this curve. 
+    
+    \vspace{0.5em}
+    \begin{minipage}{0.62\textwidth}
+    In practice, we often use the \textbf{effective (mean) wavelength}, defined as:
     $$
         \lambda_\mathrm{eq} = \frac{\int \lambda\,T_\lambda\,F_\lambda\,R_\lambda\, d\lambda}{\int T_\lambda\,F_\lambda\,R_\lambda\, d\lambda}
     $$
     where the integrals are performed over the bandpass and $T_\lambda$, $F_\lambda$, $R_\lambda$ are the atmospheric, filter, and detector response curves, respectively. The full width at half maximum (FWHM) is often used to characterize the width of the filter's transmission profile.
-
-    The observed magnitude is defined through a band-integrated flux, and differences in magnitude between two sources are given by the Pogson relation:
-    $$
-        m - m_0 = -2.5\log_{10}\left(\frac{f}{f_0}\right)
-    $$
-    where $m_0$ is the magnitude of a reference source (usually Vega or for the AB system, a flux density of $f_0 = 3.63 \times 10^{-20}$ erg s$^{-1}$ cm$^{-2}$ Hz$^{-1}$).
-
-    Today, most photometric systems standardize magnitudes using either the Vega system or the AB system. In the AB system, by definition, $V_\mathrm{AB} = V_\mathrm{vega}$ for the $V$ band (to within a small offset).
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.3\textwidth}
+        \vspace{-2em}
+        \begin{figure}[H]
+            \centering
+            \begin{tikzpicture}[scale=2]
+                % Axis
+                \draw[->] (0,0) -- (2.2,0) node[below right] {$\lambda$};
+                \draw[->] (0,0) -- (0,1.2) node[right] {$F_\lambda$};
+        
+                % Smooth filter transmission curve (Gaussian-like)
+                \draw[thick,domain=0.2:2, samples=80, smooth] plot
+                    (\x,{exp(-4*(\x-1.1)^2)}) ;
+        
+                % Dotted line at lambda_peak
+                \draw[dashed] (1.1,0) -- (1.1,1) ;
+                \node[below] at (1.1,-0.02) {$\lambda_\mathrm{p}$ \footnotesize (peak)};
+        
+                % FWHM line (half max = 0.5)
+                \draw[gray,thick] (0.67,0.5) -- (1.53,0.5);
+                \draw[gray,thick] (0.67,0.47) -- (0.67,0.53);
+                \draw[gray,thick] (1.53,0.47) -- (1.53,0.53);
+        
+                % FWHM label
+                \node[right,gray] at (1.57,0.5) {\footnotesize FWHM};
+        
+                % Annotate "lambda peak"
+                % \node[below] at (1.1,-0.08) {\scriptsize $\lambda_\mathrm{p}$};
+        
+            \end{tikzpicture}
+            \caption{Profile of a photometric filter response.}
+        \end{figure}
+    \end{minipage}
 
     \item \textbf{Telescope and detector response} $R_\nu$: 
     
@@ -790,7 +831,7 @@ where $f_\nu$ is the flux density from the source above the atmosphere. The othe
 
     \begin{itemize}
         \item \textbf{Photographic plates}: Early photographic plates had relatively poor photometric accuracy, with typical uncertainties around $\Delta m \approx 0.03$ mag.
-        \item \textbf{CCD (Charge-Coupled Devices)}: Modern CCDs revolutionized photometry, offering uncertainties as low as $\Delta m \approx 0.001$ mag thanks to their high quantum efficiency and linear response.
+        \item \textbf{CCD (Charge-Coupled Devices)}: Modern CCDs revolutionized photometry, offering uncertainties as low as $\Delta m \approx 0.001$ mag thanks to high quantum efficiency and linear response.
         \item \textbf{Photoelectric photometry}: Also widely used, providing precise measurements of incident flux using the photoelectric effect.
     \end{itemize}
 \end{itemize}
@@ -798,3 +839,58 @@ where $f_\nu$ is the flux density from the source above the atmosphere. The othe
 \begin{observationblock}[K-correction]
     For galaxies at significant cosmological distances, one must apply a \textit{K-correction} to account for the fact that their observed light is redshifted due to cosmic expansion. This correction allows us to compare the intrinsic properties of galaxies as if observed in the same rest-frame photometric band.
 \end{observationblock}
+
+\subsection{Absolute Magnitude}
+
+The \textbf{absolute magnitude} $M$ of a source is the apparent magnitude it would have if it were located at a standard distance of 10 parsecs (pc). It is defined by:
+$$
+m - M = -2.5 \log_{10} \left( \dfrac f F \right)
+$$
+where $f$ is the observed flux at distance $d$ (in pc) and $F$ is the flux at a standard distance of 10 pc.
+
+Thus, we can obtain the absolute magnitude from the apparent magnitude and the distance, and vice versa.
+$$
+m = M + 5 \log_{10} (d) - 5,
+\qquad \qquad
+M = m - 5 \log_{10} (d) + 5
+$$
+and the \textbf{distance modulus} $m - M$ depends on the distance in parsecs:
+$$
+m - M = 5 \log_{10} (d) - 5
+$$
+
+\begin{observationblock}[Absolute Magnitude of the Sun]
+    The \textbf{absolute magnitude} of the Sun in the $V$ band is $M_{V\odot} = 4.83$. 
+
+    The apparent $V$-band magnitude of the Sun as observed from Earth is $V_\odot = -26.74$. 
+    The \textbf{distance modulus} for the Sun is:
+    $$
+        (V - M_V)_\odot = V_\odot - M_{V\odot} = -26.74 - 4.83 = -31.57
+    $$
+\end{observationblock}
+
+\subsection{Color Index}
+
+To measure stellar magnitudes with the highest precision, astronomers rely on photoelectric photometers, combined with carefully selected filters that restrict the incoming light to a specific wavelength range. The most widely adopted system is the Johnson photometric system, which originally used three principal filters: $U$ (ultraviolet), $B$ (blue), and $V$ (visual). When we measure brightness through each filter, we obtain the $U$, $B$, and $V$ magnitudes, respectively.
+
+The initial UBV system was later extended to include the $R$ (red) and $I$ (infrared) filters, forming the five-color UBVRI system. Each filter samples a distinct portion of the object's spectral energy distribution, so by comparing magnitudes measured through different filters, we gain direct information about a source's color and temperature.
+
+In any photometric system, the difference between two magnitudes—measured in different passbands—is called a \textbf{color index}. For example, the $B - V$ color index is defined as:
+$$
+B - V = m_B - m_V
+$$
+where $m_B$ and $m_V$ are the magnitudes measured through the $B$ and $V$ filters. In practical terms, color indices such as $U - B$ and $B - V$ are commonly reported, while the $V$ magnitude typically serves as the reference for absolute brightness.
+
+More generally, the color index quantifies how the observed energy output changes between two wavelength intervals set by the respective filters. Formally, the $B - V$ color can be expressed as:
+$$
+B - V = C - 2.5 \log_{10} \left( \dfrac{\int_0^\infty d\lambda\, \delta_\lambda(B) f_\lambda}{\int_0^\infty d\lambda\, \delta_\lambda(V) f_\lambda} \right)
+$$
+where $\delta_\lambda(B)$ and $\delta_\lambda(V)$ are the response functions of the $B$ and $V$ filters, $f_\lambda$ is the spectral flux density, and $C$ is a system-dependent constant that ensures the correct photometric zero-point.
+
+Importantly, the color index is independent of the source's distance:
+$$
+B - V = M_B - M_V + \cancel{5 \log_{10} d} - \cancel{5} - \cancel{5 \log_{10} d} + \cancel{5} = M_B - M_V
+$$
+where $M_B$ and $M_V$ are the absolute magnitudes in the $B$ and $V$ bands, respectively. The distance-dependent terms cancel, so the observed color index directly reflects intrinsic properties of the source.
+
+The notation $(B - V)_0$ denotes the \textbf{intrinsic} (reddening-corrected) color index, removing the effects of interstellar extinction and providing a clean diagnostic of the source's physical characteristics such as temperature or composition.

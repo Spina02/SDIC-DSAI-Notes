@@ -1,0 +1,153 @@
+\chapter{Message Passing Interface - MPI}
+
+% \section{One-Sided Communication}
+
+\section{Remote Memory Access - RMA}
+
+\subsection{Memory Windows}
+
+% TODO: talk about the window creation
+
+\begin{warningblock}[\plaintt{disp\_unit}]
+    The \plaintt{disp\_unit} parameter is often misunderstood. Setting it to anything other than 1 (byte) can cause subtle bugs when mixing datatypes. The displacement calculation becomes:
+\begin{codeblock}[language=C]
+target_addr = base + (target_disp * disp_unit)
+\end{codeblock}
+\end{warningblock}
+
+% \subsection{Data Movement}
+
+\begin{observationblock}[Flush vs Sync]
+
+The fundamental difference between \plaintt{MPI\_Win\_flush} and \plaintt{MPI\_Win\_sync} is that:
+\begin{itemize}
+    \item \texttt{MPI\_Win\_flush}: Forces completion of RMA operations from the origin to the target.
+    \item \texttt{MPI\_Win\_sync}: Synchronizes local memory with the window (target-side operation).
+\end{itemize}
+
+Or, in other words:
+
+\begin{itemize}
+    \item \texttt{MPI\_Win\_flush} is about \textit{Network Completion} (\emph{Did the data arrive?})
+    \item \texttt{MPI\_Win\_sync} is about \textit{Memory Consistency} (\emph{Is the data visible to the CPU?})
+\end{itemize}
+
+This distinction is critical and often misunderstood: these calls operate on different sides of the communication and serve completely different purposes.
+\end{observationblock}
+    
+
+% \subsection{Ordering and Synchronization}
+
+% \subsubsection{Fences}
+
+% \subsubsection{Post-Start-Complete-Wait - PSCW}
+
+% \subsubsection{Locks}
+
+\begin{warningblock}[Misconception about locks]
+    Despite the unfortunate naming, MPI locks are not mutex-like. They do not provide mutual exclusion for the target process's local access. The target can modify its window memory during a locked epoch, leading to race conditions.
+\end{warningblock}
+
+\subsubsection{Assertions}
+
+% TODO: talk about synchronization asserts, cite the main ones
+
+% \subsection{RMA Memory Model}
+
+\section{Shared Memory}
+
+An HPC machine is made of several nodes that are connected by a top-level network We call these nodes "hosts".
+
+Currently every host contains a NUMA region which consists in a number of sockets. Each of which is physically connected to RAM banks.
+In turn, the sockets are interconnected so that a process running on a given core can access a memory bank not physically attached to its socket.
+
+\subsection{Getting Shared Memory Pools}
+
+\subsubsection{General and specific routines}
+
+MPI provides a method to know about that and to distinguish the tasks depending some of their charateristics:
+
+\begin{itemize}
+
+    \item a \plaintt{general routine} to split a communicator into sub-communicators:
+
+\begin{codeblock}[language=C]
+MPI_Comm_split ( 
+    MPI_Comm comm,      // the communicator to be splitted
+    int color,          // discriminate task
+    int key,            // hint for new ranks
+    MPI_Comm *newcomm   // the new communicator
+);
+\end{codeblock}
+
+\item a \plaintt{specific routine} to split a communicator into sub-communicators following the hardware hierarchy (i.e. NUMA region, socket, core, etc.):
+\begin{codeblock}[language=C]
+MPI_Comm_split_type ( 
+    MPI_Comm comm,      // the communicator to be splitted
+    int split_type,     // the splitting property
+    int key,            // hint for new ranks
+    MPI_Info info,      // helper for the splitting property
+    MPI_Comm *newcomm   // the new communicator
+);
+\end{codeblock}
+
+The \plaintt{split_type} parameter is used to specify the splitting property. It can be one of the following values:
+\begin{itemize}
+    \item \plaintt{MPI_COMM_TYPE_SHARED}: split the communicator based on the shared memory pools.
+    \item \plaintt{MPI_COMM_TYPE_HW_GUIDED}: split the communicator based on the hardware guided property.
+    \item \plaintt{MPI_COMM_TYPE_HW_UNGUIDED}: split the communicator based on the hardware unguided property.
+\end{itemize}
+
+The \plaintt{key} parameter is used to hint for the new ranks. It is used to sort the tasks depending on their charateristics.
+
+The \plaintt{info} parameter is used to provide helper for the splitting property. It is used to provide additional information about the splitting property.
+
+\subsubsection{Placement}
+
+\begin{codeblock}[language=C]
+MPI_Win_allocate_shared ( 
+    MPI_Aint size,        // the size of the window
+    int disp_unit,        // the displacement unit
+    MPI_Info info,        // the information to be used
+    MPI_Comm comm,        // the communicator
+    void *baseptr,        // the base pointer
+    MPI_Win *win          // the window
+);
+\end{codeblock}
+
+As with other window-creation routines, the memory allocation for \texttt{MPI\_Win\_allocate\_shared} does not require the allocated size to be uniform: each task may allocate a different amount. There is no strict specification as to where the memory should be physically placed: an MPI implementation will typically attempt to maximize data locality and affinity.
+
+By default, the allocation is \textbf{contiguous}. However, this contiguity does not only refer to the virtual address space: ideally, it also implies allocation in the same physical memory bank. On many systems, though, it is not possible to remap memory at arbitrary sizes to guarantee this property. Specifying a non-contiguous allocation can allow the MPI implementation to more flexibly optimize the placement, possibly enhancing the affinity for each individual task.
+
+% TODO: mentioning caveats
+
+
+A useful routine related to window allocation and memory sharing is \plaintt{MPI\_Win\_shared\_query}, which allows processes to retrieve a pointer to shared memory in a window, for either direct access or load/store operations. Its prototype is:
+
+\begin{codeblock}[language=C]
+MPI_Win_shared_query(
+    MPI_Win   win,         // the window object
+    int       rank,        // rank whose segment to query, or MPI_PROC_NULL
+    MPI_Aint *size,        // returns segment size
+    int      *disp_unit,   // returns displacement unit
+    void    **baseptr      // returns base pointer in shared memory
+);
+\end{codeblock}
+
+This function enables a process to obtain the base address and size of the memory segment exposed by any rank in a shared-memory communicator window. Commonly, it is called with \plaintt{rank = MPI\_PROC\_NULL}, which gives a pointer to the start of the entire shared memory region (regardless of which process allocated it), and returns:
+
+\begin{itemize}
+    \item the address of the first byte in the shared memory window (for contiguous allocation), or
+    \item the base address of the first process that specified a non-zero \plaintt{size} (for non-contiguous allocation).
+\end{itemize}
+
+% \begin{center}
+% \includegraphics[width=0.95\textwidth]{contiguity_example.png}
+% \end{center}
+
+The figure above illustrates the difference between default contiguous allocation and non-contiguous allocation across multiple processes. With contiguous allocation, addresses increase sequentially across processes, so the pointer returned can be used by all processes to access the underlying shared array as a unified space. In non-contiguous mode, each process's memory may be mapped separately, and thus, only the base address of the first valid allocation is returned.
+
+This routine is fundamental for writing portable and generic code utilizing shared memory windows, especially when contiguity cannot be assumed.
+
+% \subsection{Shared Memory Access}
+
