@@ -1,0 +1,178 @@
+\chapter{MPI and GPU offloading using Python}
+
+\section{MPI in Python}
+
+Message Passing Interface (MPI) is a standard for disrtribuited-memory parallel computing, using to enable communication between multiple processes.
+MPI is useful in HPC applications, where we need to distribuite large computations across multiple nodes.
+
+MPI in python is implemented using the mpi4py library. To install it, we can use the following command:
+
+\begin{codeblock}[language=bash, numbers=none]
+pip install mpi4py
+\end{codeblock}
+
+how to use:
+
+\begin{codeblock}[language=bash, numbers=none]
+mpirun -n <number_of_processes> python <script.py>
+\end{codeblock}
+
+\subsubsection{Communications}
+
+\begin{itemize}
+    \item \textbf{Point-to-point communications}
+    
+\begin{codeblock}[language=python]
+if rank == 0:
+    data = "Hellp, Process 1"
+    comm.send(data, dest=1)
+elif rank == 1:
+    data = comm.recv(source=0)
+    print(f"Process 1 received: {data}")
+\end{codeblock}
+
+\item \textbf{Non-blocking communications}
+
+\begin{codeblock}[language=python]
+if rank == 0:
+    data = "Hellp, Process 1"
+    comm.isend(data, dest=1, tag=11)
+elif rank == 1:
+    data = comm.irecv(source=0, tag=11)
+    print(f"Process 1 received: {data}")
+\end{codeblock}
+
+\item \textbf{Collective communications}
+    
+\begin{codeblock}[language=python]
+comm.bcast(data, root=0)
+\end{codeblock}
+
+\end{itemize}
+
+\begin{exampleblock}[Example]
+    We want to implement a code that computes the distance between each point of a dataset and of another one, and then compute the distance distribution.
+
+    \begin{codeblock}[language=python]
+import numpy as np
+import mpi4py
+from mpi4py import MPI
+
+npart_data = int(sys.argv[1])
+Nbins = 20
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+size = comm.Get_size()
+
+if rank == 0:
+    Data1 = np.random.rand(npart_data, 2)
+    Data2 = np.random.rand(npart_data, 2)
+    bins = np.linspace(0, 1.5, Nbins)
+else:
+    Data1 = None
+    Data2 = np.empty((npart_data, 2))
+    bins = np.empty(Nbins)
+
+comm.Barrier()
+
+comm.Bcast(Data1, root=0)
+comm.Bcast(Data2, root=0)
+
+Data1_on_task = scatter_data(Data1)
+
+dist_hist = get_statistical_distance([Data1_on_task, Data2, bins])
+
+dist_hist_fin = none
+if rank == 0:
+    dist_hist_fin = np.empty([size, len(dist_hist)])
+
+comm.Gatherv(dist_hist, dist_hist_fin, root=0)
+
+if rank == 0:
+    dist_hist_fin = np.sum(dist_hist_fin, axis=0)
+
+    \end{codeblock}
+
+where \texttt{scatter_data} is a function that scatters the data to the different tasks.
+
+\begin{codeblock}[language=python]
+def scatter_data(Data):
+    rows_per_rank = np.full(size, npart_data // size)
+    rows_per_rank[:npart_data % size] += 1
+
+    # Allocate memory for the data on the current task
+    Data1_on_task = np.empty((rows_per_rank[rank], 2))
+
+    # Calculate the displacement
+    displacement = np.cumsum(np.insert(rows_per_rank[:-1], 0, 0)) * 2
+
+    # Scatter the data
+    comm.Scatterv([Data1, rows_per_rank * 2, displacement, MPI.DOUBLE], Data1_on_task, root=0)
+
+    return Data1_on_task
+\end{codeblock}
+
+\end{exampleblock}
+
+\section{GPU offloading in Python}
+
+It is possible to offload the computation to the GPU using different libraries.
+
+\subsection{Low level APIs: PyCUDA, PyOpenCL}
+
+PyCUDA is a library that allows to write CUDA code in Python. It provides a low level API for CUDA programming.
+
+\begin{codeblock}[language=python]
+...
+\end{codeblock}
+
+\subsection{Mid level APIs: Numba}
+
+Numba is a just-in-time compiler for Python that allows to write CUDA code in Python. It provides a mid level API for CUDA programming.
+
+\begin{codeblock}[language=python]
+...
+\end{codeblock}
+
+\subsection{High level APIs: CuPy}
+
+CuPy is an open-source array library for GPU-accelerated computing in Python on NVIDIA CUDA or AMD ROCm platforms.
+
+It is highly comparible with NumPy and SciPy; in most cases it can be used as a drop-in replacement.
+
+At the same time it allows programmers to write custom CUDA kernels.
+
+\begin{codeblock}[language=python]
+import cupy as cp
+
+def distances_GPU_cupy(Data1, Data2, bins):
+    Data1 = cp.asarray(Data1)
+    Data2 = cp.asarray(Data2)
+    bins = cp.asarray(bins)
+
+    dist_hist = get_distances_GPU_cupy(Data1, Data2, bins)
+    return dist_hist
+
+def get_distances_GPU_cupy(Data1, Data2, bins):
+    # calculate the distances in a vectorized manner
+    dx = Data1[:, 0][:, cp.newaxis] - Data2[:, 0][cp.newaxis, :]
+    dy = Data1[:, 1][:, cp.newaxis] - Data2[:, 1][cp.newaxis, :]
+    dist = cp.sqrt(dx**2 + dy**2)
+
+    # use cp.histogram for GPU histogramming
+    dist_hist = cp.histogram(dist, bins=bins)
+    return dist_hist
+
+\end{codeblock}
+
+\subsubsection{Extensions}
+
+\begin{itemize}
+    \item cuDF is a GPU DataFrame library for managing data, that extends the capabilities of Pandas to the GPU.
+    \item Dpnp is a library used by Intel that implements a subset of the NumPy API that can be executes on any data parallel device.
+\end{itemize}
+
+\begin{warningblock}[Offloading only when needed]
+    Offloading only when needed. If the data is small, it is not worth offloading it to the GPU, and it can take more time than the computation on the CPU.
+\end{warningblock}
