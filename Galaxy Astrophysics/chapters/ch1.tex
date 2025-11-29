@@ -837,27 +837,40 @@ where $f_\nu$ is the flux density from the source above the atmosphere. The othe
 \end{itemize}
 
 \begin{observationblock}[K-correction]
-    For galaxies at significant cosmological distances, one must apply a \textit{K-correction} to account for the fact that their observed light is redshifted due to cosmic expansion. This correction allows us to compare the intrinsic properties of galaxies as if observed in the same rest-frame photometric band.
+    For galaxies at significant cosmological distances, one must apply a \textit{K-correction} to account for the fact that their observed light is redshifted due to cosmic expansion.
 \end{observationblock}
 
 \subsection{Absolute Magnitude}
 
-The \textbf{absolute magnitude} $M$ of a source is the apparent magnitude it would have if it were located at a standard distance of 10 parsecs (pc). It is defined by:
-$$
-m - M = -2.5 \log_{10} \left( \dfrac f F \right)
-$$
-where $f$ is the observed flux at distance $d$ (in pc) and $F$ is the flux at a standard distance of 10 pc.
+The \textbf{absolute magnitude} $M$ of an astronomical object measures how bright it would appear if it were placed at a distance of 10 parsecs, removing the effects of distance to reflect its true luminosity.
 
-Thus, we can obtain the absolute magnitude from the apparent magnitude and the distance, and vice versa.
+More formally, the relationship between apparent magnitude $m$, absolute magnitude $M$, and distance $d$ (in parsecs) is governed by the distance modulus formula:
 $$
-m = M + 5 \log_{10} (d) - 5,
-\qquad \qquad
-M = m - 5 \log_{10} (d) + 5
+m - M = -2.5 \log \left( \dfrac f F \right)
 $$
-and the \textbf{distance modulus} $m - M$ depends on the distance in parsecs:
-$$
-m - M = 5 \log_{10} (d) - 5
-$$
+Here, $f$ is the observed flux received from the source at an arbitrary distance $d$, and $F$ is the flux the same source would produce at exactly $10$ pc. Since flux decreases with the square of the distance, this relation naturally encodes the effects of distance on observed brightness.
+
+\begin{minipage}{0.58\textwidth}
+Knowing the relationship between flux and distance, we can derive the following relations:
+\begin{align*}
+    m - M &= 5 \log_{10}(d) - 5 \\[0.5em]
+    m &= M + 5 \log_{10}(d) - 5 \\
+    M &= m - 5 \log_{10}(d) + 5
+\end{align*}
+
+\vspace{0.3em}
+
+The term $m - M$ is called the \bfit{distance modulus}. It provides a convenient tool for determining absolute magnitude when both apparent magnitude and distance are measured, and vice versa.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+\begin{figure}[H]
+    \raggedright
+    \includegraphics[width=0.9\textwidth]{assets/abs-mag.png}
+    \vspace{-0.5em}
+    \caption{\centering Absolute magnitude \cite{karttunen}}
+\end{figure}
+\end{minipage}
 
 \begin{observationblock}[Absolute Magnitude of the Sun]
     The \textbf{absolute magnitude} of the Sun in the $V$ band is $M_{V\odot} = 4.83$. 
@@ -871,26 +884,86 @@ $$
 
 \subsection{Color Index}
 
-To measure stellar magnitudes with the highest precision, astronomers rely on photoelectric photometers, combined with carefully selected filters that restrict the incoming light to a specific wavelength range. The most widely adopted system is the Johnson photometric system, which originally used three principal filters: $U$ (ultraviolet), $B$ (blue), and $V$ (visual). When we measure brightness through each filter, we obtain the $U$, $B$, and $V$ magnitudes, respectively.
+To measure stellar magnitudes with the highest precision, astronomers rely on photoelectric photometers, combined with carefully selected filters that restrict the incoming light to a specific wavelength range. The most widely adopted system is the \textit{Johnson photometric system}, which originally used three principal filters: $U$ (ultraviolet), $B$ (blue), and $V$ (visual).
 
-The initial UBV system was later extended to include the $R$ (red) and $I$ (infrared) filters, forming the five-color UBVRI system. Each filter samples a distinct portion of the object's spectral energy distribution, so by comparing magnitudes measured through different filters, we gain direct information about a source's color and temperature.
+The initial UBV system was later extended to the UBVRI, including $R$ (red) and $I$ (infrared). Each filter samples a distinct portion of the object's SED, so by comparing magnitudes measured through different filters, we gain direct information about a source's color and temperature.
 
-In any photometric system, the difference between two magnitudes—measured in different passbands—is called a \textbf{color index}. For example, the $B - V$ color index is defined as:
+\medskip
+
+In any photometric system, the difference between two magnitudes measured in different passbands is called a \textbf{color index}. For example, the $B - V$ color index is defined as:
 $$
 B - V = m_B - m_V
 $$
-where $m_B$ and $m_V$ are the magnitudes measured through the $B$ and $V$ filters. In practical terms, color indices such as $U - B$ and $B - V$ are commonly reported, while the $V$ magnitude typically serves as the reference for absolute brightness.
+where $m_B$ and $m_V$ are the magnitudes measured through the $B$ and $V$ filters. 
 
 More generally, the color index quantifies how the observed energy output changes between two wavelength intervals set by the respective filters. Formally, the $B - V$ color can be expressed as:
 $$
-B - V = C - 2.5 \log_{10} \left( \dfrac{\int_0^\infty d\lambda\, \delta_\lambda(B) f_\lambda}{\int_0^\infty d\lambda\, \delta_\lambda(V) f_\lambda} \right)
+B - V = C - 2.5 \log \left( \dfrac{\int_0^\infty d\lambda\, \delta_\lambda(B) f_\lambda}{\int_0^\infty d\lambda\, \delta_\lambda(V) f_\lambda} \right)
 $$
 where $\delta_\lambda(B)$ and $\delta_\lambda(V)$ are the response functions of the $B$ and $V$ filters, $f_\lambda$ is the spectral flux density, and $C$ is a system-dependent constant that ensures the correct photometric zero-point.
 
 Importantly, the color index is independent of the source's distance:
 $$
-B - V = M_B - M_V + \cancel{5 \log_{10} d} - \cancel{5} - \cancel{5 \log_{10} d} + \cancel{5} = M_B - M_V
+B - V = M_B - M_V + \cancel{5 \log d} - \cancel{5} - \cancel{5 \log d} + \cancel{5} = M_B - M_V
 $$
-where $M_B$ and $M_V$ are the absolute magnitudes in the $B$ and $V$ bands, respectively. The distance-dependent terms cancel, so the observed color index directly reflects intrinsic properties of the source.
+where $M_B$ and $M_V$ are the absolute magnitudes in the $B$ and $V$ bands, respectively. The distance-dependent terms cancel, so the observed color index directly reflects intrinsic properties.
 
-The notation $(B - V)_0$ denotes the \textbf{intrinsic} (reddening-corrected) color index, removing the effects of interstellar extinction and providing a clean diagnostic of the source's physical characteristics such as temperature or composition.
+\medskip
+
+Building upon this, the color index emerges as a fundamental tool for probing the physical properties of stars and galaxies, such as temperature, age and stellar population types.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.6\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{assets/col-idx.png}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.39\textwidth}
+        \vspace{0.5em}
+        \captionof{figure}{Relative transmission profiles of filters used in the UBVRI magnitude system. The maxima of the bands are normalized to unity. The $R$ and $I$ bands are based on the system of Johnson, Cousins, and Glass, which includes also infrared bands $J$, $H$, $K$, $L$, and $M$. Previously used $R$ and $I$ bands differ considerably from these. \cite{karttunen}}
+    \end{minipage}
+\end{figure}
+
+In particular, the $B-V$ color index serves as a straightforward and powerful temperature diagnostic for stars. Since hotter stars emit more radiation at shorter (bluer) wavelengths, they have lower (more negative) $B-V$ values; conversely, cooler stars appear redder and have higher $B-V$. The temperature corresponding to the color index is called \textbf{color temperature} $T_c$.
+
+Color indices are also a useful diagnostic for broadly classifying the morphological types of galaxies. Elliptical galaxies typically exhibit redder colors, with $(B-V) \approx 1.5$, whereas spiral galaxies are generally bluer, around $(B-V) \approx 1.0$.
+
+% According to the \textbf{Stefan-Boltzmann law}:
+% $$
+% L = 4\pi R^2 \sigma T_\mathrm{eff}^4
+% $$
+% where $L$ is the luminosity, $R$ is the radius and $T_\mathrm{eff}$ is the effective temperature.
+
+\begin{tipsblock}[Practical use of color indices]
+    In practical terms, color indices such as $U - B$ and $B - V$ are commonly reported, while the $V$ magnitude typically serves as the reference for absolute brightness.
+\end{tipsblock}
+
+\subsection{Magnitude corrections (Stars)}
+
+\todo{Enhance and complete this section}
+
+The ISM causes interstellar extinction proportional to the frequency of the light. Therefore, we must add a $A_{\lambda}$ correction term to the observed magnitude $m$ to get the intrinsic magnitude $M$:
+
+$$
+M = m - 5 \log (d) + 5 - A_{\lambda}
+$$
+
+$A_{\lambda}$ is the extinction in magnitudes at the wavelength $\lambda$. In particular we can notice that $A_{B} > A_{V} > A_{R} > A_{I}$.
+
+$$
+B-V = (B-V)_0 + \underbrace{A_B - A_V}_{\neq 0}
+$$
+
+This ISM response is not dependent on the frequency of the radiations that pass through it. This is calles differential effect.
+
+\begin{observationblock}[Standard stars]
+To correct for the ISM effect, we refer to \bfit{standard stars}, which are stars with known magnitudes and colors. These stars are used to calibrate the magnitude system and to correct for the ISM effect.
+\end{observationblock}
+
+The quantity $E_{B-V} = A_B - A_V$ is called \bfit{colour excess}. 
+
+$$
+R = \dfrac{A_V}{E_{B-V}} \approx 3
+$$
+
