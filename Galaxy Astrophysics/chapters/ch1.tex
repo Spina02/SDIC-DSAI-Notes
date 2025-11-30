@@ -136,12 +136,12 @@ The \bfit{galactic longitude} $l$ is measured counterclockwise (analogous to rig
 03$^\mathrm{h}$ 42$^\mathrm{m}$ 35.63$^\mathrm{s}$ \hspace{1em} +42$^\circ$ 32$'$ 35.4$''$
 \end{center}
  
-\begin{tipsblock}[Units]
-    Because $1\,\mathrm{AU/yr} = 4.74047\,\mathrm{km\,s^{-1}}$ and at $1\,\mathrm{pc}$ an AU subtends $1''$, we obtain
-    $v_t[\mathrm{km\,s^{-1}}] = 4.74047\, \mu[''/\mathrm{yr}]\, d[\mathrm{pc}]$.
-    Catalogues often list $\mu$ in mas/yr; equivalently
-    $v_t[\mathrm{km\,s^{-1}}] = 4.74047\, \mu[\mathrm{mas/yr}]\, d[\mathrm{kpc}]$.
-\end{tipsblock}
+% \begin{tipsblock}[Units]
+%     Because $1\,\mathrm{AU/yr} = 4.74047\,\mathrm{km\,s^{-1}}$ and at $1\,\mathrm{pc}$ an AU subtends $1''$, we obtain
+%     $v_t[\mathrm{km\,s^{-1}}] = 4.74047\, \mu[''/\mathrm{yr}]\, d[\mathrm{pc}]$.
+%     Catalogues often list $\mu$ in mas/yr; equivalently
+%     $v_t[\mathrm{km\,s^{-1}}] = 4.74047\, \mu[\mathrm{mas/yr}]\, d[\mathrm{kpc}]$.
+% \end{tipsblock}
 \end{observationblock}
 
 \section{Coordinate perturbations}
@@ -501,27 +501,29 @@ Here, $z_{\mathrm{obs}}$ is the total observed redshift for an individual galaxy
 
 A star's space velocity splits into a \bfit{radial velocity} ($v_r$) and a \bfit{tangential velocity} ($v_t$). The tangential velocity results in the proper motion, which can be measured by taking plates at intervals of several 
 years or decades.
+
 $$
 \tan{\dfrac{\alpha}{2}} \sim \dfrac {x/2}{d}
 \qquad \Rightarrow \qquad 
 \mu \sim \dfrac{v_t}{d}
 $$
+
 Thus, the tangential velocity follows from the proper motion and the distance:
 
-\vspace{-1.2em}
 $$
 v_t = 4.74\, \mu\, d
 $$
 
-\vspace{-0.4em}
 where $4.74$ converts to km/s when using the units below:
 
+\medskip
 \begin{center}
     \renewcommand{\arraystretch}{1.1}
     \begin{tabular}{>{\centering\arraybackslash}m{3.5cm} >{\centering\arraybackslash}m{3.5cm} >{\centering\arraybackslash}m{3.5cm}}
         $[v_t] = \text{km/s}$ & $[d] = \text{pc}$ & $[\mu] = \text{arcsec/year}$ \\
     \end{tabular}
 \end{center}
+\medskip
 
 The proper motion $\mu$ is usually described in terms of two components: one along the declination direction, $\mu_\delta 
 = \Delta \delta / 1\,\mathrm{year}$, and one along the right ascension direction.
@@ -534,11 +536,9 @@ The proper motion $\mu$ is usually described in terms of two components: one alo
     Therefore, the component in right ascension is written as $\mu^*_{\alpha} = \mu_\alpha \cos \delta$, with $\mu_\alpha = \Delta \alpha / 1\,\mathrm{year}$, where the factor of $\cos \delta$ adjusts for this effect.
 
     The total proper motion is then:
-    \small
     $$
     \mu = \sqrt{\mu_\delta^2 + \mu_\alpha^2 \cos^2 \delta} \qquad \text{or} \qquad \mu = \sqrt{\mu_\delta^2 + (\mu^*_{\alpha})^2}
     $$
-    \normalsize
 \end{minipage}%
 \hfill
 \begin{minipage}{0.34\textwidth}
@@ -547,16 +547,15 @@ The proper motion $\mu$ is usually described in terms of two components: one alo
     \centering
     \includegraphics[width=0.9\textwidth]{assets/proper-motion.png}
 
-    \vspace{-0.5em}
     \caption{\centering Proper motion \cite{karttunen}}
     \end{figure}
 \end{minipage}
 
-\vspace{-0.5em}
-
 \begin{observationblock}[Barnard's Star]
     Barnard's Star exhibits the highest known proper motion of any star, moving across the sky at a remarkable rate of $\mu = 10.34\ \mathrm{arcsec/year}$.
 \end{observationblock}
+
+\newpage
 
 \section{Magnitudes}
 
@@ -939,31 +938,191 @@ Color indices are also a useful diagnostic for broadly classifying the morpholog
     In practical terms, color indices such as $U - B$ and $B - V$ are commonly reported, while the $V$ magnitude typically serves as the reference for absolute brightness.
 \end{tipsblock}
 
-\subsection{Magnitude corrections (Stars)}
+\subsection{Magnitude corrections}
 
-\todo{Enhance and complete this section}
+\subsubsection{Magnitude corrections for stars}
 
-The ISM causes interstellar extinction proportional to the frequency of the light. Therefore, we must add a $A_{\lambda}$ correction term to the observed magnitude $m$ to get the intrinsic magnitude $M$:
+Interstellar dust and gas, collectively known as the 
+Interstellar Medium (ISM), absorb and scatter starlight as 
+it travels toward us. This process, called \textbf{interstellar extinction}, dims and reddens the observed 
+light, causing the apparent magnitude $m$ to differ from 
+the star's intrinsic magnitude $M$.
+
+To correct for interstellar extinction, astronomers rely on \bfit{standard stars}: stars whose intrinsic magnitudes and colors are well known. By comparing the observed magnitudes of other stars to these calibrated standards, the effects of extinction can be accurately measured and removed.
+
+To correct for extinction, we introduce the extinction term $A_\lambda$ at wavelength $\lambda$:
 
 $$
 M = m - 5 \log (d) + 5 - A_{\lambda}
 $$
 
-$A_{\lambda}$ is the extinction in magnitudes at the wavelength $\lambda$. In particular we can notice that $A_{B} > A_{V} > A_{R} > A_{I}$.
-
+The value $A_{\lambda}$ quantifies the amount of extinction suffered by the light at wavelength $\lambda$. It is stronger at shorter wavelengths due to the wavelength dependence of the ISM opacity, meaning that blue light is affected more than red. Specifically, as we move from blue to infrared filters we have: $A_B > A_V > A_R > A_I$. This differential extinction alters the observed color index. For the $(B-V)$ color, the correction is:
 $$
-B-V = (B-V)_0 + \underbrace{A_B - A_V}_{\neq 0}
+(B - V) = (B - V)_0 + \underbrace{A_B - A_V}_{E_{B-V} \neq 0}
 $$
+where $(B-V)_0$ is the intrinsic (unreddened) color index and $E_{B-V} = A_B - A_V$ is the \textbf{color excess}. The color excess encapsulates how much the ISM has reddened the starlight.
 
-This ISM response is not dependent on the frequency of the radiations that pass through it. This is calles differential effect.
 
-\begin{observationblock}[Standard stars]
-To correct for the ISM effect, we refer to \bfit{standard stars}, which are stars with known magnitudes and colors. These stars are used to calibrate the magnitude system and to correct for the ISM effect.
-\end{observationblock}
 
-The quantity $E_{B-V} = A_B - A_V$ is called \bfit{colour excess}. 
-
+The relationship between extinction and color excess is characterized by the ratio
 $$
 R = \dfrac{A_V}{E_{B-V}} \approx 3
 $$
+for the diffuse Milky Way ISM. $R$ depends on properties, such as opacity, of the ISM along the line of sight. It is also related to the distance $d$ travelled through the ISM:
+$$
+A_V \propto d
+$$
 
+\begin{observationblock}[Colour as a distance tracer]
+    By comparing a star's observed color to its intrinsic color $(B - V)_0$, if the stellar type is known, one can infer the color excess $E_{B-V}$, and thus estimate the extinction and, ultimately, the distance to the star.
+\end{observationblock}
+
+\subsubsection{Magnitude corrections for galaxies}
+
+To accurately determine the intrinsic brightness of galaxies, astronomers must account for several corrections that affect the observed magnitude. The full correction formula is:
+
+$$
+M = m - 5 \log (d) + 5 - A_{\lambda} - A_{\lambda, i} - K + E
+$$
+
+where $A_{\lambda}$ is the MW extinction, $A_{\lambda, i}$ is the intrinsic extinction of the galaxy (due to its ISM), $K$ is the K-correction and $E$ is the evolution correction.
+
+It is important to note that elliptical galaxies exhibit minimal extinction because they contain very little interstellar dust and gas. In contrast, spiral galaxies often display significant extinction, especially when observed \textit{"edge-on"} (when the disk of the galaxy is parallel to our line of sight) where starlight traverses a longer path through the galaxy's dusty disk.
+
+\begin{itemize}
+    \item \textbf{K-correction}:
+
+    The \textbf{K-correction} adjusts for the fact that, due to redshift, a galaxy's observed spectrum is shifted and stretched to longer wavelengths compared to its rest-frame spectrum. This means an observed filter samples bluer rest-frame light. To compare intrinsic properties of galaxies at different redshifts, this effect must be corrected.
+    Wavelengths are related by:
+    $$
+    \lambda_{\text{obs}} = \lambda_{\text{RF}} (1 + z)
+    $$
+    and thus, a filter of width $\Delta \lambda_{\text{obs}}$ corresponds to a narrower interval in the rest-frame:
+    $$
+    \Delta \lambda_{\text{RF}} = \frac{\Delta \lambda_{\text{obs}}}{1 + z}
+    $$
+
+    \vspace{-1.5em}
+
+    \begin{figure}[H]
+        \centering
+        \begin{minipage}{0.42\textwidth}
+            % Hand-drawn style schematic of the K-correction / SED shift
+            \hspace{0.6em}
+            \begin{tikzpicture}[scale=0.95]
+                % Axes
+                \draw[->] (0.3,0) -- (6,0) node[right] {$\lambda$};
+                \draw[->] (0.3,0) -- (0.3,3.2) node[right] {$f_\lambda$};
+
+                % Vertical filter lines (lambda_a, lambda_b) and light gray fill
+                \fill[gray!5] (1.5,0.05) rectangle (3.6,3.0);
+                \draw[dotted] (1.5,0) -- (1.5,3.0);
+                \draw[dotted] (3.6,0) -- (3.6,3.0);
+
+                % Filter regions (lambda_a to lambda_b) -- shaded sections
+                \draw[<->] (1.5,-0.3) -- (3.6,-0.3);
+                \node at (1.5,-0.55) {$\lambda_a$};
+                \node at (3.8,-0.55) {$\lambda_b$};
+                \node at (2.55,-0.55) {\footnotesize (filter)};
+
+                % SEDs
+                % z = 0 SED
+                \draw[thick] plot [smooth, domain=0.7:4.3] (\x, {2.4*exp(-((\x-2.5)^2)/1.3)});
+                % label for z=0
+                \node at (3,2.7) {\footnotesize $z=0$};
+
+                % z > 0 SED (redshifted, dashed)
+                \draw[thick, dashed] plot [smooth, domain=1.2:5.5] (\x, {2.0*exp(-((\x-3.3)^2)/2)});
+                \node at (4.7,1.5) {\footnotesize $z > 0$};
+
+                % Arrow showing redshift
+                \draw[->, thick, red] (1.7,1.5) -- (2.55,1.5);
+                \node[red] at (1.2,1.8) {\footnotesize {redshift}};
+            \end{tikzpicture}
+        \end{minipage}%
+        \hfill
+        \begin{minipage}{0.58\textwidth}
+            \vspace{0.5em}
+            \captionof{figure}{
+                Effect of redshift on an observed galaxy spectrum: the rest-frame SED $z=0$ is not only shifted towards longer wavelengths at $z>0$ but also stretched (broadened) in wavelength. The features in the SED appear at longer wavelengths and are spread out due to the cosmological expansion. Thus, the fixed observed filter (between $\lambda_a$ and $\lambda_b$) samples different and broader parts of the SED as redshift increases.
+            }
+        \end{minipage}
+    \end{figure}
+
+    \vspace{-1em}
+
+    \item \textbf{Evolution correction}: 
+
+    The \textbf{evolution correction} ($E$) accounts for changes in a galaxy's stellar population and luminosity over time. As galaxies age, their stars evolve, altering overall brightness and color. Thus, a galaxy seen at higher redshift (when the Universe was younger) may look intrinsically brighter or bluer, not due to distance or observational effects.
+
+    \begin{itemize}
+    \item For \textbf{spiral galaxies}, we typically assume their star formation rate remains constant over time. The intrinsic properties of spirals change little, so the evolution correction is negligible: 
+    $$
+    E \approx 0
+    $$
+
+    \item In contrast, \textbf{elliptical galaxies} experienced most of their star formation in a brief, intense burst early in their history. Afterward, star formation largely ceased, and the stars passively age and redden. This causes their luminosity to fade significantly as the galaxy evolves. For these galaxies, the evolution correction can be substantial and is often parametrized as:
+    $$
+    E \sim K
+    $$
+    meaning that both evolutionary and K-corrections can be of similar magnitude and must be carefully accounted for when studying distant ellipticals.
+    \end{itemize}
+
+    \item \textbf{Extinction}:
+
+    We have already discussed extinction in the context of stars, and the same principles apply to galaxies as well. If there is no material absorbing light along the line of sight, the relation between luminosity and distance is simply given by $L = \omega r^2 F$, where $L$ is the luminosity, $F$ is the observed flux, $\omega$ is a geometric factor, and $r$ is the distance to the source.
+
+    However, when extinction occurs, the loss of light as it passes through the interstellar medium can be described by the equation
+    $$
+    dL = -\alpha L\, dr
+    $$
+    where the parameter $\alpha$, known as the \bfit{opacity}, quantifies how effectively the medium absorbs or blocks the radiation.The effect of extinction on observed luminosity is conveniently described by the \textbf{optical thickness} $\tau$, defined as:
+    $$
+    d\tau = \alpha\, dr
+    $$
+
+    The change in luminosity is then:
+    $$
+    dL = -L\, d\tau
+    \qquad \Rightarrow \qquad
+    \int_{L_0}^{L} \dfrac{dL'}{L'} = - \int_0^\tau d\tau'
+    \qquad \Rightarrow \qquad
+    L = L_0\, e^{-\tau}
+    $$
+    where $L_0$ is the intrinsic (unextinguished) luminosity.
+
+    \vspace{-0.8em}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/gal-ext.png}
+        \vspace{-0.5em}
+        \caption{Extinction effect on the observed flux of a galaxy. \cite{karttunen}}
+    \end{figure}
+
+    \vspace{-0.5em}
+
+    The effect of extinction on luminosity and flux can be written explicitly as:
+    $$
+    L(r) = \omega r^2 F(r)
+    $$
+    where $L(r)$ is the luminosity at distance $r$, $\omega$ is a geometric factor, and $F(r)$ is the observed flux at $r$.
+    Taking extinction into account, the observed flux becomes:
+    $$
+    F(r) = F_0 \, \frac{R^2}{r^2} \, e^{-\tau}
+    $$
+    where $F_0$ is the flux at a reference distance (or from a standard star), $R$ is the reference distance, and $\tau$ is the optical thickness (i.e., the total extinction along the line of sight).
+
+    The distance modulus including extinction then becomes:
+    $$
+    m - M = -2.5 \log \left( \frac{F(r)}{F(10\,\mathrm{pc})} \right)
+    $$
+    Substituting the expression for $F(r)$ and $F(10\,\mathrm{pc})$, we obtain:
+    $$
+    m - M = 5 \log \left( \frac{r}{10\,\mathrm{pc}} \right) + \underbrace{2.5\, (\log e)\, \tau}_{A}
+    $$
+    where $A$ is the total extinction in magnitudes ($A = 1.086\,\tau$).
+
+\end{itemize}
+
+\subsection{Absolute Energy Distribution}
