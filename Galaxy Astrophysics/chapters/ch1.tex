@@ -702,8 +702,6 @@ The flux we detect from an astronomical source is spread over a range of energie
     \end{figure}
 \end{minipage}
 
-% TODO check this section
-
 \subsubsection{Why do we use the apparent magnitude?}
 
 It is not always possible to measure the monochromatic flux of a source directly, because the detected signal is modified by the atmosphere, filters and the telescope+detector response. In a given photometric band, the measured flux $f$ is the source spectral energy distribution $f_\nu$ weighted by the total system throughput:
@@ -1095,7 +1093,7 @@ It is important to note that elliptical galaxies exhibit minimal extinction beca
 
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.9\textwidth]{assets/gal-ext.png}
+        \includegraphics[width=0.8\textwidth]{assets/gal-ext.png}
         \vspace{-0.5em}
         \caption{Extinction effect on the observed flux of a galaxy. \cite{karttunen}}
     \end{figure}
@@ -1104,25 +1102,76 @@ It is important to note that elliptical galaxies exhibit minimal extinction beca
 
     The effect of extinction on luminosity and flux can be written explicitly as:
     $$
-    L(r) = \omega r^2 F(r)
-    $$
-    where $L(r)$ is the luminosity at distance $r$, $\omega$ is a geometric factor, and $F(r)$ is the observed flux at $r$.
-    Taking extinction into account, the observed flux becomes:
-    $$
+    L(r) = \omega r^2 F(r),
+    \qquad \qquad
     F(r) = F_0 \, \frac{R^2}{r^2} \, e^{-\tau}
     $$
-    where $F_0$ is the flux at a reference distance (or from a standard star), $R$ is the reference distance, and $\tau$ is the optical thickness (i.e., the total extinction along the line of sight).
-
+    where $L(r)$ is the luminosity at distance $r$, $\omega$ is a geometric factor, and $F(r)$ is the observed flux at $r$ taking extinction into account. $F_0$ is the flux at a reference distance (or from a standard star), $R$ is the reference distance, and $\tau$ is the total extinction along the line of sight. 
+    
     The distance modulus including extinction then becomes:
     $$
     m - M = -2.5 \log \left( \frac{F(r)}{F(10\,\mathrm{pc})} \right)
-    $$
-    Substituting the expression for $F(r)$ and $F(10\,\mathrm{pc})$, we obtain:
-    $$
+    \qquad \Rightarrow \qquad
     m - M = 5 \log \left( \frac{r}{10\,\mathrm{pc}} \right) + \underbrace{2.5\, (\log e)\, \tau}_{A}
     $$
     where $A$ is the total extinction in magnitudes ($A = 1.086\,\tau$).
 
 \end{itemize}
 
-\subsection{Absolute Energy Distribution}
+\begin{tipsblock}[Absolute energy distribution and calibration]
+    To recover an \bfit{absolute} SED, the measured counts must be placed on an absolute flux scale using \textit{Blackbody} or \textit{spectrophotometric} standards.
+    \end{tipsblock}
+
+\subsection{Derived photometric quantities}
+
+Several widely used diagnostics derived from magnitudes and fluxes are collected here.
+
+\subsubsection{Bolometric magnitude and bolometric correction}
+
+The \bfit{bolometric magnitude} measures the brightness integrated over the entire spectrum. Using the SED, the apparent bolometric magnitude is
+$$
+m_\mathrm{bol} = -2.5 \log_{10}\!\left(\int_0^\infty f_\nu \, d\nu\right) + C_\mathrm{bol},
+$$
+where $C_\mathrm{bol}$ is a constant that fixes the zero point. The corresponding \bfit{absolute} bolometric magnitude $M_\mathrm{bol}$ is defined at $10$ pc.
+
+\subsubsection{Mass-to-light ratio}
+
+The \bfit{mass-to-light ratio} quantifies how much mass corresponds to a given luminosity in a specific photometric band $X$:
+$$
+\gamma_{\,_{X}} \equiv \frac{M}{L_X}
+$$
+It is customary to express $\gamma_{\,_{X}}$ in solar units, i.e., $[M_\odot / L_{\odot, X}]$. The luminosity of an object in band $X$, relative to the solar luminosity in that band, is related to its absolute magnitude by:
+$$
+\frac{L_X}{L_{\odot, X}} = 10^{-0.4 (M_X - M_{X\odot})}
+$$
+
+Consequently, the mass-to-light ratio can be written as:
+$$
+\gamma_{\,_{X}} = \frac{M / M_\odot}{L_X / L_{\odot, X}} = \left(\frac{M}{M_\odot}\right) \cdot 10^{+0.4 (M_X - M_{X\odot})}
+$$
+
+\subsubsection{Surface brightness of extended sources}
+
+The \bfit{surface brightness} quantifies the amount of light per unit apparent area on the sky. It is typically used for extended objects such as galaxies, nebulae, or the Sun's disk.
+
+We use different nomenclature for the different units:
+$$
+\text{[SB]} = \frac{\text{flux}}{\text{arcsec}^2}
+\qquad \text{or} \qquad
+\text{[I]} = \frac{L_\odot}{pc^2}
+\qquad \text{or} \qquad
+\text{[mu]} = \frac{\text{mag}}{\text{arcsec}^2}
+$$
+
+(SB) is \textit{independent of distance} in Euclidean geometry (if one neglects extinction and assumes the universe is not expanding).
+This property means that near and far galaxies with the same intrinsic luminosity per unit area will appear to have the same observed surface brightness (except for cosmological and extinction effects).
+
+\begin{observationblock}[Isophotal diameters]
+For galaxies, a typical size definition is the \bfit{isophotal diameter}, the diameter corresponding to the isophote where $\mu = 25 \ \mathrm{mag\ arcsec^{-2}}$ in the $B$ band, denoted $D_{25}$.
+\end{observationblock}
+
+In cosmology, surface brightness is affected by the expansion of the universe (Tolman effect):
+$$
+I_{\text{obs}} = \frac{I_0}{(1+z)^4}
+$$
+where $I_0$ is the intrinsic surface brightness and $z$ is the redshift. The observed surface brightness is thus reduced (diluted) by the factor $(1+z)^4$. This effect encompasses the combined impact of photon redshifting, time dilation, and change in apparent size with redshift.
