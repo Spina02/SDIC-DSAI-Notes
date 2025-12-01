@@ -1,1 +1,124 @@
 \chapter{Stellar Astrophysics}
+
+Stellar astrophysics is the study of the physical properties and evolution of stars. Although this course focuses on galaxies, a solid grounding in stellar astrophysics is essential: many key concepts from the study of stars are fundamental to understanding the formation, structure, and behavior of galaxies. In this chapter, we will briefly review the fundamental properties, classification, and evolution of stars as background for galactic astrophysics.
+
+\section{Star Classification}
+
+To classify a star, astronomers rely on several complementary observational techniques, each revealing key aspects of its physical properties and evolutionary state. The two most fundamental sources of information are:
+
+\begin{itemize}
+    \item Spectra: $I_\nu$
+    \item Light curves: $I = I(t)$ (mainly for variable stars)
+\end{itemize}
+
+Spectra and light curves together enable astronomers to systematically categorize stars, unravel their physical processes, and place them within broader frameworks such as the Hertzsprung-Russell diagram and stellar evolution theory.
+
+\subsection{Stellar Spectra}
+
+A stellar spectrum provides information about the effective temperature, surface gravity, chemical composition, radial velocity $\vec{v}$, rotational broadening, and magnetic field $\vec{B}$. Light curves characterize variability and, for some classes of stars, can also be used to determine distances.
+
+The two most important methods for obtaining a spectrum are the objective prism and the slit spectrograph. In the objective prism method, a photograph is taken where each stellar image has been dispersed into a spectrum. Up to several hundred spectra can be photographed on a single plate and used for spectral classification.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/star-spectra.png}
+    \caption{Typical stellar spectra. The spectrum of $\eta$ Pegasi (f) is very similar to that of the Sun. The continuous spectrum is brightest at about 550 nm and becomes fainter toward shorter wavelengths. Dark absorption lines are superimposed on the continuum. \cite{karttunen}}
+\end{figure}
+
+\subsection{The MK Classification}
+
+Currently, we use a 2D classification scheme, the \textbf{MK system}, which is based on both the spectral type (a temperature sequence) and the luminosity class (a gravity/luminosity sequence).
+
+\subsubsection{The Harvard Spectral Classification}
+
+Stellar spectra are classified according to the atomic (and, in cool stars, also molecular) spectral lines that are present. Based on line strengths and their ratios, the Harvard sequence of stellar spectra was introduced.
+These spectral classes follow a sequence denoted by the letters O, B, A, F, G, K, M, L, T; besides these, a few other spectral classes exist that will not be discussed here. This sequence corresponds to a sequence in effective temperature: O stars are very hot, while T stars are very cool.
+
+\vspace{-0.4em}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ccc}
+        \toprule
+        \textbf{Class} & \textbf{Typical Color} & \textbf{$T_{\mathrm{eff}}$ (K)} \\
+        \midrule
+        O & blue & $> 30{,}000$ \\
+        B & blue-white & $10{,}000$--$30{,}000$ \\
+        A & white & $7{,}500$--$10{,}000$ \\
+        F & yellow-white & $6{,}000$--$7{,}500$ \\
+        G & yellow & $5{,}200$--$6{,}000$ \\
+        K & orange & $3{,}700$--$5{,}200$ \\
+        M & red & $2{,}400$--$3{,}700$ \\
+        L & dark red & $1{,}300$--$2{,}400$ \\
+        T & brown & $550$--$1{,}300$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\vspace{-0.7em}
+
+For a finer classification, each spectral class is supplemented by a number between 0 and 9: A1 stars have spectra very similar to A0 ones, whereas A5 stars share features with both A0 and F0.
+
+\subsubsection{The Yerkes Luminosity Classification}
+
+Stellar luminosity is categorized using the MK (or Yerkes) classification, which relies on visually inspecting slit spectra and comparing them to standard stars, focusing on features sensitive to gravity and luminosity. In this system, stars are grouped into six main luminosity classes:
+
+\vspace{-0.4em}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{cc}
+        \toprule
+        \textbf{Class} & \textbf{Description} \\
+        \midrule
+        Ia  & most luminous supergiants \\
+        Ib  & less luminous supergiants \\
+        II  & luminous giants \\
+        III & normal giants \\
+        IV  & subgiants \\
+        V   & main sequence stars (dwarfs) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\vspace{-0.7em}
+
+The luminosity class is determined from spectral features that depend strongly on the stellar surface gravity, which is closely related to luminosity.
+
+\begin{tipsblock}[Sun and Vega classification]
+    The \bfit{Sun} is classified as a G2V star: it is a main-sequence star (luminosity class V) with a spectral type G2, indicating a yellow star with an effective temperature of about $5{,}800\,\mathrm{K}$. 
+
+    \medskip
+
+    \bfit{Vega}, on the other hand, is an A0V star: it is also a main-sequence star but of spectral type A0, making it much hotter (about $9{,}600\,\mathrm{K}$) and whiter in color. 
+\end{tipsblock}
+
+\section{Radiation Processes}
+
+Atoms and molecules emit or absorb electromagnetic radiation when they transition between different energy levels. If an atom loses energy by an amount $\Delta E$, it emits a photon—a quantum of electromagnetic radiation—whose frequency $\nu$ is related to the energy change by
+$$
+\Delta E = h\nu,
+$$
+where $h$ is the Planck constant ($h = 6.626 \times 10^{-34} \text{ J s}$). Conversely, when an atom absorbs a photon of frequency $\nu$, it gains energy according to the same formula: $\Delta E = h\nu$.
+
+In atoms, energy levels typically refer to those belonging to electrons. These electron energies are not continuous—they can only take on specific, discrete values; in other words, the energy levels are quantized. As a result, atoms can only absorb or emit radiation at particular frequencies $\nu$, corresponding to the differences between these allowed energy levels.
+
+\vspace{-0.5em}
+
+
+\begin{minipage}{0.46\textwidth}
+This phenomenon creates line spectra, with each element displaying its own unique pattern.
+ù
+When a hot, low-pressure gas emits light, it produces an emission spectrum made up of sharp, discrete lines. If the same gas is cool and observed in front of a bright continuous source (such as white light), it absorbs light at those same characteristic wavelengths, resulting in dark absorption lines.
+
+If a free electron passes near a nucleus or ion and is deflected without being captured, the interaction can change the electron's kinetic energy and produce what's known as free-free radiation. In extremely hot gas ($T > 10^6$ K), where hydrogen is fully ionized, this process—called thermal bremsstrahlung, is the dominant source of emission.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.52\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/rad-transitions.png}
+    \caption{Different kinds of transitions between energy levels.
+    Absorption and emission occur between two bound states, whereas ionization and recombination occur between a bound and a free state. Interaction of an atom with a free electron can result in a free-free transition \cite{karttunen}}
+\end{figure}
+\end{minipage}
