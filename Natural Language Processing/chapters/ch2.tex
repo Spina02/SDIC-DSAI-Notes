@@ -208,3 +208,349 @@ We minimize this loss function using stochastic gradient descent (SGD).
 \]
 
 For proofs and more details, refer to \cite{jurafskyspeech}.
+
+\section{Feedforward Neural Networks}
+
+For this session, I will be short since you have probably already seen this concepts in other courses. Consider this just a quick recap of the main ideas and if you still have doubts or need more in-depth proofs, check the book \cite{jurafskyspeech}.
+
+A \textbf{feedforward neural network (FNN)} is a multilayer network in which the units are connected with no cycles. They are sometimes called \textbf{multi-layer perceptrons (MLP)}. Three nodes are present in a FNN: 
+\begin{itemize}
+    \item input units (features) $\to \mathbf{x}$;
+    \item hidden units (intermediate computations) $\to \mathbf{h}$;
+    \item output units (predictions) $\to \mathbf{\hat{y}}$.
+\end{itemize}
+
+Each layer here is \textbf{fully connected}, meaning that each unit in each layer takes as input the outputs from all the units in the previous layer, and there is a link between every pair if units from two adjacent layers. Thus, each hidden unit sums over all the input units. 
+We represent the parameters for the entire hidden layer by combining the weight vector and bias for each unit $i$ into a single weight matrix $\mathbf{W}$ and a single bias vector $\mathit{b}$. 
+
+The computation only has three steps: multiplying the weight matrix by the input vector $\mathbf{x}$, adding the bias vector $\mathbf{b}$ and applying the activation function $\mathit{g}$. 
+\[
+\underbrace{\mathbf{h}}_{d_h\times 1} = \sigma \left(\underbrace{\mathbf{W}}_{d_h\times n_0} \underbrace{\mathbf{x}}_{n_0\times 1} + \underbrace{\mathbf{b}}_{d_h\times 1}\right)
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{assets/ch2/3.png}
+    \caption{Feedforward Neural Network with one hidden layer.}
+    \label{fig:fnn}
+\end{figure}
+
+Like the hidden layer, the output layer has a weight matrix ($\mathbf{U}$), but some models don't include a bias vector $\mathbf{b}$. The weight matrix is then multiplied by its input vector $\mathbf{h}$ to produce the intermediate output $\mathbf{z}$:
+\[
+\underbrace{\mathbf{z}}_{|V|\times 1} = \underbrace{\mathbf{U}}_{|V|\times d_h} \underbrace{\mathbf{h}}_{d_h\times 1}
+\]
+However, $\mathbf{z}$ cannot be the output of a classifier, since its values are unbounded. We therefore need to apply the \textbf{softmax} function to obtain a probability distribution over the output classes:
+\[
+\underbrace{\hat{\mathbf{y}}}_{|V|\times 1} = softmax(\underbrace{\mathbf{z}}_{|V|\times 1}) = softmax(\underbrace{\mathbf{U}}_{|V|\times d_h} \underbrace{\mathbf{h}}_{d_h\times 1})
+\]
+
+\begin{observationblock}[Replacing the bias unit]
+    Instead of having a separate bias vector $\mathbf{b}$, we can add an extra input unit $x_0$ that is always equal to $1$. This way, the bias term can be absorbed into the weight matrix $\mathbf{W}$, simplifying the notation. The same can be done for the output layer.
+    \[
+    \mathbf{h} = \sigma\left(\mathbf{Wx} + \mathbf{b}\right) \quad \longrightarrow \quad \mathbf{h} = \sigma\left(\mathbf{W'x'}\right)
+    \]
+    and so, instead of using a vector $\mathbf{x}$ of size $n_0$, we use a vector $\mathbf{x'}$ of size $n_0 + 1$, where the first element is always $1$.
+    \[
+    \mathbf{h}_j = \sigma\left(\sum_{i=0}^{n_0}\mathbf{W}_{ji}\mathbf{x'}_i\right)
+    \]
+\end{observationblock}
+
+Let's now consider \textbf{language modeling}, meaning the task of predicting upcoming words from prior word context. We can apply a FFN to language modeling by taking as input the representation of some number of previous words (the context), and outputting a probability distribution over possible next words. 
+\[
+P(w_t|w_1,\dots,w_{t-1}) \approx P(w_t|w_{t-N+1,\dots,w_{t-1}})
+\]
+
+The representations of the previous words can be their embeddings, concatenated together to form the input vector $\mathbf{x}$. The output layer will then produce a probability distribution over the vocabulary, representing the likelihood of each word being the next word in the sequence. The model can be trained using a cross-entropy loss function, comparing the predicted probabilities with the actual next word in the training data. But let's start from the beginning. For the task of \textbf{forward inference}, meaning executing a forward pass on the network and computing the output probabilities, we represent each word by a one-hot vector, and multiply it by the embedding matrix $\mathbf{E}$ to obtain its embedding vector. We then concatenate (\textbf{pooling}) the vectors to form the input vector for the FFN.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/ch2/4.png}
+    \caption{Creating the word embeddings.}
+    \label{fig:word_embeddings}
+\end{figure}
+
+The steps are the following:
+\begin{enumerate}
+    \item Pool the embeddings of the context words to form the input vector $\mathbf{x}$;
+    \item Multiply the vector by the weight matrix $\mathbf{W}$, add the bias vector $\mathbf{b}$ and apply the activation function $\sigma$ to obtain the hidden layer $\mathbf{h}$;
+    \item Multiply the hidden layer by the output weight matrix $\mathbf{U}$ to obtain the intermediate output $\mathbf{z}$;
+    \item Apply the softmax function to $\mathbf{z}$ to obtain the output probabilities $\hat{\mathbf{y}}$.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/5.png}
+    \caption{Feedforward Neural Network for language modeling.}
+    \label{fig:fnn_lm}
+\end{figure}
+
+To train the model and learn the parameters (weights and biases), we can use the \textbf{cross-entropy loss} as loss function, and then using the \textbf{gradient descent} algorithm to minimize the loss over the training set. The gradients can be computed using the \textbf{backpropagation} algorithm, which efficiently computes the gradients by applying the chain rule of calculus. It is based on computation graphs, i.e., representations of the processes of computing mathematical expressions, in which the computation is broken down into separate operations, each of which is modeled as a node in the graph. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/6.png}
+    \caption{Computation graph for a simple feedforward neural network.}
+    \label{fig:computation_graph}
+\end{figure}
+
+On this graph, both a \textbf{forward pass} and a \textbf{backward pass} can be done, with the first that is used to compute results and the second used to compute gradients. Recalling the chain rule, we can compute the gradient of the loss function with respect to each parameter by multiplying the gradients along the paths from the output node (loss) to the parameter node. This way, we can efficiently compute the gradients for all parameters in the network, allowing us to update them using gradient descent:
+\[
+\frac{df}{dx} = \frac{df}{dg} \cdot \frac{dg}{dh} \cdot \frac{dh}{dx}
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/ch2/7.png}
+    \caption{Backpropagation algorithm.}
+    \label{fig:backpropagation}
+\end{figure}
+
+\begin{observationblock}[Common derivatives]
+    Just a reminder for some common derivatives regarding the activation functions:
+    \begin{itemize}
+        \item Sigmoid:
+        \[\frac{d\sigma(z)}{dz} = \sigma(z)(1 - \sigma(z))\]
+        \item Tanh:
+        \[\frac{d\tanh(z)}{dz} = 1 - \tanh^2(z)\]
+        \item ReLU:
+        \[\frac{d\text{ReLU}(z)}{dz} = 
+        \begin{cases}
+        1 & \text{if } z > 0 \\
+        0 & \text{if } z \leq 0
+        \end{cases}\]
+    \end{itemize}
+\end{observationblock}
+
+Finally, a small change has to be done for training a neural language model, where in this case the parameters to learn are not only the weights and biases of the FFN, but also the word embeddings. During backpropagation, we also compute the gradients of the loss function with respect to the embedding matrix $\mathbf{E}$, and update it using gradient descent:
+\[\mathbf{E} := \mathbf{E} - \eta \nabla_{\mathbf{E}} L(\hat{y}, y)\]
+This way, the model learns embeddings that are useful for the language modeling task, capturing semantic and syntactic properties of words based on their context in the training data.
+
+\section{Recurrent Neural Networks}
+
+A \textbf{Recurrent Neural Network} is any network that contains a cycle within its network connections, meaning that the value of some unit is directly or indirecly dependent on its own earlier outputs as an input. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{assets/ch2/8.png}
+    \caption{Simple RNN.}
+    \label{fig:simple_rnn}
+\end{figure}
+
+As with classic feedforward NN, an input vector representing the current input ($\mathbf{x_t}$) is multiplied by a weight matrix and then passed through a non-linear activation function to compute the values for a layer of hidden units. This hidden layer is then used to calculate a corresponding output $\mathbf{y}_t$. 
+The key difference from a FNN is in the recurrent link shown in Fig.\ref{fig:simple_rnn} as a dashed line, which basically augments the input to the computation at the hidden layer with the value of the hidden layer from the preceding point in time. The hidden layer from the previous time step provides a sort of \textbf{memory}, or context, that encodes earlier processing and informs the decisions to be made at later points in time. 
+
+Consequently, there is a new set of weights $\mathbf{U}$ that connect the hidden layer from the previous step to the current hidden layer. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/ch2/9.png}
+\end{figure}
+
+Forward inference is almost identical to that of a FNN, with the addition of the recurrent connection. At each time step $t$, the hidden layer $\mathbf{h}_t$ is computed using both the current input $\mathbf{x}_t$ and the previous hidden state $\mathbf{h}_{t-1}$:
+\[
+\mathbf{h}_t = \sigma(\mathbf{W}\mathbf{x}_t + \mathbf{U}\mathbf{h}_{t-1} + \mathbf{b})
+\]
+The output layer is then computed as:
+\[
+\mathbf{z}_t = \mathbf{V}\mathbf{h}_t + \mathbf{c}
+\]
+\[
+\hat{\mathbf{y}}_t = softmax(\mathbf{z}_t)
+\]
+The training process for RNNs is similar to that of FNNs, but this time we use the \textbf{Backpropagation Through Time} algorithm, since:
+\begin{itemize}
+    \item To compute the loss function for the output at time $t$ we need the hidden layer from time $t-1$;
+    \item The hidden layer at time $t$ influences both the output at time $t$ and the hidden layer at time $t+1$ (hence also the output and loss at time $t+1$).
+\end{itemize}
+
+This means that when we compute the gradients during backpropagation, we need to consider the dependencies across multiple time steps. The Backpropagation Through Time algorithm unfolds the RNN over time, treating it as a deep feedforward network with shared weights across time steps. The gradients are then computed using the chain rule, taking into account the contributions from all time steps.
+
+Finally, for language modeling tasks, forward inference proceeds exactly as described for FNNs, with the addition of the recurrent connection. The input at each time step is the embedding of the current word, and the output is a probability distribution over the vocabulary for the next word. The model can be trained using the cross-entropy loss function, comparing the predicted probabilities with the actual next word in the training data.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/10.png}
+    \caption{Recurrent Neural Network for language modeling.}
+    \label{fig:rnn_lm}
+\end{figure}
+
+\subsection{LSTM}
+
+One of the biggest issues with training RNNs is the \textbf{vanishing gradient problem}, which occurs when the gradients of the loss function with respect to the model parameters become very small as they are propagated back through time. This can lead to slow convergence during training, and in some cases, the model may fail to learn long-term dependencies in the data.
+\textbf{Long short-term memory (LSTM)} networks are used to address this issue. They divide the context management problem into two sub-problems:
+\begin{itemize}
+    \item removing information no longer needed from the context;
+    \item adding information likely to be needed for later decision making. 
+\end{itemize}
+
+LSTMs accomplish this by first adding an explicit content layer to the architecture and second by using \textit{gates} to control the flow of information into and out of the units that comprise the network layers. 
+The gates consist of a feedforward layer, followed by a sigmoid activation function and followed by a pointwise multiplication with the layer being gated. This creates a sort of binary mask. Two types of gates are used in LSTMs:
+\begin{itemize}
+    \item \textbf{Forget gate}: deletes information from the cotext that is no longer needed. It computes a weighted sum of the previous state's hidden layer and the current input and passes that thorough a sigmoid. This mask is then multiplied element-wise by the context vector to remove the information from context that is no longer required. 
+    \[
+    \mathbf{f}_t = \sigma(\mathbf{U}_t\mathbf{h}_{t-1} + \mathbf{W}_t\mathbf{x}_t)
+    \]   
+    \[
+    \mathbf{k}_t = \mathbf{c}_{t-1} \odot \mathbf{f}_t 
+    \]
+    Then, we compute the actual information needed to extract from the previous hidden state and current inputs:
+    \[
+    \mathbf{g}_t = \tanh(\mathbf{U}_g\mathbf{h}_{t-1} + \mathbf{W}_g\mathbf{x}_t)
+    \]
+    \item \textbf{Add gate}: selects the information to add to the current context:
+    \[
+    \mathbf{i}_t = \sigma(\mathbf{U}_i\mathbf{h}_{t-1} + \mathbf{W}_i\mathbf{x}_t)
+    \]
+    \[
+    \mathbf{j}_t = \mathbf{g}_t \odot \mathbf{i}_t 
+    \]
+    Finally, we update the context vector:
+    \[
+    \mathbf{c}_t = \mathbf{k}_t + \mathbf{j}_t
+    \]
+\end{itemize}
+
+The final gate is the \textbf{output gate}, which controls the information to output from the LSTM unit:
+\[
+\mathbf{o}_t = \sigma(\mathbf{U}_o\mathbf{h}_{t-1} + \mathbf{W}_o\mathbf{x}_t)
+\]
+\[
+\mathbf{h}_t = \tanh(\mathbf{c}_t) \odot \mathbf{o}_t
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/11.png}
+    \caption{LSTM architecture.}
+    \label{fig:lstm}
+\end{figure}
+
+\section{Transformers}
+
+Even if the gates allow LSTMs to handle more distant information than RNNs, they don't completely solve the underlying problem: passing information through an extended series of recurrent connections leads to information loss and difficulties in training. \textbf{Transformers} map sequences of input vectors ($\mathbf{x}_1,\dots,\mathbf{x}_n$) to sequences of output vectors ($\mathbf{y}_1,\dots,\mathbf{y}_n$) of the same length. They are made of stacks of transformer blocks, which are multilayer networks made by combining simple linear layers, FFNs and \textbf{self-attention layers}. Moreover, the computation performed for each item is independent of all the other computations, allowing for parallelization during training.
+
+\subsection{Self-attention layer}
+
+At the core of an attention-based approach is the ability to \textit{compare} an item of interest to a collection of other items in a way that reveals their relevance in the current context. The result of these comparisons is then used to compute an output for the current input. The simplest form of comparison is the dot product:
+\[
+score(\mathbf{x}_i\mathbf{x}_j) = \mathbf{x}_i\mathbf{x}_j \quad \forall j\leq j 
+\]
+
+Then to make an effective use of these scores, they have to be normalized with a softmax to create a vector of weights that indicate the proportional relevance of each input to the input element that is the current focus of attention:
+\[
+\alpha_{ij} = softmax(score(\mathbf{x}_i,\mathbf{x}_j)) = \frac{\exp{(\mathbf{x}_i\mathbf{x}_j)}}{\sum_{k=1}^n \exp{(\mathbf{x}_i\mathbf{x}_k)}}
+\]
+
+Finally, the output for the current input element is computed as a weighted sum of the input elements, using the attention weights as coefficients:
+\[
+\mathbf{y}_i = \sum_{j=1}^n \alpha_{ij} \mathbf{x}_j
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/12.png}
+    \caption{Self-attention layer.}
+    \label{fig:self_attention}
+\end{figure}
+
+Each input embedding plays three distinct roles in the self-attention computation:
+\begin{itemize}
+    \item As a \textbf{query} vector, representing the item for which we are computing attention;
+    \item As a \textbf{key} vector, representing each item in the collection being attended to;
+    \item As a \textbf{value} vector, representing the actual content of each item in the collection.
+\end{itemize}
+To implement these three roles, we use three different weight matrices ($\mathbf{W}_Q$, $\mathbf{W}_K$, $\mathbf{W}_V$) to project the input embeddings into three different vector spaces:
+\[
+\mathbf{q}_i = \mathbf{W}_Q \mathbf{x}_i \quad \mathbf{k}_i = \mathbf{W}_K \mathbf{x}_i \quad \mathbf{v}_i = \mathbf{W}_V \mathbf{x}_i
+\]
+The attention scores are then computed using the query and key vectors:
+\[
+score(\mathbf{q}_i,\mathbf{k}_j) = \mathbf{q}_i \cdot \mathbf{k}_j
+\]
+However, since the dot products can grow large in magnitude, leading to small gradients during training, we scale the scores by the square root of the dimensionality of the key vectors ($d_k$):
+\[
+score(\mathbf{q}_i,\mathbf{k}_j) = \frac{\mathbf{q}_i \cdot \mathbf{k}_j}{\sqrt{d_k}}
+\]
+The attention weights are then computed using the softmax function:
+\[
+\alpha_{ij} = softmax\left(\frac{\mathbf{q}_i \cdot \mathbf{k}_j}{\sqrt{d_k}}\right) = \frac{\exp{\left(\frac{\mathbf{q}_i \cdot \mathbf{k}_j}{\sqrt{d_k}}\right)}}{\sum_{l=1}^n \exp{\left(\frac{\mathbf{q}_i \cdot \mathbf{k}_l}{\sqrt{d_k}}\right)}}
+\]
+Finally, the output for the current input element is computed as a weighted sum of the value vectors:
+\[
+\mathbf{y}_i = \sum_{j=1}^n \alpha_{ij} \mathbf{v}_j
+\]
+
+Since each output is computed independently, this process can be parallelized by taking advantage of efficient matrix multiplication routines and pack the input embeddings of the $N$ tokens into a single matrix $\mathbf{X}\in \mathbb{R}^{N\times d}$. We then multiply it by the key, query and value matrices (all of dimensionality $d\times d$) to produce the matrices $\mathbf{Q}$, $\mathbf{K}$ and $\mathbf{V}$:
+\[
+\mathbf{Q} = \mathbf{X}\mathbf{W}_Q \quad \mathbf{K} = \mathbf{X}\mathbf{W}_K \quad \mathbf{V} = \mathbf{X}\mathbf{W}_V
+\]
+
+So, the complete self-attention computation can be summarized as:
+\[
+SelfAttention(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = softmax\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/ch2/13.png}
+    \caption{Masked self-attention mechanism.}
+    \label{fig:masked_self_attention}
+\end{figure}
+
+\begin{observationblock}[Matrix dimensions]
+    The inputs and outputs of transformers, as well as the intermediate vectors after the various layers, all have the same dimensionality $1\times d$. For now you can assume that the dimensionalities of the transform matrices are all $d\times d$, but consider that in \textbf{Multi-head attention mechanisms}, which will be explained later, the dimensionalities change and every head has its own set of matrices with different dimensions.
+\end{observationblock}
+
+Finally, a mask has to be applied to the upper triangle of the score matrix during training, to prevent the model from attending to future tokens. This is done by setting the scores for all positions $(i,j)$ where $j > i$ to $-\infty$ before applying the softmax function. This way, the attention weights for these positions will be zero, effectively preventing the model from attending to future tokens.
+
+\subsection{Transformer Blocks}
+
+Every transformer block consists of a single attention layer followed by a fully-connected feedforward layer with \textbf{residual connections} and \textbf{layer normalizations} following each, as shown in Fig.\ref{fig:transformer_block}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/14.png}
+    \caption{Transformer block architecture.}
+    \label{fig:transformer_block}
+\end{figure}
+
+Residual connections are connections that pass information from a lower layer to a higher layer without going through the intermediate layer. That said, the output vector is the sum of the input vector and the hidden vector computed with the attention or feedforward layer:
+\[
+\mathbf{y} = \mathbf{x} + Layer(\mathbf{x})
+\]
+Layer normalization, on the other hand, is a technique used to normalize the activations of a layer across the features dimension. It helps to stabilize the training process and improve convergence by reducing internal covariate shift. The layer normalization can be applied before or after the residual connection (the original paper uses post-norm, but pre-norm is more common nowadays). The layer normalization is computed as:
+\[
+\text{LayerNorm}(\mathbf{x}) = \frac{\mathbf{x} - \mu}{\sigma} \odot \gamma + \beta
+\]
+where $\mu$ and $\sigma$ are the mean and standard deviation of the elements in $\mathbf{x}$, and $\gamma$ and $\beta$ are learnable parameters that scale and shift the normalized output.
+
+Since different words in a sentence can relate to each other in many different ways simultaneously, \textbf{multi-head attention layers} are used to learn different aspects of the relationships that exist among inputs at the same level of abstractions. They reside in parallel layers at the same depth, each with its own set of parameters. Each head $i$ has its own set of key, query and value matrices ($\mathbf{W}_K^i$, $\mathbf{W}_Q^i$, $\mathbf{W}_V^i$) to project the input embeddings into three different vector spaces. The outputs of all heads are then concatenated and projected back into the original space using a final weight matrix $\mathbf{W}_O$:
+\[
+MultiHead(\mathbf{X}) = (\mathbf{head}_1 \oplus \mathbf{head}_2 \oplus \dots \oplus \mathbf{head}_h)\mathbf{W}_O
+\]
+Just a reminder that in multi-head attention, instead of using the model dimension $d$, the query and key embeddings have dimensionality $d_k$, and the value embeddings have dimensionality $d_v$. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/15.png}
+    \caption{Multi-head attention mechanism.}
+    \label{fig:multi_head_attention}
+\end{figure}
+
+\textbf{Positional embeddings} are also added to the word embeddings to give a sense of word order. They are learned as well during training.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/16.png}
+    \caption{Transformer architecture.}
+    \label{fig:transformer_architecture}
+\end{figure}
+
+\begin{warningblock}
+    A potential problem using absolute position embeddings is that there will be plenty of training examples for the initial positions in the inputs and fewer at the outer length limits. This could lead to poor generalization during testing. An alternative approach is to use a \textbf{static function} that maps integer inputs to real-valued vectors in a way that captures the inherent relationships among the positions.
+\end{warningblock}
+
+\newpage
+\section{Machine Translation and Encoder-Decoder Models}
+
+\section{Reinforcement Learning with Human Feedback}
