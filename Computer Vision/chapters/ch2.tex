@@ -80,10 +80,10 @@ X' = -\frac{f}{Z_0}X, \quad Y' = -\frac{f}{Z_0}Y
     \label{fig:weak_perspective}
 \end{figure}
 
-The \textbf{Aperture} is related to the amount of light that enters the camera. A larger aperture (smaller $f$-number) allows more light to enter, resulting in a brighter image. However, a larger aperture also reduces the depth of field, which is the range of distances within which objects appear sharp in the image.
+The \textbf{Aperture} is related to the amount of light that enters the camera. A larger aperture allows more light to enter, resulting in a brighter image. However, a larger aperture also reduces the depth of field, which is the range of distances within which objects appear sharp in the image.
 \begin{itemize}
-    \item \textbf{Pinhole too big} $\rightarrow$ many directions are averaged, blurring the image; sharp but dark image, because little light reaches the sensor;
-    \item \textbf{Pinhole too small} $\rightarrow$ diffraction effects blur the image; brught but blurred image, because many directions are averaged.
+    \item \textbf{Pinhole too big} $\rightarrow$ many directions are averaged, blurring the image; bright but blurred image, because many directions are averaged;
+    \item \textbf{Pinhole too small} $\rightarrow$ diffraction effects blur the image; sharp but dark image, because little light reaches the sensor.
 \end{itemize}
 
 \begin{figure}[H]
@@ -349,7 +349,7 @@ z \\
 \end{bmatrix}
 \] 
 
-Converting from homogeneus coordinates to Cartesian coordinates is called \textbf{dehomogenization} and amounts to dividing by th elast coordinate:
+Converting from homogeneus coordinates to Cartesian coordinates is called \textbf{dehomogenization} and amounts to dividing by the last coordinate:
 \[
 \begin{bmatrix}
 u \\
@@ -359,7 +359,7 @@ w
 \frac{u}{w} \\
 \frac{v}{w}
 \end{bmatrix}
-\quad
+\to
 \begin{bmatrix} 
 \frac{u}{w} \\
 \frac{v}{w} \\
@@ -454,7 +454,7 @@ z \begin{bmatrix}
 u \\
 v \\    
 1
-\end{bmatrix} = \begin{bmatrix}
+\end{bmatrix} = z \begin{bmatrix}
     -\frac{fx}{z} \\ 
     -\frac{fy}{z} \\
     1
@@ -774,4 +774,532 @@ Camera calibration is the process of estimating the intrinsic and extrinsic para
     \item \textbf{Indirect methods}: first estimate the projection matrix $P$ and then decompose it to get intrinsic and extrinsic parameters.
 \end{itemize}
 
+\newpage 
 \subsection{Direct Linear Transform}
+
+This is an indirect method. Suppose having $n$ correspondences 
+\[
+m_{(i)} = \begin{bmatrix}
+x_{(i)} \\
+y_{(i)} \\
+z_{(i)} \\
+1
+\end{bmatrix} \quad \text{and} \quad m'_{(i)} = \begin{bmatrix}
+u_{(i)} \\
+v_{(i)} \\
+1
+\end{bmatrix} \quad i = 1, \ldots, n
+\]
+
+For each correspondence, two scalar equations hold 
+\[
+\begin{cases}
+u_{(i)} = \frac{p_1^T m_{(i)}}{p_3^T m_{(i)}} \\
+v_{(i)} = \frac{p_2^T m_{(i)}}{p_3^T m_{(i)}} \\
+\end{cases} \quad \to \quad \begin{cases}
+m_{(i)}^T \overbrace{p_1}^{\text{transpose of 1st row}} - u_{(i)}m_{(i)}^T p_3 = 0 \\
+m_{(i)}^T \overbrace{p_2}^{\text{transpose of 2nd row}} - v_{(i)}m_{(i)}^T p_3 = 0 \\
+\end{cases}
+\]
+
+\begin{tipsblock}
+Remember that when applying a transposition or an inversion, the following properties hold:
+\begin{itemize}
+    \item $(AB)^T = B^T A^T$;
+    \item $(A^T)^{-1} = (A^{-1})^T$.
+\end{itemize}
+\end{tipsblock}
+
+Thus, in a more compact form:
+\[
+\underbrace{\begin{bmatrix}
+m_{(i)}^T & 0^T & -u_{(i)} m_{(i)}^T \\
+0^T & m_{(i)}^T & -v_{(i)} m_{(i)}^T \\
+\end{bmatrix}}_{\text{A (knowns)}} \underbrace{\begin{bmatrix}
+p_1 \\
+p_2 \\
+p_3 \\
+\end{bmatrix}}_{\text{P (unknowns)}} = 0
+\]
+
+By stacking the $n$ pairs of equations we get an \textbf{homogeneous linear system} of $2n$ equations in 12 unkowns (entries of $P$). 
+We then have a $2n \times 12$ coefficient matrix $A$ where at least $n=6$ points are needed to compute $P$. In general, and in absense of measuring errors, $A$ has rank 11, and the solution is the null-space of $A$. 
+In practice, $A$ will be full-rank and $b$ can be estimated by solving the following optimization problem:
+\[
+\argmin{||p||=1} ||Ap||^2
+\]
+where the constraint forces to discard the trivial solution $p=0$ (which is not acceptable since $P \neq 0$). Notice that since $P$ is defined up to a scale factor, any constraint of the form $||p||=\lambda \neq 0$ will result in the same actual estimated projection. 
+
+The solution of the minimization problem is the right singular vector of $A$ corresponding to the smallest singular value. If 
+\[
+A = U\Sigma V^T 
+\]
+then $p = v_{12}$, i.e. the rightmost column of $V$.
+
+\begin{observationblock}
+    We expect $rank(A) \leq 11$, but in practice (due to the noise) we usually get 12. There is thus no exact solution except for 0, but it is not acceptable by default.
+\end{observationblock}
+
+The \textbf{cross product} $a\times b$ is a vector defined as 
+\[
+a \times b = \begin{bmatrix}
+\det\begin{bmatrix}a_2 & a_3 \\
+b_2 & b_3\end{bmatrix} \\
+-\det\begin{bmatrix}a_1 & a_3 \\
+b_1 & b_3\end{bmatrix} \\
+\det\begin{bmatrix}a_1 & a_2 \\
+b_1 & b_2\end{bmatrix}
+\end{bmatrix}
+\]
+It is null if and only if $b = \lambda a$ for any scalar $\lambda$. It may be obtained as a matrix multiplication with a skew-symmetric matrix. Let 
+\[
+[a]_{\times} = \begin{bmatrix}
+0 & -a_3 & a_2 \\
+a_3 & 0 & -a_1 \\
+-a_2 & a_1 & 0 \\
+\end{bmatrix}
+\]
+then $[a]_{\times} b = 0$ if and only if $b = \lambda a$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/ch2/24.png}
+    \caption{Cross product geometric interpretation.}
+    \label{fig:cross_product}
+\end{figure}
+
+\begin{definitionblock}[Kronecker product]
+    Given the matrices $A^{m\times n}$ and $B^{p\times q}$, their \textbf{Kronecker product} $A \otimes B$ is the matrix of size $(mp) \times (nq)$ defined as
+    \[
+    A \otimes B = \begin{bmatrix}
+    a_{11}B & a_{12}B & \ldots & a_{1n}B \\
+    a_{21}B & a_{22}B & \ldots & a_{2n}B \\
+    \vdots & \vdots & \ddots & \vdots \\
+    a_{m1}B & a_{m2}B & \ldots & a_{mn}B \\
+    \end{bmatrix}
+    \]
+\end{definitionblock}
+
+This product is defined for any pair of matrices, is non commutative and enjoys the following properties:
+\begin{itemize}
+    \item $(A\otimes B)\otimes C = A\otimes (B\otimes C)$;
+    \item $(A\otimes B)^T = A^T \otimes B^T$;
+    \item $(A\otimes B)^{-1} = A^{-1} \otimes B^{-1}$;
+    \item For square $A$ and $B$: if $\lambda_A$ is an eigenvalue of $A$ and $\lambda_B$ is an eigenvalue of $B$, then $\lambda_A \lambda_B$ is an eigenvalue of $A\otimes B$;
+    \item $rank(A\otimes B) = rank(A) \times rank(B)$.
+\end{itemize}
+
+\begin{definitionblock}[Vector Operator]
+    Given a matrix $X = \left[x_1 x_2 \dots x_n\right]$, the \textbf{vector operator} $vec$ is the operator that stacks the columns one underneath the other to a single vector:
+    \[
+    vec(X) = \begin{bmatrix}
+    x_1 \\
+    x_2 \\
+    \vdots \\
+    x_n \\
+    \end{bmatrix}
+    \]
+\end{definitionblock}
+
+The following identity holds:
+\[
+vec(AXB) = (B^T \otimes A) vec(X)
+\]
+
+and is used to "pull out" the unknown $X$ from a matrix equation.
+
+For square matrices, the $vech$ (vector half) operator turns out to be useful:
+\begin{definitionblock}[Vector Half Operator]
+    Given a square matrix $X = \left[x_1 x_2 \dots x_n\right]$, the \textbf{vector half operator} (vech) is the operator that stacks in a single column the elements of $X$, which are on or below the diagonal, taken in column-wise order. Thus, $vech(X)$ has $n(n+1)/2$ elements. 
+\end{definitionblock}
+
+The projection equation states that:
+\[
+m_{(i)}' \sim P m_{(i)}
+\]
+and taking the product of both sides by the vector $Pm_{(i)}$ we get:
+\[
+m_{(i)}' \times (P m_{(i)}) = 0
+\]
+Thus we can get rid of the arbitrary scale factor and write:
+\[
+m_{(i)}' \times Pm_{(i)} = 0
+\]
+that is equivalent to 
+\[
+\left[m_{(i)}'\right]_{\times} P m_{(i)} = 0
+\]
+and by transposing, to
+\[
+m_{(i)}^T P^T \left[m_{(i)}'\right]_{\times}^T = 0^T
+\]
+Then, by applying the vector operator to both sides, and recalling that 
+\[
+vec(AXB) = \left(B^T\otimes A\right)vec(X)
+\]
+we obtain a triplet of linear equations in the unknown $vec(P^T)$:
+\[
+\left(\left[m_{(i)}'\right]_{\times}\otimes m_{(i)}^T\right)vec(P^T) = 0
+\]
+or, by expanding the coefficients:
+\[
+\begin{bmatrix}
+0^T & -m_{(i)}^T & v_{(i)}m_{(i)}^T \\
+m_{(i)}^T & 0^T & -u_{(i)}m_{(i)}^T \\
+-v_{(i)}m_{(i)}^T & u_{(i)}m_{(i)}^T & 0^T \\
+\end{bmatrix} vec(P^T) = 0
+\]
+Notice that only two equations are independent since the Kronecker product ($\left[m_{(i)}'\right]_{\times}\otimes m_{(i)}^T$) is rank two. 
+
+For random configurations of $n\geq 6$ points, $A$ will have rank 11 or 12. In either case, a unique solution can be found (up to a scale factor). The \textbf{degenerate configurations} are those for which $P$ cannote be uniquely determined. 
+\[
+dim(ker(A))\geq 2 \quad \to \quad rank(A) \leq 10
+\]
+
+meaning that the space of solutions has dimension greater than one. The most important degenerate configurations are:
+\begin{itemize}
+    \item the points all lie on the union of a plane and a single straight line containing the camera center;
+    \item the camera and the points all lie on a twisted cubic passing through the origin.
+\end{itemize}
+
+\begin{tipsblock}
+    In practice, don't take more than six non-coplanar points. 
+\end{tipsblock}
+
+So, DLT minimizes the algebraic residual $||Ap||^2$, which has no geometrical meaning and is not invariant with respect to changes of the reference frame. Instead, the \textbf{geometric residual}:
+\[
+\epsilon(P) = \sum_{i=1}^n\left(\frac{p_1^T m_{(i)}}{p_3^T m_{(i)}} - u_{(i)}\right)^2 + \left(\frac{p_2^T m_{(i)}}{p_3^T m_{(i)}} - v_{(i)}\right)^2
+\]
+best expresses the actual need, that is to minimize the reprojection error (the distance between the estimated and the measured projections).
+The resulting non-linear optimization problem can be solved iteratively, starting from an initial guess obtained via the DLT.
+
+Given the estimated perspective projection matrix $P$, the intrinsic and extrinsic camera parameters can be computed as follows. 
+The matrix $P$ is given in the form 
+\[
+P = \left[Q|q\right]
+\]
+where $Q$ is \textbf{invertible}. We want to express $P$ as 
+\[
+P = K\left[R | t\right] = \left[KR | Kt\right] 
+\] 
+where $K$ is upper triangular and $R$ is orthogonal. Thus, 
+\[
+Q = KR \quad \text{and} \quad q = Kt
+\]
+
+Recalling that any real square matrix can be written as the product of an orthogonal matrix and an upper triangular matrix, and letting $Q^{-1} = US$ be the QR factorization of $Q^{-1}$, we can write:
+\[
+Q = S^{-1}U^{-1}
+\]
+where $S^{-1}$ is upper triangular being the inverse of an upper triangular matrix, and $U^{-1}$ is orthogonal as $U$ is orthogonal. Hence a solution is:
+\[
+R = U^{-1},\quad K = S^{-1}, \quad t = K^{-1} q
+\]
+\begin{observationblock}
+    Note that $P$ may contain an arbitrary scale factor that will affect $K$. The proper scale for $K$ is obtained by imposing $K_{33} = 1$.
+\end{observationblock}
+
+A further observation is that it is not possible to recover the "true" focal length $f$ from the 3D-2D correspondences only (without knowing the actual sensor size or the pixel size). Indeed, recalling that the calibration matrix $K$ takes the form 
+\[
+K = \begin{bmatrix}
+    \alpha_u & \alpha_u \cot \theta & u_0 \\
+    0 & \frac{\alpha_v}{\sin \theta} & v_0 \\
+    0 & 0 & 1 \\
+\end{bmatrix} = \begin{bmatrix}
+    fk_u & fk_u \cot \theta & u_0 \\
+    0 & \frac{fk_v}{\sin \theta} & v_0 \\
+    0 & 0 & 1 \\
+\end{bmatrix}
+\]
+where $k_u$ and $K_v$ are the reciprocal of the pixel sizes, along $u$ and $v$ respectively, it is clear that $f$ is "entangled" with $k_u$ and $k_v$. Thus, without knowing the pixel sizes, it is not possible to separate $f$ from them. If we, for instance, double the focal length as well as the pixel sizes we get the same calibration matrix. Thus, we can only recover $\alpha_u$ and $\alpha_v$.
+
+\begin{advancedblock}[Dealing with radial distortion]
+
+\end{advancedblock}
+
+\subsection{Zhang's method}
+
+Since DLT calibration requires an image of many ($\geq 6$) non co-planar points, and so building an accurate 3D calibration object may be difficult, we can use an easier method that requires $\geq 3$ images of a plane and is based on \textit{homography}: the \textbf{Zang's calibration method}.
+
+\begin{definitionblock}[Homography]
+    A \textbf{homography} is an isomorphism of $P^n$, i.e., a map 
+    \[
+    x\to Hx, \quad H^{(n+1)\times(n+1)}, \text{ non-singular}
+    \]
+    where $H$ and $\lambda H, \lambda \neq 0$ represent the same homography. 
+\end{definitionblock}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/ch2/25.png}
+    \caption{Homography mapping between two planes.}
+    \label{fig:homography}
+\end{figure}
+
+The map from a 3D plane $\pi$ to its perspective image is easily seen to be a homography. Assume for simplicity that the plane has equation $z=0$. Then 
+\[
+w\begin{bmatrix}
+    u \\
+    v \\
+    1
+\end{bmatrix} = P \begin{bmatrix}
+    x \\
+    y \\
+    0 \\
+    1
+\end{bmatrix} = \begin{bmatrix}
+    p_1 & p_2 & p_3 & p_4 \\
+\end{bmatrix} \begin{bmatrix}
+    x \\
+    y \\
+    0 \\
+    1
+\end{bmatrix} = \underbrace{\begin{bmatrix}
+    p_1 & p_2 & p_4 \\
+\end{bmatrix}}_{=H} \begin{bmatrix}
+    x \\
+    y \\
+    1
+\end{bmatrix}
+\] 
+where the matrix $H$ is non-singular unless for degenerate cases. Given at least 4 pairs of original and projected points, a matrix $H$ corresponding to a homography can be computed via DLT. 
+
+Suppose a homography $H$ of a 3D plane $\pi$ to the image plane is known (e.g. estimated from measurements):
+\[
+H = \lambda\begin{bmatrix}
+    p_1 & p_2 & p_4 \\
+\end{bmatrix}
+\]
+Since $P = K\left[R|t\right] = K\begin{bmatrix} r_1 & r_2 & r_3 & t\end{bmatrix}$, we get $p_1 = K r_1$, $p_2 = K r_2$ and $p_4 = Kt$. Then, by substitution:
+\[
+H = \lambda K \begin{bmatrix}
+    r_1 & r_2 & t 
+\end{bmatrix}
+\]
+
+Thus:
+\[
+\begin{cases}
+    h_1 = \lambda K r_1 \\
+    h_2 = \lambda K r_2 \\
+\end{cases} \to \begin{cases}
+    r_1 = \frac{1}{\lambda} K^{-1} h_1 \\
+    r_2 = \frac{1}{\lambda} K^{-1} h_2 \\
+\end{cases}
+\]
+Now, being $R$ a rotation matrix, we have 
+\[
+\begin{cases}
+    r_1^T r_2 = 0 \\
+    r_1^T r_1 = r_2^T r_2 = 1 \\
+\end{cases} \to \begin{cases}
+    h_1^T(KK^T)^{-1}h_2 = 0 \\ 
+    h_1^T(KK^T)^{-1}h_1 = h_2^T(KK^T)^{-1}h_2 \\
+\end{cases}
+\]   
+Thus, from a plane $\pi$ and the corresponding estimated homography $H$, we get two scalar constraints: 
+\[
+\begin{cases}
+    h_1^T B h_2 = 0 \\
+    h_1^T B h_1 = h_2^T B h_2 \\
+\end{cases}
+\]
+where $B = (KK^T)^{-1}$. The constraints are linear in the unknown $B$. By taking $n$ planes and the corresponding estimated homographies 
+\[
+\Pi^{(k)}, H^{(k)} \quad k = 1, \dots, n 
+\]
+we get $2n$ constraints on the same $B$. 
+
+How to solve for $B$? First, note that $B = B^T$ by construction, so $B$ is symmetric; hence there are 6 unknowns. Let 
+\[
+b = \begin{bmatrix}
+    B_{11} & B_{12} & B_{22} & B_{13} & B_{23} & B_{33}
+\end{bmatrix}^T 
+\]
+by the vector of unknowns. For $i,j \in \left\{1,2\right\}$, it is verified that 
+\[
+h_i^T B h_j = v_{ij}^T b 
+\]
+where 
+\[
+v_{ij} = \begin{bmatrix}
+    H_{1i}H_{1j} \\ 
+    H_{1i}H_{2j} + H_{2j}H_{1j} \\
+    H_{2i}H_{2j} \\
+    H_{3i}H_{1j} + H_{1i}H_{3j} \\
+    H_{3i}H_{2j} + H_{2i}H_{3j} \\
+    H_{3i}H_{3j} \\
+\end{bmatrix}
+\]
+
+Thus, the two equations become:
+\[
+\begin{bmatrix}
+    v_{12}^T \\
+    (v_{11} - v_{22})^T 
+\end{bmatrix} b = 0
+\]
+
+For $n$ planes, by stacking equations of the above form, we get 
+\[
+Vb = 0
+\]
+where $V$ is $2n \times 6$.
+
+For $b$ being uniquely determined (up to a scale factor), $V$ must have rank 5:
+\begin{itemize}
+    \item At least $n=3$ planes in general configuration are needed;
+    \item In practice, the more the planes, the better the accuracy;
+    \item In practice, due to noise, $V$ will be full rank and the system can be solved by linear least squares:
+    \[
+    \argmin{||b||=1} ||Vb||^2
+    \]
+    where the constraint forces to discard the trivial solution $b=0$;
+    The solution of the above minimization problem is well known and is the right singular vector of $V$ corresponding to the smallest singular value. If the singular value decomposition of $V$ is 
+    \[
+    V = U\Sigma V^T
+    \]
+    then $b = v_6$, i.e. the rightmost column of $S$.
+\end{itemize}
+
+Given $B = (KK^T)^{-1}$, the matrix $K$ can be found by the Cholesky factorization. Recall that any real symmetirc and positive definite matrix can be decomposed \textbf{uniquely} as the product of lower triangular matrix having strictly positive eigenvalues and its transpose. Let 
+\[
+B = LL^T 
+\]
+be the Cholesky factorization of $B$, where $L$ is lower triangular. On the other hand we have 
+\[
+B = (KK^T)^{-1} = (K^T)^{-1}K^{-1} = (K^{-1})^TK^{-1}
+\]
+where $(K^{-1})^T$ is lower triangular, being the transpose of an upper triangular matrix. By comparison, we get 
+\[
+K^{-1} = L^T \quad \to \quad K = (L^{-T})^{-1}
+\]
+As usual, the proper scale for $K$ is obtained by imposing $K_{33} = 1$.
+
+Finally, the extrinsic parameters for each image are readily computed as:
+\[
+r_1 = \lambda K^{-1}h_1, \quad r_2 = \lambda K^{-1}h_2, \quad r_3 = r_1 \times r_2, \quad t = \lambda K^{-1} h_3
+\]
+where $\lambda = \frac{1}{||K^{-1}h_1||} = \frac{1}{||K^{-1}h_2||}$ and $\times$ denotes the cross product. 
+
+Due to noise, the resulting matrix $R$ may not be orthogonal. The closest (in the Frobenius norm) orthogonal matrix $R'$ to a given matrix $R$ is known to be 
+\[
+R' = UV^T
+\]
+where $R = U\Sigma V^T$ is the singular value decomposition of $R$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/ch2/26.png}
+    \caption{Std of the focal length distance $f$ as function of the number of images that are used for calibration. The std is computed on the outcomes of every possible subset of $l$ images from a total of 20 images.}
+    \label{fig:zhangs_calibration}
+\end{figure}
+
+\begin{advancedblock}[Alternative derivation]
+
+\end{advancedblock}
+
+\subsection{Estimating homographies}
+
+\section{Stereopsis}
+
+Computational stereopsis has the goal of getting information regarding the 3D structure of a scene, given a pair of images captured by two cameras in different positions. There are two steps:
+\begin{itemize}
+    \item Computing the correspondences between the two images;
+    \item Performing triangulation to get the 3D points.
+\end{itemize}
+The first is based on feature detection and matching. Two points in the two images that correspond to the same point of the scene are called \textbf{conjugate points}. Given the location of them corresponding to the 3D point $M$ of the scene, and the two perspective projection matrices, the location in the 3D space of $M$ can be found by triangulation.
+
+\subsection{Triangulation}
+
+Given two cameras, aligned and having parallel optical axes, the disparity is defined as the horizontal difference between the coordinates of the conjugate points in the two images. Consider the following figure:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/ch2/27.png}
+\end{figure}
+
+Placing the world reference frame in correspondence of the camera on the right, the perspective projection equations are:
+\[
+\begin{cases}
+    \frac{f}{z} = \frac{-u}{x} \\
+    \frac{f}{z} = \frac{-u'}{x-b} \\
+\end{cases}
+\]
+
+Thus, solving for $z$ we get:
+\[
+z = \frac{fb}{u'-u}
+\]
+so it is possible to compute the depth of point $M$ from the disparity $u'-u$ and the geometry of the stereo pair (baseline $b$ and $f$).
+Note that $b$ acts as a scale factor and that the depth $z$ is inversely proportional to the disparity.
+
+\begin{observationblock}[Sensisivity to disparity error]
+    Suppose that the disparity is affected by an error $\delta d$. What is the error on the computed depth $z$?
+    
+    By taking the derivative of $z = \frac{fb}{d}$ w.r.t. $d$ we get:
+    \[
+    \frac{\partial z}{\partial d} = -\frac{fb}{d^2}
+    \]
+    thus, for small errors $\delta d$ we have:
+    \[
+    \delta z \approx -\frac{fb}{d^2} \delta d
+    \]
+    and by substitution:
+    \[
+    \delta z \approx -\frac{z^2}{fb} \delta d
+    \]
+    This means that for a given $\delta d$, the error is proportional to the square of the working distance $z$ and inversely proportional to the baseline $b$ and to the focal length $f$. 
+\end{observationblock}
+
+In the general case, let $P'$ and $P''$ be the two perspective projection matrices and let $m' = \begin{bmatrix} u' & v' & 1 \end{bmatrix}^T$ be the homogeneous coordinates of $M'$ and $m'' = \begin{bmatrix} u'' & v'' & 1 \end{bmatrix}^T$ be the homogeneous coordinates of $M''$. Let $m = \begin{bmatrix} x & y & z & 1 \end{bmatrix}^T$. As for $M'$, we have:
+\[
+\begin{cases}
+    (p_1'^T - u'p_3'^T)m = 0 \\
+    (p_2'^T - v'p_3'^T)m = 0 \
+\end{cases}
+\]
+By considering the conjugate point $M''$, we get another pair of equations, thus we can write a homogeneous linear system of 4 equations and 4 unknowns:
+\[
+\begin{bmatrix}
+    p_1'^T - u'p_3'^T \\
+    p_2'^T - v'p_3'^T \\
+    p_1''^T - u''p_3''^T \\
+    p_2''^T - v''p_3''^T \\
+\end{bmatrix} m = 0
+\]
+The solution is the null space of the $4\times 4$ coefficient matrix. The matrix must be rank 3, otherwise the only solution is the trivial one ($m=0$). In practice, due to noise, the rank is 4 and a least squares solution is sought for, using SVD. 
+
+\subsection{Epipolar Geometry}
+\begin{minipage}{0.48\textwidth}
+    Epipolar geometry describes the relationship between conjugate points. Consider Fig.~\ref{fig:epipolar_geometry}: given $M''$, any possible conjugate point $M'$ must lie on the intersection between $\mathcal{R}'$ and the plane containing $M, C', C''$. Such intersection is a straight line called \textbf{epipolar line} (relative to $M''$). All the epipolar linear in $\mathcal{R}'$ pass through the point $E'$ (the epipole) and, similarly, all the epipolar linear in $\mathcal{R}''$ pass through the epipolar $E''$. The plane containing $M, C', C''$ is the epipolar plane of $M$.  
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.6\textwidth]{assets/ch2/28.png}
+        \caption{Epipolar geometry.}
+        \label{fig:epipolar_geometry}
+    \end{figure}
+\end{minipage}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/ch2/29.png}
+    \caption{A stereo pair. Epipolar lines corresponding to the points on the left image, are drawn on the right image.}
+    \label{fig:stereo_pair_epipolar_lines}
+\end{figure}
+
+Let $P' = \left[Q'|q'\right]$ and $P'' = \left[Q''|q''\right]$. Then:
+\[
+\begin{cases}
+    m' = P'm \\
+    m'' = P''m 
+\end{cases}
+\]
+
+The epipolar line corresponding to $M'$ is the projection through $P''$ of the optical ray of $M'$, whose equation is: 
+\[
+m = c' + \lambda \begin{bmatrix}(Q')^{-1}m' \\ 0\end{bmatrix}
+\]
+where $c'$ is the vector of homogeneous coordinates of $C'$ w.r.t. the world reference frame. 
