@@ -2393,3 +2393,246 @@ Which is the king model.
 
 % add picture about king models density profile
 
+\missing{Lecture before 04/12/2025}
+
+
+\chapter{Lecture 04/12/2025}
+
+\dots
+
+$$
+\bar F(\bar x) = G \int \dfrac{\bar x' - \bar x}{|\bar x' - \bar x|^3} \rho(\bar x') d^3 \bar x'
+\qquad \Rightarrow \qquad
+\int \delta \bar F(\bar x) = G \dfrac{(\bar x' - \bar x)} {|\bar x' - \bar x|^3} \rho(\bar x') d^3 \bar x'
+$$
+
+$$
+\bar F(z) = - \dfrac{G M}{z^2} \hat z \qquad \Rightarrow \qquad \int \delta \bar F(z) = \rho(z) G \left( \dfrac{\bar z}{z^3} \right)
+$$
+
+$$
+\left.\dfrac{d\bar V_M}{dt}\right|_{V_m} = \underbrace{4 \pi \ln \lambda G m (M+m) f(\bar V_m)}_{\rho(\bar V_m)} G \dfrac{\bar V_m - \bar V_m}{|\bar V_m - \bar V_m|^3}
+$$
+
+$$
+\int \left.\dfrac{d\bar V_M}{dt}\right|_{V_m} = 16 \pi^2 \ln \lambda G^2 m (M+m) \int_0^{V_M} \dfrac{f(V_m)V_m^2}{V_m^3} dV_m
+$$
+
+% eq 7.14
+which is the Chandal dynamical friction
+
+\begin{enumerate}
+    \item $V_M$ is small:
+    
+    $$
+    \dfrac{d\bar V_M}{dt} \propto \bar V_M
+    $$
+
+    and also the force on M is proportional to $\bar V_M$
+
+    \item $V_M$ is large and $f(V_m)$ is Maxwellian:
+    
+    $$
+    \dfrac{d\bar V_M}{dt} = \dfrac{4 \pi \ln \lambda G^2 (M + m)n_0}{V_M^3} (...) \bar V_M
+    $$
+
+    where $n_0$ is the number density of the stars.
+
+    Therefore, the variational velocity is proportional to:
+
+    $$
+    \dfrac{d\bar V_M}{dt} \propto M,
+    $$
+
+    the force now is proportional to $M^2$:
+
+    $$
+    force \propto M^2
+    $$
+
+    force is proportional to $n_0m$
+
+    $$
+    force \propto n_0m = \rho
+    $$
+
+\end{enumerate}
+
+$$
+\mathcal T_{df} = \langle - \dfrac{1}{V} \dfrac{d V}{dt} \rangle^{-1}
+$$
+
+\begin{advancedblock}[Applications]
+
+\begin{itemize}
+
+    \item decay of globular cluster.
+    
+    Globular cluster slow down because of the dynamical friction.
+
+    $$
+    \mathcal T_{orb-decay} \sim 2 \mathcal T_{df}
+    $$
+    
+    \item Magellanous Clouds
+    
+    \item galactic combination
+
+    sometimes in a cluster, the central dominant galaxy is made of more than one nucleus.
+    
+    ...
+    %missing something about fossil groups
+    
+\end{itemize}
+\end{advancedblock}
+
+\subsubsection{High speed encounters}
+
+enounters 
+between two systems
+
+effect of internal structure
+High speed encounters
+
+One of the most important classes of interaction between stellar systems is high-speed encounters. By “high-speed” we mean that the duration of the encounter (the interval during which the mutual gravitational forces are significant) is short compared to the crossing time within each system.
+
+closest approaches
+$V$ = relative $V_2$ velocity
+$b'$ = distance
+
+$$
+t_{enc} = \dfrac{\max(r_1, r_2, b')}{V}
+$$
+
+impulse approximation:
+
+$$
+t_i \gg t_{enc}
+$$
+
+$$
+V \gg \sigma_i \dfrac{\max(r_1, r_2, b')}{r_i}
+$$
+
+\dots
+
+$\alpha$ star fields a potential $\Phi (\bar r, t)$ 
+
+$$
+\dot \bar V_\alpha = - \bar \nabla \Phi (\bar r, t)
+$$
+
+in the relative system becomes:
+
+$$
+\Delta \bar V_\alpha' = \Delta \bar V_\alpha + \Delta \bar V
+$$
+
+% 7.42
+$$
+\Delta E = \dfrac 12 \sum_{\alpha = 1} m_\alpha |\Delta \bar V_\alpha'|^2
+$$
+
+\subsubsection{The distant-tide approximation}
+
+violent relaxation
+
+\begin{itemize}
+    \item before the encounter: 
+    $$
+    E_0 = T_0 + U_0 = T_0 - 2 T_0 = - T_0
+    $$
+    This $T_0 = - E_0$
+
+    We have $T_0 \to T_0 + \delta T$, thus:
+
+    $$
+    E_1 = e_0 + \delta T
+    $$
+
+    \item relaxation:
+    
+    $$
+    E_1 = - (E_0 + \delta T) = T_0 - \delta T
+    $$
+\end{itemize}
+
+Therefore we have something like:
+
+$$
+T_0 \longleftarrow T_0 + \delta T \longleftarrow T_0 - \delta T
+$$
+
+Tidal stripping of galaxies
+
+very important in galaxy groups
+
+$$
+\sigma_{v_{gal}} \sim 300 km/s \sim \sigma_{v_*}
+$$
+
+tidal approximation:
+
+$$
+\begin{cases}
+r_1 \ll b'
+r_2 \ll b'
+\end{cases}
+\qquad \Rightarrow \qquad
+\Delta E = ... = \dfrac {4 G^2}{3} \dfrac{M_2^2 M_1}{b^4 V^2} \bar r^2
+$$
+
+where $\bar r$ is:
+
+$$
+\bar r^2 = \dfrac{\int \rho(x^2 + y^2 + z^2) d^3 x}{\int \rho(x)}
+$$
+
+therefore, we can notice that:
+
+\begin{itemize}
+    \item $\Delta E \propto M_2^2$
+    \item $\Delta E \propto b^{-4}$
+    \item $\Delta E \propto V^{-2}$
+\end{itemize}
+
+$$
+\Delta E = \dfrac {G^2}3 \dfrac{M_2^2 M_1}{V^2 a^2}
+$$
+
+$$
+\Phi_{Plummer} = - \dfrac{G M}{\sqrt{r^2 + a^2}}
+$$
+
+as a result:
+\begin{itemize}
+    \item $a$ is small
+    \item The globular cluster is not compact
+    \item $\Delta E$ is big
+\end{itemize}
+
+\begin{advancedblock}[Applications]
+
+    The most important applications are:
+
+    \begin{itemize}
+        \item disruption of GCs
+        \item disruption of binary systems
+        \item disk shocking of globular clusters
+    \end{itemize}
+
+\end{advancedblock}
+
+\subsubsection{...}
+
+$$
+E_J = \dfrac 12 V^2 + \underbrace{\Phi(\bar x) - \dfrac 12 | \bar \Omega \times \bar x|^2}_{\Phi_{eff}}
+$$
+
+$E_J$ cannot surpass a region where $\Phi_{eff} > E_J$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/tides.png}
+    \caption{Contours of equal effective potential $\Phi_{\mathrm{eff}}$ for two point masses in a circular orbit, with mass ratio $m/M = 1/9$. The locations L1, \ldots, L5 are the Lagrange points. L4 and L5 form equilateral triangles with the two masses. \cite{binney}}
+\end{figure}
