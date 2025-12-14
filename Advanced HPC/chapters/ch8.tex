@@ -1,5 +1,27 @@
 \chapter{Message Passing Interface - MPI}
 
+Advanced Usage of some MPI features on Topology awareness, Shared memory and One-sided communications.
+
+\begin{itemize}
+    \item Basics of the One-sided communication
+    \item Buildinga  hierarchy of Communicators that reflects the topology
+    \item Exchanging data in shared memory windows among MPI processes
+\end{itemize}
+
+and we will see briefly other advanced features of MPI:
+\begin{itemize}
+    \item Derived Data-Types
+    \item More details on Groups and Communicators
+    \item Virtual topologies (cartesian and graph communicators) and neighborhood collectives
+    \item Non-blocking collectives
+\end{itemize}
+
+\subsubsection{Two-Sided communications}
+
+By its very nature, the message-passing paradigm is designed around the concept of cooperative exchange of informations among two or more processes whose address space are isolated and not directly inaccessible by other processes.
+
+
+    
 % \section{One-Sided Communication}
 
 \section{Remote Memory Access - RMA}
@@ -42,7 +64,35 @@ This distinction is critical and often misunderstood: these calls operate on dif
 
 % \subsubsection{Post-Start-Complete-Wait - PSCW}
 
-% \subsubsection{Locks}
+\subsubsection{Locks}
+
+Locks are a way to synchronize the access to a shared resource. They are a way to ensure that only one process can access the shared resource at a time.
+
+Passive mode: the target does not participate in opertions: one sided asynchronous communication.
+
+\begin{codeblock}[language=C]
+MPI_Win_lock(int lock_type, int rank, int assert, MPI_Win win);
+
+MPI_Win_unlock(int rank, MPI_Win win);
+
+MPI_Win_flush/flush_local(int rank, MPI_Win win);
+\end{codeblock}
+
+where \texttt{lock\_type} is one of the following:
+\begin{itemize}
+    \item \texttt{MPI\_LOCK\_EXCLUSIVE}: only one process can access the shared resource at a time.
+    \item \texttt{MPI\_LOCK\_SHARED}: multiple processes can access the shared resource at a time.
+\end{itemize}
+
+\texttt{rank} is the rank of the process that will access the shared resource.
+
+\texttt{assert} is the assertion that will be used to synchronize the access to the shared resource.
+
+\begin{itemize}
+    \item \texttt{MPI\_Win\_flush}: complete operations on remote target process; data will be then available to the target task, or to other tasks
+    \item \texttt{MPI\_Win\_flush\_local}: locally complete operations to the target process
+\end{itemize}
+
 
 \begin{warningblock}[Misconception about locks]
     Despite the unfortunate naming, MPI locks are not mutex-like. They do not provide mutual exclusion for the target process's local access. The target can modify its window memory during a locked epoch, leading to race conditions.
@@ -91,16 +141,18 @@ MPI_Comm_split_type (
 );
 \end{codeblock}
 
-The \plaintt{split_type} parameter is used to specify the splitting property. It can be one of the following values:
+The \plaintt{split\_type} parameter is used to specify the splitting property. It can be one of the following values:
 \begin{itemize}
-    \item \plaintt{MPI_COMM_TYPE_SHARED}: split the communicator based on the shared memory pools.
-    \item \plaintt{MPI_COMM_TYPE_HW_GUIDED}: split the communicator based on the hardware guided property.
-    \item \plaintt{MPI_COMM_TYPE_HW_UNGUIDED}: split the communicator based on the hardware unguided property.
+    \item \plaintt{MPI\_COMM\_TYPE\_SHARED}: split the communicator based on the shared memory pools.
+    \item \plaintt{MPI\_COMM\_TYPE\_HW\_GUIDED}: split the communicator based on the hardware guided property.
+    \item \plaintt{MPI\_COMM\_TYPE\_HW\_UNGUIDED}: split the communicator based on the hardware unguided property.
 \end{itemize}
 
 The \plaintt{key} parameter is used to hint for the new ranks. It is used to sort the tasks depending on their charateristics.
 
 The \plaintt{info} parameter is used to provide helper for the splitting property. It is used to provide additional information about the splitting property.
+
+\end{itemize}
 
 \subsubsection{Placement}
 
@@ -151,3 +203,121 @@ This routine is fundamental for writing portable and generic code utilizing shar
 
 % \subsection{Shared Memory Access}
 
+\section{Cartesian Communication}
+
+Many scientific and engineering problems operate on regular, structured grids: finite difference methods for PDEs, stencil computations, image processing, and particle-mesh methods in astrophysics. When parallelizing these applications via domain decomposition, we partition the computational domain into sub-domains, each handled by a distinct MPI process.
+
+The fundamental challenge is neighbor communication: processes must exchange boundary data (ghost zones, halo cells) with their neighbors. While we could manually compute neighbor ranks using arithmetic on process coordinates, this approach is error-prone, non-portable, and fails to leverage potential hardware optimizations.
+
+\subsubsection{Why not Manual Rank Arithmetic}
+
+Consder a 2D grid decomposition with dimensions ($P_x \times P_y$). Given a process with coordinates ($i, j$), its neighbors are:
+
+\begin{codeblock}[language=C]
+// Manual neighbor calculation (fragile approach)
+int rank_left  = (i > 0)     ? i-1 + j*Px   : MPI_PROC_NULL;
+int rank_right = (i < Px-1)  ? i+1 + j*Px   : MPI_PROC_NULL;
+int rank_down  = (j > 0)     ? i + (j-1)*Px : MPI_PROC_NULL;
+int rank_up    = (j < Py-1)  ? i + (j+1)*Px : MPI_PROC_NULL;
+\end{codeblock}
+
+The possible issues, or inconveniencies, with this approach are:
+
+\begin{itemize}
+    \item \textbf{Boundary handling}: Explicit conditionals for edges; periodic boundaries add complexity
+    \item \textbf{Dimension ordering}: Row-major vs column-major rank assignment affects all calculations
+    \item \textbf{Scalability}: 3D or higher dimensions require nested conditionals
+    \item \textbf{Optimization}: MPI implementations cannot optimize message routing without knowing the topology
+\end{itemize}
+
+\subsubsection{Cartesian Communication Model}
+
+MPI provides virtual topologies to express logical process arrangements. A \textbf{Cartesian topology} maps processes onto a regular $n$-dimensional grid, and MPI provides a suite of routines for creating and querying such topologies:
+
+\begin{itemize}
+    \item \textbf{Automatic coordinate $\leftrightarrow$ rank translation}: Convert between process ranks and their multidimensional coordinates in the grid.
+    \item \textbf{Built-in periodic boundary support}: Specify whether each grid dimension is periodic (wrap-around), e.g., for toroidal grids.
+    \item \textbf{Neighbor lookup via relative displacement}: Functions for obtaining neighbor ranks given directional offsets ("shifts")—no manual arithmetic required.
+    \item \textbf{Hints for process placement optimization}: Inform the MPI implementation of communication patterns, potentially improving performance by optimizing process placement (implementation-dependent).
+\end{itemize}
+
+\begin{exampleblock}[Non-Periodic 3x2 Grid]
+
+\begin{codeblock}[language=C, numbers=none]
+        j=0    j=1
+      +------+------+  
+i=0   |  R0  |  R1  |   Rank = i + j*3
+      +------+------+  
+i=1   |  R2  |  R3  |   R0:(0,0) R1:(1,0)
+      +------+------+   R2:(0,1) R3:(1,1)
+i=2   |  R4  |  R5  |   R4:(0,2) R5:(1,2)
+      +------+------+  
+\end{codeblock}
+\end{exampleblock}
+
+\subsection{Core API Functions}
+
+\subsubsection{MPI\_Dims\_create}
+
+Computes a "balanced" distribution of processes across dimensions:
+
+\begin{codeblock}[language=C]
+int MPI_Dims_create (int nnodes,    // Total number of processes
+                     int ndims,     // Number of dimensions
+                     int dims[]);   // IN/OUT: dimension sizes
+\end{codeblock}
+
+
+\subsubsection{MPI\_Cart\_create}
+
+Creates a new communicator with processes laid out on a Cartesian grid:
+
+\begin{codeblock}[language=C]
+int MPI_Cart_create(MPI_Comm comm_old, int ndims, const int dims[], const int periods[], int reorder, MPI_Comm *comm_cart);
+\end{codeblock}
+
+Key behavior: Pre-set dimensions (dims[i] > 0) are preserved; zero entries are computed.
+
+The algorithm tries to minimize surface-to-volume ratio for communication efficiency.
+
+\begin{exampleblock}[2D grid, 12 processes]
+\begin{codeblock}[language=C]
+// unconstrained: let MPI choose
+int dims[2] = {0, 0};
+MPI_Dims_create(12, 2, dims); // Result: dims = {4, 3} or {3, 4}
+
+// constrained: force 4 columns
+int dims2[2] = {0, 4};
+MPI_Dims_create(12, 2, dims2); // Result: dims2 = {3, 4}
+\end{codeblock}
+\end{exampleblock}
+
+\begin{warningblock}[MPI\_Dims\_create failure]
+    MPI\_Dims\_create fails if \plaintt{nnodes} is not divisible by the product of pre-set dimensions. Always verify \plaintt{dims[i] > 0} for all \plaintt{i} after the call.
+\end{warningblock}
+
+\subsubsection{MPI\_Cart\_create}
+
+Creates a new communicator with Cartesian topology:
+
+\begin{codeblock}[language=C]
+int MPI_Cart_create(
+    MPI_Comm comm_old,      // Input communicator
+    int ndims,              // Number of dimensions
+    const int dims[],       // Size of each dimension
+    const int periods[],    // Periodicity flags (0 or 1)
+    int reorder,            // Allow rank reordering?
+    MPI_Comm *comm_cart     // Output: new Cartesian comm
+);
+\end{codeblock}
+
+where:
+\begin{itemize}
+    \item \texttt{periods[i]}: If non-zero, dimension \texttt{i} wraps around (periodic boundary)
+    \item \texttt{reorder}: If non-zero, MPI may reassign ranks to optimize for hardware topology
+    \item If size(\texttt{comm\_old}) > product(\texttt{dims}), excess processes receive \texttt{MPI\_COMM\_NULL}
+\end{itemize}
+
+\begin{tipsblock}[Best practices]
+    Set reorder=1 in production code. This allows MPI implementations (especially on clusters with complex interconnects like fat-trees or torus networks) to map logically adjacent processes to physically adjacent nodes, reducing communication latency.
+\end{tipsblock}

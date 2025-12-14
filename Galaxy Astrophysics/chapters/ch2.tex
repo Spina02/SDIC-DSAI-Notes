@@ -95,26 +95,22 @@ The luminosity class is determined from spectral features that depend strongly o
 
 \section{Radiation Processes}
 
-Atoms and molecules emit or absorb electromagnetic radiation when they transition between different energy levels. If an atom loses energy by an amount $\Delta E$, it emits a photon—a quantum of electromagnetic radiation—whose frequency $\nu$ is related to the energy change by
+Atoms and molecules emit or absorb electromagnetic radiation when they transition between different energy levels. If an atom loses energy by an amount $\Delta E$, it emits a photon (a quantum of electromagnetic radiation) whose frequency $\nu$ is related to the energy change by:
 $$
-\Delta E = h\nu,
+\Delta E = h\nu
 $$
 where $h$ is the Planck constant ($h = 6.626 \times 10^{-34} \text{ J s}$). Conversely, when an atom absorbs a photon of frequency $\nu$, it gains energy according to the same formula: $\Delta E = h\nu$.
 
-In atoms, energy levels typically refer to those belonging to electrons. These electron energies are not continuous—they can only take on specific, discrete values; in other words, the energy levels are quantized. As a result, atoms can only absorb or emit radiation at particular frequencies $\nu$, corresponding to the differences between these allowed energy levels.
-
-\vspace{-0.5em}
-
+In atoms, energy levels typically refer to those belonging to electrons, which are not continuous and can only take on specific, discrete values. As a result, atoms can only absorb or emit radiation at particular frequencies $\nu$, corresponding to the differences between these allowed energy levels.
 
 \begin{minipage}{0.46\textwidth}
-This phenomenon creates line spectra, with each element displaying its own unique pattern.
-ù
-When a hot, low-pressure gas emits light, it produces an emission spectrum made up of sharp, discrete lines. If the same gas is cool and observed in front of a bright continuous source (such as white light), it absorbs light at those same characteristic wavelengths, resulting in dark absorption lines.
+This phenomenon creates line spectra, with each element displaying its own unique pattern. When a hot, low-pressure gas emits light, it produces an emission spectrum made up of sharp, discrete lines. If the same gas is cool and observed in front of a bright continuous source, it absorbs light at those same wavelengths, resulting in dark absorption lines.
 
-If a free electron passes near a nucleus or ion and is deflected without being captured, the interaction can change the electron's kinetic energy and produce what's known as free-free radiation. In extremely hot gas ($T > 10^6$ K), where hydrogen is fully ionized, this process—called thermal bremsstrahlung, is the dominant source of emission.
+If a free electron passes near a nucleus or ion and is deflected without being captured, the interaction can change the electron's kinetic energy and produce a \bfit{free-free} radiation. This is the case of galaxy clusters, where we have the \textit{Intra Cluster Medium} (ICM), which is an extremely hot gas ($T > 10^6$ K), where hydrogen is fully ionized. This process, called \bfit{thermal bremsstrahlung}, is the dominant source of emission.
 \end{minipage}%
 \hfill
 \begin{minipage}{0.52\textwidth}
+    \vspace{-0.5em}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{assets/rad-transitions.png}
@@ -122,3 +118,135 @@ If a free electron passes near a nucleus or ion and is deflected without being c
     Absorption and emission occur between two bound states, whereas ionization and recombination occur between a bound and a free state. Interaction of an atom with a free electron can result in a free-free transition \cite{karttunen}}
 \end{figure}
 \end{minipage}
+
+\vspace{-0.5em}
+
+\subsubsection{The hydrogen atom}
+
+The hydrogen atom is the simplest atom, consisting of a single proton and a single electron. When an electron transitions between two quantized energy levels $n_1$ and $n_2$, it must emit or absorb a photon with energy:
+$$
+\Delta E = h\nu = E_{n_2} - E_{n_1}
+$$
+corresponding to a specific wavelength $\lambda = c / \nu$.
+
+Electronic transitions ending at particular levels produce characteristic series of lines:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Lyman series} ($n_1=1$): transitions from $n\geq 2$ to $n=1$, all in the ultraviolet (UV).
+    \item \textbf{Balmer series} ($n_1=2$): transitions from $n\geq 3$ to $n=2$, visible and near-UV. 
+    
+    These lines appear as dark absorption lines in stellar spectra (H15, H12, H10, H9, H$\beta$, \dots).
+    \item \textbf{Paschen series} ($n_1=3$): transitions from $n\geq 4$ to $n=3$, infrared.
+    \item \textbf{Bracket series} ($n_1=4$): infrared.
+    \item \textbf{Pfund series} ($n_1=5$): far infrared.
+\end{itemize}
+
+The \bfit{Balmer discontinuity} occurs at $364.7$ nm, representing the \textit{"edge"} in the spectrum corresponding to the ionization energy from the $n=2$ level, where electrons can be ejected from this state. At wavelengths shorter than this limit, photons have enough energy to ionize hydrogen atoms from the $n=2$ state; this is known as the Balmer limit.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.6\textwidth}
+        \includegraphics[width=\textwidth]{assets/h-trans.png}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.35\textwidth}
+        \captionof{figure}{
+            Hydrogen atom transitions and spectral lines. The lower image shows the spectrum of star HD193182, with the dark hydrogen Balmer absorption lines converging toward the Balmer discontinuity at $\lambda = 364.7$\,nm (the ionization limit from $n=2$) on the left. The numbers indicate the higher quantum levels $n$ in each transition. The adjacent iron emission lines, with known wavelengths, serve as calibration references. \cite{karttunen}
+        }
+    \end{minipage}
+\end{figure}
+
+\vspace{-1.5em}
+
+\subsubsection{Line profile}
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.72\textwidth}
+        The previous discussion suggests that spectral lines would have an infinitely narrow and sharp profile. In reality, however, they are somewhat broadened. They have a so-called "\bfit{Voigt profile}": atoms of a gas move faster at higher temperatures, so spectral lines arising from individual atoms are shifted by the Doppler effect.
+
+        \medskip
+
+        A way to characterize the width of a spectral line is by its \textbf{full width at half maximum (FWHM)}, but it is typically larger than the intrinsic (natural) width of the line due to Doppler broadening.
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.25\textwidth}
+        \includegraphics[width=\textwidth]{assets/voigt-profile.png}
+        \vspace{-1.5em}
+        \captionof{figure}{\centering \\ Voigt profile. \cite{karttunen}}
+    \end{minipage}
+\end{figure}
+
+\vspace{-0.5em}
+
+\begin{minipage}{0.3\textwidth}
+    \includegraphics[width=\textwidth]{assets/ew.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.66\textwidth}
+    The \textbf{equivalent width} is another measure of a line's strength. It is the area of rectangular line that has the same area as the line profile and that emits no light at all. The equivalent width can be used to describe the energy corresponding to a line independently of the shape of the line profile.
+\end{minipage}
+
+% The full width at half maximum and the equivalent width both characterize line strength, but they typically differ, though their values are often similar.
+
+\subsubsection{Stellar spectroscopy}
+
+Stellar spectroscopy is a powerful tool that allows us to infer several fundamental properties of a star by carefully analyzing its spectrum:
+
+\begin{enumerate}
+    \item \textbf{Temperatures derived from the spectrum}
+    \begin{itemize}
+        \item \textbf{Color temperature} ($T_\mathrm{col}$): Estimated from color indices ($B - V$). It indicates the spectral peak according to blackbody radiation.
+        \item \textbf{Effective temperature} ($T_\mathrm{eff}$): Defined such that the star emits the same total energy per unit area as a blackbody of temperature $T_\mathrm{eff}$; related to luminosity by $L = 4 \pi R^2 \sigma T_\mathrm{eff}^4$.
+        \item \textbf{Ionization temperature} ($T_\mathrm{ion}$): The temperature that characterizes the state of ionization of atoms, estimated using the Saha equation.
+        \item \textbf{Excitation temperature} ($T_\mathrm{exc}$): The temperature associated with the distribution of atoms in various excited states, deduced using the Boltzmann law.
+    \end{itemize}
+
+    \item \textbf{Surface gravity ($g$)} 
+    
+    Surface gravity determines the pressure broadening of spectral lines and is defined as $g \equiv \frac{GM}{R^2}$, where $M$ is the stellar mass and $R$ is its radius. Higher density ($\rho$) at the stellar surface leads to a greater $g$.
+    
+    \begin{itemize}
+        \item \textbf{Main sequence stars} (luminosity class V): Have higher densities, so as $\rho$ increases, $g$ increases, resulting in broader spectral lines due to pressure broadening (Stark effect).
+        \item \textbf{Giant and supergiant stars} (luminosity classes I, II): Have larger radii and lower densities ($\rho$ decreases as $R$ increases), resulting in higher luminosity ($L$) and narrower spectral lines.
+    \end{itemize}
+
+    \item \textbf{Chemical composition}
+    
+    The presence and strengths of absorption lines, particularly in the ultraviolet, allow us to determine the abundances of various elements within the stellar atmosphere. Specific spectral features correspond to elements and their ionization states, revealing the star's metallicity and chemical history.
+\end{enumerate}
+
+\subsection{Stellar Spectral Types}
+
+\begin{itemize}
+    \item \textbf{O stars}
+    
+    Lines oh He II (ionized), $T \sim (20 000 \to 35 000) K$, Blue
+
+    \item \textbf{B stars}
+
+    Lines of He I (neutral) few lines of H I, $T \sim 15 000 K$, Blue-White.
+
+    \item \textbf{A stars}
+    
+    strong lines of H I, $T \sim 3 000 K$, White.
+
+    \item \textbf{F stars}
+    
+    weak lines of H I, first metallic lines (Ca II), $T \sim 7000 K$, White-Yellow.
+
+    \item \textbf{G stars}
+    
+    Metallic lines (Ca II), G band, $T \sim 5 500 K$, Yellow.
+
+    \item \textbf{K stars}
+    
+    Start to disappear metallic lines, no molecolar lines, $T \sim 4 000 K$, Orange-Yellow
+
+    \item \textbf{M stars}
+    
+    molecolar bands, $T \sim 3000 K$ Red.
+\end{itemize}
+    
