@@ -425,7 +425,7 @@ The final gate is the \textbf{output gate}, which controls the information to ou
     \label{fig:lstm}
 \end{figure}
 
-\section{Transformers}
+\section{Transformer}
 
 Even if the gates allow LSTMs to handle more distant information than RNNs, they don't completely solve the underlying problem: passing information through an extended series of recurrent connections leads to information loss and difficulties in training. \textbf{Transformers} map sequences of input vectors ($\mathbf{x}_1,\dots,\mathbf{x}_n$) to sequences of output vectors ($\mathbf{y}_1,\dots,\mathbf{y}_n$) of the same length. They are made of stacks of transformer blocks, which are multilayer networks made by combining simple linear layers, FFNs and \textbf{self-attention layers}. Moreover, the computation performed for each item is independent of all the other computations, allowing for parallelization during training.
 
@@ -551,6 +551,266 @@ Just a reminder that in multi-head attention, instead of using the model dimensi
 \end{warningblock}
 
 \newpage
-\section{Machine Translation and Encoder-Decoder Models}
 
-\section{Reinforcement Learning with Human Feedback}
+\section{Encoder-Decoder Models}
+
+In the previous section, the basic block of the transformer architecture was presented. However, the first use of the architecture was for a different case: transforming one sequence of tokens into another to enable machine translation between languages. For this use case, a two-phase system was designed: encoding and decoding, where the transformer from the previous section corresponds to the second phase.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/17.png}
+    \caption{Encoder-Decoder architecture described in the original transformer paper.}
+    \label{fig:encoder_decoder}
+\end{figure}
+
+As shown in Fig.\ref{fig:encoder_decoder}, the transformer architecture described before is just the decoder part (on the right), for which we can remove the mixed multi-head attention if we don't consider the encoder. The \textbf{encoder}, on the other part, is used for different purposes. Together, they form the \textbf{encoder-decoder architecture}, which is widely used for sequence-to-sequence tasks such as machine translation, text summarization, and question answering.
+It is able to generate contextually appropriate, arbitraty length output sequences. The encoder, in fact, takes an input sequence and creates a contextualized representation of it, called the \textbf{context}. It is then passed to the decoder which generates a task-specific output sequence. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/18.png}
+\end{figure}
+
+Machine Translation (MT) systems generally use a fixed vocabulary generated with the \textbf{BPE} or \textbf{wordpiece} algorithms. Both of them are \textbf{subword tokenization} methods, meaning that they break down rare words into smaller, more frequent subword units. This allows the model to handle out-of-vocabulary words and reduces the overall vocabulary size, making training more efficient. Both also have a \textbf{token learner}, which takes row training corpus and induces a vocabulary, and a \textbf{token segmenter}, which takes a row test sentence and segments it into the tokens in the vocabulary. BPE token learner begins with a vocabulary that is just the set of individual characters. It then examines the training corpus, chooses the two symbols that are most frequently adjacent, adds a new merger symbol to the vocabulary and replaces every adjacent occurrence of the two symbols with the new symbol. This process continues until $k$ merges have been done creating $k$ novel tokens. Once we've learned our vocabulary, the token segmenter can segment new sentences by greedily matching the longest possible tokens from the vocabulary. Wordpiece, instead, first initializes the lexicon with characters, then it trains an n-gram language model on the training corpus and, considering the set of possivle new wordpieces made by concatenating two wordpieces from the current lexicon, chooses the one that most increases the language model probability of the training corpus. Repeat the last two steps until there are $V$ wordpieces.
+
+\subsection{Beam Search}
+
+Choosing the single most probable token to generate at each step in Machine Translation is called \textbf{greedy decoding}. This is not optimal, since the token that looks good to the decoder now might not turn out later to have been the wrong choice. Thus, decoding in MT and other sequence generation problems generally uses a method called \textbf{beam search}. In it, instead of choosing the best token to generate at each timestep, we keep $k$ possible tokens at each step. This fixed-size memory footprint $k$ is called the \textit{beam width}. These initial $k$ outputs are the search frontier and these $k$ initial words are called \textit{hypotheses}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/19.png}
+    \caption{Beam search with beam width of 2.}
+    \label{fig:beam_search}
+\end{figure}
+
+At subsequent steps, each of the $k$ best hypotheses is extended incrementally by being passed to distinct decoders, which each generate a softmax over the entire vocabulary to extend the hypothesis to every possible next token. Each of these $k\times V$ hypotheses is scored by $P(y_i|x,y_{<i})$: the product of the probability of current word choice multiplied by the probability of the path that led to it. We then prune the $k\times V$ hypotheses down to the $k$ best ones, so there are never more than $k$ hypotheses at the frontier of the search, and never more than $k$ decoders. 
+
+\begin{warningblock}
+    One problem arises from the fact that the completed hypotheses may have different lengths. Because models generally assign lower probabilities to longer strings, a naive algorithm would also choose shorter strings for $y$.
+\end{warningblock}
+
+\subsection{Pre-trained Models}
+
+If we want to assign the correct named-entity tag to each word in a sentence, or other sophisticated labels like the parse tags, we'll want to be able to take into account information from the right context as we process each element. \textbf{Birirectional encoders} are designed to do just that by allowing the self-attention mechanism to range over the entire input. They underlies models like BERT and its descendants like RoBERTa or SpanBERT. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/20.png}
+    \caption{Bidirectional encoder self-attention mechanism.}
+    \label{fig:bidirectional_encoder_self_attention}
+\end{figure}
+
+The focus of bidirectional encoders is on computing contextualized representations of the tokens in an input sequence that are generally useful across a range of downstream applications. This contextualization is accomplished through the use of the same self-attention mechanism used in causal models, the only difference is that here we skip the masking step, allowing the model to contextualize each token using information from the entire input. 
+
+\begin{observationblock}
+    In BERT and descendants, the WordPiece algorithm is used for tokenization, creating subwords. This will require that for some NLP tasks that require notions of words we will occasionally need to map subwords back to words. 
+\end{observationblock}
+
+For training, bidirectional encoders learn to perform a fill-in-the-blank task, technically called the \textbf{cloze task}. That is, given an input sequence with one or more elements missing, the learning task is to predict the missing elements. More precisely, during training the model is deprived of one or more elements of an input sequence and must generate a probability distribution over the vocabulary for each of the missing items. 
+The original approach to training bidirectional encoders is called \textbf{Masked Language Modeling (MLM)}, which uses unannotated text from large corpus. The model is presented with a series of sentences from the training corpus where a random sample of tokens from each training sequence is selected for use in the learning task. Once chosen, a token is used in one of three ways:
+\begin{itemize}
+    \item It is replaces with the unique vocabulary token \plaintt{[MASK]} $\to 80\%$;
+    \item It is replaces with another token from the vocabulary, randomly sampled based on token unigram probabilities $\to 10\%$;
+    \item It is left unchanged $\to 10\%$.
+\end{itemize}
+
+In BERT, $15\%$ of the input tokens in a training sequence are sampled for learning. 
+\begin{observationblock}
+    Note that all of the input tokens play a role in the self-attention process, but only the sampled tokens are used for learning.
+\end{observationblock}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{assets/ch2/21.png}
+    \caption{Masked Language Modeling training process.}
+    \label{fig:mlm_training}
+\end{figure}
+
+To produce a probability distribution over the vocabulary for each of the masked tokens, the output vector from the final transformer layer for each of the masked tokens is multiplied by a learned set of classification weights $\mathbf{W}_V \in \mathbb{R}^{|V|\times d_h}$ and then through a softmax to yield the required predictions over the vocabulary:
+\[
+\hat{\mathbf{y}}_i = softmax(\mathbf{W}_V \mathbf{h}_i)
+\]
+
+For many NLP applications, the natural unit of interest may be larger than a single word or token. Question answering, syntactic parsing, coreference and semantic role labeling applications all involve the identification and classification of constituents or phrases. This suggests a \textbf{span-oriented} masked learning objective mighe provide improved performance on such tasks. 
+A span is a contiguous sequence of one or more words selected from a training text, prior to subword tokenization. In span-based masking, a set of randomly selected spans from a trainig sequence are chosen. Once a span is chosen for masking, all the words within the span are substituted according to the same regime used in BERT. Moreover, the SpanBERT learning objective augments the MLM objective with a boundary oriented component called the \textbf{Span Boundary Objective (SBO)}, which relies on a model's ability to predict the words within a masked span from the words immediately preceding and following it. 
+\[
+L(x) = L_{MLM}(x) + L_{SBO}(x)
+\]
+\[
+L_{SBO}(x) = -\log P(x|x_s,x_e,p_x)
+\]
+where $s$ denotes the position of the word before the span and $e$ denotes the word after the end. 
+\[
+s = FFNN([y_{s-1};y_{e+1};p_{i-s+1}])
+\]
+\[
+z = softmax(Es)
+\]
+The final loss is the sum of the MLM loss and the SBO loss.
+
+An important class of applications involves determining the relationship between pairs of sentences. These include tasks like paraphrase detection, entailment or discourse coherence. To capture the kind of knowledge required for applications such as these, BERT introduced a second learning objective called \textbf{Next Sentence Prediction (NSP)}, where the model is presented with pairs of sentences and is asked to predict whether each pair consists of an actual pair of adjacent sentences from the training corpus or a pair of unrelated sentences. To facilitate this, BERT introduces two new tokens to the input representation. After tokenizing the input with the subword model, the token \plaintt{[CLS]} is prepended to the input sentence pair, and the token \plaintt{[SEP]} is placed between the sentences and after the final token of the second sentence. 
+
+During training, the output vector from the final layer associated with the \plaintt{[CLS]} token represents the next sentence prediction. A learned set of classification weights $\mathbf{W_{NSP}} \in \mathbb{R}^{2\times d_h}$ is used to produce a two-class prediction from the raw \plaintt{[CLS]} vector.
+\[
+\hat{\mathbf{y}}_i = softmax\left(\mathbf{W_{NSP}} \mathbf{h}_i\right)
+\]
+
+The power of pretrained language models lies in their ability to extract generalizations from large amounts of text. To make practical use of these generalizations, we need to create interfaces from these models to downstream applications through a process called \textbf{fine-tuning}. Most common applications are:
+\begin{itemize}
+    \item \textbf{Sequence Classification}: An additional vector is added to the model to stand for the entire sequence. This vector is sometimes called the \textit{sentence embedding} since it refers to the entire sequence. In BERT, the \plaintt{[CLS]} token plays the role of this embedding. This unique token is added to the vocabulary and is prepended to the start of all input sequences. The output vector in the final layer of the model for the \plaintt{[CLS]} input represents the entire input sequence and serves as the input to a \textit{classifier head}, a logistic regression or NN classifier that makes the relevant decision. A key difference from what we've seen earlier with neural classifier is that this loss can be used to not only learn the weights of the classifier, but also to update the weights for the pretrained language model itself.
+    \item \textbf{Pair-wise Sequence Classification}: Fine-tuning an application for one of these tasks proceeds just as with pretraining using the NSP objective. During fine-tuning, pairs of labeled sentences from the supervised learning data are presented to the model. The output vector associated with the prepended \plaintt{[CLS]} token represents the model's view of the input pair. And as NSP training, the two inputs are separated by the \plaintt{[SEP]} token. 
+    \item \textbf{Sequence Labelling}: Here, the final output vector corresponding to each input token is passed to a classifier that produces a softmax distribution over the possible set of tags. Again, assuming a simple classifier consisting of a single feedforward layer followed by a softmax, the set of weights to be learned for this additional layer is $\mathbf{W_K} \in \mathbb{R}^{k\times d_h}$, where $k$ is the number of possible tags for the task. A complication with this approach arises from the use of subword tokenization. Supervised training data for tasks like named entity recognition is typically in the form of BIO tags associated with text segmented at the word level. To deal with this, we need a way to assign BIO tags to subword tokens dueing training and a corresponding way to recover word-level tags from subwords during decoding. For training, we can just assign a gold-standard tag associated with each word to all of the subwords token derived from it. For decoding, the simplest approach is to use the argmax BIO tag associated with the first subword token of a word.  
+\end{itemize}
+
+\section{Prompting}
+
+One key emergent ability from GPT-2 is \textbf{zero-shot learning}, i.e., the ability to do many tasks with no examples and no gradient updates, by simply:
+\begin{itemize}
+    \item Specifying the right sequence in prediction problem (e.g. question answering) $\to$ "Passage: Tom Brady ... Q: Where was Tom Brady born? A: ...";
+    \item Comparing probabilities of sequences (e.g. classification tasks) $\to$ "The cat couldn't fit into the hat because it was too big.", does "it" refers to the cat or to the hat?
+\end{itemize}
+GPT-2 beats state-of-the-art models on language modeling benchmarks with \textbf{no task-specific fine-tuning}. Moreover, with bigger models (GPT-3), we can see \textbf{few-shot learning}, where the model is given a few examples of the task in the prompt, and it can generalize to new examples without any gradient updates. It is also called \textbf{in-context learning}. Therefore, there exist another method to prompt the model, using this ability to learn in context without having to fine-tune the model and update weights. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/ch2/22.png}
+    \caption{Prompting methods: zero-shot, one-shot and few-shot learning.}
+    \label{fig:prompting_methods}
+\end{figure}
+
+However, some tasks seem to hard for even large LMs to learn through prompting alone, see for example operations with large numbers, where tasks require multi-step reasoning. Therefore, \textbf{chain-of-thought prompting} has evolved, where the idea is to demonstrate the process we want the model to follow, by providing intermediate reasoning steps in the prompt. This way, the model can decompose complex problems into simpler sub-problems, and solve them step by step. 
+
+\begin{exampleblock}[Chain-of-thought prompting]
+    \textit{Model Input} \\
+    \textbf{Q:} Roger has 5 tennis balls. He buys 2 more cans of tennis balls. Each can has 3 tennis balls. How many tennis balls does he have now? \\
+    \textbf{A:} The answer is 11. \\
+    \textbf{Q:} The cafeteria had 23 apples. If they used 20 to make lunch and bought 6 more, how many apples do they have? \\
+    \textit{Model Output} \\
+    \textbf{A:} The answer is 27. \textbf{Wrong!}
+
+    Using chain-of-thought prompting: \\
+    \textit{Model Input} \\
+    \textbf{Q:} Roger has 5 tennis balls. He buys 2 more cans of tennis balls. Each can has 3 tennis balls. How many tennis balls does he have now? \\
+    \textbf{A:} He starts with 5 tennis balls. He buys 2 cans, each with 3 balls, so he gets 2 * 3 = 6 more balls. In total, he has 5 + 6 = 11 tennis balls. \\
+    \textbf{Q:} The cafeteria had 23 apples. If they used 20 to make lunch and bought 6 more, how many apples do they have? \\
+    \textit{Model Output} \\
+    \textbf{A:} They start with 23 apples. They use 20 for lunch, leaving them with 23 - 20 = 3 apples. They then buy 6 more apples, so they have 3 + 6 = 9 apples. \textbf{Correct!}
+\end{exampleblock}
+
+This chain-of-thought prompt is an emergent property of model at scale (e.g. GPT-3 with 175B parameters). Smaller models don't seem to benefit from it.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/ch2/23.png}
+    \caption{Chain-of-thought prompting performance on arithmetic reasoning tasks.}
+    \label{fig:cot_prompting}
+\end{figure}
+
+An even better approach that was tested is the use of phrases like "Let's think step by step", with which the performance improves even more.
+
+The negative sides of this approach are in the limits to what we can fit in context and in the complex tasks that still need gradient steps. Moreover, language modeling does not mean alignment with human assistance, since they are just made to predict the next most probable token. Therefore, we can do fine-tuning on some tasks, i.e. \textbf{instruction fine-tuning}. To do this, we collect examples of (instruction, output) tuples across many tasks and fine-tune an LM. We then evaluate on unseen tasks.
+As always, the key is to use more data and a model that can scale. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/ch2/24.png}
+    \caption{Instruction fine-tuning.}
+    \label{fig:instruction_fine_tuning}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/ch2/25.png}
+    \caption{Performance of prompting vs. fine-tuning.}
+    \label{fig:prompting_vs_fine_tuning}
+\end{figure}
+
+\begin{warningblock}[Limitations]
+    This approach remains first of all \textbf{expensive}: we need to collect much ground-truth data. Moreover, there are two main problems:
+    \begin{itemize}
+        \item Tasks like open-ended creative generation have no right answer;
+        \item Language modeling penalizes all token-level mistakes equally, but some errors are worse than others. Even with instruction fine-tuning, a mismatch between the LM objective and the objective of satisfying human preferences exists. 
+    \end{itemize} 
+\end{warningblock}
+
+For those limitations, \textbf{Reinforcement Learning with Human Feedback (RLHF)} has been developed. Imagine having a way to get a \textit{human reward} regarding an answer, where higher is better. We want to maximize the expected reward of samples from our LM:
+\[
+\mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\right]
+\]
+We update the parameters of the LM with gradient ascent:
+\[
+\theta_{t+1} := \theta_t + \alpha \nabla_{\theta} \mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\right]
+\]
+Policy gradient methods in RL (e.g. REINFORCE) give us a way to estimate and optimize this objective. The main problem is the almost infinite search space. Since we want 
+\[
+\nabla_{\theta} \mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\right] = \nabla_{\theta} \sum_s R(s)p_{\theta}(s) = \sum_s R(s)\nabla_{\theta} p_{\theta}(s)
+\]
+we can use the log-derivative trick to take the gradient of $\log p_{\theta}(s)$
+\[
+\nabla_{\theta} \log p_{\theta}(s) = \frac{1}{p_{\theta}(s)}\nabla_{\theta} p_{\theta}(s) \quad \to \quad \nabla_{\theta}p_{\theta}(s) = \nabla_{\theta}\log p_{\theta}(s)p_{\theta}(s)
+\]
+and plug it back in the previous equation:
+\[
+\nabla_{\theta} \mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\right] = \sum_s R(s)\nabla_{\theta}\log p_{\theta}(s)p_{\theta}(s) = \mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\nabla_{\theta}\log p_{\theta}(\hat{s})\right]
+\]
+
+Now we can approximate the expectation with Monte Carlo sampling:
+\[
+\mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\nabla_{\theta}\log p_{\theta}(\hat{s})\right] \approx \frac{1}{N}\sum_{i=1}^N R(\hat{s}_i)\nabla_{\theta}\log p_{\theta}(\hat{s}_i) \quad \hat{s}_i \sim P_{\theta}(s)
+\]
+giving us the update rule:
+\[
+\theta_{t+1} := \theta_t + \frac{\alpha}{N}\sum_{i=1}^N R(\hat{s}_i)\nabla_{\theta}\log p_{\theta}(\hat{s}_i)
+\]
+
+The problem is that collecting human feedback is expensive and slow. Therefore, we can model their prefereices as a separate (NLP) problem. We can train an LM to predict human preferences from an annotated dataset, then optimize for the predicted reward instead of the actual human reward. This is called \textbf{reward modeling}.
+The second main problem is that human judgements are noisy and miscalibrated. It has been demonstrated, in fact, that instead of asking for direct ratings, asking for \textbf{pairwise comparisons} between two outputs leads to more reliable results. Therefore, the reward model is trained to predict which of two outputs is preferred by humans. Given two outputs $\hat{s}_1$ and $\hat{s}_2$, the probability that $\hat{s}_1$ is preferred over $\hat{s}_2$ is modeled as:
+\[
+J_{RM}(\phi) = -\mathbb{E}_{(s^w,s^l)\sim D}\left[\log \sigma(RM_{\phi}(s^w) - RM_{\phi}(s^l))\right]
+\]     
+where $s^w$ is the winning sample, $s^l$ is the losing sample, and $\sigma$ is the sigmoid function.
+
+Now, to put all together:
+\begin{itemize}
+    \item Initialize a copy of the model $p_{\theta}^{RL}(s)$ with parameters $\theta$;
+    \item Optimize the following reward objective with policy gradient:
+    \[
+        R(s) = RM_{\phi}(s) - \beta \log \left(\frac{p_{\theta}^{RL}(s)}{p^{PT}(s)}\right)
+    \]
+    where $p^{PT}(s)$ is the pretrained LM, and $\beta$ is a hyperparameter that controls the strength of the KL regularization; We pay a price when $p_{\theta}^{RL}(s) > p^{PT}(s)$.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/ch2/26.png}
+    \caption{RLHF provides gains over pretraining + finetuning.}
+    \label{fig:rlhf_gains}
+\end{figure}
+
+\begin{warningblock}[Limitations of RLHF]
+    RLHF is not a silver bullet. Some limitations are:
+    \begin{itemize}
+        \item Reward hacking: the model may find ways to exploit weaknesses in the reward model;
+        \item Catastrophic forgetting: the model may forget how to perform well on the original language modeling task;
+        \item Scalability: collecting human feedback and training reward models can be expensive and time-consuming.
+    \end{itemize}
+\end{warningblock}
+
+\section{Multilingual Models}
+
+So far, in our exploration of transformer-based natural language processing models, we have primarily considered systems that work on a single language or, at least, we have not explicitly considered the possibility of using a single model for multiple languages. However, as we will see in this section, models can handle multiple languages simultaneously, and there are significant advantages to doing so. One of these advantages stems from a phenomenon known as \textbf{transfer learning}, where knowledge gained about one language in the representations learned by the neural network can be applied to other languages. This is particularly valuable for \textit{low-resource} languages, that is, languages with fewer training resources, as they may end up benefiting from the knowledge gained by the model from other languages.
+
+Training a multilingual transformer model is not very different from training a monolingual model. The main difference lies in the training data, which is a mixture of texts in different languages. The tokenizer is created using the entire multilingual corpus with systems such as SentencePiece or byte pair encoding (BPE). If the languages are related, some tokens may be shared, which helps the neural network learn joint representations, also known as \textbf{cross-lingual embeddings}. For example, consider \textit{centro}, \textit{centru}, \textit{centre}, and \textit{center} in Spanish, Asturian, Catalan, and English, respectively; if these words are tokenized as centr and the remaining suffix, the model can learn a representation for \textit{centr} from Spanish, Catalan, or English texts and apply it to Asturian inputs, even if the word \textit{centru} has not been seen in the Asturian training data. Names of people or places can also be easily shared across languages.
+In the common case of data imbalance, where there are significantly more texts in some languages than in others, it is common to use a rebalancing formula to upsample languages with less data, ensuring that their texts are overrepresented in the training or evaluation datasets, as well as in the corpus used to train the tokenizer.
+Interestingly, even without shared tokens, words like \textit{atristuráu} (Asturian) and \textit{sad} (English) might end up with similar embeddings in certain layers of the model. This is another example of the language-independent nature of some of the representations learned.
+Additionally, depending on the task, language-specific tokens can be used as the first token to indicate the language of the text. This practice is more common in encoder-decoder models (e.g., to indicate the target language) than in decoder-only models. These special tokens are added to the vocabulary, prepended to every sentence during both training and inference, and learned in the same way as the \plaintt{MASK} token in BERT-like pretraining.
+Decoder-like language models are usually trained with multilingual data from the beginning but do not require language-specific tokens. The language used in the prompt is sufficient to guide the generation process toward the desired language.
+
+Early pre-trained models, such as BERT, were English-centric. Over time, variants emerged for other languages, like CamemBERT for French, GilBERTo for Italian, or BERTo for Spanish. These models, however, were still essentially monolingual. A turning point came with pre-trained multilingual models like mBERT or XLM-R, which support around a hundred languages, and more recently, Glot500, which extends to 500 languages. These models are self-supervisedly trained with neutral tasks, such as masked language modeling, making them general-purpose models that can be fine-tuned for specific tasks in any of the supported languages. There are also encoder-decoder multilingual models like mBART, mT5 or NLLB-200. More recently, multilingual decoder-only models trained as large language models and covering a wide range of languages have started to emerge, such as EMMA-500, EuroLLM or Aya.
+A notable phenomenon here is the zero-shot generalization ability of the model. For example, in a named entity recognition task, a model fine-tuned only with English texts can be applied to texts in other languages without requiring labeled data in those languages, thanks to the multilingual representations learned during pretraining. This is particularly useful for low-resource languages.
+
+\begin{warningblock}[Challenges]
+    Multilingual models often face the challenge known as the curse of \textit{multilinguality} (a term inspired by the \textit{curse of dimensionality} in statistics and machine learning). This phenomenon refers to a decline in performance for individual languages as the model expands to accommodate a larger number of languages. Languages with more resources often benefit the least from the multilingual model and may even exhibit lower performance compared to a monolingual model trained with the same data.
+    Several techniques have been proposed to mitigate the curse of multilinguality. One approach is the use of \textbf{adapters}, small trainable modules (e.g., a feedforward network), one for each language, inserted at specific points within the transformer layers. During training, common parameters are learned as usual, while adapter parameters are updated only for their associated language. This allows the model to learn a mix of cross-lingual and language-specific parameters. Adapters are also used to fine-tune pre-trained models for new tasks or languages without retraining the entire model. This preserves the original model's weights, updating only the adapter parameters.
+    Other alternatives for using monolingual models in multilingual scenarios, such as \textit{translate-train} or \textit{translate-test}, are also possible. In the first case, training data available in one language is translated into other languages, and a multilingual model is trained with both the source and translated data. In the second case, test data is translated into the language of a monolingual model at inference time. In both cases, machine translation systems perform the translation.
+    Finally, several multilingual datasets are available for different tasks, such as the universal dependencies treebanks, the XNLI dataset for natural language inference, or the Seed or FLORES+ corpora for machine translation.
+\end{warningblock}
