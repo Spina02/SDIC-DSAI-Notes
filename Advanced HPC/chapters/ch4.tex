@@ -1,0 +1,266 @@
+\chapter{Supercomputers}
+
+Modern scientific discovery increasingly relies on high-performance computing infrastructure capable of handling massive computational workloads. Supercomputers represent the pinnacle of this infrastructure, combining thousands of processors, accelerators, and specialized networking hardware to tackle problems that would be intractable on conventional systems. These range from climate modeling and molecular dynamics simulations to machine learning training and quantum mechanics calculations.
+We will focus on Leonardo, one of Europe's flagship supercomputing systems. We'll examine its modular design, computing capabilities, and the practical aspects of accessing and utilizing it.
+
+\section{Leonardo Supercomputer}
+
+Leonardo is a pre-exascale supercomputer hosted at CINECA in Bologna, Italy, and represents one of the cornerstones of the European High Performance Computing Joint Undertaking (EuroHPC JU). Leonardo was designed to support both traditional HPC workloads and emerging AI applications.
+
+The system exemplifies the trend toward heterogeneous computing in modern HPC, integrating both CPU-centric compute nodes and GPU-accelerated nodes optimized for highly parallel workloads.
+
+\subsection{System Architecture and Modules}
+
+Leonardo adopts a modular architecture consisting of several distinct partitions, each tailored to specific classes of workloads. The two primary modules are the \textbf{Booster module} and the \textbf{Data-Centric (DHPC) module}, supplemented by additional service and hybrid partitions.
+
+\subsubsection{Booster Module}
+
+The Booster module constitutes the heart of Leonardo's computational power and is optimized for massively parallel, compute-intensive workloads. This partition is composed of GPU-accelerated nodes, each equipped with:
+
+\begin{itemize}
+    \item \textbf{CPUs}: 1 Intel Xeon Platinum 8358 processor (32 cores, 2.6 GHz base frequency)
+    \item \textbf{GPUs}: 4 NVIDIA A100 GPUs (64 GB HBM2 memory each), providing substantial computational throughput for floating-point operations and tensor computations
+    \item \textbf{System Memory}: 512 GB DDR4 RAM per node
+    \item \textbf{Node-to-GPU Interconnect}: GPUs connected via NVIDIA NVLink for high-bandwidth, low-latency communication within each node
+\end{itemize}
+
+The Booster module comprises approximately 3,500 such nodes, yielding roughly 14,000 NVIDIA A100 GPUs in total. This configuration is particularly well-suited for applications in machine learning, computational fluid dynamics, materials science, and other domains that benefit from the massive parallelism offered by modern GPUs. Each A100 GPU provides mixed-precision capabilities (FP64, FP32, FP16, and Tensor Core operations), enabling efficient execution of both traditional HPC simulations and AI training workloads.
+
+\subsubsection{Data-Centric (DHPC) Module}
+
+The Data-Centric module provides CPU-centric compute resources designed for workloads that require large memory capacity, complex branching logic, or I/O-intensive operations. Nodes in this partition feature:
+
+\begin{itemize}
+    \item \textbf{CPUs}: 2 Intel Xeon Platinum 8358 processors per node (64 cores total)
+    \item \textbf{System Memory}: Typically 512 GB DDR4 RAM per node, with some high-memory configurations available
+    \item \textbf{Local Storage}: NVMe SSDs for fast local data staging
+\end{itemize}
+
+This module comprises approximately 1,500 nodes and is intended for traditional HPC applications such as computational chemistry codes, finite element analysis, and large-scale data analytics tasks that do not map efficiently onto GPU architectures.
+
+\subsubsection{Inter-Node Network Topology}
+
+\vspace{-0.5em}
+
+\begin{minipage}{0.67\textwidth}
+Leonardo employs a \textbf{Dragonfly+} network topology based on NVIDIA Mellanox InfiniBand HDR (High Data Rate) technology and NVIDIA Quantum QM8700 switches. This topology is designed to provide high bandwidth and low latency while maintaining scalability and resilience.
+
+\medskip
+
+In the Dragonfly+ topology, compute nodes are organized into \textbf{groups} (or cells), with dense all-to-all connectivity within each group. Inter-group connections are carefully engineered to minimize the maximum number of hops between any two nodes while balancing cost and performance. Each node is connected via InfiniBand HDR links operating at 200 Gb/s, ensuring that communication-intensive parallel applications can scale efficiently across thousands of nodes.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \vspace{-2.5em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/leo-topology.png}
+    \caption{Dragonfly+ Topology. Booster Module nodes (blue), I/O cell (purple), Data-centric cells (red), and Hybrid cell (green) \cite{cinecaLeonardoSystem}.}
+    \label{fig:dragonfly-topology}
+\end{figure}
+\end{minipage}
+
+\subsection{Storage System}
+
+Leonardo's storage infrastructure is organized into a two-tier hierarchy:
+
+\begin{itemize}
+    \item \textbf{Fast Tier (NVMe-based)}: 5.4 PB of capacity with an aggregate bandwidth of 1.4 TB/s. This tier uses high-speed NVMe SSDs and is intended for I/O-intensive workloads requiring rapid data access, such as checkpointing in large-scale simulations or intermediate data staging for machine learning training.
+    
+    \item \textbf{Capacity Tier (HDD-based)}: 106 PB of capacity with an aggregate bandwidth of 2.9 TB/s. This tier provides long-term storage for datasets, simulation outputs, and archival purposes. While slower than the fast tier, it offers significantly greater capacity at a lower cost per terabyte.
+\end{itemize}
+
+Both tiers are accessible via a parallel filesystem (typically GPFS/Spectrum Scale or Lustre) that provides a unified namespace and supports concurrent access from thousands of compute nodes.
+
+\begin{observationblock}[Top500]
+    The \textbf{Top500} list is the authoritative ranking of the world's fastest supercomputers, updated twice a year (June and November). Leonardo currently holds the rank of 9th fastest supercomputer globally. At its debut in November 2022, Leonardo achieved the impressive position of \textbf{4th fastest}, trailing only Frontier (USA), Fugaku (Japan), and LUMI (Finland).
+
+\end{observationblock}
+
+\subsection{Accessing Leonardo}
+
+Access to Leonardo is managed through a project-based allocation system. For users affiliated with Italian universities and research institutions, CINECA offers several account classes tailored to different project sizes and durations:
+
+\begin{tipsblock}[Apply for resources]
+    If you belong to an Italian university, you can apply for resources in the following classes:
+    \begin{itemize}
+        \item \textbf{Class B}: Large-scale projects, typically requesting millions of core-hours. Duration: 12 months. Calls for proposals are issued twice per year.
+        \item \textbf{Class C}: Small to medium-sized projects. Duration: 9 months. Continuous submission process, with up to 10 calls per year.
+        \item \textbf{Class D}: Storage allocations related to HPC simulations, useful for projects requiring substantial long-term data retention. Duration: 36 months.
+        \item \textbf{Test Account}: Small allocations for testing, debugging, and scaling studies. Duration: 3 months. Ideal for validating code performance before requesting larger allocations.
+    \end{itemize}
+\end{tipsblock}
+
+    \medskip
+
+Upon logging in to Leonardo, users are greeted by the \textbf{Message of the Day} (MOTD), an informational banner designed to keep users up-to-date with the system's status and important announcements. The MOTD typically includes:
+\begin{itemize}
+    \item A brief description of the cluster architecture or key features
+    \item Real-time system status updates (e.g., queues, ongoing issues, resource availability)
+    \item ``In evidence'' messages highlighting noteworthy news or actionable items
+    \item Important notifications, such as planned downtime, upcoming maintenance, or urgent advisories
+\end{itemize}
+
+\section{Working on Leonardo}
+
+\subsection{Filesystem Organization}
+
+Upon logging into Leonardo, users find themselves in a hierarchical filesystem with several designated directories, each serving a specific purpose:
+
+\begin{itemize}
+    \item \textbf{HOME} (\texttt{\$HOME}): A personal home directory; it is backed up and is intended for configuration files, scripts, and small datasets. Quota-limited, typically to tens of gigabytes.
+    
+    \item \textbf{WORK} (\texttt{\$WORK}): A larger, project-specific workspace for active development, source code, and intermediate build artifacts. Not typically backed up, but persistent across sessions.
+    
+    \item \textbf{SCRATCH} (\texttt{\$SCRATCH}): A high-performance scratch space for temporary files generated during job execution. This area offers the best I/O performance and is intended for files needed only during the runtime of a job. Files in scratch are subject to automatic purging policies (e.g., files not accessed for 40 days may be deleted), so do not use this for long-term storage.
+    
+    \item \textbf{DATA} (\texttt{\$DATA}): Intended for long-term storage of large datasets and simulation outputs. This directory is often mapped to the capacity storage tier and may have different quota and performance characteristics than \texttt{\$SCRATCH}.
+    
+    \item \textbf{PUBLIC}: A shared directory where project members can exchange data and scripts. Useful for collaboration within a project team.
+\end{itemize}
+
+Active simulation I/O should target \texttt{\$SCRATCH} for speed, while final results should be moved to \texttt{\$DATA} or \texttt{\$WORK} for safekeeping.
+
+\subsection{Software and Module Environment}
+
+Leonardo's software stack is managed via the \textbf{Environment Modules} system, with packages built and deployed using the \textbf{Spack} package manager. This approach allows for coexistence of multiple versions and configurations of libraries and compilers, enabling reproducibility and flexibility.
+
+Upon login, a default environment is loaded, but users typically need to load additional modules to access specific compilers, MPI implementations, or scientific libraries. 
+
+The module system provides commands to query, load, and manage the software environment:
+
+\begin{itemize}
+    \item \texttt{module avail} or \texttt{module av}: List all available modules.
+    \item \texttt{module list}: Show currently loaded modules and profiles.
+    \item \texttt{module load <name>}: Load a specific module into the environment.
+    \item \texttt{module unload <name>}: Unload a module.
+    \item \texttt{module purge}: Remove all loaded modules (useful for starting with a clean environment).
+    \item \texttt{module show <name>}: Display information about what a module does (env. variables, paths).
+    \item \texttt{modmap -m <name>}: Search or map module names (CINECA-specific tool).
+\end{itemize}
+
+Different \textit{profiles} or module collections may be available depending on whether you are working on CPU-only or GPU-enabled nodes, or whether you are using a specific programming model (MPI, CUDA, OpenMP, OpenACC, etc.).
+
+\subsubsection{Programming Environments}
+
+Leonardo supports multiple compiler toolchains and programming environments:
+
+\begin{itemize}
+    \item \textbf{GNU Compiler Collection (GCC)}: Open-source compilers (\texttt{gcc}, \texttt{g++}, \texttt{gfortran}).
+    \item \textbf{NVIDIA HPC SDK}: Provides \texttt{nvc}, \texttt{nvc++},  \texttt{nvcc}, \texttt{nvfortran} with OpenACC and CUDA support, essential for GPU programming on the Booster module.
+    \item \textbf{Intel oneAPI}: Compilers (\texttt{icc}, \texttt{icpc}, \texttt{ifort}) optimized for Intel CPUs, along with Intel MPI.
+\end{itemize}
+
+To develop GPU-accelerated code, load the NVIDIA HPC SDK module (e.g. \texttt{module load nvhpc}) and ensure that the CUDA runtime libraries are accessible. For traditional MPI applications, load an MPI module compatible with the chosen compiler (e.g. \texttt{module load openmpi}).
+
+\begin{warningblock}[Intel and NVIDIA Compilers]
+    \textbf{Important:} Intel compilers do \emph{not} support CUDA or GPU offloading on NVIDIA GPUs. If your code targets NVIDIA GPUs using CUDA, OpenACC, or similar technologies, you must use the NVIDIA HPC SDK tools for compilation.
+\end{warningblock}
+
+\subsection{Job Submission with Slurm}
+
+CINECA HPC clusters, such as Leonardo, are shared among many users. As such, responsible usage is essential to ensure fair access and optimal performance for everyone. The system is divided into two main types of nodes: login nodes and compute nodes.
+
+When you log in, you access a \textbf{login node}, intended only for light tasks such as editing files, compiling code, or performing brief test runs. Running heavy computations or large parallel jobs directly on it is strictly prohibited. The login environment enforces a hard CPU time limit for any process, and jobs exceeding this limit may be killed without warning. Furthermore, GPUs are not available on login nodes, so you cannot test or run GPU code interactively in this environment.
+
+All resource-intensive and production workloads must be submitted to the \textbf{compute nodes} through the \bfit{Slurm} job scheduler. Slurm manages how resources like CPU cores, GPUs, memory, and temporary storage are allocated to different users. Compute nodes support two main job submission styles: batch mode, in which you provide a job script for Slurm to execute, and interactive mode, where you request an interactive session on a compute node for active development or debugging.
+
+While compute nodes themselves are shared across users, once Slurm assigns resources to a job, those resources are dedicated exclusively to that job for its duration. It is crucial to request only the resources you truly need and to release them promptly to maximize efficiency and minimize costs, since accounting is based on \textit{reserved} resources rather than those you actively use.
+
+\subsubsection{Batch Job Submission}
+
+A typical batch script for Slurm on Leonardo includes a shebang line, a series of \texttt{\#SBATCH} directives specifying resource requirements, environment setup commands (loading modules), and finally the execution command. Below is an example for a GPU job:
+
+\begin{codeblock}[language=bash]
+#!/bin/bash
+
+# Slurm directives
+#SBATCH --job-name=my_gpu_job       # Job name
+#SBATCH --nodes=1                   # Number of nodes
+#SBATCH --ntasks-per-node=1         # Number of MPI tasks per node
+#SBATCH --cpus-per-task=8           # Number of CPU cores per task
+#SBATCH --gres=gpu:4                # Request 4 GPUs per node
+#SBATCH --mem=494000                # Memory in MB (approx 480 GB)
+#SBATCH --time=00:30:00             # Wall-clock time limit (hh:mm:ss)
+#SBATCH --partition=boost_usr_prod  # Partition (queue) to submit to
+#SBATCH --account=tra25_gputs       # Account/project code
+#SBATCH --reservation=s_tra_gputs   # (Optional) reservation name
+#SBATCH --output=job_%j.out         # Standard output file (%j = job ID)
+#SBATCH --error=job_%j.err          # Standard error file
+
+# Load necessary modules
+module <module-name>
+
+# Run the executable
+srun my_application # or mpirun
+\end{codeblock}
+
+Key directives:
+
+\begin{itemize}
+    \item \texttt{-{}-nodes} and \texttt{-{}-ntasks-per-node}: Define the number of nodes and MPI ranks per node.
+    \item \texttt{-{}-cpus-per-task}: Sets CPU cores per MPI task (useful for hybrid MPI+OpenMP jobs).
+    \item \texttt{-{}-gres=gpu:N}: Request \texttt{N} GPUs per node. On Booster nodes, typically \texttt{gpu:4}.
+    \item \texttt{-{}-time}: Maximum wall-clock time. Jobs exceeding this limit are terminated.
+    \item \texttt{-{}-partition}: Specifies the queue or partition. Common partitions on Leonardo include \texttt{boost\_usr\_prod} (Booster nodes) and \texttt{dcgp\_usr\_prod} (DHPC nodes).
+    \item \texttt{-{}-account}: Your project or account code, used for tracking resource usage and billing.
+\end{itemize}
+
+To submit the job, save the script (e.g., \texttt{job.sh}) and run:
+
+\vspace{-0.2em}
+
+\begin{codeblock}[language=bash, numbers=none]
+sbatch job.sh
+\end{codeblock}
+
+\vspace{-0.2em}
+
+Slurm will return a job ID, which you can use to track the job's status.
+
+\subsubsection{Interactive Jobs}
+
+For debugging, performance profiling, or exploratory work, you may request an interactive session on compute nodes. Use \texttt{salloc} or \texttt{srun} with the \texttt{-{}-pty} option:
+
+\begin{itemize}
+\item \texttt{srun}:
+
+    \begin{codeblock}[language=bash, numbers=none]
+srun -N=1 --ntasks-per-node=1 --cpus-per-task=8 --gres=gpu:1 --time=00:10:00 --partition=boost_usr_prod --account=<name> --pty bash
+    \end{codeblock}
+
+    Once the allocation is granted, you will receive an interactive shell on a \bfit{compute node}, which means the resources are allocated and the shell is executed directly on the worker node.
+
+    \item \texttt{salloc}:
+
+    \begin{codeblock}[language=bash, numbers=none]
+salloc -N=1 --ntasks-per-node=1 --cpus-per-task=8 --gres=gpu:1 --time=00:10:00 --partition=boost_usr_prod --account=<name>
+    \end{codeblock}
+
+    A new session starts on the \bfit{login node}, as \texttt{salloc} only performs the resource allocation. Therefore, you must explicitly launch commands (usually via \texttt{srun}) to execute code on the allocated compute node(s). Useful to run multiple commands within the same allocation.
+\end{itemize}
+
+\begin{warningblock}[Exit the allocation]
+    Remember to exit or cancel the allocation when done to avoid wasting resources.
+\end{warningblock}
+
+\subsubsection{Monitoring and Managing Jobs}
+
+When specifying the \texttt{--account} option, you must use your project account. Each account has a budget of core-hours shared among team members. On Leonardo, you can check the balance with:
+
+\begin{codeblock}[language=bash, numbers=none]
+saldo -b         # For Booster accounts
+saldo -b --dcgp  # For DCGP accounts
+\end{codeblock}
+
+Booster and DCGP accounts/resources are separate, and can only be used on their respective partitions. Each \textbf{Booster node} provides up to 32 CPU cores, 4 GPUs, and approximately 494~GB RAM. You can allocate resources for your job within these limits, but the product \texttt{ntasks-per-node}~$\times$~\texttt{cpus-per-task} must not exceed 32. Accounting for allocation will consider the number of CPUs, GPUs, and RAM you request.
+
+To monitor and control your jobs, you can use the following SLURM commands:
+
+\begin{itemize}
+    \item \texttt{squeue -u <username>} or \texttt{squeue --me}: Shows the list of all your scheduled jobs, along with their status (pending, running, closing, \ldots). Also displays the jobID.
+    \item \texttt{scontrol show job <jobid>}: Provides a long list of information for the job requested, including resource allocation, start time, and node assignments. If the job is not running yet, you'll be notified about the reason and, for top priority jobs, an \textit{estimated start time} is provided.
+    \item \texttt{scancel <jobid>}: Removes (cancels) the job (queued or running) from the scheduled job list.
+    \item \texttt{sacct <options> <jobid>} (e.g., \texttt{sacct -Bj <jobid>}): Displays accounting data for all jobs and job steps in the SLURM log or database. Useful for post-mortem analysis of resource usage.
+    \item \texttt{sinfo} (e.g., \texttt{sinfo -o "\%10D \%a \%20F \%P"}): Provides information about SLURM nodes and partitions.
+\end{itemize}

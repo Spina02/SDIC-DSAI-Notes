@@ -1,0 +1,474 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Start section to modify
+
+\chapter{CUDA C/C++}
+
+\section{Introduction to Accelerated Computing}
+
+The constant demand for computational power in science and engineering has driven the evolution of computer architecture. For decades, performance gains were fueled by increasing clock frequencies and instruction-level parallelism, but physical limitations have shifted the focus toward massive parallelism. This paradigm shift requires a corresponding evolution in programming models to effectively harness the capabilities of modern hardware.
+
+This chapter introduces \textit{accelerated computing}, a paradigm where a specialized, highly parallel processing unit, the Graphics Processing Unit (GPU), is used in conjunction with a traditional Central Processing Unit (CPU) to accelerate computationally intensive portions of an application. We will explore the architectural differences between CPUs and GPUs, delve into the CUDA C/C++ programming model for NVIDIA GPUs, and discuss fundamental concepts such as memory hierarchies, thread organization, and performance optimization.
+
+\subsubsection{Key Performance Metrics}
+
+When evaluating system performance, three metrics are crucial:
+\begin{itemize}
+    \item \textbf{Latency}: The time it takes to perform a single operation or access a single piece of data (e.g., time to fetch a value from memory). Measured in seconds.
+    \item \textbf{Bandwidth}: The rate at which data can be transferred. Measured in bytes per second.
+    \item \textbf{Throughput}: The total number of operations completed in a given amount of time. Measured Floating-Point Operations Per Second (FLOPS).
+\end{itemize}
+
+CPUs are optimized for low latency, while GPUs are designed for high throughput and high memory bandwidth, sacrificing single-thread latency to achieve massive parallelism.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/metrics.png}
+    % \caption{Latency, Bandwidth and Throughput}
+    \label{fig:performance-metrics}
+\end{figure}
+
+\begin{warningblock}[Architecture and Programming Models]
+    A fundamental principle in HPC is that changes in hardware architecture necessitate changes in programming models to achieve efficiency. Code written for a latency-oriented CPU will not perform well on a throughput-oriented GPU.
+\end{warningblock}
+
+\subsection{Architectural Design Philosophies: Latency vs. Throughput}
+
+CPUs and GPUs are designed with fundamentally different goals, their architectures reflect this.
+
+
+\begin{minipage}{0.65\textwidth}
+\subsubsection{Latency-Oriented Design (CPUs)}
+
+A CPU is a \textbf{latency-oriented} device, designed to execute a single thread of instructions as quickly as possible:
+\begin{itemize}
+    \item \textbf{Powerful Cores}: A CPU has a small number of powerful, general-purpose cores capable of complex control flow and integer/floating-point arithmetic.
+    \item \textbf{Large Caches}: It employs a deep, multi-level cache hierarchy (L1, L2, L3) to minimize memory latency. The goal is to keep data as close to the core as possible, to reduce waiting time for data from main memory.
+    \item \textbf{Sophisticated Control Logic}: Features as branch prediction, speculative execution are used to maximize performance.
+\end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.33\textwidth}
+    \vspace{-1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/cpu.png}
+    \caption{Simplified CPU \cite{cinecaSCAITraining}}
+    \label{fig:cpu-arch}
+\end{figure}
+\end{minipage}
+
+\medskip
+
+This design excels at serial, irregular workloads where instructions may depend on previous ones.
+
+Modern architectures rely on a memory hierarchy to balance the trade-off between fast, small, and expensive memory (CPU caches) and large, slower, but cheaper memory (DRAM or storage).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/mem-speed.png}
+
+    \vspace{-0.5em}
+    \caption{Memory Hierarchy \cite{cinecaSCAITraining}}
+    \label{fig:memory-hierarchy}
+\end{figure}
+
+\subsubsection{Virtual Memory: The Great Abstraction}
+
+\begin{minipage}{0.65\textwidth}
+\textbf{Virtual memory} is a foundational abstraction in all modern CPUs, allowing each process to believe it has access to a private, contiguous range of addresses, providing several advantages:
+
+\begin{itemize}
+    \item \textbf{Simplified Programming Model}: Programs can use memory addresses freely.
+    \item \textbf{Isolation}: Each process is protected from accidental or malicious access to others' memory.
+    \item \textbf{Efficient Resource Utilization}: The OS can move data between physical memory and storage transparently.
+\end{itemize}
+
+\medskip
+
+The virtual address used by a program is translated into a physical address by the CPU hardware (the Memory Management Unit, MMU) using page tables maintained by the operating system.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.33\textwidth}
+    \vspace{-1em}
+\begin{figure}[H]
+    \vspace{-0.8em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/virtual-memory.png}
+    \caption{Translation of virtual to physical addresses.}
+\end{figure}
+\end{minipage}
+
+\begin{warningblock}{Page Faults and Swapping}
+    If a program accesses memory that is not currently mapped to physical RAM, a \textbf{page fault} occurs. The OS may need to load the required page from disk (swap space), causing a major slowdown.
+\end{warningblock}
+
+When a CPU needs data, it first checks the fastest cache (L1), then proceeds to L2, L3, and finally DRAM if necessary. The principle of \textbf{locality} (recently or nearby accessed data being more likely to be reused) underpins cache design.
+
+
+Caching increases effective memory bandwidth and reduces average memory access latency---key for maximizing CPU (and to a certain extent, GPU) performance.
+
+% multicore CPUs
+\missing{multicore CPUs}
+
+\subsubsection{Throughput-Oriented Design (GPUs)}
+A GPU, in contrast, is a \textbf{throughput-oriented} device, designed to execute thousands of parallel threads simultaneously. Its architecture is specialized for data-parallel tasks:
+\begin{itemize}
+    \item \textbf{Many Simple Cores}: A GPU contains thousands of simpler, more energy-efficient cores grouped into \textit{Streaming Multiprocessors} (SMs).
+    \item \textbf{Smaller Caches, High-Bandwidth Memory}: While GPUs have caches, they are smaller relative to the number of cores. The design prioritizes high memory bandwidth to feed the massive number of cores with data concurrently. The philosophy is to "hide" latency by having other work to do. While one group of threads waits for data, the SM switches to another group that is ready to execute.
+    \item \textbf{Simple Control Logic}: GPUs use simpler control logic and are optimized for executing the same instruction on multiple data elements (a model known as SIMT, or Single Instruction, Multiple Threads).
+\end{itemize}
+This design is ideal for workloads where the same computation can be performed independently on many different data points, such as matrix multiplication, image processing, and scientific simulations.
+
+\section{The GPU Architecture}
+
+In a typical accelerated node, the CPU is referred to as the \textbf{host} and the GPU as the \textbf{device}. They are physically distinct processors with their own memory spaces, connected by a high-speed interconnect like the PCIe bus. A key task in accelerated computing is managing the transfer of data and control between the host and device.
+
+GPUs are designed to execute a massive number of threads simultaneously. In the CUDA model, threads are launched in groups of 32, known as \textbf{warps}. All threads in a warp execute the same instruction at the same time, making them the fundamental unit of scheduling on the GPU. This execution model is highly efficient for data-parallel problems but requires careful programming to avoid performance pitfalls.
+
+\subsection{NVIDIA Ampere Architecture}
+
+The NVIDIA A100 GPU, used in the Leonardo supercomputer, is based on the \textbf{Ampere architecture}. A full Ampere GPU consists of several \textbf{Graphics Processing Clusters (GPCs)}, which are further subdivided into \textbf{Streaming Multiprocessors (SMs)}. The SM is the core processing unit of the GPU.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/nvidia-ampere.png}
+    \caption{High-level overview of the NVIDIA Ampere A100 GPU architecture, showing the arrangement of GPCs and SMs.}
+    \label{fig:nvidia-ampere}
+\end{figure}
+
+\begin{minipage}{0.6\textwidth}
+The \textbf{Streaming Multiprocessor (SM)} is the heart of the NVIDIA GPU. In the Ampere architecture, each SM is partitioned into four processing blocks, each with its own instruction buffer, warp scheduler, and dispatch units. This allows the SM to manage and execute multiple warps concurrently.
+
+Key components within an Ampere SM include:
+\begin{itemize}
+    \item \textbf{FP32/FP64 Cores}: CUDA cores dedicated to single- and double-precision floating-point arithmetic.
+    \item \textbf{Tensor Cores (3rd Gen)}: Specialized units that accelerate mixed-precision matrix multiply-accumulate operations, crucial for AI and deep learning workloads. They support new data formats like TF32 and BFloat16.
+    \item \textbf{Shared Memory and L1 Cache}: A configurable block of high-speed on-chip memory that can be used as a software-managed cache (\texttt{L1}) or a scratchpad for thread cooperation (\texttt{shared memory}).
+    \item \textbf{Warp Schedulers}: Hardware units that select which warps are ready to execute their next instruction.
+\end{itemize}
+The SM is designed to keep its execution units busy by rapidly context-switching between different warps. If one warp stalls (e.g., waiting for data from global memory), the scheduler immediately switches to another resident warp that is ready to execute, thereby hiding memory latency and maximizing computational throughput.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/nvidia-sm.png}
+    \caption{Simplified block diagram of an NVIDIA Ampere Streaming Multiprocessor (SM).}
+    \label{fig:nvidia-sm}
+\end{figure}
+\end{minipage}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% End section to modify
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+
+\section{CUDA Programming Model}
+
+% skip slide 33
+
+\texttt{<<<>>>}: are used to quantify the number blocks and threads to launch the kernel.
+
+We have dirrerent qualifiers for the functions:
+\begin{itemize}
+    \item \texttt{\_\_global\_\_}: It indicates that the function will run in the GPU, and can be invoked generally both from the host and the device.
+
+\begin{codeblock}[language=C]
+__global__ void GPUFunction() {
+    printf("Hello from GPU!\n");
+}
+
+int main() {
+    CPUFunction();
+    GPUFunction<<<1, 1>>>();
+    cudaDeviceSynchronize();
+}
+\end{codeblock}
+
+    \item \texttt{\_\_device\_\_}: device function, executed on the device.
+    \item \texttt{\_\_host\_\_}: host function, executed on the host.
+    \item \texttt{\_\_host\_\_ \_\_device\_\_}: host and device function, compiled for both.
+\end{itemize}
+
+A cuda kernel is executed as a grid (array) of threads, each of them runs in the same kernel.
+
+Each thread has a unique index \texttt{threadIdx.x}, which is used to access the data.
+
+To compile a program we must use the NVIDIA \texttt{nvcc} compiler. It is able to identify the functions to be executed on the GPU and the ones to be executed on the host.
+
+\begin{codeblock}[language=bash]
+nvcc -arch=sm_80 -o <output-file> <cuda-code>.cu -run
+\end{codeblock}
+
+Where:
+\begin{itemize}
+    \item \texttt{-arch=sm\_80}: specifies the architecture of the GPU to compile for.
+    \item \texttt{-run}: runs the program after compilation.
+\end{itemize}
+
+\subsubsection{SIMT vs SIMD}
+
+In cuda programming, we use the SIMT (Single Instruction Multiple Thread) model.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{assets/simt.png}
+    \caption{SIMT vs SIMD}
+    \label{fig:simt-simd}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{SIMD}: “One instruction, one data chunk.”
+    \begin{itemize}
+        \item A single instruction operates on multiple data elements simultaneously
+        \item Requires wide vector units in hardware (e.g., 4 or 8 lanes)
+        \item A SIMD register (or a vector register) can hold many values (2 - 16 values or more) of a single type
+        \item Operates on packed data in wide registers (e.g., 128-bit or 256-bit)
+        \item All elements in the vector must follow the same control flow—no divergence
+        \item Vectorisation helps you write code which has good access patterns to maximise bandwidth
+    \end{itemize}
+    \item \textbf{SIMT} "Single Instruction, Multiple Threads".
+    \begin{itemize}
+        \item Uses scalar execution units, not wide vectors, rigid, lockstep vector processing
+        \item 32 threads in a warp share a single instruction fetch, executed over multiple cycles (e.g., 4 cycles
+        on 8 CUDA cores)
+        \item Flexible, thread-level parallelism with divergence support.
+        \item Single instruction, multiple flow paths
+        if statements are allowed!
+    \end{itemize}
+\end{itemize}
+
+SIMT allows CUDA GPU to perform “vector” computations on scalar cores. Much easier to vectorise than getting compiler to autovectorize on CPU.
+
+\section{GPU Thread Hierarchy}
+
+A gpu consists of thousands of grids, each one containing thousands of thread blocks (teams), each one containing 1024 threads divided into warps of 32 threads each.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/gpu-hierarchy.png}
+    \caption{GPU Thread Hierarchy}
+    \label{fig:gpu-thread-hierarchy}
+\end{figure}
+
+All thread blocks in a grid must have the same number of threads, ensuring homogeneity across the GPU workload. To process $N$ elements in parallel, we need to launch at least $N$ concurrent threads on the device. Threads within the same block (or team) can efficiently cooperate by exchanging data through a shared memory cache. Importantly, each block is executed independently, and there is no guarantee on the order in which blocks are scheduled or executed by the GPU.
+
+CPUs and GPUs have physically distinct memory regions connected by the PCIe bus.
+
+Every time we want to compute something on a GPU we need to perform some steps:
+
+\begin{itemize}
+    \item Allocate GPU memory
+    \item Copy data from the host to the GPU
+    \item Load GPU program and execute, caching data on chip for performance
+    \item Copy results from the GPU memory to the host memory
+    \item Free the GPU memory
+\end{itemize}
+
+We can see how the code for cpu is very similar to the one for gpu, but with the addition of the cuda functions.
+
+\begin{minipage}{0.48\textwidth}
+\textbf{CPU code}
+
+\begin{codeblock}[language=C]
+int N = 10000;
+size_t size = N * sizeof(int);
+
+int *a;
+a = (int *) malloc(size);
+
+free(a);
+\end{codeblock}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.48\textwidth}
+\textbf{GPU code}
+
+\begin{codeblock}[language=C]
+int N = 10000;
+size_t size = N * sizeof(int);
+
+int *a;
+cudaMallocManaged(&a, size);
+
+cudaFree(a);
+\end{codeblock}
+\end{minipage}
+
+\subsubsection{Choosing the optimal grid size}
+
+Let's start by choosing the \bfit{optimal block size}. To do that, we need to write an execution configuration that creates more threads than necessary, then pass a value as an argument into the kernel (N) that represents that total size if the data set to be processed/total threads needed to complete the work.
+
+Then, we need to calculate the global index and if it does not exceed N perform the kernel work.
+
+\begin{codeblock}[language=C]
+__global__ vectorSum(int N) {
+    int idx = threadIdx.x + blockIdx.x * blockDim.x;
+    if (idx < N) { // only do work if it does}
+}
+\end{codeblock}
+
+Maximum size at each level of the thread hierarchy is device dependent.
+
+On A100 typicaly you get:
+
+\begin{itemize}
+    \item Maximum number of threads per block: 1024
+    \item Maximum sizes of x-, y-, and -z dimensions of threads block: 1024 x 1024 x 64
+    \item Maximum sizes of each dimension of grid of thread blocks: 65535 x 65535 x 65535 (about 280,000 billion blocks)
+\end{itemize}
+
+The best performance is achieved for blocks that contain a number of threads that is a multiple of 32, due to GPU hardware traits.
+
+\begin{exampleblock}[Choosing the optimal block size]
+We want to run 1000 parallel task with blocks containing 256 threads. How do we choose the optimal block size?
+
+\begin{codeblock}[language=C]
+int N = 100000; size_t threads_per_blocks = 256;
+size_t number_of_blocks = (N + threads_per_block - 1) / threads_per_block;
+kernel<<<number_of_blocks, threads_per_block>>>(N);
+\end{codeblock}
+
+The "-1" term is added to round up the division if necessary.
+\end{exampleblock}
+
+A limited number of threads (1024) can fit inside a thread block
+To increase parallelism, we need to coordinate work among thread blocks
+
+This is achieved by mapping element of data vector to threads using global index
+
+\begin{codeblock}[language=C]
+int idx = threadIdx.x + blockIdx.x * blockDim.x;
+\end{codeblock}
+
+\subsubsection{Error handling}
+
+All CUDA APIs returns an error code of type \texttt{cudaError\_t}. A special value \texttt{cudaSuccess} is returned on success, otherwise an error code is returned.
+
+
+To understand wich problem occurred, we can use the cudaGetErrorString() function.
+
+\begin{codeblock}[language=C]
+    cudaError_t err;
+    err = cudaMallocManaged(&a, size);
+    if (err != cudaSuccess)
+        printf("Error: %s\n", cudaGetErrorString(err));
+\end{codeblock}
+
+To check for errors occurring at the time of kernel execution, we can use the cudaGetLastError() function.
+
+\section{NVIDIA profiling tools}
+
+A typical scenario while accelerating a code is to start with a cpu-only version and then accelerate it using cuda. 
+
+TO understand if everything is working correctly, we start with a \textbf{Nsight System profiler}: it is a system-wide performance viewer, which tracks CPU and GPU interactions across time.
+
+If we find something wrong, we can use the \textbf{Nsight Compute profiler}: it is a GPU-only profiler, which tracks the occupancy, memory usage, and instruction throughput.
+
+Let's see how to use the Nsight System profiler. 
+
+\begin{codeblock}[language=bash]
+nsys profile -t cuda,nvtx,mpi,openacc -stats=true --force-overwrite=true -o <output-file> <executable>
+\end{codeblock}
+
+\subsubsection{Nsight Compute profiler}
+
+\begin{codeblock}[language=bash]
+nsys profile -t cuda -o <output-file> <executable>
+\end{codeblock}
+
+---
+
+\begin{minipage}{0.74\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/mem-hierarchy.png}
+    \caption{Memory Hierarchy}
+    \label{fig:memory-hierarchy}
+\end{figure}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.24\textwidth}
+    \begin{figure}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.8}
+    \begin{tabular}{cc}
+        \toprule
+        \textbf{Bandwidth} & \textbf{Latency} \\
+        \midrule
+        $13 \times$ & $1 \times$ \\
+        $3 \times$ & $5 \times$ \\
+        $1 \times$ & $15 \times$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Bandwidth and Latency comparison}
+    \label{fig:bandwidth-latency-comparison}
+    \end{figure}
+\end{minipage}
+
+In such architecture, CUDA provides 4 different memory types:
+
+\begin{itemize}
+    \item \textbf{Global Memory}: The largest memory space available on the device, but also the slowest in terms of access latency.
+    \begin{itemize}
+        \item Scope: Accessible by all threads (from any block or grid).
+        \item Usage: Memory allocated with \texttt{cudaMalloc()} and data transferred using \texttt{cudaMemcpy()}.
+    \end{itemize}
+
+    \item \textbf{Shared Memory}: Fast and low-latency memory, but much smaller than global memory.
+    \begin{itemize}
+        \item Scope: Shared between all threads within the same block.
+        \item Usage: Useful for data reuse and to reduce global memory accesses. Declared with the \texttt{\_\_shared\_\_} qualifier.
+    \end{itemize}
+
+    \item \textbf{Registers}: The fastest memory available, mapped directly to the hardware registers of each Streaming Multiprocessor (SM).
+    \begin{itemize}
+        \item Scope: Private to each thread; cannot be accessed by other threads.
+        \item Usage: Used for automatic variables declared within a kernel.
+    \end{itemize}
+
+    \item \textbf{Constant Memory}: Read-only memory space cached and optimized for uniform access by all threads. Offers efficient broadcast for all threads reading the same location.
+    \begin{itemize}
+        \item Scope: Accessible from all threads, but cannot be modified from device code.
+        \item Usage: Declared with the \texttt{\_\_constant\_\_} qualifier.
+    \end{itemize}
+\end{itemize}
+
+
+\begin{tipsblock}[Memory coalescing]
+    For optimal performance, threads in a warp should access consecutive memory addresses. Coalesced memory access can improve bandwidth utilization by up to 10x compared to non-coalesced access patterns.    
+\end{tipsblock}
+
+\subsection{CUDA Streams}
+
+A CUDA stream is a sequence of CUDA operations. The defaualt stream executes those operations in the order they are issued, therefore, an instruction must be completed before the next one can begin.
+
+Multiple streams or Non-default streams can be created and utilise by CUDA programmers. 
+While single stream kernels must execute in order, kernels in different, non-default streams, can interact concurrently, and therefore have no fixed order of execution
+
+This can be useful to overlap the execution of kernels and memory transfers, or to execute kernels in parallel.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/cuda-stream.png}
+    \caption{CUDA Streams Overlap}
+    \label{fig:cuda-streams}
+\end{figure}
+
+\begin{codeblock}[language=C]
+// Create a new stream
+cudaStream_t stream;
+cudaStreamCreate(&stream);
+
+// Launch a kernel in the new stream
+someKernel<<<numberOfBlocks, numberOfThreads, 0, stream>>>();
+
+// Destroy the stream
+cudaStreamDestroy(stream);
+\end{codeblock}
+
+\begin{advancedblock}[non-blocking streams]
+cudaStreamCreate creates a blocking stream, but it exitsts also a non-blocking versions, like \plaintt{cudaStreamNonBlocking}. This topic is not covered in this course.
+\end{advancedblock}
+

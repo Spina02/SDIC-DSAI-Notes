@@ -1,0 +1,413 @@
+\chapter{OpenMP}
+
+
+
+\section{Tasks}
+
+A \textbf{task} in OpenMP represents an independent unit of work, comprising a well-defined set of instructions or operations that can be executed asynchronously. Tasks enable the efficient decomposition of complex computations into smaller, manageable pieces that can be scheduled and executed in parallel by different threads. This \textbf{task abstraction} allows for flexible parallelism beyond the constraints of loop-based parallel regions, supporting dynamic workloads with unpredictable execution paths.
+
+\textbf{Data Abstraction} refers to the encapsulation of logically uniform pieces of information (such as arrays, objects, or structures) that may be accessed concurrently by multiple threads. Proper management of data abstraction is essential to avoid race conditions and ensure consistency, especially when multiple tasks access shared data out-of-order. Mechanisms such as data dependencies, synchronization constructs, and memory models are employed to manage safe and efficient concurrent access.
+
+Tasks often interact through shared data, giving rise to dependencies. These dependencies form a \textbf{task dependency graph}, where nodes are tasks and directed edges represent data dependencies (i.e., one task must complete before another can start due to shared data). It is crucial that this graph is \textbf{acyclic} ensuring there are no circular wait conditions or deadlocks, and allowing the runtime system to correctly schedule and execute tasks respecting all required data dependencies.
+
+It is sometimes possible to parallelize a workflow that is irregular or depends on runtime conditions using OpenMP \bfit{sections}. However, solutions built with sections often become convoluted and difficult to manage, and, more importantly, the intrinsic rigidity of the sections construct makes it nearly impossible to express truly dynamic patterns of parallelism.
+
+Since version 3.0, OpenMP introduced the \textbf{task} construct, which provides an elegant and flexible way to handle precisely these kinds of problems—where execution flow is irregular and only determined at runtime. When defining a task, OpenMP internally creates a "unit of work," bundling together all necessary code, data, and local variables. This work is then scheduled for execution at some future point. 
+
+Behind the scenes, OpenMP employs a queuing system to orchestrate the assignment of these tasks to the available threads, efficiently balancing the workload and enabling dynamic parallelism.
+
+We have a main thread which generates tasks and a pool of threads which execute them. As soon as they are free, the free threads pickup one queued task each, and execute it. In the same way, when the main thread finishes to create tasks, it picks up one of the queued tasks and executes it.
+
+To make it clearer: creating tasks does not mean creating threads. The tasks are “units of work” that are assigned to the running threads. The pool of threads is unaltered(unless, of course, there is nested parallelism involved) and mapped onto the underlying physical cores.
+
+....
+
+
+The management of tasks in OpenMP involves three main key concepts: the data environment, creation and execution, and synchronization and dependence. The \textbf{data environment} refers to how data is assigned to each task, and how the framework distinguishes between shared and private variables within task contexts. \textbf{Creation and execution} concerns when tasks are generated, how many tasks are created, who is responsible for their execution, and whether there is any prioritization among them. Finally, \textbf{synchronization and dependence} focuses on the ways tasks are coordinated, including how tasks are synchronized, scheduled, and whether they depend on the results or completion of other tasks. A robust understanding and careful management of these aspects is essential for writing correct and efficient parallel code using OpenMP's tasking model.
+
+\begin{codeblock}[language = C]
+int main( int argc, char **argv )
+{
+    #pragma omp parallel
+    {
+    #pragma omp single
+    {
+        printf( " »Yuk yuk, here is thread %d from "
+                "within the single region\n", omp_get_thread_num() );
+        #pragma omp task
+        {
+        printf( "\tHi, here is thread %d "
+                "running task A\n", omp_get_thread_num() );
+        }
+        #pragma omp task
+        {
+        printf( "\tHi, here is thread %d "
+                "running task B\n", omp_get_thread_num() );
+        }
+    }
+    printf(" :Hi, here is thread %d after the end "
+            "of the single region, I was stuck waiting "
+            "all the others\n", omp_get_thread_num() );
+    }
+    return 0;
+}
+\end{codeblock}
+
+
+\subsubsection{Scheduler points}
+
+\begin{itemize}
+    \item \textbf{barrier}: either implicit or explicit.
+
+    all tasks reated by any thread in the current parallel region are guaranteed to complete after the barrier exits.
+
+    \item \textbf{taskwait}:
+
+    all children tasks are completed, the encountering task is suspended until that is true it does not apply to descendants: i.e. it includes only direct children tasks.
+
+    \item \textbf{taskgroup}:
+
+    All descendant tasks are guaranteed to be completed at the exit of the taskgroup region (see later); it baheves as an implicit omp barrier.
+\end{itemize}
+
+\subsubsection{Scope of variables}
+
+in the code above, we called \texttt{omp\_get\_thread\_num()} multiple times because it is a thread-local variable. If we had declared it as a global variable, it would have been shared by all threads and the output would have been the same for all threads (the one who enters the single region).
+
+The main point to consider here is that by its very nature, the tasks' creation is driven by the coeval data context and is not related to the values that any variable will have in the future at the moment of their execution.
+
+As such, the rule-of-thumb is \textbf{data, unless otherwise stated, are
+copied in local copies so that to preserve the data context at
+the moment of creation}.
+
+\begin{codeblock}[language = C]
+...
+#pragma omp single
+{
+    int me = omp_get_thread_num();
+    printf( " »Yuk yuk, here is thread %d from "
+            "within the single region\n", me );
+    #pragma omp task
+    {
+    printf( "\tHi, here is thread %d "
+            "running task A\n", me );
+    }
+    #pragma omp task
+    {
+    printf( "\tHi, here is thread %d "
+            "running task B\n", me );
+    }
+}
+...
+\end{codeblock}
+
+here \texttt{me} will have always the same value, also if different threads will execute the tasks. This is a \textbf{very common error to avoid}.
+
+Let's remind the following rules:
+
+\begin{itemize}
+    \item When a variable is shared on the task creation the storage used is that referred with that name at the point where the task was created
+    \item When a variable is private on the task creation the references to it (inside the task code region) use the uninitialized storage that is created when the task is executed
+    \item When a variable is firstprivate on a task creation the references to it inside the task code region are to the new storage that is created and initialized with the value of the existing storage of that name when the task is created    
+\end{itemize}
+
+\dots
+
+With the \texttt{untied} clause, you are signalling that this task, if
+ever suspended, can be resumed by any free thread. The default is the opposite, a task to be tied to the thread that initially starts it.
+
+If untied, you must take care of the data environment, for instance, no \texttt{threadprivate} variables can be used, nor the thread number, and so on.
+
+
+-----------------------------
+
+locks
+
+\begin{codeblock}[language = C]
+    // set the lock, blocking
+    omp_set_lock(&lock);
+    // set the lock, non-blocking
+    omp_test_lock(&lock);
+
+    // unset the lock
+    omp_unset_lock(&lock);
+\end{codeblock}
+
+\subsection{Memory consistency model}
+
+Consider the following scenario: we have two shared variables, $A = 0$ and $B = 0$, and two threads:
+
+\begin{minipage}{0.48\textwidth}
+\centering
+\textbf{Thread a:}
+\begin{codeblock}[language = C]
+A = 1;
+read(B);
+print(B);
+\end{codeblock}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\textbf{Thread b:}
+\begin{codeblock}[language = C]
+B = 1;
+read(A);
+print(A);
+\end{codeblock}
+\end{minipage}
+
+A natural question is: what values can be printed for $A$ and $B$ by the respective threads? To answer this, let's introduce the concept of \textbf{Sequential Consistency}, a memory model defined by Leslie Lamport in 1979.
+
+Sequential consistency means that the results of execution are the same as if all operations from all threads were executed in some sequential order, and each thread's operations appear in this sequence in the order written in the code.
+Put simply, every individual thread issues memory operations in program order, and all such operations appear as though they are executed one at a time in a global sequence.
+
+In our example, under sequential consistency, the possible outputs printed by each thread for $A$ and $B$ are restricted by the orderings of the two stores and loads. For instance, it won't be possible for both threads to print 0, since that would imply that both the write to $A$ and the write to $B$ happened after both reads, which contradicts a single global ordering. Instead, possible outputs include (A=0, B=1), (A=1, B=0), or (A=1, B=1), depending on how the stores and loads are interleaved. Sequential consistency guarantees that the memory operations will be observed in an order that makes intuitive sense, as if there were some global sequence in which all operations happened.
+
+\dots
+\begin{codeblock}[language = C]
+#pragma omp parallel num_threads(2)
+{
+    int tid = omp_get_thread_num();
+    if (tid == 0) {
+        x = 1;
+        #pragma omp flush(x)
+        y = 1;
+        #pragma omp flush(y)
+    }
+    else {
+        int local_x, local_y;
+        #pragma omp flush(y)
+        local_y = y;
+
+        if (local_y == 1) {
+            local_x = x;
+		}
+    }
+}
+\end{codeblock}
+
+% TODO: check this
+OpenMP utilizes a \textbf{relaxed consistency} memory model, which means that each thread's view of memory can temporarily diverge from the actual contents of main memory. In other words, updates performed by one thread may not be immediately visible to others unless specific actions are taken to ensure consistency. This flexibility allows for significant performance improvements, but also places a responsibility on the programmer to manage memory visibility, often using \texttt{flush} or synchronization constructs.
+
+Within this relaxed model, certain rules must still be followed. All so-called ``S operations'' (synchronization operations, such as barriers, flushes, and locks) are required to appear in the same order across all threads, maintaining a sequentially consistent view for these events. Furthermore, within a single thread, memory reads and writes (R and W operations) cannot be reordered with respect to S operations—the order between computation and synchronization is preserved. The weak consistency model thus enforces ordering only at synchronization points, guaranteeing, for example, that $S \rightarrow W$, $S \rightarrow R$, $R \rightarrow S$, $W \rightarrow S$, and $S \rightarrow S$ are respected. This ensures that, even though memory can appear temporarily out-of-date, any synchronization will properly reconcile views between threads and allow safe, predictable parallel programming.
+
+
+\dots
+
+\subsubsection{Implicit flushes}
+
+\begin{codeblock}[language = C]
+#pragma omp barrier
+#pragma omp critical
+#pragma omp ordered
+#pragma omp parallel
+#pragma omp for
+#pragma omp single
+#pragma omp master
+\end{codeblock}
+
+\begin{warningblock}[Locks]
+	Lock operations (\plaintt{omp\_set\_lock}, \plaintt{omp\_unset\_lock}) have implicit flush of all variables.
+\end{warningblock}
+
+\dots
+
+\begin{codeblock}[language = C]
+seq_cst // sequentially consistency (default)
+acq_rel // acquire-release
+release // release
+acquire // acquire
+relaxed // relaxed (no synchronization)
+\end{codeblock}
+
+\begin{itemize}
+\item \texttt{seq\_cst}: is the default memory order. It is the most strict memory order and it is the most expensive. A single thread must execute all operations in the order they are written in the code.
+
+\item \texttt{acq\_rel}: is the acquire-release memory order. It is a mix of acquire and release. It is less strict than \texttt{seq\_cst} and it is cheaper. It is used when you need to ensure that all operations are executed in the order they are written in the code, but you do not need to ensure that all operations are executed in the order they are written in the code.
+
+\item \texttt{release}: it is like doing a write back of whatever is in the local cache to the main memory.
+
+\item \texttt{acquire}: it is like doing a read from the main memory to the local cache.
+
+\item \texttt{relaxed}: is the least strict memory order and it is the cheapest. It is used when you do not need to ensure that all operations are executed in the order they are written in the code.
+\end{itemize}
+
+
+\subsubsection{Data race}
+
+% TODO: fill this section
+
+% notes about 
+
+\begin{tipsblock}[Debugging data races]
+	The compiler flag \plaintt{-fsanitize=thread} can be used to detect data races:
+
+	\begin{codeblock}[language = bash, numbers=none]
+		gcc -fopenmp -fsanitize=thread -g -o program program.c
+	\end{codeblock}
+\end{tipsblock}
+
+\begin{itemize}
+\item Start with correct, simple syncronization (\texttt{seq\_cst}, \texttt{critical})
+\item \dots
+\end{itemize}
+
+\dots
+
+% TODO flush vs atomic
+
+\dots
+
+\begin{advancedblock}[Locks hints]
+Note: the locks can be initialized with an hint about what will be their typical usage:
+
+\begin{codeblock}[language = C]
+omp_init_lock_with_hint(omp_lock_t *t, omp_lock_hint_t hint);
+void omp_init_nest_lock_with_hint ( omp_lock_t *t, omp_lock_hint_t hint);
+
+typedef enum omp_lock_hint_t {
+  omp_lock_hint_none = 0,           // No hint
+  omp_lock_hint_uncontended = 1,    // lock is usually uncontended
+  omp_lock_hint_contended = 2,      // lock is often contended
+  omp_lock_hint_nonspeculative = 4, // prefer non-speculative lock
+  omp_lock_hint_speculative = 8,    // speculative lock allowed
+} omp_lock_hint_t;
+\end{codeblock}
+
+The values are powers of two (bitmask), so they can be combined with the bitwise OR operator. E.g., you can use \plaintt{omp\_lock\_hint\_contended | omp\_lock\_hint\_speculative} to combine two hints.
+Each value represents a specific optimization the runtime may apply for the lock.
+
+\medskip
+$$
+\boxed{\text{\bfit{
+	!!! At the time of writing (2025), it is not really supported by the compilers !!!
+}}}
+$$
+\end{advancedblock}
+
+\subsection{Controlling the task creation - Clauses}
+
+The task creation construct adtmits a number of clauses that allow to control the creation of tasks:
+
+\begin{codeblock}[language = C]
+#pragma omp task clause, clause, ...
+{ /* code */ }
+\end{codeblock}
+
+\begin{center}
+	\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{} >{\ttfamily\footnotesize}l p{0.78\textwidth} @{}}
+\toprule
+\textbf{Clause} & \textbf{Description} \\
+\midrule
+if (expr) & When \texttt{expr} evaluates \texttt{false}, the encountering thread does not create a new task in the task queue; instead, the execution of the current task is suspended and the newly created task is \textit{undeferred} and started. The task suspended is resumed afterwards. \\
+
+final (expr) & The \texttt{final(expr)} clause can be used to suppress the task creation and then to control the tasking overhead, especially in recursive task creation. If \texttt{expr} evaluates \texttt{true}, no more tasks are generated and the code is executed immediately. That is propagated to all the children tasks. That is called an \textit{included} task and is always undeferred. Use \texttt{omp\_in\_final()} to check if the task is a final one. \\
+
+mergeable & This clause avoids a separated data environment to be created if a task is undeferred or included. \\
+
+tied, untied & This clause lets a suspended task be resumed by a different thread than the one that started it. The default option is \texttt{tied}. \\
+
+depend, priority & \textit{We will cover this afterwards} \\
+
+\bottomrule
+\end{tabular}
+\normalsize
+\end{center}
+
+\subsubsection{Task creation in loops}
+
+Many times happens that you need to create tasks in a loop (for instance, a task for every entry, or sections, of an array).
+The taskloop construct has been conceived to ease this cases, combining the for loops and the tasks natively.
+
+\begin{codeblock}[language = C]
+#pragma omp taskloop [clause [[,] clause] ...]
+for-loops // (perfectly nested)
+\end{codeblock}
+
+Clauses are very similar to both the usual for and task constructs:
+\texttt{private}, \texttt{firstprivate}, \texttt{lastprivate}, \texttt{shared}, \texttt{default}, \texttt{if}, \texttt{final}, \texttt{priority}, \texttt{untied}, \texttt{mergeable}
+
+There are 3 specific clauses for \texttt{taskloop}:
+
+\begin{itemize}
+    \item \texttt{grainsize(arg)}: \texttt{arg} is a positive integer. This clause regulates the granularity of the work assignment, ensuring that the amount of work per task is not too small. The number of loop iterations assigned to each task is at least the grainsize and at most $2 \times$ grainsize, but not more than the number of iterations left.
+    \item \texttt{num\_tasks(arg)}: \texttt{arg} is a positive integer, indicating the maximum number of tasks that can be generated at runtime. This is useful to limit the task creation overhead.
+    \item \texttt{nogroup}: Specifies that the tasking construct is not embedded in an otherwise implied \texttt{taskgroup} construct.
+\end{itemize}
+
+\subsection{Task dependencies}
+
+Often, there are data dependencies among different tasks: a given tasks may have to use the results of another one, or in any case to wait for its operations to terminate.
+
+There are 3 types of dependencies:
+
+\begin{itemize}
+    \item \texttt{IN}:
+	
+	the task will be dependent on a \textit{previously generated} task if that task has an \plaintt{OUT}, \plaintt{INOUT}, or \plaintt{MUTEXINOUTSET} dependence on the same \textit{memory region}.
+    
+    \item \texttt{OUT}, \texttt{[INOUT]$^*$}:
+	
+	the task will be dependent on a \textit{previously generated} task if that task has an \plaintt{IN}, \plaintt{OUT}, or \plaintt{MUTEXINOUTSET} dependence on the same \textit{memory region}.
+    
+    \item \texttt{MUTEXINOUTSET}: 
+	
+	the task will be dependent on a previously generated task if that task has an \plaintt{IN} or \plaintt{OUT} dependence on the same \textit{memory region}; it will be \textit{mutually exclusive} with another \plaintt{MUTEXINOUTSET} sibling task, meaning that they can be executed in any order but not at the same time.
+\end{itemize}
+
+\begin{observationblock}[INOUT]
+    In modern OpenMP standards, \plaintt{INOUT} dependence type is considered obsolete and is treated as an alias for \plaintt{OUT}. Its use is discouraged in new code.
+\end{observationblock}
+
+\begin{itemize}
+    \item \textbf{RaW (Read after Write)}: 
+    
+	When an instruction (task) depends on the result of another instruction (task), that is called a \textbf{flow dependency} or \textbf{true dependency} and referred as \textbf{Read-After-Write} (you need to read a result after it is written)
+
+    \begin{codeblock}[language=C]
+#pragma omp task depend(out:the_answer)
+function_wise(*the_answer);
+
+#pragma omp task depend(in:the_answer)
+function_curious(*the_answer);
+    \end{codeblock}
+    
+    \item \textbf{WaR (Write after Read)}:
+    
+	When an instruction (task) may change the result of another instruction (task), the ordering must be strict. That is called \textbf{anti-dependency} and referred as \textbf{Write-After-Read}	
+
+
+    \begin{codeblock}[language=C]
+#pragma omp task depend(in:the_question)
+function_sage(*the_question);
+
+#pragma omp task depend(out:the_question)
+function_curious(*the_question);
+    \end{codeblock}
+
+    \item \textbf{WaW (Write after Write)}: 
+	
+	When two instructions (tasks) are independent of each other but writes in the same memory location, then there is an \textbf{output dependency} or a \textbf{Write-After-Write}
+
+	That may also be considered a \textbf{false dependency} or \textbf{name dependency}, as it may be sufficient a variable renaming to remove it
+
+    \begin{codeblock}[language=C]
+function_sage(*the_question);
+function_curious(*the_question);
+    \end{codeblock}
+
+    \item \textbf{RaR (Read after Read)}: 
+    
+	When two instructions (tasks) read the same memory region, there is actually no dependency
+
+    \begin{codeblock}[language=C]
+#pragma omp task depend(in:the_question)
+function_wise1(*the_question);
+
+#pragma omp task depend(in:the_question)
+function_wise2(*the_question);
+    \end{codeblock}
+\end{itemize}

@@ -1,0 +1,323 @@
+\chapter{Message Passing Interface - MPI}
+
+Advanced Usage of some MPI features on Topology awareness, Shared memory and One-sided communications.
+
+\begin{itemize}
+    \item Basics of the One-sided communication
+    \item Buildinga  hierarchy of Communicators that reflects the topology
+    \item Exchanging data in shared memory windows among MPI processes
+\end{itemize}
+
+and we will see briefly other advanced features of MPI:
+\begin{itemize}
+    \item Derived Data-Types
+    \item More details on Groups and Communicators
+    \item Virtual topologies (cartesian and graph communicators) and neighborhood collectives
+    \item Non-blocking collectives
+\end{itemize}
+
+\subsubsection{Two-Sided communications}
+
+By its very nature, the message-passing paradigm is designed around the concept of cooperative exchange of informations among two or more processes whose address space are isolated and not directly inaccessible by other processes.
+
+
+    
+% \section{One-Sided Communication}
+
+\section{Remote Memory Access - RMA}
+
+\subsection{Memory Windows}
+
+% TODO: talk about the window creation
+
+\begin{warningblock}[\plaintt{disp\_unit}]
+    The \plaintt{disp\_unit} parameter is often misunderstood. Setting it to anything other than 1 (byte) can cause subtle bugs when mixing datatypes. The displacement calculation becomes:
+\begin{codeblock}[language=C]
+target_addr = base + (target_disp * disp_unit)
+\end{codeblock}
+\end{warningblock}
+
+% \subsection{Data Movement}
+
+\begin{observationblock}[Flush vs Sync]
+
+The fundamental difference between \plaintt{MPI\_Win\_flush} and \plaintt{MPI\_Win\_sync} is that:
+\begin{itemize}
+    \item \texttt{MPI\_Win\_flush}: Forces completion of RMA operations from the origin to the target.
+    \item \texttt{MPI\_Win\_sync}: Synchronizes local memory with the window (target-side operation).
+\end{itemize}
+
+Or, in other words:
+
+\begin{itemize}
+    \item \texttt{MPI\_Win\_flush} is about \textit{Network Completion} (\emph{Did the data arrive?})
+    \item \texttt{MPI\_Win\_sync} is about \textit{Memory Consistency} (\emph{Is the data visible to the CPU?})
+\end{itemize}
+
+This distinction is critical and often misunderstood: these calls operate on different sides of the communication and serve completely different purposes.
+\end{observationblock}
+    
+
+% \subsection{Ordering and Synchronization}
+
+% \subsubsection{Fences}
+
+% \subsubsection{Post-Start-Complete-Wait - PSCW}
+
+\subsubsection{Locks}
+
+Locks are a way to synchronize the access to a shared resource. They are a way to ensure that only one process can access the shared resource at a time.
+
+Passive mode: the target does not participate in opertions: one sided asynchronous communication.
+
+\begin{codeblock}[language=C]
+MPI_Win_lock(int lock_type, int rank, int assert, MPI_Win win);
+
+MPI_Win_unlock(int rank, MPI_Win win);
+
+MPI_Win_flush/flush_local(int rank, MPI_Win win);
+\end{codeblock}
+
+where \texttt{lock\_type} is one of the following:
+\begin{itemize}
+    \item \texttt{MPI\_LOCK\_EXCLUSIVE}: only one process can access the shared resource at a time.
+    \item \texttt{MPI\_LOCK\_SHARED}: multiple processes can access the shared resource at a time.
+\end{itemize}
+
+\texttt{rank} is the rank of the process that will access the shared resource.
+
+\texttt{assert} is the assertion that will be used to synchronize the access to the shared resource.
+
+\begin{itemize}
+    \item \texttt{MPI\_Win\_flush}: complete operations on remote target process; data will be then available to the target task, or to other tasks
+    \item \texttt{MPI\_Win\_flush\_local}: locally complete operations to the target process
+\end{itemize}
+
+
+\begin{warningblock}[Misconception about locks]
+    Despite the unfortunate naming, MPI locks are not mutex-like. They do not provide mutual exclusion for the target process's local access. The target can modify its window memory during a locked epoch, leading to race conditions.
+\end{warningblock}
+
+\subsubsection{Assertions}
+
+% TODO: talk about synchronization asserts, cite the main ones
+
+% \subsection{RMA Memory Model}
+
+\section{Shared Memory}
+
+An HPC machine is made of several nodes that are connected by a top-level network We call these nodes "hosts".
+
+Currently every host contains a NUMA region which consists in a number of sockets. Each of which is physically connected to RAM banks.
+In turn, the sockets are interconnected so that a process running on a given core can access a memory bank not physically attached to its socket.
+
+\subsection{Getting Shared Memory Pools}
+
+\subsubsection{General and specific routines}
+
+MPI provides a method to know about that and to distinguish the tasks depending some of their charateristics:
+
+\begin{itemize}
+
+    \item a \plaintt{general routine} to split a communicator into sub-communicators:
+
+\begin{codeblock}[language=C]
+MPI_Comm_split ( 
+    MPI_Comm comm,      // the communicator to be splitted
+    int color,          // discriminate task
+    int key,            // hint for new ranks
+    MPI_Comm *newcomm   // the new communicator
+);
+\end{codeblock}
+
+\item a \plaintt{specific routine} to split a communicator into sub-communicators following the hardware hierarchy (i.e. NUMA region, socket, core, etc.):
+\begin{codeblock}[language=C]
+MPI_Comm_split_type ( 
+    MPI_Comm comm,      // the communicator to be splitted
+    int split_type,     // the splitting property
+    int key,            // hint for new ranks
+    MPI_Info info,      // helper for the splitting property
+    MPI_Comm *newcomm   // the new communicator
+);
+\end{codeblock}
+
+The \plaintt{split\_type} parameter is used to specify the splitting property. It can be one of the following values:
+\begin{itemize}
+    \item \plaintt{MPI\_COMM\_TYPE\_SHARED}: split the communicator based on the shared memory pools.
+    \item \plaintt{MPI\_COMM\_TYPE\_HW\_GUIDED}: split the communicator based on the hardware guided property.
+    \item \plaintt{MPI\_COMM\_TYPE\_HW\_UNGUIDED}: split the communicator based on the hardware unguided property.
+\end{itemize}
+
+The \plaintt{key} parameter is used to hint for the new ranks. It is used to sort the tasks depending on their charateristics.
+
+The \plaintt{info} parameter is used to provide helper for the splitting property. It is used to provide additional information about the splitting property.
+
+\end{itemize}
+
+\subsubsection{Placement}
+
+\begin{codeblock}[language=C]
+MPI_Win_allocate_shared ( 
+    MPI_Aint size,        // the size of the window
+    int disp_unit,        // the displacement unit
+    MPI_Info info,        // the information to be used
+    MPI_Comm comm,        // the communicator
+    void *baseptr,        // the base pointer
+    MPI_Win *win          // the window
+);
+\end{codeblock}
+
+As with other window-creation routines, the memory allocation for \texttt{MPI\_Win\_allocate\_shared} does not require the allocated size to be uniform: each task may allocate a different amount. There is no strict specification as to where the memory should be physically placed: an MPI implementation will typically attempt to maximize data locality and affinity.
+
+By default, the allocation is \textbf{contiguous}. However, this contiguity does not only refer to the virtual address space: ideally, it also implies allocation in the same physical memory bank. On many systems, though, it is not possible to remap memory at arbitrary sizes to guarantee this property. Specifying a non-contiguous allocation can allow the MPI implementation to more flexibly optimize the placement, possibly enhancing the affinity for each individual task.
+
+% TODO: mentioning caveats
+
+
+A useful routine related to window allocation and memory sharing is \plaintt{MPI\_Win\_shared\_query}, which allows processes to retrieve a pointer to shared memory in a window, for either direct access or load/store operations. Its prototype is:
+
+\begin{codeblock}[language=C]
+MPI_Win_shared_query(
+    MPI_Win   win,         // the window object
+    int       rank,        // rank whose segment to query, or MPI_PROC_NULL
+    MPI_Aint *size,        // returns segment size
+    int      *disp_unit,   // returns displacement unit
+    void    **baseptr      // returns base pointer in shared memory
+);
+\end{codeblock}
+
+This function enables a process to obtain the base address and size of the memory segment exposed by any rank in a shared-memory communicator window. Commonly, it is called with \plaintt{rank = MPI\_PROC\_NULL}, which gives a pointer to the start of the entire shared memory region (regardless of which process allocated it), and returns:
+
+\begin{itemize}
+    \item the address of the first byte in the shared memory window (for contiguous allocation), or
+    \item the base address of the first process that specified a non-zero \plaintt{size} (for non-contiguous allocation).
+\end{itemize}
+
+% \begin{center}
+% \includegraphics[width=0.95\textwidth]{contiguity_example.png}
+% \end{center}
+
+The figure above illustrates the difference between default contiguous allocation and non-contiguous allocation across multiple processes. With contiguous allocation, addresses increase sequentially across processes, so the pointer returned can be used by all processes to access the underlying shared array as a unified space. In non-contiguous mode, each process's memory may be mapped separately, and thus, only the base address of the first valid allocation is returned.
+
+This routine is fundamental for writing portable and generic code utilizing shared memory windows, especially when contiguity cannot be assumed.
+
+% \subsection{Shared Memory Access}
+
+\section{Cartesian Communication}
+
+Many scientific and engineering problems operate on regular, structured grids: finite difference methods for PDEs, stencil computations, image processing, and particle-mesh methods in astrophysics. When parallelizing these applications via domain decomposition, we partition the computational domain into sub-domains, each handled by a distinct MPI process.
+
+The fundamental challenge is neighbor communication: processes must exchange boundary data (ghost zones, halo cells) with their neighbors. While we could manually compute neighbor ranks using arithmetic on process coordinates, this approach is error-prone, non-portable, and fails to leverage potential hardware optimizations.
+
+\subsubsection{Why not Manual Rank Arithmetic}
+
+Consder a 2D grid decomposition with dimensions ($P_x \times P_y$). Given a process with coordinates ($i, j$), its neighbors are:
+
+\begin{codeblock}[language=C]
+// Manual neighbor calculation (fragile approach)
+int rank_left  = (i > 0)     ? i-1 + j*Px   : MPI_PROC_NULL;
+int rank_right = (i < Px-1)  ? i+1 + j*Px   : MPI_PROC_NULL;
+int rank_down  = (j > 0)     ? i + (j-1)*Px : MPI_PROC_NULL;
+int rank_up    = (j < Py-1)  ? i + (j+1)*Px : MPI_PROC_NULL;
+\end{codeblock}
+
+The possible issues, or inconveniencies, with this approach are:
+
+\begin{itemize}
+    \item \textbf{Boundary handling}: Explicit conditionals for edges; periodic boundaries add complexity
+    \item \textbf{Dimension ordering}: Row-major vs column-major rank assignment affects all calculations
+    \item \textbf{Scalability}: 3D or higher dimensions require nested conditionals
+    \item \textbf{Optimization}: MPI implementations cannot optimize message routing without knowing the topology
+\end{itemize}
+
+\subsubsection{Cartesian Communication Model}
+
+MPI provides virtual topologies to express logical process arrangements. A \textbf{Cartesian topology} maps processes onto a regular $n$-dimensional grid, and MPI provides a suite of routines for creating and querying such topologies:
+
+\begin{itemize}
+    \item \textbf{Automatic coordinate $\leftrightarrow$ rank translation}: Convert between process ranks and their multidimensional coordinates in the grid.
+    \item \textbf{Built-in periodic boundary support}: Specify whether each grid dimension is periodic (wrap-around), e.g., for toroidal grids.
+    \item \textbf{Neighbor lookup via relative displacement}: Functions for obtaining neighbor ranks given directional offsets ("shifts")—no manual arithmetic required.
+    \item \textbf{Hints for process placement optimization}: Inform the MPI implementation of communication patterns, potentially improving performance by optimizing process placement (implementation-dependent).
+\end{itemize}
+
+\begin{exampleblock}[Non-Periodic 3x2 Grid]
+
+\begin{codeblock}[language=C, numbers=none]
+        j=0    j=1
+      +------+------+  
+i=0   |  R0  |  R1  |   Rank = i + j*3
+      +------+------+  
+i=1   |  R2  |  R3  |   R0:(0,0) R1:(1,0)
+      +------+------+   R2:(0,1) R3:(1,1)
+i=2   |  R4  |  R5  |   R4:(0,2) R5:(1,2)
+      +------+------+  
+\end{codeblock}
+\end{exampleblock}
+
+\subsection{Core API Functions}
+
+\subsubsection{MPI\_Dims\_create}
+
+Computes a "balanced" distribution of processes across dimensions:
+
+\begin{codeblock}[language=C]
+int MPI_Dims_create (int nnodes,    // Total number of processes
+                     int ndims,     // Number of dimensions
+                     int dims[]);   // IN/OUT: dimension sizes
+\end{codeblock}
+
+
+\subsubsection{MPI\_Cart\_create}
+
+Creates a new communicator with processes laid out on a Cartesian grid:
+
+\begin{codeblock}[language=C]
+int MPI_Cart_create(MPI_Comm comm_old, int ndims, const int dims[], const int periods[], int reorder, MPI_Comm *comm_cart);
+\end{codeblock}
+
+Key behavior: Pre-set dimensions (dims[i] > 0) are preserved; zero entries are computed.
+
+The algorithm tries to minimize surface-to-volume ratio for communication efficiency.
+
+\begin{exampleblock}[2D grid, 12 processes]
+\begin{codeblock}[language=C]
+// unconstrained: let MPI choose
+int dims[2] = {0, 0};
+MPI_Dims_create(12, 2, dims); // Result: dims = {4, 3} or {3, 4}
+
+// constrained: force 4 columns
+int dims2[2] = {0, 4};
+MPI_Dims_create(12, 2, dims2); // Result: dims2 = {3, 4}
+\end{codeblock}
+\end{exampleblock}
+
+\begin{warningblock}[MPI\_Dims\_create failure]
+    MPI\_Dims\_create fails if \plaintt{nnodes} is not divisible by the product of pre-set dimensions. Always verify \plaintt{dims[i] > 0} for all \plaintt{i} after the call.
+\end{warningblock}
+
+\subsubsection{MPI\_Cart\_create}
+
+Creates a new communicator with Cartesian topology:
+
+\begin{codeblock}[language=C]
+int MPI_Cart_create(
+    MPI_Comm comm_old,      // Input communicator
+    int ndims,              // Number of dimensions
+    const int dims[],       // Size of each dimension
+    const int periods[],    // Periodicity flags (0 or 1)
+    int reorder,            // Allow rank reordering?
+    MPI_Comm *comm_cart     // Output: new Cartesian comm
+);
+\end{codeblock}
+
+where:
+\begin{itemize}
+    \item \texttt{periods[i]}: If non-zero, dimension \texttt{i} wraps around (periodic boundary)
+    \item \texttt{reorder}: If non-zero, MPI may reassign ranks to optimize for hardware topology
+    \item If size(\texttt{comm\_old}) > product(\texttt{dims}), excess processes receive \texttt{MPI\_COMM\_NULL}
+\end{itemize}
+
+\begin{tipsblock}[Best practices]
+    Set reorder=1 in production code. This allows MPI implementations (especially on clusters with complex interconnects like fat-trees or torus networks) to map logically adjacent processes to physically adjacent nodes, reducing communication latency.
+\end{tipsblock}
