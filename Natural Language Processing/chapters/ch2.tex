@@ -1,0 +1,816 @@
+\chapter{Architectures for written-text processing}
+
+\section{Logistic Regression}
+
+Before diving deeper into Neural Networks, it is useful to understand their littele brother: \textbf{Logistic Regression}. It can be used to classify an observation onto one of two classes (binary classification), or into one of many classes (multinomial classification). This section builds from the book Speech and Language Processing \cite{jurafskyspeech}.
+
+Logistic Regression is a discriminative model, meaning that it models the conditional probability $P(y|x)$ directly, where $y$ is the class label and $x$ is the input feature vector. The model assumes a linear relationship between the input features and the log-odds of the class probabilities. A machine learning system for classification is based on four components:
+\begin{enumerate}
+    \item A \textbf{feature representation} of the input data, in the form of a vector of real-valued features $x = [x_1, x_2, \ldots, x_n]$;
+    \item A classification function that computes $\hat{y}$, the estimated class, via $p(y|x)$ (see the \textbf{sigmoig} and \textbf{softmax} functions);
+    \item An objective function for learning the model parameters from training data, minimizing error on the training set (in this case \textbf{cross-entropy loss function});
+    \item An algorithm for optimizing the objective function, such as \textbf{gradient descent}.
+\end{enumerate}
+
+Starting from a single input observation $x$ represented as a vector of $n$ features $[x_1, x_2, \dots, x_n]$, the classifier output can be $1$ or $0$ in the \textbf{binary classification}. Logistic regression solves this task by learning, from a training set, a vector of \textbf{weights $W$} and a \textbf{bias term $b$} (which will be broadcasted to a vector in this case). The weight $w_i$ represents how important feature $x_i$ is to the classification decision. 
+\[
+z = \left(\sum_{i=1}^n w_i x_i\right) + b = \mathbf{w}^\top \mathbf{x} + b
+\] 
+
+To create a probability, then, we'll pass $z$ through the \textbf{sigmoid} function $\sigma(z)$, also called the \textbf{logistic function}. It has a domain of $(-\infty, +\infty)$ and a range of $(0, 1)$, making it suitable for modeling probabilities. 
+
+\begin{minipage}{0.48\textwidth}
+    \[
+    \sigma(z) = \frac{1}{1 + e^{-z}}
+    \]
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/ch2/1.png}
+\end{figure}
+\end{minipage}
+
+We can then derive the probability of class $1$ as:
+\[
+P(y=1|x) = \sigma(z) = \frac{1}{1 + e^{-(\mathbf{w}^\top \mathbf{x} + b)}}
+\]
+
+\begin{observationblock}
+    The sigmoid function has the property
+    \[
+    \sigma(-z) = 1 - \sigma(z)
+    \]
+    which implies that
+    \[
+    P(y=0|x) = 1 - P(y=1|x) = \sigma(-z)
+    \]
+\end{observationblock}
+
+The \textbf{decision boundary} is the value of $z$ for which we make a decision about which class to assign to a test instance $x$. Usually we set a threshold of $0.5$ for the probability of class $1$. This corresponds to $z = 0$, since $\sigma(0) = 0.5$. Therefore, if $z \geq 0$, we classify the instance as class $1$; otherwise, we classify it as class $0$.
+
+As for now, we only consider a single example, but in practice we have to handle many of them. The most efficient approach is to use matrix multiplication to compute the outputs for all $m$ examples at once. The input data is still represented as a vector of features, but now the output must be a \textbf{one-hot vector} of $K$ values representing the classes. This way, only one of the $K$ values is $1$, indicating the correct class, while all other values are $0$. 
+\[
+\underbrace{\mathbf{Z}}_{(K, 1)} = \underbrace{\mathbf{W}}_{(K, n)} \underbrace{\mathbf{x}}_{(n, 1)} + \underbrace{\mathbf{b}}_{(K, 1)}
+\]
+
+Moreover, the \textbf{softmax} function is used in this case. It is a generalization of the sigmoid function for multi-class classification problems, where there are more than two classes. The softmax function takes a vector of real-valued scores (logits) and converts them into a probability distribution over multiple classes. Given a vector of logits $\mathbf{z} = [z_1, z_2, \ldots, z_k]$, the softmax function computes the probability of each class $i$ as follows:
+\[
+P(y=i|\mathbf{z}) = \frac{e^{z_i}}{\sum_{j=1}^k e^{z_j}}
+\]
+
+Applying the softmax function to the logistic regression model, we have to separate weight vectors $\mathbf{w}_i$ and bias $b_i$ for each of the $K$ classes. 
+\[
+p(y_i|\mathbf{x}) = \frac{e^{\mathbf{w}_i^\top \mathbf{x} + b_i}}{\sum_{j=1}^K e^{\mathbf{w}_j^\top \mathbf{x} + b_j}}  
+\]
+where $\mathbf{w}$ has shape $[n, K]$ and $\mathbf{b}$ has shape $[K, 1]$.
+
+\[
+\underbrace{\hat{y}}_{(K, 1)} = softmax(\underbrace{\mathbf{W}}_{(K, n)} \underbrace{\mathbf{x}}_{(n, 1)} + \underbrace{\mathbf{b}}_{(K, 1)})
+\]
+
+\subsection{Cross-entropy Loss Function}
+
+We now need a loss function that expresses, for an observation $x$, how close the classifier output $\hat{y}$ is to the correct output $y$. We do this via a loss function that prefers the correct class labels of the training examples to be \textit{more likely}. We therefore choose the parameters $\mathbf{W}$ and $\mathbf{b}$ that maximize the likelihood of the correct class labels in the training data. This is equivalent to minimizing the \textbf{cross-entropy loss function}, which is defined as follows for a single training example:
+\[
+L(\hat{y}, y) = - \log p(y|x) = -\left[y\log\hat{y} + (1-y)\log(1-\hat{y})\right]
+\]
+
+\begin{observationblock}[Cross-entropy Loss = Negative Log-Likelihood]
+    The information an event $x$ carries is defined as $I(x) = -\log P(x)$. The cross-entropy between two probability distributions $p$ and $q$ over the same set of events measures the average number of bits needed to identify an event drawn from the set, if a coding scheme used for the set is optimized for an estimated probability distribution $q$, rather than the true distribution $p$. It is defined as:
+    \[
+    H(p, q) = - \sum_x p(x) \log q(x)
+    \]
+    We can notice that the cross-entropy loss function is equivalent to the negative log-likelihood of the correct class label (look at the binary classification to understand better).
+\end{observationblock}
+
+The cross-entropy loss function can be written also as:
+\[
+L(\hat{y}, y) = - \sum_{i=1}^K y_i \log \hat{y}_i
+\]
+
+We now need an algorithm to minimize the loss function over the training set. A common choice is \textbf{gradient descent}, which iteratively updates the model parameters in the direction of the negative gradient of the loss function with respect to the parameters. The update rule for the weights and bias is as follows:
+\[
+\mathbf{W} := \mathbf{W} - \eta \nabla_{\mathbf{W}} L(\hat{y}, y)
+\]
+where $\eta$ is the learning rate, a hyperparameter that controls the step size of each update.
+
+\begin{warningblock}
+    To use the gradient descent algorithm, we need to be able to compute the gradient of the loss function with respect to the model parameters. This is done using the \textbf{backpropagation} algorithm, which efficiently computes the gradients by applying the chain rule of calculus, but also introduces the need to have proper differentiable functions in the model. 
+\end{warningblock}
+
+The gradient descent algorithm can be applied in two main ways: \textbf{batch gradient descent} and \textbf{stochastic gradient descent (SGD)}. In batch gradient descent, the gradients are computed using the entire training set, while in SGD, the gradients are computed using a single training example at a time. A compromise between these two approaches is \textbf{mini-batch gradient descent}, where the gradients are computed using a small subset of the training set (mini-batch) at each iteration.
+
+It's now time to generalize the loss function from 2 to $K$ classes. We represent both $y$ and $\hat{y}$ as vectors, and the loss function is the sum of the logs of th $K$ output classes, each weighted by their probability $y_i$:
+
+\begin{align*}
+L(\hat{y}, y) &= - \sum_{i=1}^K y_i \log \hat{y}_i \\
+&= - \log \hat{\mathbf{y_c}} \quad \text{(where } c \text{ is the correct class)} \\
+&= -\log \frac{\exp{\mathbf{w}_c \mathbf{x} + b_c}}{\sum_{j=1}^K \exp{\mathbf{w}_j \mathbf{x} + b_j}} \\
+\end{align*}
+
+Moreover, we can derive the partial derivative of the loss with respect to $\mathbf{w}_{k,i}$ as:
+\[
+\frac{\partial L}{\partial \mathbf{w}_{k,i}} = (\hat{y}_i - y_i) x_k
+\]
+
+\begin{advancedblock}[Deriving the Gradient Equation]
+    The \textbf{chain rule} is a fundamental rule in calculus that allows us to compute the derivative of a composite function. It states that if we have two functions $f(g(x))$, then the derivative of the composite function with respect to $x$ is given by:
+    \[
+    \frac{d}{dx} f(g(x)) = f'(g(x)) \cdot g'(x)
+    \]
+    Using the chain rule, we can derive the partial derivative of the loss function with respect to $\mathbf{w}_{k,i}$ as follows:
+    \begin{align*}
+    \frac{\partial L}{\partial \mathbf{w}_{k,i}} &= - \frac{\partial}{\partial \mathbf{w}_{k,i}} \log \hat{y}_c \\
+    &= - \frac{1}{\hat{y}_c} \cdot \frac{\partial \hat{y}_c}{\partial \mathbf{w}_{k,i}} \\
+    &= - \frac{1}{\hat{y}_c} \cdot \frac{\partial}{\partial \mathbf{w}_{k,i}} \left( \frac{e^{\mathbf{w}_c \mathbf{x} + b_c}}{\sum_{j=1}^K e^{\mathbf{w}_j \mathbf{x} + b_j}} \right) \\
+    &= - \frac{1}{\hat{y}_c} \cdot \left( \frac{e^{\mathbf{w}_c \mathbf{x} + b_c} x_k (\delta_{i,c} - \hat{y}_i)}{\sum_{j=1}^K e^{\mathbf{w}_j \mathbf{x} + b_j}} \right) \\
+    &= - (1) x_k (\delta_{i,c} - \hat{y}_i) \\
+    &= (\hat{y}_i - y_i) x_k
+    \end{align*}
+    where $\delta_{i,c}$ is the Kronecker delta, which is $1$ if $i = c$ and $0$ otherwise.
+\end{advancedblock}
+
+\newpage
+\section{Embeddings}
+
+Vector semantics is the standard way to represent word meaning in NLP. It derives from two ideas: using a point in a 3D space to represent the connotation of a word and defining the meaning of a word by its \textbf{distribution} in language use, considering the neighborhood of words that tend to occur near it. 
+
+\begin{definitionblock}[Embeddings]
+    An \textbf{embedding} is simply a multidimensional vector to represent words or other discrete items. The idea is to map each word to a point in a continuous vector space, where semantically similar words are mapped to nearby points. 
+\end{definitionblock}
+
+They are \textbf{dense} vectors, meaning that the number of dimensions is much lower than the vocabulary size $|V|$, and these dimensions don't have a clear interpretation. Having dense vectors instead of sparse ones helps in different tasks, since we have to learn much less weights. Here we will dive deeper into one model: the \textbf{skip-gram with negative sampling (SGNS)}, usually referred to also as Word2Vec.
+
+\begin{observationblock}[Cosine Similarity]
+    To measure similarity between two target words $v$ and $w$, we need a metric that takes two vectors (of the same dimensionality) and gives a measure of similarity. We consider here the \textbf{cosine similarity}, which measures the angle between the two vectrs. It is based on the dot product, in fact it is a \textbf{normalized dot product}, corrected since the normal one favors long vectors ($|\mathbf{v}|$):
+    \[
+    cosine(\mathbf{v}, \mathbf{w}) = \frac{\mathbf{v}\cdot\mathbf{w}}{|\mathbf{v}||\mathbf{w}|} = \frac{\sum_{i=1}^N v_i w_i}{\sqrt{\sum_{i=1}^N v_i^2}\sqrt{\sum_{i=1}^N w_i^2}}
+    \] 
+    The cosine value ranges from 1 for vectors pointing in the same direction, through 0 for orthogolan vectors, to -1 for vectors pointing in opposite directions. 
+\end{observationblock}
+
+Word2Vec embeddings are \textbf{static embeddings}, meaning that the method learns one fixed embedding for each word in the vocaboulary, contrary to the \textbf{contextual embeddings} that will be later explained. Its intuition is to train a classifier on a binary prediction task ("Is word $w$ likely to show up near word $c$?") and then use the learned weights (initialized randomly) as embeddings. It seems like a cycle, but remember that the embeddings are the weights and the whole procedure of learning them is the algorithm. An important consideration is that we can apply \textbf{self-supervision} in this case, since we can check in an online way if our prediction is corrext just by using running text.
+
+Given a text, we want to train a classifier such that, given a tuple $(w,c)$ of a target word $w$ paired with a candidate context word $c$, it will return the probability that $c$ is a real context word. 
+
+\[
+P(+|w,c)
+\]
+
+To compute this probability, we use embedding similarity: a word is likely to occur near the target if its embeddings (weights) are simiar to the ones of the target. We then consider the \textbf{dot product}:
+
+\[
+Similarity(w,c) \approx \mathbf{c} \cdot \mathbf{w}
+\]
+
+To have a probability, we then use the \textbf{sigmoid} function:
+
+\[
+P(+|w,c) = \sigma(\mathbf{c}\cdot\mathbf{w}) = \frac{1}{1 + e^{-\mathbf{c}\cdot\mathbf{w}}}
+\]
+
+Since we also need the total probability of all the cases to be 1, and simplifying using the independence assumption, we have that:
+
+\[
+P(+|w,c_{1:L}) = \prod_{i=1}^L P(+|w,c_i) = \prod_{i=1}^L \sigma(\mathbf{c}_i \cdot \mathbf{w})
+\]
+
+Skip-gram stores \textbf{two embeddings} for each word: the \textbf{target embedding} (used when the word is the target word $w$) and the \textbf{context embedding} (used when the word is a context word $c$). This way, we can have different representations for words depending on their role in the prediction task.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/2.png}
+    \caption{Skip-gram architecture.}
+    \label{fig:skip_gram}
+\end{figure}
+
+The learning algorithm takes as input a corpus of text and a chosen vocabulary size $N$. It randomly initializes the embeddings and then iteratively shifts them for each word to be more like the embeddings of word that occur nearby in texts, and less like the embeddings of words that do not. Since we need \textbf{negative samples}, the algorithm first determines the correct pairs and then randomly samples $k$ words from the vocabulary to create negative pairs. The loss function to minimize is then:
+
+\begin{align*}
+L_{CE} &= -\log\left[P(+|w,c_{pos})\prod_{i=1}^k P(-|w,c_{neg_i})\right] \\
+&= -\left[\log P(+|w,c_{pos}) + \sum_{i=1}^k \log P(-|w,c_{neg_i})\right] \\
+&= -\left[\log P(+|w,c_{pos}) + \sum_{i=1}^k \log (1 - P(+|w,c_{neg_i}))\right] \\
+&= -\left[\log \sigma(\mathbf{c}_{pos} \cdot \mathbf{w}) + \sum_{i=1}^k \log \sigma(-\mathbf{c}_{neg_i} \cdot \mathbf{w})\right] 
+\end{align*}
+
+This loss function is constructed such that it:
+\begin{itemize}
+    \item Maximizes the similarity between the target word, context word pairs ($w,c_{pos}$) drawn from the positive examples;
+    \item Minimizes the similarity between the target word, context word pairs ($w,c_{neg}$) drawn from the negative examples.
+\end{itemize}
+
+We minimize this loss function using stochastic gradient descent (SGD).
+
+\[
+\mathbf{w}^{t+1} = \mathbf{w}^t - \eta \left[\left[\sigma(\mathbf{c}_{pos}\cdot\mathbf{w}^t) - 1\right]\mathbf{c}_{pos} + \sum_{i=1}^k\left[\sigma(\mathbf{c}_{neg_i}\cdot\mathbf{w}^t)\right]\mathbf{c}_{neg_i}\right]
+\]
+
+For proofs and more details, refer to \cite{jurafskyspeech}.
+
+\section{Feedforward Neural Networks}
+
+For this session, I will be short since you have probably already seen this concepts in other courses. Consider this just a quick recap of the main ideas and if you still have doubts or need more in-depth proofs, check the book \cite{jurafskyspeech}.
+
+A \textbf{feedforward neural network (FNN)} is a multilayer network in which the units are connected with no cycles. They are sometimes called \textbf{multi-layer perceptrons (MLP)}. Three nodes are present in a FNN: 
+\begin{itemize}
+    \item input units (features) $\to \mathbf{x}$;
+    \item hidden units (intermediate computations) $\to \mathbf{h}$;
+    \item output units (predictions) $\to \mathbf{\hat{y}}$.
+\end{itemize}
+
+Each layer here is \textbf{fully connected}, meaning that each unit in each layer takes as input the outputs from all the units in the previous layer, and there is a link between every pair if units from two adjacent layers. Thus, each hidden unit sums over all the input units. 
+We represent the parameters for the entire hidden layer by combining the weight vector and bias for each unit $i$ into a single weight matrix $\mathbf{W}$ and a single bias vector $\mathit{b}$. 
+
+The computation only has three steps: multiplying the weight matrix by the input vector $\mathbf{x}$, adding the bias vector $\mathbf{b}$ and applying the activation function $\mathit{g}$. 
+\[
+\underbrace{\mathbf{h}}_{d_h\times 1} = \sigma \left(\underbrace{\mathbf{W}}_{d_h\times n_0} \underbrace{\mathbf{x}}_{n_0\times 1} + \underbrace{\mathbf{b}}_{d_h\times 1}\right)
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{assets/ch2/3.png}
+    \caption{Feedforward Neural Network with one hidden layer.}
+    \label{fig:fnn}
+\end{figure}
+
+Like the hidden layer, the output layer has a weight matrix ($\mathbf{U}$), but some models don't include a bias vector $\mathbf{b}$. The weight matrix is then multiplied by its input vector $\mathbf{h}$ to produce the intermediate output $\mathbf{z}$:
+\[
+\underbrace{\mathbf{z}}_{|V|\times 1} = \underbrace{\mathbf{U}}_{|V|\times d_h} \underbrace{\mathbf{h}}_{d_h\times 1}
+\]
+However, $\mathbf{z}$ cannot be the output of a classifier, since its values are unbounded. We therefore need to apply the \textbf{softmax} function to obtain a probability distribution over the output classes:
+\[
+\underbrace{\hat{\mathbf{y}}}_{|V|\times 1} = softmax(\underbrace{\mathbf{z}}_{|V|\times 1}) = softmax(\underbrace{\mathbf{U}}_{|V|\times d_h} \underbrace{\mathbf{h}}_{d_h\times 1})
+\]
+
+\begin{observationblock}[Replacing the bias unit]
+    Instead of having a separate bias vector $\mathbf{b}$, we can add an extra input unit $x_0$ that is always equal to $1$. This way, the bias term can be absorbed into the weight matrix $\mathbf{W}$, simplifying the notation. The same can be done for the output layer.
+    \[
+    \mathbf{h} = \sigma\left(\mathbf{Wx} + \mathbf{b}\right) \quad \longrightarrow \quad \mathbf{h} = \sigma\left(\mathbf{W'x'}\right)
+    \]
+    and so, instead of using a vector $\mathbf{x}$ of size $n_0$, we use a vector $\mathbf{x'}$ of size $n_0 + 1$, where the first element is always $1$.
+    \[
+    \mathbf{h}_j = \sigma\left(\sum_{i=0}^{n_0}\mathbf{W}_{ji}\mathbf{x'}_i\right)
+    \]
+\end{observationblock}
+
+Let's now consider \textbf{language modeling}, meaning the task of predicting upcoming words from prior word context. We can apply a FFN to language modeling by taking as input the representation of some number of previous words (the context), and outputting a probability distribution over possible next words. 
+\[
+P(w_t|w_1,\dots,w_{t-1}) \approx P(w_t|w_{t-N+1,\dots,w_{t-1}})
+\]
+
+The representations of the previous words can be their embeddings, concatenated together to form the input vector $\mathbf{x}$. The output layer will then produce a probability distribution over the vocabulary, representing the likelihood of each word being the next word in the sequence. The model can be trained using a cross-entropy loss function, comparing the predicted probabilities with the actual next word in the training data. But let's start from the beginning. For the task of \textbf{forward inference}, meaning executing a forward pass on the network and computing the output probabilities, we represent each word by a one-hot vector, and multiply it by the embedding matrix $\mathbf{E}$ to obtain its embedding vector. We then concatenate (\textbf{pooling}) the vectors to form the input vector for the FFN.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/ch2/4.png}
+    \caption{Creating the word embeddings.}
+    \label{fig:word_embeddings}
+\end{figure}
+
+The steps are the following:
+\begin{enumerate}
+    \item Pool the embeddings of the context words to form the input vector $\mathbf{x}$;
+    \item Multiply the vector by the weight matrix $\mathbf{W}$, add the bias vector $\mathbf{b}$ and apply the activation function $\sigma$ to obtain the hidden layer $\mathbf{h}$;
+    \item Multiply the hidden layer by the output weight matrix $\mathbf{U}$ to obtain the intermediate output $\mathbf{z}$;
+    \item Apply the softmax function to $\mathbf{z}$ to obtain the output probabilities $\hat{\mathbf{y}}$.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/5.png}
+    \caption{Feedforward Neural Network for language modeling.}
+    \label{fig:fnn_lm}
+\end{figure}
+
+To train the model and learn the parameters (weights and biases), we can use the \textbf{cross-entropy loss} as loss function, and then using the \textbf{gradient descent} algorithm to minimize the loss over the training set. The gradients can be computed using the \textbf{backpropagation} algorithm, which efficiently computes the gradients by applying the chain rule of calculus. It is based on computation graphs, i.e., representations of the processes of computing mathematical expressions, in which the computation is broken down into separate operations, each of which is modeled as a node in the graph. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/6.png}
+    \caption{Computation graph for a simple feedforward neural network.}
+    \label{fig:computation_graph}
+\end{figure}
+
+On this graph, both a \textbf{forward pass} and a \textbf{backward pass} can be done, with the first that is used to compute results and the second used to compute gradients. Recalling the chain rule, we can compute the gradient of the loss function with respect to each parameter by multiplying the gradients along the paths from the output node (loss) to the parameter node. This way, we can efficiently compute the gradients for all parameters in the network, allowing us to update them using gradient descent:
+\[
+\frac{df}{dx} = \frac{df}{dg} \cdot \frac{dg}{dh} \cdot \frac{dh}{dx}
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/ch2/7.png}
+    \caption{Backpropagation algorithm.}
+    \label{fig:backpropagation}
+\end{figure}
+
+\begin{observationblock}[Common derivatives]
+    Just a reminder for some common derivatives regarding the activation functions:
+    \begin{itemize}
+        \item Sigmoid:
+        \[\frac{d\sigma(z)}{dz} = \sigma(z)(1 - \sigma(z))\]
+        \item Tanh:
+        \[\frac{d\tanh(z)}{dz} = 1 - \tanh^2(z)\]
+        \item ReLU:
+        \[\frac{d\text{ReLU}(z)}{dz} = 
+        \begin{cases}
+        1 & \text{if } z > 0 \\
+        0 & \text{if } z \leq 0
+        \end{cases}\]
+    \end{itemize}
+\end{observationblock}
+
+Finally, a small change has to be done for training a neural language model, where in this case the parameters to learn are not only the weights and biases of the FFN, but also the word embeddings. During backpropagation, we also compute the gradients of the loss function with respect to the embedding matrix $\mathbf{E}$, and update it using gradient descent:
+\[\mathbf{E} := \mathbf{E} - \eta \nabla_{\mathbf{E}} L(\hat{y}, y)\]
+This way, the model learns embeddings that are useful for the language modeling task, capturing semantic and syntactic properties of words based on their context in the training data.
+
+\section{Recurrent Neural Networks}
+
+A \textbf{Recurrent Neural Network} is any network that contains a cycle within its network connections, meaning that the value of some unit is directly or indirecly dependent on its own earlier outputs as an input. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.3\textwidth]{assets/ch2/8.png}
+    \caption{Simple RNN.}
+    \label{fig:simple_rnn}
+\end{figure}
+
+As with classic feedforward NN, an input vector representing the current input ($\mathbf{x_t}$) is multiplied by a weight matrix and then passed through a non-linear activation function to compute the values for a layer of hidden units. This hidden layer is then used to calculate a corresponding output $\mathbf{y}_t$. 
+The key difference from a FNN is in the recurrent link shown in Fig.\ref{fig:simple_rnn} as a dashed line, which basically augments the input to the computation at the hidden layer with the value of the hidden layer from the preceding point in time. The hidden layer from the previous time step provides a sort of \textbf{memory}, or context, that encodes earlier processing and informs the decisions to be made at later points in time. 
+
+Consequently, there is a new set of weights $\mathbf{U}$ that connect the hidden layer from the previous step to the current hidden layer. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/ch2/9.png}
+\end{figure}
+
+Forward inference is almost identical to that of a FNN, with the addition of the recurrent connection. At each time step $t$, the hidden layer $\mathbf{h}_t$ is computed using both the current input $\mathbf{x}_t$ and the previous hidden state $\mathbf{h}_{t-1}$:
+\[
+\mathbf{h}_t = \sigma(\mathbf{W}\mathbf{x}_t + \mathbf{U}\mathbf{h}_{t-1} + \mathbf{b})
+\]
+The output layer is then computed as:
+\[
+\mathbf{z}_t = \mathbf{V}\mathbf{h}_t + \mathbf{c}
+\]
+\[
+\hat{\mathbf{y}}_t = softmax(\mathbf{z}_t)
+\]
+The training process for RNNs is similar to that of FNNs, but this time we use the \textbf{Backpropagation Through Time} algorithm, since:
+\begin{itemize}
+    \item To compute the loss function for the output at time $t$ we need the hidden layer from time $t-1$;
+    \item The hidden layer at time $t$ influences both the output at time $t$ and the hidden layer at time $t+1$ (hence also the output and loss at time $t+1$).
+\end{itemize}
+
+This means that when we compute the gradients during backpropagation, we need to consider the dependencies across multiple time steps. The Backpropagation Through Time algorithm unfolds the RNN over time, treating it as a deep feedforward network with shared weights across time steps. The gradients are then computed using the chain rule, taking into account the contributions from all time steps.
+
+Finally, for language modeling tasks, forward inference proceeds exactly as described for FNNs, with the addition of the recurrent connection. The input at each time step is the embedding of the current word, and the output is a probability distribution over the vocabulary for the next word. The model can be trained using the cross-entropy loss function, comparing the predicted probabilities with the actual next word in the training data.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/10.png}
+    \caption{Recurrent Neural Network for language modeling.}
+    \label{fig:rnn_lm}
+\end{figure}
+
+\subsection{LSTM}
+
+One of the biggest issues with training RNNs is the \textbf{vanishing gradient problem}, which occurs when the gradients of the loss function with respect to the model parameters become very small as they are propagated back through time. This can lead to slow convergence during training, and in some cases, the model may fail to learn long-term dependencies in the data.
+\textbf{Long short-term memory (LSTM)} networks are used to address this issue. They divide the context management problem into two sub-problems:
+\begin{itemize}
+    \item removing information no longer needed from the context;
+    \item adding information likely to be needed for later decision making. 
+\end{itemize}
+
+LSTMs accomplish this by first adding an explicit content layer to the architecture and second by using \textit{gates} to control the flow of information into and out of the units that comprise the network layers. 
+The gates consist of a feedforward layer, followed by a sigmoid activation function and followed by a pointwise multiplication with the layer being gated. This creates a sort of binary mask. Two types of gates are used in LSTMs:
+\begin{itemize}
+    \item \textbf{Forget gate}: deletes information from the cotext that is no longer needed. It computes a weighted sum of the previous state's hidden layer and the current input and passes that thorough a sigmoid. This mask is then multiplied element-wise by the context vector to remove the information from context that is no longer required. 
+    \[
+    \mathbf{f}_t = \sigma(\mathbf{U}_t\mathbf{h}_{t-1} + \mathbf{W}_t\mathbf{x}_t)
+    \]   
+    \[
+    \mathbf{k}_t = \mathbf{c}_{t-1} \odot \mathbf{f}_t 
+    \]
+    Then, we compute the actual information needed to extract from the previous hidden state and current inputs:
+    \[
+    \mathbf{g}_t = \tanh(\mathbf{U}_g\mathbf{h}_{t-1} + \mathbf{W}_g\mathbf{x}_t)
+    \]
+    \item \textbf{Add gate}: selects the information to add to the current context:
+    \[
+    \mathbf{i}_t = \sigma(\mathbf{U}_i\mathbf{h}_{t-1} + \mathbf{W}_i\mathbf{x}_t)
+    \]
+    \[
+    \mathbf{j}_t = \mathbf{g}_t \odot \mathbf{i}_t 
+    \]
+    Finally, we update the context vector:
+    \[
+    \mathbf{c}_t = \mathbf{k}_t + \mathbf{j}_t
+    \]
+\end{itemize}
+
+The final gate is the \textbf{output gate}, which controls the information to output from the LSTM unit:
+\[
+\mathbf{o}_t = \sigma(\mathbf{U}_o\mathbf{h}_{t-1} + \mathbf{W}_o\mathbf{x}_t)
+\]
+\[
+\mathbf{h}_t = \tanh(\mathbf{c}_t) \odot \mathbf{o}_t
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/11.png}
+    \caption{LSTM architecture.}
+    \label{fig:lstm}
+\end{figure}
+
+\section{Transformer}
+
+Even if the gates allow LSTMs to handle more distant information than RNNs, they don't completely solve the underlying problem: passing information through an extended series of recurrent connections leads to information loss and difficulties in training. \textbf{Transformers} map sequences of input vectors ($\mathbf{x}_1,\dots,\mathbf{x}_n$) to sequences of output vectors ($\mathbf{y}_1,\dots,\mathbf{y}_n$) of the same length. They are made of stacks of transformer blocks, which are multilayer networks made by combining simple linear layers, FFNs and \textbf{self-attention layers}. Moreover, the computation performed for each item is independent of all the other computations, allowing for parallelization during training.
+
+\subsection{Self-attention layer}
+
+At the core of an attention-based approach is the ability to \textit{compare} an item of interest to a collection of other items in a way that reveals their relevance in the current context. The result of these comparisons is then used to compute an output for the current input. The simplest form of comparison is the dot product:
+\[
+score(\mathbf{x}_i\mathbf{x}_j) = \mathbf{x}_i\mathbf{x}_j \quad \forall j\leq j 
+\]
+
+Then to make an effective use of these scores, they have to be normalized with a softmax to create a vector of weights that indicate the proportional relevance of each input to the input element that is the current focus of attention:
+\[
+\alpha_{ij} = softmax(score(\mathbf{x}_i,\mathbf{x}_j)) = \frac{\exp{(\mathbf{x}_i\mathbf{x}_j)}}{\sum_{k=1}^n \exp{(\mathbf{x}_i\mathbf{x}_k)}}
+\]
+
+Finally, the output for the current input element is computed as a weighted sum of the input elements, using the attention weights as coefficients:
+\[
+\mathbf{y}_i = \sum_{j=1}^n \alpha_{ij} \mathbf{x}_j
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/12.png}
+    \caption{Self-attention layer.}
+    \label{fig:self_attention}
+\end{figure}
+
+Each input embedding plays three distinct roles in the self-attention computation:
+\begin{itemize}
+    \item As a \textbf{query} vector, representing the item for which we are computing attention;
+    \item As a \textbf{key} vector, representing each item in the collection being attended to;
+    \item As a \textbf{value} vector, representing the actual content of each item in the collection.
+\end{itemize}
+To implement these three roles, we use three different weight matrices ($\mathbf{W}_Q$, $\mathbf{W}_K$, $\mathbf{W}_V$) to project the input embeddings into three different vector spaces:
+\[
+\mathbf{q}_i = \mathbf{W}_Q \mathbf{x}_i \quad \mathbf{k}_i = \mathbf{W}_K \mathbf{x}_i \quad \mathbf{v}_i = \mathbf{W}_V \mathbf{x}_i
+\]
+The attention scores are then computed using the query and key vectors:
+\[
+score(\mathbf{q}_i,\mathbf{k}_j) = \mathbf{q}_i \cdot \mathbf{k}_j
+\]
+However, since the dot products can grow large in magnitude, leading to small gradients during training, we scale the scores by the square root of the dimensionality of the key vectors ($d_k$):
+\[
+score(\mathbf{q}_i,\mathbf{k}_j) = \frac{\mathbf{q}_i \cdot \mathbf{k}_j}{\sqrt{d_k}}
+\]
+The attention weights are then computed using the softmax function:
+\[
+\alpha_{ij} = softmax\left(\frac{\mathbf{q}_i \cdot \mathbf{k}_j}{\sqrt{d_k}}\right) = \frac{\exp{\left(\frac{\mathbf{q}_i \cdot \mathbf{k}_j}{\sqrt{d_k}}\right)}}{\sum_{l=1}^n \exp{\left(\frac{\mathbf{q}_i \cdot \mathbf{k}_l}{\sqrt{d_k}}\right)}}
+\]
+Finally, the output for the current input element is computed as a weighted sum of the value vectors:
+\[
+\mathbf{y}_i = \sum_{j=1}^n \alpha_{ij} \mathbf{v}_j
+\]
+
+Since each output is computed independently, this process can be parallelized by taking advantage of efficient matrix multiplication routines and pack the input embeddings of the $N$ tokens into a single matrix $\mathbf{X}\in \mathbb{R}^{N\times d}$. We then multiply it by the key, query and value matrices (all of dimensionality $d\times d$) to produce the matrices $\mathbf{Q}$, $\mathbf{K}$ and $\mathbf{V}$:
+\[
+\mathbf{Q} = \mathbf{X}\mathbf{W}_Q \quad \mathbf{K} = \mathbf{X}\mathbf{W}_K \quad \mathbf{V} = \mathbf{X}\mathbf{W}_V
+\]
+
+So, the complete self-attention computation can be summarized as:
+\[
+SelfAttention(\mathbf{Q}, \mathbf{K}, \mathbf{V}) = softmax\left(\frac{\mathbf{Q}\mathbf{K}^T}{\sqrt{d_k}}\right)\mathbf{V}
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/ch2/13.png}
+    \caption{Masked self-attention mechanism.}
+    \label{fig:masked_self_attention}
+\end{figure}
+
+\begin{observationblock}[Matrix dimensions]
+    The inputs and outputs of transformers, as well as the intermediate vectors after the various layers, all have the same dimensionality $1\times d$. For now you can assume that the dimensionalities of the transform matrices are all $d\times d$, but consider that in \textbf{Multi-head attention mechanisms}, which will be explained later, the dimensionalities change and every head has its own set of matrices with different dimensions.
+\end{observationblock}
+
+Finally, a mask has to be applied to the upper triangle of the score matrix during training, to prevent the model from attending to future tokens. This is done by setting the scores for all positions $(i,j)$ where $j > i$ to $-\infty$ before applying the softmax function. This way, the attention weights for these positions will be zero, effectively preventing the model from attending to future tokens.
+
+\subsection{Transformer Blocks}
+
+Every transformer block consists of a single attention layer followed by a fully-connected feedforward layer with \textbf{residual connections} and \textbf{layer normalizations} following each, as shown in Fig.\ref{fig:transformer_block}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/14.png}
+    \caption{Transformer block architecture.}
+    \label{fig:transformer_block}
+\end{figure}
+
+Residual connections are connections that pass information from a lower layer to a higher layer without going through the intermediate layer. That said, the output vector is the sum of the input vector and the hidden vector computed with the attention or feedforward layer:
+\[
+\mathbf{y} = \mathbf{x} + Layer(\mathbf{x})
+\]
+Layer normalization, on the other hand, is a technique used to normalize the activations of a layer across the features dimension. It helps to stabilize the training process and improve convergence by reducing internal covariate shift. The layer normalization can be applied before or after the residual connection (the original paper uses post-norm, but pre-norm is more common nowadays). The layer normalization is computed as:
+\[
+\text{LayerNorm}(\mathbf{x}) = \frac{\mathbf{x} - \mu}{\sigma} \odot \gamma + \beta
+\]
+where $\mu$ and $\sigma$ are the mean and standard deviation of the elements in $\mathbf{x}$, and $\gamma$ and $\beta$ are learnable parameters that scale and shift the normalized output.
+
+Since different words in a sentence can relate to each other in many different ways simultaneously, \textbf{multi-head attention layers} are used to learn different aspects of the relationships that exist among inputs at the same level of abstractions. They reside in parallel layers at the same depth, each with its own set of parameters. Each head $i$ has its own set of key, query and value matrices ($\mathbf{W}_K^i$, $\mathbf{W}_Q^i$, $\mathbf{W}_V^i$) to project the input embeddings into three different vector spaces. The outputs of all heads are then concatenated and projected back into the original space using a final weight matrix $\mathbf{W}_O$:
+\[
+MultiHead(\mathbf{X}) = (\mathbf{head}_1 \oplus \mathbf{head}_2 \oplus \dots \oplus \mathbf{head}_h)\mathbf{W}_O
+\]
+Just a reminder that in multi-head attention, instead of using the model dimension $d$, the query and key embeddings have dimensionality $d_k$, and the value embeddings have dimensionality $d_v$. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/15.png}
+    \caption{Multi-head attention mechanism.}
+    \label{fig:multi_head_attention}
+\end{figure}
+
+\textbf{Positional embeddings} are also added to the word embeddings to give a sense of word order. They are learned as well during training.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/16.png}
+    \caption{Transformer architecture.}
+    \label{fig:transformer_architecture}
+\end{figure}
+
+\begin{warningblock}
+    A potential problem using absolute position embeddings is that there will be plenty of training examples for the initial positions in the inputs and fewer at the outer length limits. This could lead to poor generalization during testing. An alternative approach is to use a \textbf{static function} that maps integer inputs to real-valued vectors in a way that captures the inherent relationships among the positions.
+\end{warningblock}
+
+\newpage
+
+\section{Encoder-Decoder Models}
+
+In the previous section, the basic block of the transformer architecture was presented. However, the first use of the architecture was for a different case: transforming one sequence of tokens into another to enable machine translation between languages. For this use case, a two-phase system was designed: encoding and decoding, where the transformer from the previous section corresponds to the second phase.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/17.png}
+    \caption{Encoder-Decoder architecture described in the original transformer paper.}
+    \label{fig:encoder_decoder}
+\end{figure}
+
+As shown in Fig.\ref{fig:encoder_decoder}, the transformer architecture described before is just the decoder part (on the right), for which we can remove the mixed multi-head attention if we don't consider the encoder. The \textbf{encoder}, on the other part, is used for different purposes. Together, they form the \textbf{encoder-decoder architecture}, which is widely used for sequence-to-sequence tasks such as machine translation, text summarization, and question answering.
+It is able to generate contextually appropriate, arbitraty length output sequences. The encoder, in fact, takes an input sequence and creates a contextualized representation of it, called the \textbf{context}. It is then passed to the decoder which generates a task-specific output sequence. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch2/18.png}
+\end{figure}
+
+Machine Translation (MT) systems generally use a fixed vocabulary generated with the \textbf{BPE} or \textbf{wordpiece} algorithms. Both of them are \textbf{subword tokenization} methods, meaning that they break down rare words into smaller, more frequent subword units. This allows the model to handle out-of-vocabulary words and reduces the overall vocabulary size, making training more efficient. Both also have a \textbf{token learner}, which takes row training corpus and induces a vocabulary, and a \textbf{token segmenter}, which takes a row test sentence and segments it into the tokens in the vocabulary. BPE token learner begins with a vocabulary that is just the set of individual characters. It then examines the training corpus, chooses the two symbols that are most frequently adjacent, adds a new merger symbol to the vocabulary and replaces every adjacent occurrence of the two symbols with the new symbol. This process continues until $k$ merges have been done creating $k$ novel tokens. Once we've learned our vocabulary, the token segmenter can segment new sentences by greedily matching the longest possible tokens from the vocabulary. Wordpiece, instead, first initializes the lexicon with characters, then it trains an n-gram language model on the training corpus and, considering the set of possivle new wordpieces made by concatenating two wordpieces from the current lexicon, chooses the one that most increases the language model probability of the training corpus. Repeat the last two steps until there are $V$ wordpieces.
+
+\subsection{Beam Search}
+
+Choosing the single most probable token to generate at each step in Machine Translation is called \textbf{greedy decoding}. This is not optimal, since the token that looks good to the decoder now might not turn out later to have been the wrong choice. Thus, decoding in MT and other sequence generation problems generally uses a method called \textbf{beam search}. In it, instead of choosing the best token to generate at each timestep, we keep $k$ possible tokens at each step. This fixed-size memory footprint $k$ is called the \textit{beam width}. These initial $k$ outputs are the search frontier and these $k$ initial words are called \textit{hypotheses}.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/19.png}
+    \caption{Beam search with beam width of 2.}
+    \label{fig:beam_search}
+\end{figure}
+
+At subsequent steps, each of the $k$ best hypotheses is extended incrementally by being passed to distinct decoders, which each generate a softmax over the entire vocabulary to extend the hypothesis to every possible next token. Each of these $k\times V$ hypotheses is scored by $P(y_i|x,y_{<i})$: the product of the probability of current word choice multiplied by the probability of the path that led to it. We then prune the $k\times V$ hypotheses down to the $k$ best ones, so there are never more than $k$ hypotheses at the frontier of the search, and never more than $k$ decoders. 
+
+\begin{warningblock}
+    One problem arises from the fact that the completed hypotheses may have different lengths. Because models generally assign lower probabilities to longer strings, a naive algorithm would also choose shorter strings for $y$.
+\end{warningblock}
+
+\subsection{Pre-trained Models}
+
+If we want to assign the correct named-entity tag to each word in a sentence, or other sophisticated labels like the parse tags, we'll want to be able to take into account information from the right context as we process each element. \textbf{Birirectional encoders} are designed to do just that by allowing the self-attention mechanism to range over the entire input. They underlies models like BERT and its descendants like RoBERTa or SpanBERT. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/ch2/20.png}
+    \caption{Bidirectional encoder self-attention mechanism.}
+    \label{fig:bidirectional_encoder_self_attention}
+\end{figure}
+
+The focus of bidirectional encoders is on computing contextualized representations of the tokens in an input sequence that are generally useful across a range of downstream applications. This contextualization is accomplished through the use of the same self-attention mechanism used in causal models, the only difference is that here we skip the masking step, allowing the model to contextualize each token using information from the entire input. 
+
+\begin{observationblock}
+    In BERT and descendants, the WordPiece algorithm is used for tokenization, creating subwords. This will require that for some NLP tasks that require notions of words we will occasionally need to map subwords back to words. 
+\end{observationblock}
+
+For training, bidirectional encoders learn to perform a fill-in-the-blank task, technically called the \textbf{cloze task}. That is, given an input sequence with one or more elements missing, the learning task is to predict the missing elements. More precisely, during training the model is deprived of one or more elements of an input sequence and must generate a probability distribution over the vocabulary for each of the missing items. 
+The original approach to training bidirectional encoders is called \textbf{Masked Language Modeling (MLM)}, which uses unannotated text from large corpus. The model is presented with a series of sentences from the training corpus where a random sample of tokens from each training sequence is selected for use in the learning task. Once chosen, a token is used in one of three ways:
+\begin{itemize}
+    \item It is replaces with the unique vocabulary token \plaintt{[MASK]} $\to 80\%$;
+    \item It is replaces with another token from the vocabulary, randomly sampled based on token unigram probabilities $\to 10\%$;
+    \item It is left unchanged $\to 10\%$.
+\end{itemize}
+
+In BERT, $15\%$ of the input tokens in a training sequence are sampled for learning. 
+\begin{observationblock}
+    Note that all of the input tokens play a role in the self-attention process, but only the sampled tokens are used for learning.
+\end{observationblock}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{assets/ch2/21.png}
+    \caption{Masked Language Modeling training process.}
+    \label{fig:mlm_training}
+\end{figure}
+
+To produce a probability distribution over the vocabulary for each of the masked tokens, the output vector from the final transformer layer for each of the masked tokens is multiplied by a learned set of classification weights $\mathbf{W}_V \in \mathbb{R}^{|V|\times d_h}$ and then through a softmax to yield the required predictions over the vocabulary:
+\[
+\hat{\mathbf{y}}_i = softmax(\mathbf{W}_V \mathbf{h}_i)
+\]
+
+For many NLP applications, the natural unit of interest may be larger than a single word or token. Question answering, syntactic parsing, coreference and semantic role labeling applications all involve the identification and classification of constituents or phrases. This suggests a \textbf{span-oriented} masked learning objective mighe provide improved performance on such tasks. 
+A span is a contiguous sequence of one or more words selected from a training text, prior to subword tokenization. In span-based masking, a set of randomly selected spans from a trainig sequence are chosen. Once a span is chosen for masking, all the words within the span are substituted according to the same regime used in BERT. Moreover, the SpanBERT learning objective augments the MLM objective with a boundary oriented component called the \textbf{Span Boundary Objective (SBO)}, which relies on a model's ability to predict the words within a masked span from the words immediately preceding and following it. 
+\[
+L(x) = L_{MLM}(x) + L_{SBO}(x)
+\]
+\[
+L_{SBO}(x) = -\log P(x|x_s,x_e,p_x)
+\]
+where $s$ denotes the position of the word before the span and $e$ denotes the word after the end. 
+\[
+s = FFNN([y_{s-1};y_{e+1};p_{i-s+1}])
+\]
+\[
+z = softmax(Es)
+\]
+The final loss is the sum of the MLM loss and the SBO loss.
+
+An important class of applications involves determining the relationship between pairs of sentences. These include tasks like paraphrase detection, entailment or discourse coherence. To capture the kind of knowledge required for applications such as these, BERT introduced a second learning objective called \textbf{Next Sentence Prediction (NSP)}, where the model is presented with pairs of sentences and is asked to predict whether each pair consists of an actual pair of adjacent sentences from the training corpus or a pair of unrelated sentences. To facilitate this, BERT introduces two new tokens to the input representation. After tokenizing the input with the subword model, the token \plaintt{[CLS]} is prepended to the input sentence pair, and the token \plaintt{[SEP]} is placed between the sentences and after the final token of the second sentence. 
+
+During training, the output vector from the final layer associated with the \plaintt{[CLS]} token represents the next sentence prediction. A learned set of classification weights $\mathbf{W_{NSP}} \in \mathbb{R}^{2\times d_h}$ is used to produce a two-class prediction from the raw \plaintt{[CLS]} vector.
+\[
+\hat{\mathbf{y}}_i = softmax\left(\mathbf{W_{NSP}} \mathbf{h}_i\right)
+\]
+
+The power of pretrained language models lies in their ability to extract generalizations from large amounts of text. To make practical use of these generalizations, we need to create interfaces from these models to downstream applications through a process called \textbf{fine-tuning}. Most common applications are:
+\begin{itemize}
+    \item \textbf{Sequence Classification}: An additional vector is added to the model to stand for the entire sequence. This vector is sometimes called the \textit{sentence embedding} since it refers to the entire sequence. In BERT, the \plaintt{[CLS]} token plays the role of this embedding. This unique token is added to the vocabulary and is prepended to the start of all input sequences. The output vector in the final layer of the model for the \plaintt{[CLS]} input represents the entire input sequence and serves as the input to a \textit{classifier head}, a logistic regression or NN classifier that makes the relevant decision. A key difference from what we've seen earlier with neural classifier is that this loss can be used to not only learn the weights of the classifier, but also to update the weights for the pretrained language model itself.
+    \item \textbf{Pair-wise Sequence Classification}: Fine-tuning an application for one of these tasks proceeds just as with pretraining using the NSP objective. During fine-tuning, pairs of labeled sentences from the supervised learning data are presented to the model. The output vector associated with the prepended \plaintt{[CLS]} token represents the model's view of the input pair. And as NSP training, the two inputs are separated by the \plaintt{[SEP]} token. 
+    \item \textbf{Sequence Labelling}: Here, the final output vector corresponding to each input token is passed to a classifier that produces a softmax distribution over the possible set of tags. Again, assuming a simple classifier consisting of a single feedforward layer followed by a softmax, the set of weights to be learned for this additional layer is $\mathbf{W_K} \in \mathbb{R}^{k\times d_h}$, where $k$ is the number of possible tags for the task. A complication with this approach arises from the use of subword tokenization. Supervised training data for tasks like named entity recognition is typically in the form of BIO tags associated with text segmented at the word level. To deal with this, we need a way to assign BIO tags to subword tokens dueing training and a corresponding way to recover word-level tags from subwords during decoding. For training, we can just assign a gold-standard tag associated with each word to all of the subwords token derived from it. For decoding, the simplest approach is to use the argmax BIO tag associated with the first subword token of a word.  
+\end{itemize}
+
+\section{Prompting}
+
+One key emergent ability from GPT-2 is \textbf{zero-shot learning}, i.e., the ability to do many tasks with no examples and no gradient updates, by simply:
+\begin{itemize}
+    \item Specifying the right sequence in prediction problem (e.g. question answering) $\to$ "Passage: Tom Brady ... Q: Where was Tom Brady born? A: ...";
+    \item Comparing probabilities of sequences (e.g. classification tasks) $\to$ "The cat couldn't fit into the hat because it was too big.", does "it" refers to the cat or to the hat?
+\end{itemize}
+GPT-2 beats state-of-the-art models on language modeling benchmarks with \textbf{no task-specific fine-tuning}. Moreover, with bigger models (GPT-3), we can see \textbf{few-shot learning}, where the model is given a few examples of the task in the prompt, and it can generalize to new examples without any gradient updates. It is also called \textbf{in-context learning}. Therefore, there exist another method to prompt the model, using this ability to learn in context without having to fine-tune the model and update weights. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/ch2/22.png}
+    \caption{Prompting methods: zero-shot, one-shot and few-shot learning.}
+    \label{fig:prompting_methods}
+\end{figure}
+
+However, some tasks seem to hard for even large LMs to learn through prompting alone, see for example operations with large numbers, where tasks require multi-step reasoning. Therefore, \textbf{chain-of-thought prompting} has evolved, where the idea is to demonstrate the process we want the model to follow, by providing intermediate reasoning steps in the prompt. This way, the model can decompose complex problems into simpler sub-problems, and solve them step by step. 
+
+\begin{exampleblock}[Chain-of-thought prompting]
+    \textit{Model Input} \\
+    \textbf{Q:} Roger has 5 tennis balls. He buys 2 more cans of tennis balls. Each can has 3 tennis balls. How many tennis balls does he have now? \\
+    \textbf{A:} The answer is 11. \\
+    \textbf{Q:} The cafeteria had 23 apples. If they used 20 to make lunch and bought 6 more, how many apples do they have? \\
+    \textit{Model Output} \\
+    \textbf{A:} The answer is 27. \textbf{Wrong!}
+
+    Using chain-of-thought prompting: \\
+    \textit{Model Input} \\
+    \textbf{Q:} Roger has 5 tennis balls. He buys 2 more cans of tennis balls. Each can has 3 tennis balls. How many tennis balls does he have now? \\
+    \textbf{A:} He starts with 5 tennis balls. He buys 2 cans, each with 3 balls, so he gets 2 * 3 = 6 more balls. In total, he has 5 + 6 = 11 tennis balls. \\
+    \textbf{Q:} The cafeteria had 23 apples. If they used 20 to make lunch and bought 6 more, how many apples do they have? \\
+    \textit{Model Output} \\
+    \textbf{A:} They start with 23 apples. They use 20 for lunch, leaving them with 23 - 20 = 3 apples. They then buy 6 more apples, so they have 3 + 6 = 9 apples. \textbf{Correct!}
+\end{exampleblock}
+
+This chain-of-thought prompt is an emergent property of model at scale (e.g. GPT-3 with 175B parameters). Smaller models don't seem to benefit from it.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/ch2/23.png}
+    \caption{Chain-of-thought prompting performance on arithmetic reasoning tasks.}
+    \label{fig:cot_prompting}
+\end{figure}
+
+An even better approach that was tested is the use of phrases like "Let's think step by step", with which the performance improves even more.
+
+The negative sides of this approach are in the limits to what we can fit in context and in the complex tasks that still need gradient steps. Moreover, language modeling does not mean alignment with human assistance, since they are just made to predict the next most probable token. Therefore, we can do fine-tuning on some tasks, i.e. \textbf{instruction fine-tuning}. To do this, we collect examples of (instruction, output) tuples across many tasks and fine-tune an LM. We then evaluate on unseen tasks.
+As always, the key is to use more data and a model that can scale. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/ch2/24.png}
+    \caption{Instruction fine-tuning.}
+    \label{fig:instruction_fine_tuning}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{assets/ch2/25.png}
+    \caption{Performance of prompting vs. fine-tuning.}
+    \label{fig:prompting_vs_fine_tuning}
+\end{figure}
+
+\begin{warningblock}[Limitations]
+    This approach remains first of all \textbf{expensive}: we need to collect much ground-truth data. Moreover, there are two main problems:
+    \begin{itemize}
+        \item Tasks like open-ended creative generation have no right answer;
+        \item Language modeling penalizes all token-level mistakes equally, but some errors are worse than others. Even with instruction fine-tuning, a mismatch between the LM objective and the objective of satisfying human preferences exists. 
+    \end{itemize} 
+\end{warningblock}
+
+For those limitations, \textbf{Reinforcement Learning with Human Feedback (RLHF)} has been developed. Imagine having a way to get a \textit{human reward} regarding an answer, where higher is better. We want to maximize the expected reward of samples from our LM:
+\[
+\mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\right]
+\]
+We update the parameters of the LM with gradient ascent:
+\[
+\theta_{t+1} := \theta_t + \alpha \nabla_{\theta} \mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\right]
+\]
+Policy gradient methods in RL (e.g. REINFORCE) give us a way to estimate and optimize this objective. The main problem is the almost infinite search space. Since we want 
+\[
+\nabla_{\theta} \mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\right] = \nabla_{\theta} \sum_s R(s)p_{\theta}(s) = \sum_s R(s)\nabla_{\theta} p_{\theta}(s)
+\]
+we can use the log-derivative trick to take the gradient of $\log p_{\theta}(s)$
+\[
+\nabla_{\theta} \log p_{\theta}(s) = \frac{1}{p_{\theta}(s)}\nabla_{\theta} p_{\theta}(s) \quad \to \quad \nabla_{\theta}p_{\theta}(s) = \nabla_{\theta}\log p_{\theta}(s)p_{\theta}(s)
+\]
+and plug it back in the previous equation:
+\[
+\nabla_{\theta} \mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\right] = \sum_s R(s)\nabla_{\theta}\log p_{\theta}(s)p_{\theta}(s) = \mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\nabla_{\theta}\log p_{\theta}(\hat{s})\right]
+\]
+
+Now we can approximate the expectation with Monte Carlo sampling:
+\[
+\mathbb{E}_{\hat{s}\sim P_{\theta}(s)}\left[R(\hat{s})\nabla_{\theta}\log p_{\theta}(\hat{s})\right] \approx \frac{1}{N}\sum_{i=1}^N R(\hat{s}_i)\nabla_{\theta}\log p_{\theta}(\hat{s}_i) \quad \hat{s}_i \sim P_{\theta}(s)
+\]
+giving us the update rule:
+\[
+\theta_{t+1} := \theta_t + \frac{\alpha}{N}\sum_{i=1}^N R(\hat{s}_i)\nabla_{\theta}\log p_{\theta}(\hat{s}_i)
+\]
+
+The problem is that collecting human feedback is expensive and slow. Therefore, we can model their prefereices as a separate (NLP) problem. We can train an LM to predict human preferences from an annotated dataset, then optimize for the predicted reward instead of the actual human reward. This is called \textbf{reward modeling}.
+The second main problem is that human judgements are noisy and miscalibrated. It has been demonstrated, in fact, that instead of asking for direct ratings, asking for \textbf{pairwise comparisons} between two outputs leads to more reliable results. Therefore, the reward model is trained to predict which of two outputs is preferred by humans. Given two outputs $\hat{s}_1$ and $\hat{s}_2$, the probability that $\hat{s}_1$ is preferred over $\hat{s}_2$ is modeled as:
+\[
+J_{RM}(\phi) = -\mathbb{E}_{(s^w,s^l)\sim D}\left[\log \sigma(RM_{\phi}(s^w) - RM_{\phi}(s^l))\right]
+\]     
+where $s^w$ is the winning sample, $s^l$ is the losing sample, and $\sigma$ is the sigmoid function.
+
+Now, to put all together:
+\begin{itemize}
+    \item Initialize a copy of the model $p_{\theta}^{RL}(s)$ with parameters $\theta$;
+    \item Optimize the following reward objective with policy gradient:
+    \[
+        R(s) = RM_{\phi}(s) - \beta \log \left(\frac{p_{\theta}^{RL}(s)}{p^{PT}(s)}\right)
+    \]
+    where $p^{PT}(s)$ is the pretrained LM, and $\beta$ is a hyperparameter that controls the strength of the KL regularization; We pay a price when $p_{\theta}^{RL}(s) > p^{PT}(s)$.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/ch2/26.png}
+    \caption{RLHF provides gains over pretraining + finetuning.}
+    \label{fig:rlhf_gains}
+\end{figure}
+
+\begin{warningblock}[Limitations of RLHF]
+    RLHF is not a silver bullet. Some limitations are:
+    \begin{itemize}
+        \item Reward hacking: the model may find ways to exploit weaknesses in the reward model;
+        \item Catastrophic forgetting: the model may forget how to perform well on the original language modeling task;
+        \item Scalability: collecting human feedback and training reward models can be expensive and time-consuming.
+    \end{itemize}
+\end{warningblock}
+
+\section{Multilingual Models}
+
+So far, in our exploration of transformer-based natural language processing models, we have primarily considered systems that work on a single language or, at least, we have not explicitly considered the possibility of using a single model for multiple languages. However, as we will see in this section, models can handle multiple languages simultaneously, and there are significant advantages to doing so. One of these advantages stems from a phenomenon known as \textbf{transfer learning}, where knowledge gained about one language in the representations learned by the neural network can be applied to other languages. This is particularly valuable for \textit{low-resource} languages, that is, languages with fewer training resources, as they may end up benefiting from the knowledge gained by the model from other languages.
+
+Training a multilingual transformer model is not very different from training a monolingual model. The main difference lies in the training data, which is a mixture of texts in different languages. The tokenizer is created using the entire multilingual corpus with systems such as SentencePiece or byte pair encoding (BPE). If the languages are related, some tokens may be shared, which helps the neural network learn joint representations, also known as \textbf{cross-lingual embeddings}. For example, consider \textit{centro}, \textit{centru}, \textit{centre}, and \textit{center} in Spanish, Asturian, Catalan, and English, respectively; if these words are tokenized as centr and the remaining suffix, the model can learn a representation for \textit{centr} from Spanish, Catalan, or English texts and apply it to Asturian inputs, even if the word \textit{centru} has not been seen in the Asturian training data. Names of people or places can also be easily shared across languages.
+In the common case of data imbalance, where there are significantly more texts in some languages than in others, it is common to use a rebalancing formula to upsample languages with less data, ensuring that their texts are overrepresented in the training or evaluation datasets, as well as in the corpus used to train the tokenizer.
+Interestingly, even without shared tokens, words like \textit{atristuráu} (Asturian) and \textit{sad} (English) might end up with similar embeddings in certain layers of the model. This is another example of the language-independent nature of some of the representations learned.
+Additionally, depending on the task, language-specific tokens can be used as the first token to indicate the language of the text. This practice is more common in encoder-decoder models (e.g., to indicate the target language) than in decoder-only models. These special tokens are added to the vocabulary, prepended to every sentence during both training and inference, and learned in the same way as the \plaintt{MASK} token in BERT-like pretraining.
+Decoder-like language models are usually trained with multilingual data from the beginning but do not require language-specific tokens. The language used in the prompt is sufficient to guide the generation process toward the desired language.
+
+Early pre-trained models, such as BERT, were English-centric. Over time, variants emerged for other languages, like CamemBERT for French, GilBERTo for Italian, or BERTo for Spanish. These models, however, were still essentially monolingual. A turning point came with pre-trained multilingual models like mBERT or XLM-R, which support around a hundred languages, and more recently, Glot500, which extends to 500 languages. These models are self-supervisedly trained with neutral tasks, such as masked language modeling, making them general-purpose models that can be fine-tuned for specific tasks in any of the supported languages. There are also encoder-decoder multilingual models like mBART, mT5 or NLLB-200. More recently, multilingual decoder-only models trained as large language models and covering a wide range of languages have started to emerge, such as EMMA-500, EuroLLM or Aya.
+A notable phenomenon here is the zero-shot generalization ability of the model. For example, in a named entity recognition task, a model fine-tuned only with English texts can be applied to texts in other languages without requiring labeled data in those languages, thanks to the multilingual representations learned during pretraining. This is particularly useful for low-resource languages.
+
+\begin{warningblock}[Challenges]
+    Multilingual models often face the challenge known as the curse of \textit{multilinguality} (a term inspired by the \textit{curse of dimensionality} in statistics and machine learning). This phenomenon refers to a decline in performance for individual languages as the model expands to accommodate a larger number of languages. Languages with more resources often benefit the least from the multilingual model and may even exhibit lower performance compared to a monolingual model trained with the same data.
+    Several techniques have been proposed to mitigate the curse of multilinguality. One approach is the use of \textbf{adapters}, small trainable modules (e.g., a feedforward network), one for each language, inserted at specific points within the transformer layers. During training, common parameters are learned as usual, while adapter parameters are updated only for their associated language. This allows the model to learn a mix of cross-lingual and language-specific parameters. Adapters are also used to fine-tune pre-trained models for new tasks or languages without retraining the entire model. This preserves the original model's weights, updating only the adapter parameters.
+    Other alternatives for using monolingual models in multilingual scenarios, such as \textit{translate-train} or \textit{translate-test}, are also possible. In the first case, training data available in one language is translated into other languages, and a multilingual model is trained with both the source and translated data. In the second case, test data is translated into the language of a monolingual model at inference time. In both cases, machine translation systems perform the translation.
+    Finally, several multilingual datasets are available for different tasks, such as the universal dependencies treebanks, the XNLI dataset for natural language inference, or the Seed or FLORES+ corpora for machine translation.
+\end{warningblock}
