@@ -1,4 +1,14 @@
-\chapter{Particle-Mesh}
+\chapter{Astrophysical Numerical Methods}
+
+\section{N-Body Simulations}
+
+\missing{N-Body Simulation notes}
+
+\newpage
+
+\section{Particle-Mesh}
+
+\todo{Review these notes}
 
 We want to integrate equations for the evolutions of a colisionless fluid acting under the action of gravity. The equations governing the system are the Vlasov-Poisson:
 
@@ -120,3 +130,531 @@ $$
 x_i^{t+ \Delta t} = x_i^{t} +  v_i^{t+1/2 \Delta t} \Delta t
 $$
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newpage
+\section{Hydrodynamics}
+
+In astrophysics, \textbf{numerical hydrodynamics} plays a crucial role in modeling the formation of baryonic structures within dark matter potential wells during non-linear evolutionary phases. The complexity of realistic flows (involving turbulence, shocks, magnetic fields, and radiative processes) demands numerical approaches. 
+
+\medskip
+
+There are two major computational paradigms: 
+
+\begin{itemize}
+    \item \textbf{Eulerian methods} track flow of gas and energy through fixed spatial grids, computing derivatives at stationary points in space; this approach excels at capturing shocks and complex flows. 
+    \item \textbf{Lagrangian methods} follow individual fluid elements as they move through space, with derivatives calculated in a co-moving coordinate system; these methods provide excellent mass conservation and natural resolution adaptivity in regions of high density.
+\end{itemize}
+
+\medskip
+
+The \textbf{Euler equations} form the fundamental framework for describing inviscid fluid motion. This system of coupled PDEs governs the conservation of mass, momentum, and energy:
+
+\begin{align}
+    & \dfrac{d\vec{v}}{dt} = - \dfrac{\nabla P}{\rho} && \text{(momentum conservation)} \tag{1}\label{eq:momentum-conservation}\\[0.6em]
+    & \dfrac{du}{dt} = - \dfrac{P}{\rho} \nabla \cdot \vec{v} && \text{(energy conservation)} \tag{2}\label{eq:energy-conservation}\\[0.6em]
+    & \dfrac{d\rho}{dt} + \rho \nabla \cdot \vec{v} = 0 && \text{(mass conservation)} \tag{3}\label{eq:mass-conservation}\\[0.8em]
+    & P = (\gamma - 1) \rho u && \text{(equation of state)} \tag{4}\label{eq:equation-of-state}
+\end{align}
+
+where $\vec{v}$ is the \bfit{fluid velocity} field, $P$ represents \bfit{pressure}, $u$ denotes \bfit{specific internal energy}, $\rho$ is the \bfit{density}, and $\gamma$ is the \bfit{adiabatic index} (equal to $5/3$ for an ideal monoatomic gas).
+
+\medskip
+
+The total \textbf{Lagrangian derivative} captures how quantities change following a fluid element:
+
+$$
+\dfrac{d}{dt} = \dfrac{dx^i}{dt} \dfrac{\partial}{\partial x^i} + \dfrac{\partial}{\partial t} = \vec v \cdot \nabla + \dfrac{\partial}{\partial t}
+$$
+
+This combines the local time rate of change with the advective transport due to fluid motion.
+
+\medskip
+
+From the principle of mass conservation \eqref{eq:mass-conservation}, we can derive the \textbf{Lagrangian continuity equation}. Applying the chain rule $d\rho/dt = \vec v \cdot \nabla \rho + \partial \rho / \partial t$ and expanding the divergence, we get:
+
+$$
+\dfrac{d\rho}{dt} = - \rho \nabla \cdot \vec{v}
+$$
+
+This shows that density changes are directly related to the divergence of the velocity field: compression ($\nabla \cdot \vec{v} < 0$) increases density, while expansion ($\nabla \cdot \vec{v} > 0$) decreases it.
+
+\medskip
+
+The \textbf{energy equation} derives from the first law of thermodynamics, $dU = dQ - P\,dV$. For adiabatic processes ($dQ = 0$), we substitute the specific volume relationship $dV \rightarrow d(1/\rho) = -d\rho/\rho^2$ and apply the continuity equation:
+
+$$
+du = \dfrac{P}{\rho^2} d\rho \quad\longrightarrow\quad \dfrac{du}{dt} = \dfrac{P}{\rho^2} \dfrac{d\rho}{dt} = - \dfrac{P}{\rho} \nabla \cdot \vec{v}
+$$
+
+This demonstrates how internal energy changes are coupled to the compression or expansion of the fluid through the pressure-volume work term.
+
+\subsection{Smoothed Particle Hydrodynamics (SPH)}
+
+\textbf{Smoothed Particle Hydrodynamics} (SPH) is a Lagrangian method that represents the fluid as a collection of discrete particles, each carrying hydrodynamic properties such as mass, velocity, and internal energy. The fundamental principle is that any quantity at a given point is not taken as a sharp value, but rather \emph{smoothed} over the contributions of neighboring particles within a characteristic length scale $h$, called the \textbf{smoothing length}.
+
+Particles evolve under the Euler equations using these smoothed quantities. At each timestep, positions and velocities are updated, the smoothed fields are recomputed from the new configuration, and the cycle repeats. This approach offers several advantages: automatic adaptivity (particles naturally concentrate in high-density regions), exact conservation of mass and momentum, and straightforward handling of free boundaries.
+
+\subsubsection{Smoothing and the kernel}
+
+The smoothed estimate of a function $f(\vec{r})$ is defined through a convolution with a \textbf{kernel} (or window function) $W$:
+$$
+\tilde{f}_h(\vec{r}) = \int f(\vec{r}') \, W(\vec{r} - \vec{r}', h) \, d^3r'
+$$
+The kernel must satisfy several properties:
+\begin{enumerate}
+    \item \textbf{normalization}: the kernel must hold $\int W(\vec{r}, h) \, d^3r = 1$, ensuring that $\lim_{h \to 0} \tilde{f}_h(\vec{r}) = f(\vec{r})$. 
+    \item \textbf{radially symmetric}: the kernel should be radially symmetric to conserve angular momentum. 
+    \item \textbf{compact support}: the kernel should vanish beyond some radius to limit computational cost.
+\end{enumerate}
+
+\medskip
+
+To convert the integral into a sum over particles, we multiply and divide by the density field:
+
+$$
+\tilde{f}_h(\vec{r}) = \int \frac{f(\vec{r}')}{\rho(\vec{r}')} \, W(\vec{r} - \vec{r}', h) \, \rho(\vec{r}') \, d^3r'
+$$
+
+Since each particle $b$ occupies a volume element $d^3r' \approx m_b / \rho_b$, we obtain:
+
+$$
+f(\vec{r}) \simeq \sum_b \frac{m_b}{\rho_b} \, f_b \, W(\vec{r} - \vec{r}_b, h)
+$$
+
+Setting $f = \rho$ yields the fundamental \textbf{SPH density estimator}:
+
+$$
+\boxed{\rho(\vec{r}) = \sum_b m_b \, W(\vec{r} - \vec{r}_b, h)}
+$$
+
+This formula, central to SPH, automatically satisfies the continuity equation when particle masses are conserved.
+
+Since derivatives act on smooth functions, we can transfer the gradient operator onto the kernel. The \textbf{SPH gradient estimator} in its naive form is:
+
+$$
+\nabla f(\vec{r}) = \sum_b \frac{m_b}{\rho_b} \, f_b \, \nabla W(\vec{r} - \vec{r}_b, h)
+$$
+
+This naive form, however, does not vanish for constant $f$. To enforce this property, we use a symmetrized formulation. Introducing an auxiliary fields $\Phi$ and $A$, the identity
+
+$$
+\frac{\partial A}{\partial x} = \frac{1}{\Phi} \left( \frac{\partial (\Phi A)}{\partial x} - A \frac{\partial \Phi}{\partial x} \right)
+$$
+
+leads to the \textbf{SPH gradient} (computed on particle $a$):
+
+$$
+\left( \frac{\partial A}{\partial x} \right)_a = \frac{1}{\Phi_a} \sum_b m_b \frac{\Phi_b}{\rho_b} (A_b - A_a) \frac{\partial W_{ab}}{\partial x_a}
+$$
+
+where $W_{ab} \equiv W(|\vec{r}_a - \vec{r}_b|, h)$. This form vanishes identically when $A$ is constant. Common choices are $\Phi = 1$ and $\Phi = \rho$, giving respectively:
+
+$$
+\left( \frac{\partial A}{\partial x} \right)_a = \sum_b \frac{m_b}{\rho_b} (A_b - A_a) \frac{\partial W_{ab}}{\partial x_a}
+\qquad \text{or} \qquad
+\left( \frac{\partial A}{\partial x} \right)_a = \frac{1}{\rho_a} \sum_b m_b (A_b - A_a) \frac{\partial W_{ab}}{\partial x_a}
+$$
+
+For the \textbf{SPH divergence} (needed in the continuity equation), analogous expressions hold:
+
+$$
+\frac{d\rho_a}{dt} = \sum_b m_b \, \vec{v}_{ab} \cdot \nabla_a W_{ab}
+\qquad \text{or} \qquad
+\frac{d\rho_a}{dt} = \rho_a \sum_b \frac{m_b}{\rho_b} \, \vec{v}_{ab} \cdot \nabla_a W_{ab}
+$$
+
+Differentiating the kernel twice amplifies numerical noise. A more stable \textit{approximation} for the \textbf{Laplacian} is:
+$$
+(\nabla^2 f)_a = 2 \sum_b \frac{m_b}{\rho_b} (f_a - f_b) \frac{W_{ab}}{r_{ab}}
+$$
+
+Despite this, higher-order derivatives remain problematic in SPH, making diffusion-type equations (thermal conduction, physical viscosity) challenging to handle accurately.
+
+To understand the accuracy of the smoothing procedure, we expand $f(\vec{r}')$ in a Taylor series about $\vec{r}$:
+
+$$
+f(\vec{r}') = \sum_{k=0}^\infty \dfrac{(-1)^k h^k f^{(k)}(\vec{r})}{k!} \left(\dfrac{\vec{r}' - \vec{r}}{h}\right)^k
+$$
+
+Substituting into the convolution integral and exploiting the symmetry properties of the kernel, \textit{odd-order} terms vanish:
+$$
+\tilde{f}_h(\vec{r}) = f(\vec{r}) + C h^2 + O(h^4)
+$$
+
+where the coefficient $C$ contains second-order derivatives of the function. This means that constant and linear functions are reproduced exactly, while the leading error is second-order in the smoothing length.
+In practice, the \textbf{cubic spline kernel} is the most widely used choice, offering a good balance between accuracy and computational efficiency:
+
+\small
+$$
+W(q) = \dfrac{\sigma}{h^d}
+\begin{cases}
+    1 - \dfrac{3}{2} q^2 + \dfrac{3}{4} q^3 & \text{if } 0 \leq q \leq 1 \\[0.3em]
+    \dfrac{1}{4} (2 - q)^3 & \text{if } 1 < q \leq 2 \\[0.3em]
+    0 & \text{if } q > 2
+\end{cases}
+$$
+\normalsize
+
+where $q = r_{ab}/h$ is the dimensionless separation, $d$ is the number of spatial dimensions, and $\sigma$ is a normalization constant: $\sigma = 2/3$ in 1D, $\sigma = 10/(7\pi)$ in 2D, and $\sigma = 1/\pi$ in 3D. The compact support (vanishing for $q > 2$) limits neighbor searches to within a radius of $2h$.
+
+The \textbf{Gaussian kernel}, $W(r,h) \propto \exp(-r^2/h^2)$, is sometimes used for theoretical analysis due to its smoothness, but its non-compact support makes it impractical. Higher-order kernels (quintic splines, Wendland functions) offer better accuracy but at greater computational cost.
+
+\vspace{-0.4em}
+
+\begin{tipsblock}[Self-contribution]
+    Each particle contributes to its own density estimate, typically as the dominant term since the kernel peaks at zero separation.
+\end{tipsblock}
+
+\subsubsection{SPH equations of motion}
+
+With the discretization machinery in place, we can now write the SPH form of the Euler equations. A naive application of the SPH gradient formula to the momentum equation \eqref{eq:momentum-conservation} yields:
+$$
+\dfrac{d\vec{v}_a}{dt} = -\dfrac{1}{\rho_a} \sum_b \dfrac{m_b}{\rho_b} P_b \nabla_a W_{ab}
+$$
+However, this formulation does not conserve momentum. To see why, consider the force exerted on particle $a$ by particle $b$:
+$$
+\vec{F}_{ba} = m_a \left( \dfrac{d\vec{v}_a}{dt} \right)_b = -\dfrac{m_a m_b}{\rho_a \rho_b} P_b \nabla_a W_{ab}
+$$
+and the reaction force on $b$ from $a$:
+$$
+\vec{F}_{ab} = m_b \left( \dfrac{d\vec{v}_b}{dt} \right)_a = -\dfrac{m_b m_a}{\rho_b \rho_a} P_a \nabla_b W_{ba} = \dfrac{m_a m_b}{\rho_a \rho_b} P_a \nabla_a W_{ab}
+$$
+where we used $\nabla_b W_{ba} = -\nabla_a W_{ab}$. If $P_a \neq P_b$, then $\vec{F}_{ba} \neq -\vec{F}_{ab}$ and Newton's third law is violated.
+
+To obtain a momentum-conserving form, we use the identity:
+$$
+\nabla \left( \dfrac{P}{\rho} \right) = \dfrac{\nabla P}{\rho} - P \dfrac{\nabla \rho}{\rho^2}
+\quad \Longrightarrow \quad
+\dfrac{\nabla P}{\rho} = \nabla \left( \dfrac{P}{\rho} \right) + \dfrac{P}{\rho^2} \nabla \rho
+$$
+Writing the gradients in SPH form and combining terms:
+$$
+\dfrac{d\vec{v}_a}{dt} = - \sum_b \dfrac{m_b}{\rho_b} \dfrac{P_b}{\rho_b} \nabla_a W_{ab} -\dfrac{P_a}{\rho_a^2} \sum_b m_b \nabla_a W_{ab}
+$$
+Therefore, the \textbf{SPH momentum equation} is:
+$$
+\boxed{
+\dfrac{d\vec{v}_a}{dt} = -\sum_b m_b \left( \dfrac{P_a}{\rho_a^2} + \dfrac{P_b}{\rho_b^2} \right) \nabla_a W_{ab}
+}
+$$
+This symmetry ensures exact conservation of linear and angular momentum: $\nabla_a W_{ab} = -\nabla_b W_{ba}$.
+
+The energy equation follows from the first law of thermodynamics:
+$$
+\dfrac{du}{dt} = - \dfrac{P}{\rho^2} d\rho
+$$
+Recall the principle of energy conservation \eqref{eq:energy-conservation}. Using the SPH density estimator $\rho_a = \sum_b m_b W_{ab}$, we compute:
+$$
+\dfrac{d\rho_a}{dt} = \dfrac{d}{dt} \left( \sum_b m_b W_{ab} \right) = \sum_b m_b \dfrac{dW_{ab}}{dt}
+$$
+The time derivative of the kernel requires the chain rule. Since $W_{ab} = W(r_{ab}, h)$ with $r_{ab} = |\vec{r}_a - \vec{r}_b|$:
+$$
+\dfrac{dW_{ab}}{dt} = \dfrac{\partial W_{ab}}{\partial r_{ab}} \dfrac{dr_{ab}}{dt}
+= \dfrac{\partial W_{ab}}{\partial r_{ab}} \dfrac{(\vec{r}_a - \vec{r}_b) \cdot (\vec{v}_a - \vec{v}_b)}{r_{ab}}
+= \nabla_a W_{ab} \cdot \vec{v}_{ab}
+$$
+Substituting back yields the \textbf{SPH energy equation}:
+$$
+\boxed{
+\dfrac{du_a}{dt} = \dfrac{P_a}{\rho_a^2} \sum_b m_b \, \vec{v}_{ab} \cdot \nabla_a W_{ab}
+}
+$$
+The system is closed by the \textbf{equation of state} for an ideal gas:
+$$
+\boxed{
+P_a = (\gamma - 1) \rho_a u_a
+}
+$$
+Together, these three equations constitute a complete set of SPH equations.
+
+\subsubsection{Conservation properties}
+
+The SPH equations conserve \textbf{momentum}, \textbf{energy}, and \textbf{angular momentum} by construction. This can be verified by showing that the following quantities vanish:
+$$
+\sum_a m_a \dfrac{d\vec{v}_a}{dt} = 0, \qquad
+\dfrac{dE}{dt} = \dfrac{d}{dt} \sum_a \left( m_a u_a + \dfrac{1}{2} m_a v_a^2 \right) = 0, \qquad
+\sum_a \vec{M}_a = 0
+$$
+where $\vec{M}_a = \vec{r}_a \times \vec{F}_a$ is the torque on particle $a$. The proofs rely on the symmetry properties of the kernel (specifically $\nabla_a W_{ab} = -\nabla_b W_{ba}$) and the pairwise structure of the forces.
+
+\subsection{Adaptive resolution and the Lagrangian formulation}
+
+The smoothing length $h$ defines the minimum length scale above which numerical results have physical meaning. Many astrophysical problems (such as the formation of cosmic structures) involve a wide dynamical range in density, requiring \textbf{adaptive resolution}: the smoothing length must vary spatially to maintain accuracy in both dense and rarefied regions.
+
+Common prescriptions for setting $h$ include keeping the number of neighbor particles fixed, or keeping the gas mass enclosed within a sphere of radius $h$ constant (if particle masses can vary). In either case, $h$ becomes a function of the local density: $h_a = h(\rho_a)$.
+
+However, the SPH equations derived earlier assume a constant $h$. When $h$ varies spatially, we must rederive the equations to account for this dependence. An elegant way to do this is through a \textbf{variational principle}, which guarantees conservation properties by construction.
+
+\subsubsection{Lagrangian derivation of SPH}
+
+We start by discretizing the Lagrangian of an ideal fluid in the continuum with a sum over particles:
+$$
+L = \int \rho \left( \dfrac{v^2}{2} - u(\rho, s) \right) dV
+\quad \Longrightarrow \quad
+L_{\text{SPH}} = \sum_b m_b \left( \dfrac{v_b^2}{2} - u(\rho_b, s_b) \right)
+$$
+Applying the Euler-Lagrange equations:
+$$
+\dfrac{d}{dt} \left( \dfrac{\partial L}{\partial \vec{v}_a} \right) - \dfrac{\partial L}{\partial \vec{r}_a} = 0
+$$
+The first term gives simply $m_a \frac{d\vec{v}_a}{dt}$:
+$$
+\dfrac{\partial L}{\partial \vec{v}_a} = \dfrac{\partial}{\partial \vec{v}_a} \left[ \sum_b m_b \left( \dfrac{v_b^2}{2} - u(\rho_b, s_b) \right) \right] = m_a \vec{v}_a
+$$
+For the second term, we need:
+$$
+\dfrac{\partial L}{\partial \vec{r}_a} = \dfrac{\partial}{\partial \vec{r}_a} \left[ \sum_b m_b \left( \dfrac{v_b^2}{2} - u(\rho_b, s_b) \right) \right]
+= -\sum_b m_b \left. \dfrac{\partial u_b}{\partial \rho_b} \right|_s \cdot \dfrac{\partial \rho_b}{\partial \vec{r}_a}
+$$
+Using $\left( \frac{\partial u}{\partial \rho} \right)_s = \dfrac{P}{\rho^2}$, we get:
+$$
+m_a \frac{d\vec{v}_a}{dt} = -\sum_b m_b \dfrac{P_b}{\rho_b^2} \dfrac{\partial \rho_b}{\partial \vec{r}_a}
+$$
+Computing $\partial \rho_b / \partial \vec{r}_a$ from the density estimator, one recovers the SPH momentum equation.
+
+\subsubsection{Grad-h terms for variable smoothing length}
+
+When $h$ depends on position (through its dependence on density), the time derivative of the density picks up an additional term. Starting from $\rho_a = \sum_b m_b W_{ab}(h_a)$:
+
+$$
+\begin{array}{rcl}
+\dfrac{d\rho_a}{dt} &=& \displaystyle \dfrac{d}{dt} \left( \sum_b m_b W_{ab}(h_a) \right)
+= \sum_b m_b \bigg\{ \dfrac{\partial W_{ab}(h_a)}{\partial r_{ab}} \dfrac{dr_{ab}}{dt} + \dfrac{\partial W_{ab}(h_a)}{\partial h_a} \dfrac{dh_a}{dt}\bigg\}\\[0.7em]
+&=& \displaystyle \sum_b m_b \vec{v}_{ab} \cdot \nabla_a W_{ab}(h_a) + \dfrac{\partial h_a}{\partial \rho_a} \dfrac{d\rho_a}{dt} \sum_b m_b \dfrac{\partial W_{ab}(h_a)}{\partial h_a} = ...
+\end{array}
+$$
+$$
+\dfrac{d\rho_a}{dt} \left( 1 - \dfrac{\partial h_a}{\partial \rho_a} \sum_b m_b \dfrac{\partial W_{ab}(h_a)}{\partial h_a} \right) = \sum_b m_b v_{ab} \cdot \nabla_a W_{ab}(h_a)
+$$
+
+Defining the \textbf{grad-h correction factor} $
+\Omega_a = 1 - \dfrac{\partial h_a}{\partial \rho_a} \sum_b m_b \dfrac{\partial W_{ab}(h_a)}{\partial h_a}
+$, we get:
+
+$$
+\boxed{
+\dfrac{d\rho_a}{dt} = \dfrac{1}{\Omega_a} \sum_b m_b \, \vec{v}_{ab} \cdot \nabla_a W_{ab}(h_a)
+}
+$$
+
+Similarly, the spatial derivative of the density (needed for the momentum equation) becomes:
+
+$$
+\nabla_a \rho_b = \dfrac{\partial \rho_b}{\partial \vec{r}_a} 
+= \sum_k m_k \left\{ \nabla_a W_{bk}(h_b) + \dfrac{\partial W_{bk}(h_b)}{\partial h_b} \dfrac{\partial h_b}{\partial \rho_b} \dfrac{\partial \rho_b}{\partial \vec{r}_a}\right\}
+= \dfrac{1}{\Omega_b} \sum_k m_k \nabla_a W_{bk}(h_b)
+$$
+
+\subsubsection{SPH equations with grad-h corrections}
+
+Substituting $\nabla_a \rho_b$ into the Euler-Lagrange equations $m_a \dfrac{d\vec{v}_a}{dt} = -\sum_b m_b \dfrac{P_b}{\rho_b^2} \nabla_a \rho_b$ and applying the thermodynamic identity $\left( \frac{\partial u}{\partial \rho} \right)_s = \dfrac{P}{\rho^2}$, we obtain the \textbf{momentum equation with grad-h corrections}:
+
+$$
+\boxed{
+\dfrac{d\vec{v}_a}{dt} = -\sum_b m_b \left( \dfrac{P_a}{\Omega_a \rho_a^2} \nabla_a W_{ab}(h_a) + \dfrac{P_b}{\Omega_b \rho_b^2} \nabla_a W_{ab}(h_b) \right)
+}
+$$
+
+A key feature of this formulation is that each particle's contribution is evaluated using \textit{its own smoothing length}. The kernel gradient achieves ``automatic'' symmetrization through the inherent structure of the equation: the first term employs $W(r_{ab}, h_a)$ while the second utilizes $W(r_{ab}, h_b)$. This asymmetric kernel evaluation is essential for maintaining conservation properties when resolution varies spatially.
+
+\medskip
+
+The \textbf{energy equation with grad-h corrections} follows from the first law of thermodynamics, $\dfrac{du_a}{dt} = \dfrac{P_a}{\rho_a^2} \dfrac{d\rho_a}{dt}$, combined with the modified density evolution:
+
+$$
+\boxed{
+\dfrac{du_a}{dt} = \dfrac{1}{\Omega_a} \dfrac{P_a}{\rho_a^2} \sum_b m_b \, \vec{v}_{ab} \cdot \nabla_a W_{ab}(h_a)
+}
+$$
+
+These equations seamlessly reduce to the standard SPH formulation when $h$ is held constant, since $\Omega_a \to 1$ in that limit. The variational derivation from the Lagrangian guarantees that total energy, linear momentum, and angular momentum are conserved \emph{exactly}, even with spatially varying resolution, a crucial property for long-duration simulations of self-gravitating systems.
+
+\subsubsection{Entropy formulation and Lagrangian constraints}
+
+The standard formulation of SPH does not conserve entropy explicitly. To achieve proper conservation properties, we introduce an \textbf{entropic function} $A(s)$ defined:
+$$
+P = A(s) \rho^\gamma
+$$
+where $A(s)$ depends only on the entropy $s$. From the equation of state, we can express:
+$$
+u = \dfrac{A(s)}{\gamma - 1} \rho^{\gamma - 1}
+$$
+
+The key insight is that integrating $dA/dt = 0$ is mathematically equivalent to integrating the energy equation, but with a crucial advantage: entropy is \textbf{manifestly conserved} in the absence of shocks.
+
+We introduce \textbf{Lagrangian constraints} such that a sphere of radius $h$ contains a fixed mass $M_{\text{sph}}$:
+$$
+\phi(\rho) = \dfrac{4}{3} h^3 \rho - M_{\text{sph}} = 0
+$$
+
+The Lagrangian for the system becomes:
+$$
+L(\vec{q}, \dot{\vec{q}}) = \sum_a m_a \left( \dfrac{\vec{v}_a^2}{2} - \dfrac{A_a}{\gamma - 1} \rho_a^{\gamma - 1} \right)
+=
+\dfrac 12 \sum_a m_a \vec{v}_a^2 - \dfrac{1}{\gamma - 1} \sum_a m_a A_a \rho_a^{\gamma - 1}
+$$
+
+Here the independent variables are $\vec{q} = (\vec{r}_1, \ldots, \vec{r}_N, h_1, \ldots, h_N)$. The crucial departure from standard formulations is that the smoothing lengths $h_a$ are now treated as dynamical variables.
+To minimize the action while respecting the constraint that each smoothing sphere encloses a fixed mass, we introduce \textbf{Lagrange multipliers} $\lambda_a$. The constrained Euler-Lagrange equations then read:
+$$
+\dfrac{d}{dt} \dfrac{\partial L}{\partial \dot{q}_i} - \dfrac{\partial L}{\partial q_i} = \lambda_i \dfrac{\partial \phi_i}{\partial q_i}
+$$
+
+The second set of $N$ equations (one for each smoothing length) gives:
+$$
+\lambda_a = \dfrac{3 m_a P_a}{4\pi h_a^4 \rho_a^2} \left[ 1 + \dfrac{3\rho_a}{h_a} \left( \dfrac{\partial \rho_a}{\partial h_a} \right)^{-1} \right]^{-1}
+$$
+
+Using the constraint equations, the first $N$ equations yield:
+$$
+m_a \dfrac{d\vec{v}_a}{dt} = -\sum_{b=1}^{N} m_b \dfrac{P_b}{\rho_b^2} \left[ 1 + \dfrac{h_b}{3\rho_b} \dfrac{\partial \rho_b}{\partial h_b} \right]^{-1} \nabla_a \rho_b
+$$
+
+Now, using $\nabla_a \rho_b = m_b \nabla_a W_{ab}(h_b) + \delta_{ab} \sum_k m_k \nabla_a W_{ak}(h_a)$, we have:
+$$
+\dfrac{d\vec{v}_a}{dt} = -\sum_b m_b \left[ f_a \dfrac{P_a}{\rho_a^2} \nabla_a W_{ab}(h_a) + f_b \dfrac{P_b}{\rho_b^2} \nabla_a W_{ab}(h_b) \right]
+$$
+where the correction factors $f_a$ and $f_b$ are the \textbf{grad-h terms}:
+$$
+f_a = \left( 1 + \dfrac{h_a}{3\rho_a} \dfrac{\partial \rho_a}{\partial h_a} \right)^{-1}
+$$
+
+When a particle moves, this factor $f_a$ changes the density of its neighbors. But if the density changes, the constraint requires that $h$ also changes.
+
+This formulation extends the previous derivation to varying $h$ with a fixed-mass constraint. The key achievements are:
+\begin{enumerate}
+    \item Entropy is manifestly conserved in adiabatic flows.
+    \item Energy conservation holds exactly with spatially varying resolution.
+    \item Smoothing lengths adapt automatically to maintain constant neighbor count.
+\end{enumerate}
+
+\subsubsection{Shock tube test}
+
+\todo{Review this section}
+
+The \textbf{shock tube} (or Sod problem) is the canonical test case for hydrodynamical codes. Consider a one-dimensional tube divided by a membrane at its center, with two fluid regions having different initial conditions. The left region typically has higher pressure and density, while the right region has lower values of both. Both regions are initially at rest. Typical initial conditions (in SI units) are:
+\begin{center}
+\begin{tabular}{lcc}
+    \toprule
+    \textbf{Quantity} & \textbf{Left zone} & \textbf{Right zone} \\
+    \midrule
+    Pressure $P$ & $10^5$ Pa & $10^4$ Pa \\
+    Density $\rho$ & 1 kg/m$^3$ & 0.125 kg/m$^3$ \\
+    Velocity $v$ & 0 m/s & 0 m/s \\
+    \bottomrule
+\end{tabular}
+\end{center}
+
+At time $t = 0$, the membrane is instantaneously removed, creating a classical \textbf{Riemann problem}. The sudden pressure imbalance drives a complex wave pattern that propagates through the tube. Three distinct phenomena emerge:
+
+\textbf{Rarefaction fan.} On the high-pressure side, a rarefaction wave propagates backward into the undisturbed fluid, creating a smooth transition region where density, pressure, and velocity change continuously. The rarefaction fan spreads out over time, producing the characteristic curved profile in the density distribution.
+
+\textbf{Contact discontinuity.} This interface separates the two original fluids. While pressure and velocity are continuous across this boundary, density exhibits a jump discontinuity. The contact discontinuity moves at the local fluid velocity.
+
+\textbf{Shock wave.} On the low-pressure side, a sharp discontinuity propagates forward into the undisturbed fluid. Across the shock, all fluid properties change abruptly; the shock compresses and heats the fluid it encounters.
+
+The resulting flow pattern consists of four distinct regions separated by these three wave types. This problem serves as an excellent test case because it contains both smooth (rarefaction) and discontinuous (shock, contact) solutions, challenging the numerical scheme's ability to handle different types of flow features accurately.
+
+\begin{warningblock}[Euler equations and shocks]
+    The Euler equations, being inviscid, do not contain the physical dissipation mechanisms that operate within real shock fronts. Without additional treatment, numerical solutions develop spurious oscillations near discontinuities.
+\end{warningblock}
+
+\subsubsection{Artificial viscosity}
+
+To capture shocks correctly in SPH, we introduce an \textbf{artificial viscosity} term $\Pi_{ab}$ that adds dissipation only in regions of compression. The pressure terms in the momentum equation are modified as:
+$$
+\left(\dfrac{P_a}{\rho_a^2} + \dfrac{P_b}{\rho_b^2}\right) 
+\quad \longrightarrow \quad
+\left(\dfrac{P_a}{\rho_a^2} + \dfrac{P_b}{\rho_b^2} + \Pi_{ab}\right)
+$$
+
+The artificial viscosity is activated only when particles approach each other:
+$$
+\Pi_{ab} = \begin{cases}
+\dfrac{-\alpha \bar{c}_{s,ab} \mu_{ab} + \beta \mu_{ab}^2}{\bar{\rho}_{ab}} & \text{if } \vec{x}_{ab} \cdot \vec{v}_{ab} < 0 \\[0.5em]
+0 & \text{otherwise}
+\end{cases}
+$$
+where the auxiliary quantity $\mu_{ab}$ is defined as:
+$$
+\mu_{ab} = \dfrac{\bar{h}_{ab} \, \vec{x}_{ab} \cdot \vec{v}_{ab}}{|\vec{x}_{ab}|^2 + \varepsilon \bar{h}_{ab}^2}
+$$
+Here, $\vec{x}_{ab} = \vec{r}_a - \vec{r}_b$ and $\vec{v}_{ab} = \vec{v}_a - \vec{v}_b$ are the relative position and velocity, $\bar{h}_{ab}$ and $\bar{\rho}_{ab}$ are arithmetic averages of the smoothing lengths and densities, $\bar{c}_{s,ab}$ is the average sound speed, and $\varepsilon \approx 0.01$ prevents singularities when particles are very close. Typical parameter values are $\alpha = 1$ and $\beta = 2$.
+
+The linear term (proportional to $\alpha$) provides bulk viscosity that smears shocks over a few smoothing lengths, while the quadratic term (proportional to $\beta$) prevents particle interpenetration in high Mach number shocks.
+
+A drawback of artificial viscosity is that it also damps legitimate shear flows. The \textbf{Balsara switch} reduces this spurious dissipation by weighting the viscosity with a factor that distinguishes between compression and shear:
+$$
+f_a = \dfrac{|\langle \nabla \cdot \vec{v} \rangle_a|}{|\langle \nabla \cdot \vec{v} \rangle_a| + |\langle \nabla \times \vec{v} \rangle_a| + 10^{-4} c_{s,a}/h_a}
+$$
+This factor approaches unity in pure compression (where $\nabla \times \vec{v} = 0$) and vanishes in pure shear (where $\nabla \cdot \vec{v} = 0$). The modified viscosity becomes:
+$$
+\Pi_{ab}' = \Pi_{ab} \cdot \frac{f_a + f_b}{2}
+$$
+The small term in the denominator prevents division by zero in quiescent regions.
+
+\subsubsection{Time integration}
+
+The SPH equations of motion must be integrated in time using a stable and accurate scheme. The \textbf{leapfrog} (or kick-drift-kick) integrator is the standard choice, offering second-order accuracy, time-reversibility, and excellent energy conservation for Hamiltonian systems.
+
+The timestep must satisfy the \textbf{Courant-Friedrichs-Lewy (CFL) condition}, which ensures that information does not propagate more than one resolution element per timestep. For SPH, this becomes:
+$$
+\Delta t < \dfrac{h}{c_s}
+$$
+where $c_s = \sqrt{\gamma P / \rho}$ is the local sound speed. In practice, a safety factor $K \approx 0.1$--$0.15$ is applied, and the global timestep is the minimum over all particles:
+$$
+\Delta t = K \cdot \min_a \left( \dfrac{h_a}{c_{s,a} + 0.6(\alpha c_{s,a} + 2 \max_b |\mu_{ab}|)} \right)
+$$
+The additional terms in the denominator account for the artificial viscosity contribution to signal propagation.
+
+The leapfrog integrator proceeds in three phases per timestep:
+
+\textbf{Kick} (half-step): Update velocities and internal energies by half a timestep using the current accelerations and heating rates:
+\begin{align*}
+    \vec{v}^{n+1/2} &= \vec{v}^n + \frac{\Delta t}{2} \vec{a}^n \\
+    u^{n+1/2} &= u^n + \frac{\Delta t}{2} \dot{u}^n
+\end{align*}
+
+\textbf{Drift} (full step): Update positions by a full timestep using the half-step velocities:
+$$
+\vec{r}^{n+1} = \vec{r}^n + \Delta t \, \vec{v}^{n+1/2}
+$$
+
+After the drift, recompute densities, pressures, and accelerations at the new positions.
+
+\textbf{Kick} (half-step): Complete the velocity and energy update using the new accelerations:
+\begin{align*}
+    \vec{v}^{n+1} &= \vec{v}^{n+1/2} + \frac{\Delta t}{2} \vec{a}^{n+1} \\
+    u^{n+1} &= u^{n+1/2} + \frac{\Delta t}{2} \dot{u}^{n+1}
+\end{align*}
+
+The complete SPH simulation loop can be summarized as follows:
+
+\begin{enumerate}
+    \item \textbf{Initialization}: Set up initial conditions (positions, velocities, masses, internal energies); compute initial densities and pressures.
+    \item \textbf{Force computation}: Find neighbors within $2h$; compute accelerations and energy rates.
+    \item \textbf{Timestep}: Determine $\Delta t$ from the Courant condition.
+    \item \textbf{First kick}: Advance velocities and energies by $\Delta t/2$.
+    \item \textbf{Drift}: Advance positions by $\Delta t$.
+    \item \textbf{Density update}: Recompute densities and pressures from new positions.
+    \item \textbf{Force update}: Recompute accelerations and energy rates.
+    \item \textbf{Second kick}: Complete velocity and energy update.
+    \item \textbf{Output}: Write snapshot if needed.
+    \item \textbf{Loop}: Return to step 3 until final time is reached.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/sph-scheme.png}
+    \caption{Schematic representation of the SPH simulation cycle.}
+    \label{fig:sph-scheme}
+\end{figure}
+
+\begin{observationblock}[Neighbor search]
+    Steps 2, 6, and 7 require finding all particles within distance $2h$ of each particle. For large $N$, a naive $O(N^2)$ search becomes prohibitive. Tree-based algorithms (such as octrees or kd-trees) reduce this to $O(N \log N)$, making SPH practical for millions of particles.
+\end{observationblock}
+
+\begin{tipsblock}[Choosing $h$ in practice]
+    For a simple 1D simulation with $N$ particles over a domain of length $L$, setting $h = 32 L / N$ ensures each particle has approximately 64 neighbors within the kernel support radius $2h$. In 3D, a typical choice is $N_{\text{ngb}} \approx 32$--$64$ neighbors.
+\end{tipsblock}
