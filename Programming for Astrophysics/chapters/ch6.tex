@@ -1,12 +1,15 @@
 \chapter{Astrophysical Numerical Methods}
 
-\section{N-Body Simulations}
+\section{Gravitational N-Body Methods}
+
+
+\subsection{Direct N-Body}
 
 \missing{N-Body Simulation notes}
 
 \newpage
 
-\section{Particle-Mesh}
+\subsection{Particle-Mesh}
 
 \todo{Review these notes}
 
@@ -133,7 +136,7 @@ $$
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newpage
-\section{Hydrodynamics}
+\section{Hydrodynamics simulations}
 
 In astrophysics, \textbf{numerical hydrodynamics} plays a crucial role in modeling the formation of baryonic structures within dark matter potential wells during non-linear evolutionary phases. The complexity of realistic flows (involving turbulence, shocks, magnetic fields, and radiative processes) demands numerical approaches. 
 
@@ -522,6 +525,8 @@ $$
 
 When a particle moves, this factor $f_a$ changes the density of its neighbors. But if the density changes, the constraint requires that $h$ also changes.
 
+\medskip
+
 This formulation extends the previous derivation to varying $h$ with a fixed-mass constraint. The key achievements are:
 \begin{enumerate}
     \item Entropy is manifestly conserved in adiabatic flows.
@@ -529,70 +534,130 @@ This formulation extends the previous derivation to varying $h$ with a fixed-mas
     \item Smoothing lengths adapt automatically to maintain constant neighbor count.
 \end{enumerate}
 
-\subsubsection{Shock tube test}
+\subsection{Shock tube test}
 
-\todo{Review this section}
+The \textbf{shock tube} is the canonical test case for hydrodynamical codes. 
 
-The \textbf{shock tube} (or Sod problem) is the canonical test case for hydrodynamical codes. Consider a one-dimensional tube divided by a membrane at its center, with two fluid regions having different initial conditions. The left region typically has higher pressure and density, while the right region has lower values of both. Both regions are initially at rest. Typical initial conditions (in SI units) are:
-\begin{center}
-\begin{tabular}{lcc}
-    \toprule
-    \textbf{Quantity} & \textbf{Left zone} & \textbf{Right zone} \\
-    \midrule
-    Pressure $P$ & $10^5$ Pa & $10^4$ Pa \\
-    Density $\rho$ & 1 kg/m$^3$ & 0.125 kg/m$^3$ \\
-    Velocity $v$ & 0 m/s & 0 m/s \\
-    \bottomrule
-\end{tabular}
-\end{center}
+\medskip
 
-At time $t = 0$, the membrane is instantaneously removed, creating a classical \textbf{Riemann problem}. The sudden pressure imbalance drives a complex wave pattern that propagates through the tube. Three distinct phenomena emerge:
+\begin{minipage}{0.53\textwidth}
+    Consider a tube divided by a membrane, with two fluid regions at different initial conditions: high pressure and density on the left, low values on the right. Both regions start at rest.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/shock-tube.jpg}
 
-\textbf{Rarefaction fan.} On the high-pressure side, a rarefaction wave propagates backward into the undisturbed fluid, creating a smooth transition region where density, pressure, and velocity change continuously. The rarefaction fan spreads out over time, producing the characteristic curved profile in the density distribution.
+    \vspace{-0.8em}
+    \captionof{figure}{The shock tube problem}
+    \label{fig:shock-tube}
+\end{minipage}
 
-\textbf{Contact discontinuity.} This interface separates the two original fluids. While pressure and velocity are continuous across this boundary, density exhibits a jump discontinuity. The contact discontinuity moves at the local fluid velocity.
+\medskip
 
-\textbf{Shock wave.} On the low-pressure side, a sharp discontinuity propagates forward into the undisturbed fluid. Across the shock, all fluid properties change abruptly; the shock compresses and heats the fluid it encounters.
+At time $t = 0$, the membrane is instantaneously removed, creating a classical \textbf{Riemann problem}. The sudden pressure imbalance drives a complex wave pattern that propagates through the tube. 
 
-The resulting flow pattern consists of four distinct regions separated by these three wave types. This problem serves as an excellent test case because it contains both smooth (rarefaction) and discontinuous (shock, contact) solutions, challenging the numerical scheme's ability to handle different types of flow features accurately.
+Three distinct phenomena emerge:
+
+\begin{itemize}
+\item \textbf{Rarefaction fan}: On the high-pressure side, a rarefaction wave propagates backward into the undisturbed fluid, creating a smooth transition region where density, pressure, and velocity change continuously. The rarefaction fan spreads out over time, producing the characteristic curved profile in the density distribution.
+
+\item \textbf{Contact discontinuity}: This interface separates the two original fluids. While pressure and velocity are continuous across this boundary, density exhibits a jump discontinuity. The contact discontinuity moves at the local fluid velocity.
+
+\item \textbf{Shock wave}: On the low-pressure side, a sharp discontinuity propagates forward into the undisturbed fluid. Across the shock, all fluid properties change abruptly; the shock compresses and heats the fluid it encounters.
+\end{itemize}
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/shocks.jpg}
+    \vspace{-0.5em}
+    \caption{Solution to the shock tube problem. \cite{rosswog2009}}
+    \label{fig:shocks}
+\end{figure}
+
+\vspace{-0.7em}
+
+The resulting flow pattern consists of four distinct regions separated by these three wave types. This problem serves as an excellent test case because it contains both smooth (rarefaction) and discontinuous (shock, contact) solutions.
 
 \begin{warningblock}[Euler equations and shocks]
     The Euler equations, being inviscid, do not contain the physical dissipation mechanisms that operate within real shock fronts. Without additional treatment, numerical solutions develop spurious oscillations near discontinuities.
 \end{warningblock}
 
-\subsubsection{Artificial viscosity}
+\subsection{Artificial viscosity}
 
-To capture shocks correctly in SPH, we introduce an \textbf{artificial viscosity} term $\Pi_{ab}$ that adds dissipation only in regions of compression. The pressure terms in the momentum equation are modified as:
+The idea behind artificial viscosity is to add dissipative terms that give shocks a finite thickness comparable to the particle spacing, allowing the same equations to be used throughout without explicit shock tracking. Artificial viscosity is not meant to mimic physical viscosity; it is an ad hoc method to produce on a resolvable scale what results from unresolvable, small-scale dissipation within real shock fronts.
+
+The artificial pressure must satisfy several requirements: no real discontinuities occur, the shock layer thickness is everywhere of the order of the resolution length scale, no noticeable effects occur away from shock layers, and the Rankine-Hugoniot relations hold when considering length scales large compared to the shock thickness. Von Neumann and Richtmyer suggested adding an artificial pressure contribution proportional to:
+$$q_{\text{NR}} = c_2 \rho l^2 (\nabla \cdot \vec{v})^2$$
+where $c_2$ is a dimensionless parameter of order unity and $l$ is the resolution length scale. This approach works reasonably well for strong shocks, but it still allows oscillations in the post-shock region. To avoid this, an additional term with the form of a bulk viscosity is introduced: 
+$$q_b = -c_1 \rho c_s l (\nabla \cdot \vec{v})$$
+where $c_s$ is the sound speed and $c_1$ is another parameter of order unity.
+
+In SPH, these ideas translate into an artificial viscosity term $\Pi_{ab}$ that modifies the pressure contributions in the momentum equation. The identification of the resolution length scale $l$ with the smoothing length $h$ leads to the standard SPH artificial viscosity formulation. Instead of simply increasing the hydrodynamic pressures by viscous contributions, we augment the pressure terms in the momentum equation \eqref{eq:momentum-conservation} as:
 $$
 \left(\dfrac{P_a}{\rho_a^2} + \dfrac{P_b}{\rho_b^2}\right) 
 \quad \longrightarrow \quad
 \left(\dfrac{P_a}{\rho_a^2} + \dfrac{P_b}{\rho_b^2} + \Pi_{ab}\right)
 $$
 
-The artificial viscosity is activated only when particles approach each other:
+To derive the SPH form, consider first the bulk viscosity contribution in one dimension. The bulk contribution to $\Pi_{ab}$ is proportional to $-c_1 c_s (h/\rho) \partial v / \partial x$. Using a Taylor expansion of the velocity field, we can approximate the velocity gradient as:
+$$
+\left(\frac{\partial v}{\partial x}\right)_a \approx \frac{v_b - v_a}{x_b - x_a} + O((x_b - x_a)^2) \qquad \Rightarrow \qquad \left(\frac{\partial v}{\partial x}\right)_a \approx \frac{x_{ab} v_{ab}}{x_{ab}^2 + \varepsilon \bar{h}_{ab}^2}
+$$
+
+We used $x_{ab} = x_a - x_b$ and $v_{ab} = v_a - v_b$, and regularized the potentially diverging denominator by replacing $1/x_{ab}$ with $x_{ab}/(x_{ab}^2 + \varepsilon \bar{h}_{ab}^2)$. The sign of $x_{ab} v_{ab}$ indicates if particles are approaching ($< 0$) or receding ($> 0$): the artificial viscosity is applied only when particles are converging.
+
+This quantity $\mu_{ab}$ plays the role of $l(\nabla \cdot \vec{v})$ in the original von Neumann-Richtmyer prescription. Adopting standard SPH notation with $c_1 \rightarrow \alpha$ and $c_2 \rightarrow \beta$, the complete artificial viscosity term is:
 $$
 \Pi_{ab} = \begin{cases}
 \dfrac{-\alpha \bar{c}_{s,ab} \mu_{ab} + \beta \mu_{ab}^2}{\bar{\rho}_{ab}} & \text{if } \vec{x}_{ab} \cdot \vec{v}_{ab} < 0 \\[0.5em]
 0 & \text{otherwise}
 \end{cases}
+, \qquad \text{where} \qquad
+\mu_{ab} = \dfrac{\bar{h}_{ab} \, \vec{x}_{ab} \cdot \vec{v}_{ab}}{\vec{x}_{ab}^2 + \varepsilon \bar{h}_{ab}^2}
 $$
-where the auxiliary quantity $\mu_{ab}$ is defined as:
-$$
-\mu_{ab} = \dfrac{\bar{h}_{ab} \, \vec{x}_{ab} \cdot \vec{v}_{ab}}{|\vec{x}_{ab}|^2 + \varepsilon \bar{h}_{ab}^2}
-$$
-Here, $\vec{x}_{ab} = \vec{r}_a - \vec{r}_b$ and $\vec{v}_{ab} = \vec{v}_a - \vec{v}_b$ are the relative position and velocity, $\bar{h}_{ab}$ and $\bar{\rho}_{ab}$ are arithmetic averages of the smoothing lengths and densities, $\bar{c}_{s,ab}$ is the average sound speed, and $\varepsilon \approx 0.01$ prevents singularities when particles are very close. Typical parameter values are $\alpha = 1$ and $\beta = 2$.
 
-The linear term (proportional to $\alpha$) provides bulk viscosity that smears shocks over a few smoothing lengths, while the quadratic term (proportional to $\beta$) prevents particle interpenetration in high Mach number shocks.
+Here, $\bar{h}_{ab}$ and $\bar{\rho}_{ab}$ are arithmetic averages of the smoothing lengths and densities, $\bar{c}_{s,ab}$ is the average sound speed, and $\varepsilon \approx 0.01$ prevents singularities when particles are very close. Numerical experiments suggest typical parameter values of $\alpha \approx 1$, $\beta \approx 2$, and $\varepsilon \approx 0.01$.
+
+To have a consistent formulation, the energy equation must also be modified. Accounting for artificial viscosity, the momentum and energy equations become:
+$$
+\dfrac{d\vec{v}_a}{dt} = -\sum_b m_b \left( \dfrac{P_a}{\rho_a^2} + \dfrac{P_b}{\rho_b^2} + \Pi_{ab} \right) \nabla_a W_{ab}
+$$
+$$
+\dfrac{du_a}{dt} = \sum_b m_b \left(\dfrac{P_a}{\rho_a^2} + \frac{1}{2} \Pi_{ab} \right) \vec{v}_{ab} \cdot \nabla_a W_{ab} 
+$$
+
+The equation for the rate of change of the entropic function $A$ (related to entropy) can also be derived consistently with artificial viscosity:
+$$
+\dfrac{dA_a}{dt} = \dfrac{1}{2} \dfrac{\gamma - 1}{\rho_a^{\gamma - 1}} \sum_b m_b \Pi_{ab} \vec{v}_{ab} \cdot \nabla_a W_{ab}
+$$
+
+This formulation is relevant when using entropy as an independent variable instead of internal energy $u$, as in entropy-conserving SPH schemes. The entropic function $A$ is defined through $P = A \rho^\gamma$, and this equation ensures that entropy increases only at shocks (where $\Pi_{ab} \neq 0$), while remaining constant in smooth adiabatic flows.
+
+\medskip
+
+This formulation still conserves energy, linear momentum, and angular momentum by construction, as the proofs follow analogously to the inviscid case.
 
 A drawback of artificial viscosity is that it also damps legitimate shear flows. The \textbf{Balsara switch} reduces this spurious dissipation by weighting the viscosity with a factor that distinguishes between compression and shear:
 $$
 f_a = \dfrac{|\langle \nabla \cdot \vec{v} \rangle_a|}{|\langle \nabla \cdot \vec{v} \rangle_a| + |\langle \nabla \times \vec{v} \rangle_a| + 10^{-4} c_{s,a}/h_a}
 $$
+
 This factor approaches unity in pure compression (where $\nabla \times \vec{v} = 0$) and vanishes in pure shear (where $\nabla \cdot \vec{v} = 0$). The modified viscosity becomes:
 $$
 \Pi_{ab}' = \Pi_{ab} \cdot \frac{f_a + f_b}{2}
 $$
+
 The small term in the denominator prevents division by zero in quiescent regions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/shear.png}
+    \caption{In pure shear flow, $\vec{x}_{ab}$ has a finite projection on $\vec{v}_{ab}$, causing spurious viscous forces.}
+    \label{fig:artificial-viscosity}
+\end{figure}
 
 \subsubsection{Time integration}
 
@@ -604,32 +669,16 @@ $$
 $$
 where $c_s = \sqrt{\gamma P / \rho}$ is the local sound speed. In practice, a safety factor $K \approx 0.1$--$0.15$ is applied, and the global timestep is the minimum over all particles:
 $$
-\Delta t = K \cdot \min_a \left( \dfrac{h_a}{c_{s,a} + 0.6(\alpha c_{s,a} + 2 \max_b |\mu_{ab}|)} \right)
+\Delta t = K \cdot \min_a \left( \dfrac{h_a}{c_{s,a} + 0.6(c_{s,a} + 2 \max_b |\mu_{ab}|)} \right)
 $$
 The additional terms in the denominator account for the artificial viscosity contribution to signal propagation.
 
-The leapfrog integrator proceeds in three phases per timestep:
+\subsubsection{SPH simulation loop}
 
-\textbf{Kick} (half-step): Update velocities and internal energies by half a timestep using the current accelerations and heating rates:
-\begin{align*}
-    \vec{v}^{n+1/2} &= \vec{v}^n + \frac{\Delta t}{2} \vec{a}^n \\
-    u^{n+1/2} &= u^n + \frac{\Delta t}{2} \dot{u}^n
-\end{align*}
 
-\textbf{Drift} (full step): Update positions by a full timestep using the half-step velocities:
-$$
-\vec{r}^{n+1} = \vec{r}^n + \Delta t \, \vec{v}^{n+1/2}
-$$
+\begin{minipage}[t]{0.63\textwidth}
 
-After the drift, recompute densities, pressures, and accelerations at the new positions.
-
-\textbf{Kick} (half-step): Complete the velocity and energy update using the new accelerations:
-\begin{align*}
-    \vec{v}^{n+1} &= \vec{v}^{n+1/2} + \frac{\Delta t}{2} \vec{a}^{n+1} \\
-    u^{n+1} &= u^{n+1/2} + \frac{\Delta t}{2} \dot{u}^{n+1}
-\end{align*}
-
-The complete SPH simulation loop can be summarized as follows:
+The SPH simulation loop can be summarized as follows:
 
 \begin{enumerate}
     \item \textbf{Initialization}: Set up initial conditions (positions, velocities, masses, internal energies); compute initial densities and pressures.
@@ -643,18 +692,25 @@ The complete SPH simulation loop can be summarized as follows:
     \item \textbf{Output}: Write snapshot if needed.
     \item \textbf{Loop}: Return to step 3 until final time is reached.
 \end{enumerate}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.33\textwidth}
+\vspace{0pt}
+\centering
+\includegraphics[width=\textwidth]{assets/sph-scheme.png}
+\captionof{figure}{Schematic SPH simulation loop.}
+\label{fig:sph-scheme}
+\end{minipage}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{assets/sph-scheme.png}
-    \caption{Schematic representation of the SPH simulation cycle.}
-    \label{fig:sph-scheme}
-\end{figure}
+\begin{tipsblock}[Neighbor search and $h$ choice]
+    \textbf{Neighbor search}
+    
+    Steps 2, 6, and 7 require finding all particles within distance $2h$ of each particle. For large $N$, a naive $O(N^2)$ search becomes prohibitive. 
 
-\begin{observationblock}[Neighbor search]
-    Steps 2, 6, and 7 require finding all particles within distance $2h$ of each particle. For large $N$, a naive $O(N^2)$ search becomes prohibitive. Tree-based algorithms (such as octrees or kd-trees) reduce this to $O(N \log N)$, making SPH practical for millions of particles.
-\end{observationblock}
+    \medskip
 
-\begin{tipsblock}[Choosing $h$ in practice]
-    For a simple 1D simulation with $N$ particles over a domain of length $L$, setting $h = 32 L / N$ ensures each particle has approximately 64 neighbors within the kernel support radius $2h$. In 3D, a typical choice is $N_{\text{ngb}} \approx 32$--$64$ neighbors.
+    \textbf{Choosing $\mathbf{h}$}
+    
+    For a simple 1D simulation with $N$ particles over a domain of length $L$, setting $h = 32 L / N$ ensures each particle has approximately 64 neighbors within the kernel support radius $2h$. In 3D, a typical choice is $N_{\text{ngb}} \approx 32$-$64$ neighbors.
+
 \end{tipsblock}
