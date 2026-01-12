@@ -1,1 +1,249 @@
 \chapter{Architectures for speech}
+
+Automatic transcription of speech by any speaker in any environment is still far from solved, but \textbf{ASR} (Automatic Speech Recognition) technology has matured to the point where it is now viable for many practical tasks. 
+Speech is a natural interface for communicating with smart home appliances, personal assistants or cellphones, where keyboards are less convenient. 
+The opposite, \textbf{TTS} (Text To Speech), also called speech synthesis, is the exact opposite of ASR:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/1.png}
+    \caption{Audio representing the phrase "It's time for lunch".}
+    \label{fig:audio_sample}
+\end{figure}
+
+\section{Feature Extraxtion for ASR: Log Mel Spectrum}
+
+Before describing the algorithms for ASR, we have to talk about how the task itself varies. We have four main dimensions of variation:
+\begin{enumerate}
+    \item \textbf{Vocabulary size} - with a vocabulary of two words it is easy to solve an ASR task, while with 60000 words, as in normal conversations, it is much more difficult;
+    \item \textbf{Who the speaker is talking to} - humans speaking to machines are easier to recognize than humans speaking to humans;
+    \item \textbf{Channel and noise} - speech is easier to recognize if it is recorded in a quiet room with head-mounted microphones than if it is recorded by a distant microphone on a noisy city street;
+    \item \textbf{Accent or speaker-class characteristics} - speech is easier to recognize if the speaker is speaking the same dialect or variety that the system was trained on.
+\end{enumerate}
+
+The first step in ASR is to transform the input waveform into a sequence of acoustic \textbf{feature vectors}, each vector representing the information in a small time window of the signal. The most commonly used features are called \textbf{log mel spectrum} vectors. This conversion has two steps: \textbf{sampling} and \textbf{quantization}. 
+A signal is sampled by measuring its amplitude at a particular time; the \textit{sampling rate} is the number of samples taken per second. To accurately measure a wave, we must have at least two samples in each cycle: one measuring the positive part of the wave and one measuring the negative part. Thus, the maximum frequency wave that can be measured is one whose frequency is half the sample rate. This maximum frequency is called \textbf{Nyquist frequency}.
+Most information in human speech is in frequencies below 10 kHz, so a 20 kHz sampling rate would be necessary for complete accuracy. Since telephone speech is filtered by the switching network and only frequencies less than 4 kHz are transmitted, an 8 kHz sampling rate is sufficient for telephone-bandwidth speech, and 16 kHz for microphone speech. 
+
+\begin{observationblock}
+    Keep in mind that we cannot combine different sampling rates for training and testing ASR systems, so if we are testing on a telephone corpus, we must downsample our training corpus to 8 kHz.
+\end{observationblock}
+
+Amplitude measurements are stored as integers (either 8 or 16 bit), and this process of representing real-valued numbers as integers is called \textbf{quantization}. We refer to each sample at time index $n$ in the digitized, quantized waveform as $x[n]$.
+
+From the digitized waveform, we need to extract spectral features from a small \textbf{window} of speech that characterizes part of a particular phoneme. Inside this small window, we can roughly think of the signal as \textit{stationary} (i.e. same statistical properties). The window has non-zero value inside and zero outside, and we multiply it by the input waveform to produce a windowed waveform. 
+The speech extracted from each window is called a \textbf{frame} and the windowing is characterized by three parameters: 
+\begin{itemize}
+    \item \textbf{Window/Frame size} - width in \textit{ms};
+    \item \textbf{Frame stride} - distance in \textit{ms} between the start of one frame and the start of the next;
+    \item \textbf{Shape} - the shape of the window function (e.g. Hamming, Hanning, rectangular).
+\end{itemize}
+
+To extract the signal we multiply the value of the signal at time $n$, $s[n]$, by the value of the window at time $n$, $w[n]$:
+
+\[
+y[n] = w[n]\cdot s[n]
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/2.png}
+    \caption{Windowing of a speech signal.}
+    \label{fig:windowing}
+\end{figure}
+
+Since the rectangular shape cuts off the signal at its boundaries, which creates problems with the Fourier analysis, the \textbf{Hamming} shape is usually used:
+
+\[
+rectangular \quad w[n] = \begin{cases}
+    1 & 0 \leq n \leq L-1 \\
+    0 & \text{otherwise}
+\end{cases}
+\]   
+\[ 
+Hamming \quad w[n] = \begin{cases}
+    0.54 - 0.46 \cos\left(\frac{2\pi n}{L-1}\right) \quad 0 \leq n \leq L-1\\
+    0 \quad \text{otherwise}
+\end{cases}
+\]
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/3.png}
+    \caption{Different window shapes.}
+    \label{fig:window_shapes}
+\end{figure}
+
+The next step is to extract spectral information for our windowed signal; we need to know how much energy the signal contains at different frequency bands. The tool for this is the \textbf{discrete Fourier transform (DFT)}.
+The input is a windowed signal $x[n],\dots,x[m]$, and the output, for each of $N$ discrete frequency bands, is a complex number $X[k]$ representing the magnitude and phase of that frequency component in the original signal. 
+If we plot the magnitude against the frequency, we can visualize the \textbf{spectrum}, as shown in Fig. \ref{fig:spectrum}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/4.png}
+    \caption{Spectrum of a windowed speech signal (right).}
+    \label{fig:spectrum}
+\end{figure}
+
+Fourier analysis relies on the Euler's formula, with $j$ as the imaginary unit:
+\[
+e^{j\theta} = \cos(\theta) + j\sin(\theta)
+\]
+Moreover, the DFT is defined as:
+\[
+X[k] = \sum_{n=0}^{N-1} x[n] e^{-j(2\pi/N)kn} \quad k = 0, \dots, N-1
+\]
+A commonly used algorithm for computing the DFT is the \textbf{fast Fourier transform (FFT)}, which is very efficient but only works for values of $N$ that are powers of 2.
+
+The results of the FFT tell us the energy at each frequency band. Human hearing, however, is not equally sensitive at all frequency bands; it is less sensitive at higher frequencies. This bias toward low frequencies helps humans recognition, since information in low frequencies like formants is crucial for distinguishing values or nasals, while information in high frequencies like stop bursts or fricative noise is less crucial for successful recognition. Modeling this human perceptual property improves speech recognition performance in the same way.
+
+This intuition is implemented by collecting energies, not equally at each frequency band, but according to the \textbf{mel} scale, an auditory frequency scale. A \textbf{mel} is a unit of pitch. Pair of sounds that are perceptually equidistant in pitch are separated by an equal number of mels. The mel frequency $m$ can be computed from the raw acoustic frequency by a log transformation:
+\[
+mel(f) = 1127\ln(1 + \frac{f}{700})
+\]
+We implement this intuition by creating a bank of filters that collect energy from each frequency band, spread logarithmically so that we have very fine resolution at low frequencies and less resolution at high frequencies. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/5.png}
+    \caption{Mel filter bank.}
+    \label{fig:mel_filter_bank}
+\end{figure}
+
+Finally, we take the log of each of the mel spectrum values. The human response to signal level is logarithmic. Humans are less sensitive to slight differences in amplitude at high amplitudes than at low amplitudes. 
+
+\section{Speech Recognition Architecture}
+
+The basic architecture for ASR is the encoder-decoder. Generally we start from the log mel spectral features described before and map to letters, although it is also possible to use morpheme-like chunks like wordpieces or BPE. This models are referred to as \textbf{attention-based encoder decoder (AED)}, and it is represented in Fig. \ref{fig:aed_asr}.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/6.png}
+    \caption{Attention-based encoder-decoder architecture for ASR.}
+    \label{fig:aed_asr}
+\end{figure}
+
+Given the extreme length difference between input and output, encoder-decoder models for speech need to have a special compression stage that shortens the acoustic feature sequence before the encoder stage. The goal of the subsampling is to produce a shorter sequence $X = x_1,\dots,x_n$ that will be the input to the encoder. The simplest algorithm is called \textbf{low frame rate}: for time $i$ we stack the acoustic feature vector $f_i$ with the prior two vectors $f_{i-1}$ and $f_{i-2}$ to make a new vector three times longer. Then we simply delete $f_{i-1}$ and $f_{i-2}$. After this compression stage, encoder-decoder for speech use the same architecture as for MT or other text.
+
+For inference, the probability of the output sequence $Y$ is decomposed as:
+\[
+p(y_1,\dots,y_n) = \prod_{i=1}^n p(y_i|y_1,\dots,y_{i-1},X)
+\]
+and we can produce each letter of the output via greedy decoding:
+\[
+\hat{y}_i = \argmax{\text{char}\in\text{Alphabet}} P(\text{char}|y_1,\dots,y_{i-1},X)
+\]
+where $X$ is the encoded input sequence.
+
+Since an encoder-decoder model is essentially a conditional language model, encoder-decoders implicitly learn a language model for the output domain of letters from their training data. However, the training data (speech along with text transcriptions) may not include sufficient text to train a good language model. Thus we can usually improve a model at least slightly by incorporating a very large language model. 
+The simplest way to do this is to use a beam search to get a final beam of hypothesized sentences; this beam is sometimes called an \textbf{n-best list}. We can then use a language model to \textbf{rescore} each hypothesis on the beam. The scoring is done by interpolating the score assigned by the language model with the encoder-decoder score used to create the beam, with a weight $\lambda$ tuned on a held-out set.
+
+The training phase is done using the normal cross-entropy loss. At timestep $i$ of decoding, the loss is the log probability of the correct token $y_i$:
+\[
+L_{CE} = -\log p(y_i|y_1,\dots,y_{i-1},X)
+\]
+The loss for the entire sentence is the sum of these losses:
+\[
+L_{CE} = -\sum_{i=1}^n \log p(y_i|y_1,\dots,y_{i-1},X)
+\]
+This loss is then backpropagated through the entire end-to-end model to train the entire encoder-decoder. 
+
+\section{Connectionist Temporal Classification (CTC)}
+
+Here we introduce an alternative to encoder-decoder: the \textbf{Connectionist Temporal Classification (CTC)}. The intuition is to output a single character for every frame of the input, so that the output is the same length as the input and then to apply a collapsing function that combines sequences of identical letters, resulting in a shorter sequence. The sequence of letters corresponding to each input frame is called an \textbf{alignment}, because it tells us where in the acoustic signal each letter aligns to. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/7.png}
+    \caption{CTC architecture for ASR.}
+    \label{fig:ctc_asr}
+\end{figure}
+
+The main problem is that collapsing does not handle double letters, and also it does not tell us what symbol to align with silence the input. To solve them, we use a \textit{blank} symbol, which can be used in the alignment whenever we don't want to transcribe a letter. It can also be used between letters. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/8.png}
+    \caption{Collapsing function in CTC.}
+    \label{fig:ctc_collapsing}
+\end{figure}
+
+But how does CTC assign a probability to one particular alignment $\hat{A} = {\hat{a}_1,\dots,\hat{a}_n}$? CTC makes a strong conditional independence assumption: it assumes that, given the input $X$, the CTC model output $a_t$ at time $t$ is independent of the output labels at any other time $a_i$. Thus:
+\[
+P_{CTC}(A|X) = \prod_{t=1}^T P(a_t|X)
+\]
+Thus to find the best alignment $\hat{A} = {\hat{a}_1,\dots,\hat{a}_T}$ we can greedily choose the character with the max probability at each time step $t$:
+\[
+\hat{a}_t = \argmax{c\in C} p_t(x|X)
+\]
+We then pass the resulting sequence A to the CTC collapsing function B to get the output sequence Y.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/9.png}
+    \caption{CTC decoding process.}
+    \label{fig:ctc_decoding}
+\end{figure}
+
+The problem is that we chose the most likely alignment A, but the most likely alignment may not correspond to the most likely final collapsed output string $Y$. That is because there are many possible alignments that lead to the same output string, and hence the most likely output string might not correspond to the most probable alignment. 
+For this reason, the most probable output sequence $Y$ is one that has, not the single beat CTC alignment, but the highest sum over the probability of all its possible alignments:
+\begin{align}
+    P_{CTC(Y|X)} &= \sum_{A\in B^{-1}(Y)} P(A|X) \\
+    &= sum_{A\in B^{-1}(Y)} \prod_{t=1}^T P(a_t|h_t) \\
+    \hat{Y} &= \argmax{Y} P_{CTC}(Y|X)
+\end{align}
+
+The problem here is that summing over all alignments is very expensive, so we approximate this sum by using a version of the Viterbi beam search that cleverly keeps in the beam the high-probability alignments that map to the same output string, and sums those as an approximation. 
+Moreover, given the strong independence assumption, CTC does not implicitly learn a language model over the data. It is therefore necessary to interpolate a language model using interpolation weights that are trained on a dev set:
+\[
+score_{CTC}(Y|X) = \log P_{CTC}(Y|X) + \lambda_1 \log P_{LM}(Y)\lambda_2 L(Y)
+\]
+
+To train a CTC-based ASR system, we use negative log-likelihood loss with a special CTC loss function. Thus the loss for an entire dataset D is the sum of the negative log-likelihoods of the correct output Y for each input X:
+\[
+L_{CTC} = \sum_{(X,Y)\in D} -\log P_{CTC}(Y|X)
+\]
+
+To compute CTC loss function for a single input pair $(X,Y)$, we need the probability of the output $Y$ given the input $X$. To compute the probability of a given output $Y$ we need to sum over all the possible alignments that would collapse to $Y$. In other words:
+\[
+P_{CTC}(Y|X) = \sum_{A\in B^{-1(Y)}} \prod_{t=1}^T p(a_t|h_t)
+\]
+
+Naively summing over all possible alignments is not feasible, but we can use dynamic programming to merge alignments, with a version of the \textbf{forward-backward algorithm} also used to train HMMs and CRFs.
+
+It is also possible to combine the two arghitextures/loss functions, the cross-entropy loss from the encoder-decoder architecture and the CTC loss. For training, we can simply weight the two losses with a $\lambda$ tuned on a dev set:
+\[
+L = -\lambda \log P_{encdec}(Y|X) - (1 - \lambda)\log P_{ctc}(Y|X)
+\]
+For inference, we can combine the two with the language model, again with learned weights:
+\[
+\hat{Y} = \argmax{Y} \left[\lambda \log P_{encdec}(Y|X) - (1 - \lambda)\log P_{ctc}(Y|X)\right]
+\]
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ch3/10.png}
+    \caption{Combined CTC and encoder-decoder architecture for ASR.}
+    \label{fig:combined_asr}
+\end{figure}
+
+Because of the strong independence assumption in CTC, recognizers based on CTC don't achieve as hich as accuracy as the attention-based encoder-decoder recognizers. CTC recognizers have the advantage, however, that they can be used for \textbf{streaming}, i.e., recognizing words on-line rather than waiting until the end of the sentence to recognize them. 
+Streaming is crucial for many applications, from commands to dictation, where we want to start recognition while the user is still talking. Thus, to do it we need a way to improve CTC recognition to remove the conditional independence assumption, enabling it to know about output history. The \textbf{RNN-Transducer (RNN-T)} does that. It is made of two components:
+\begin{enumerate}
+    \item a CTC acoustic model;
+    \item a separate language model component called the \textbf{predictor} that conditions on the output token history.
+\end{enumerate}
+
+At each time step $t$, the CTC encoder outputs a hidden state $h_t^{enc}$ given the input $x_1,\dots,x_t$. The language model predictor takes as input the previous output token (not counting blanks), outputting a hidden state $h_u^{pred}$. The two are passed through another network whose output is then passed through a softmax to predict the next character.
+\begin{align}
+    P_{RNN-T}(Y|X) &= \sum_{A\in B^{-1}(Y)}P(A|X) \\
+    &= \sum_{A\in B^{-1}(Y)}\prod_{t=1}^T p(a_t|h_t, y_{<u_t})
+\end{align}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/ch3/11.png}
+    \caption{RNN-Transducer architecture for ASR.}
+    \label{fig:rnn_transducer}
+\end{figure}
+
