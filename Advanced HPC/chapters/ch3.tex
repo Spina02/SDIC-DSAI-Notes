@@ -601,7 +601,9 @@ The task creation construct adtmits a number of clauses that allow to control th
 
 \begin{codeblock}[language = C]
 #pragma omp task clause, clause, ...
-{ /* code */ }
+{ 
+    /* code */
+}
 \end{codeblock}
 
 \begin{center}
@@ -633,7 +635,9 @@ The taskloop construct has been conceived to ease this cases, combining the for 
 
 \begin{codeblock}[language = C]
 #pragma omp taskloop [clause [[,] clause] ...]
-for-loops // (perfectly nested)
+{
+    for-loops // (perfectly nested)
+}
 \end{codeblock}
 
 Clauses are very similar to both the usual for and task constructs:
@@ -647,131 +651,123 @@ There are 3 specific clauses for \texttt{taskloop}:
     \item \texttt{nogroup}: Specifies that the tasking construct is not embedded in an otherwise implied \texttt{taskgroup} construct.
 \end{itemize}
 
-\subsection{Task dependencies}
+\subsection{Task priority and dependencies}
 
-A data race occurs when:
-\begin{enumerate}
-	\item Two or more threads access the same memory location
-	\item At least one access is a write
-	\item The accesses are not ordered by synchronization
+\subsubsection{Task priority}
+
+Even when tasks can execute concurrently, it is sometimes beneficial for certain tasks to run earlier than others. For instance, tasks that receive data should typically execute before tasks that post-process the results. The \texttt{priority(p)} clause allows the programmer to suggest a scheduling preference to the OpenMP runtime: higher values of \texttt{p} indicate higher priority.
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+#pragma omp parallel
+#pragma omp single
+{
+    #pragma omp task priority(100)
+    read_data(...);
+    #pragma omp task priority(50)
+    process_and_save_data(...);
+    #pragma omp task priority(10)
+    postprocess_and_send_data(...);
+}
+\end{codeblock}
+
+Note that priority is a \emph{hint} to the scheduler, not a strict ordering guarantee. The runtime may ignore priorities under certain conditions (e.g., when work-stealing from another thread's queue).
+
+\subsubsection{Data races and dependencies}
+
+A \bfit{data race} leads to undefined behavior; it occurs when three conditions are simultaneously met: 
+
+\begin{enumerate}[label=\roman*,align=Center, noitemsep]
+\item two or more threads access the same memory location, 
+\item at least one access is a write
+\item the accesses are not ordered by synchronization.
 \end{enumerate}
 
 \begin{tipsblock}[Debugging data races]
-	The compiler flag \plaintt{-fsanitize=thread} can be used to detect data races:
+The compiler flag \plaintt{-fsanitize=thread} enables runtime detection of data races:
 
-	\begin{codeblock}[language = bash, numbers=none]
-		gcc -fopenmp -fsanitize=thread -g -o program program.c
-	\end{codeblock}
+\begin{center}
+\plaintt{gcc -fopenmp -fsanitize=thread -g -o program program.c}
+\end{center}
 \end{tipsblock}
 
-\begin{itemize}
-\item Start with correct, simple syncronization (\texttt{seq\_cst}, \texttt{critical})
-\item \dots
-\end{itemize}
+In task-based parallelism, data dependencies frequently arise: one task may need the results produced by another, or must wait for another task's operations to complete before proceeding. OpenMP provides the \texttt{depend} clause to express these relationships explicitly, allowing the runtime to schedule tasks in a valid order while maximizing parallelism.
 
-Often, there are data dependencies among different tasks: a given tasks may have to use the results of another one, or in any case to wait for its operations to terminate.
-
-There are 3 types of dependencies:
+OpenMP recognizes three primary \textbf{dependence types}:
 
 \begin{itemize}
-    \item \texttt{IN}:
-	
-	the task will be dependent on a \textit{previously generated} task if that task has an \plaintt{OUT}, \plaintt{INOUT}, or \plaintt{MUTEXINOUTSET} dependence on the same \textit{memory region}.
+    \item \texttt{in}: the task depends on any \emph{previously generated} task that has an \texttt{out}, \texttt{inout}, or \texttt{mutexinoutset} dependence on the same memory region.
     
-    \item \texttt{OUT}, \texttt{[INOUT]$^*$}:
-	
-	the task will be dependent on a \textit{previously generated} task if that task has an \plaintt{IN}, \plaintt{OUT}, or \plaintt{MUTEXINOUTSET} dependence on the same \textit{memory region}.
+    \item \texttt{out} (and \texttt{inout}): the task depends on any previously generated task with an \texttt{in}, \texttt{out}, \texttt{inout}, or \texttt{mutexinoutset} dependence on the same memory region.
     
-    \item \texttt{MUTEXINOUTSET}: 
-	
-	the task will be dependent on a previously generated task if that task has an \plaintt{IN} or \plaintt{OUT} dependence on the same \textit{memory region}; it will be \textit{mutually exclusive} with another \plaintt{MUTEXINOUTSET} sibling task, meaning that they can be executed in any order but not at the same time.
+    \item \texttt{mutexinoutset}: similar to \texttt{out}, but tasks with \texttt{mutexinoutset} on the same variable are \emph{mutually exclusive}: they may execute in any order, but never concurrently.
 \end{itemize}
 
-\begin{observationblock}[INOUT]
-    In modern OpenMP standards, \plaintt{INOUT} dependence type is considered obsolete and is treated as an alias for \plaintt{OUT}. Its use is discouraged in new code.
+\vspace{-0.2em}
+
+\begin{observationblock}[\plaintt{inout} is equivalent to \plaintt{out}]
+In OpenMP 5.x, \plaintt{inout} is treated as an alias for \plaintt{out}. The distinction is purely semantic (indicating that the task both reads and writes a variable); the scheduling behavior is identical.
 \end{observationblock}
 
+
+The dependence types above correspond to well-known data hazards from instruction parallelism:
+
 \begin{itemize}
-    \item \textbf{RaW (Read after Write)}: 
-    
-	When an instruction (task) depends on the result of another instruction (task), that is called a \textbf{flow dependency} or \textbf{true dependency} and referred as \textbf{Read-After-Write} (you need to read a result after it is written)
+\item \textbf{Read-after-Write (RaW)}
 
-    \begin{codeblock}[language=C]
-#pragma omp task depend(out:the_answer)
-function_wise(*the_answer);
+also called a \emph{true dependency} or \emph{flow dependency}, occurs when a task must read data produced by a previous task. This is the fundamental producer-consumer relationship:
 
-#pragma omp task depend(in:the_answer)
-function_curious(*the_answer);
-    \end{codeblock}
-    
-    \item \textbf{WaR (Write after Read)}:
-    
-	When an instruction (task) may change the result of another instruction (task), the ordering must be strict. That is called \textbf{anti-dependency} and referred as \textbf{Write-After-Read}	
+\begin{codeblock}[language=C]
+#pragma omp task depend(out:result)
+compute_result(&result);
 
+#pragma omp task depend(in:result)
+use_result(&result);
+\end{codeblock}
 
-    \begin{codeblock}[language=C]
-#pragma omp task depend(in:the_question)
-function_sage(*the_question);
+\item \textbf{Write-after-Read (WaR)}
 
-#pragma omp task depend(out:the_question)
-function_curious(*the_question);
-    \end{codeblock}
+also known as an \emph{anti-dependency}, occurs when a task overwrites data that a previous task is still reading. The write must wait until all prior reads complete:
 
-    \item \textbf{WaW (Write after Write)}: 
-	
-	When two instructions (tasks) are independent of each other but writes in the same memory location, then there is an \textbf{output dependency} or a \textbf{Write-After-Write}
+\begin{codeblock}[language=C]
+#pragma omp task depend(in:buffer)
+read_buffer(&buffer);
 
-	That may also be considered a \textbf{false dependency} or \textbf{name dependency}, as it may be sufficient a variable renaming to remove it
+#pragma omp task depend(out:buffer)
+overwrite_buffer(&buffer);
+\end{codeblock}
 
-    \begin{codeblock}[language=C]
-function_sage(*the_question);
-function_curious(*the_question);
-    \end{codeblock}
+\item \textbf{Write-after-Write (WaW)}
 
-    \item \textbf{RaR (Read after Read)}: 
-    
-	When two instructions (tasks) read the same memory region, there is actually no dependency
+also known as \emph{output dependency}, occurs when two tasks write to the same location. The final value must come from the logically later task. This is sometimes called a \emph{false dependency} or \emph{name dependency}, since renaming the variable could eliminate it:
 
-    \begin{codeblock}[language=C]
-#pragma omp task depend(in:the_question)
-function_wise1(*the_question);
+\begin{codeblock}[language=C]
+#pragma omp task depend(out:x)
+initialize_x(&x);
 
-#pragma omp task depend(in:the_question)
-function_wise2(*the_question);
-    \end{codeblock}
+#pragma omp task depend(out:x)
+reinitialize_x(&x);
+\end{codeblock}
+
+\item \textbf{Read-after-Read (RaR)} 
+
+involves two tasks reading the same memory region. Since neither modifies the data, there is no actual dependency; both tasks can execute concurrently:
+
+\begin{codeblock}[language=C]
+#pragma omp task depend(in:data)
+analyze_data(&data);
+
+#pragma omp task depend(in:data)
+visualize_data(&data);
+\end{codeblock}
 \end{itemize}
 
-\begin{tipsblock}[OpenMP 5.x Best Practices]
-
-Recommendation hierarchy:
+\begin{tipsblock}[OpenMP 5.x synchronization best practices]
+When choosing synchronization mechanisms, prefer higher-level constructs that are easier to reason about:
 
 \begin{enumerate}
-    \item \textbf{First choice}: High-level synchronization constructs
-    \begin{itemize}
-        \item \plaintt{\#pragma omp barrier}
-        \item \plaintt{\#pragma omp critical}
-        \item \plaintt{\#pragma omp atomic} with appropriate memory order
-    \end{itemize}
-
-    \item \textbf{Second choice}: Atomics with explicit memory order
-    \begin{itemize}
-        \item Use \plaintt{acquire} for reads in consumers
-        \item Use \plaintt{release} for writes in producers
-        \item Use \plaintt{relaxed} for true race-free counters
-    \end{itemize}
-
-    \item \textbf{Last resort}: Explicit flush
-    \begin{itemize}
-        \item Only when you need to synchronize multiple variables simultaneously
-        \item Only when atomics are not available (old OpenMP versions)
-        \item Document extensively why flush is necessary
-    \end{itemize}
-
-    \item \textbf{Never}: \plaintt{volatile} in OpenMP code
-    \begin{itemize}
-        \item Provides no synchronization guarantees
-        \item Can prevent compiler optimizations
-        \item Use atomics instead
-    \end{itemize}
+    \item \textbf{First choice}: High-level constructs (\plaintt{barrier}, \plaintt{critical}, \plaintt{atomic})
+    \item \textbf{Second choice}: Atomics with explicit memory order (\plaintt{acquire}/\plaintt{release})
+    \item \textbf{Last resort}: Explicit \plaintt{flush} (only when synchronizing multiple variables at once)
+    \item \textbf{Avoid}: \plaintt{volatile} provides no synchronization guarantees in OpenMP
 \end{enumerate}
 \end{tipsblock}
