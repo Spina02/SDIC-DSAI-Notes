@@ -66,7 +66,7 @@
   </thead>
   <tbody>
     <tr>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Programming%20for%20Astrophysics/main.pdf">Programming for Astrophysics</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/Spina/Programming%20for%20Astrophysics/main.pdf">Programming for Astrophysics</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
       <td>...</td>
       <td></td>
