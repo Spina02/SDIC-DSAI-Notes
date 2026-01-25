@@ -1,0 +1,154 @@
+\chapter{Temporal-Difference Learning}
+
+TD learning is a combination of Monte Carlo ideas and dynamic programming (DP) ideas. Like Monte Carlo methods, TD methods can learn directly from raw experience without a model of the environment's dynamics. Like DP, TD methods update estimates based in part on other learned estimated, without waiting for a final outcome (they bootstrap).
+
+As usual, we start by focusing on the policy evaluation or \textit{prediction} problem, the problem of esimating the value function $v_{\pi}$ for a given policy $\pi$. For the \textit{control} problem, DP, TD and Monte Carlo methods all use some variation of generalized policy iteration (GPI). 
+
+\section{TD Prediction}
+
+Both TD and Monte Carlo methdos use experience to solve the prediction problem. Given some experience following a policy $\pi$, both methods update their estimate $V$ of $v_{\pi}$ for the nonterminal states $S_t$ occurring in that experience. 
+
+\begin{equation}
+V(S_t) \leftarrow V(S_t) + \alpha\left[G_t - V(S_t)\right] \label{eq:51}
+\end{equation}
+
+Whereas Monte Carlo methods must wait until the end of the episode to determine the increment to $V(S_t)$, TD methods need to wait only until the next time step. At time $t+1$ they immediately form a target and make a useful update using the observed reward $R_{t+1}$ and the estimate $V(S_{t+1})$. The simplest TD method makes the update 
+
+\begin{equation}
+V(S_t) \leftarrow V(S_t) + \alpha\left[R_{t+1} + \gamma V(S_{t+1} - V(S_t))\right] \label{eq:52}
+\end{equation}
+
+This TD method is called \textit{one-step TD (TD(0))}.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/td_code.png}
+\caption{Pseudocode for one-step TD learning.}
+\label{fig:td_code}
+\end{figure}
+
+Because TD(0) methods bases its update in part on an existing estimate, we say that it is a \textit{bootstrapping} method, like DP. 
+
+\begin{align}
+v_{\pi}(s) &= \mathbb{E}_{\pi}\left[G_t | S_t=s\right] \label{eq:53}\\
+&= \mathbb{E}_{\pi}\left[R_{t+1} + \gamma G_{t+1} | S_t=s\right] \nonumber \\
+&= \mathbb{E}_{\pi}\left[R_{t+1} + \gamma v_{\pi}(S_{t+1}) | S_t=s\right] \label{eq:54}
+\end{align}
+
+Monte Carlo methods use an estimate of (\ref{eq:53}) as a target, whereas DP methods use an estimate of (\ref{eq:54}) as a target. The Monte Carlo target is an estimate because the expected value in (\ref{eq:53}) is not known; a sample return is used in place of the real expected return. The DP target is an estimate not because of the expected values, which are assumed to be completely provided by a model of the environment, but because $v_{\pi}(S_{t+1})$ is not known and the current estimate, $V(S_{t+1})$, is used instead. The TD target is an estimate for both reasons: it samples the expected values in (\ref{eq:54}) and it uses the current estimate $V$ instead of the true $v_{\pi}$. Thus, TD methods combine the sampling Monte Carlo with the bootstrapping of DP. 
+
+We refer to TD and Monte Carlo updates as \textit{sample updates} bacause they involve looking ahead to a sample successor state (or state-action pair), using the value of the successor and the reward along the way to compute a backed-up value, and then updating the value of the originale state (or state-action pair) accordingly. \textit{Sample} updates differ from the \textit{expected} updates of DP methods in that they are based on a single sample successor rather than on a complete distribution of all possible successors. 
+
+Finally, note that the quantity in brackets in $TD(0)$ update is a sort of error, measuring the difference between the estimated value of $S_t$ and the better estimate $R_{t+1} + \gamma V(S_{t+1})$. This quantity, called the \textit{TD error}, arises in various forms throughout RL:
+
+\begin{equation}
+    \delta_t = R_{t+1} + \gamma V(S_{t+1}) - V(S_t)
+\end{equation}
+
+\section{Advantages of TD Prediction Methods}
+
+TD methods update their estimates based in part on other estimates. They learn a guess from a guess., i.e., they \textbf{bootstrap}.
+
+TD methods have an advantage over DP methods in that they do not require a model of the environment, of its reward and next-state probability distributions. The next most obvious advantage of TD methods over Monte Carlo methods is that they are naturally implemented in an online, fully incremental fashion. With Monte Carlo methods one must wait until the end of an espisode, because only then is the return known, whereas with TD methods one need wait only one time step. 
+
+Certaily it is convenient to learn one guess from the next, without waiting for an actual outcome, but can we still guarantee convergence to the correct answer? Happily, the answer is yes. 
+
+\section{Optimality of TD(0)}
+
+Suppose there is available only a finite amount of experience. In this case, a common approach with incremental learning methods is to present the experience repeatedly until the method converges upon an answer. Given an approximate value function, $V$, the increments specified by \ref{eq:51} or \ref{eq:52} are computed for every time step $t$ at which a nonterminal state is visited, but the value function is changed only once, by the sum of all the increments. Then all the available experience is processed again with the new value function to produce a new overall increment, and so on, until the value function converges. We call this \textbf{batch updating} because updates are made only after processing each complete \textit{batch} of training data. 
+
+Batch Monte Carlo methods always find the estimates that minimize the mean square error on the training set, whereas batch TD(0) always finds the estimates that would be exactly correct for the maximum-likelihood model of the Markov process. In general, the maximum-likelihood estimate of a parameter is the parameter value whose probability of generating the data is greatest. 
+
+\section{Sarsa: On-policy TD Control}
+
+We turn now to the use of TD prediction methods for the control problem. As with Monte Carlo methods, we face the need to trade off exploration and exploitation, and again approaches fall into two main classes: on-policy and off-policy. In this section we present an on-policy TD control method. 
+
+The first step is to learn an action-value function rather than a state-value function. We must estimate $q_{\pi}(S,a)$ for the current behavior policy $\pi$ for all states $s$ and actions $a$. This can be done using essentially the same TD method described above for learning $v_{\pi}$. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/sarsa_graph.png}
+\end{figure}
+
+In the previous section we considered transitions from state to state and learned values of states. Now we consider transitions from state-action pair to state-action pair, and learn the values of state-action pairs. Formally these cases are identical: they are both Markov chains with a reward process. The theorems assuring the convergence of state values under TD(0) also apply to the corresponding algorith, for action values:
+
+\begin{equation}
+    Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha\left[R_{t+1} + \gamma Q(S_{t+1}, A_{t+1}) - Q(S_t,A_t)\right].
+\end{equation}
+
+This rule uses every element of the quintuple of events, $(S_t,A_t,R_{t+1},S_{t+1},A_{t+1})$, that make up a transition from one state-action pair to the next. This quintuple gives rise to the name \textbf{Sarsa} for the algorithm.
+
+As in all on-policy methods, we continually estimate $q_{\pi}$ for the behavior policy $\pi$, and at the same time change $\pi$ toward greediness with respect tio $q_{\pi}$. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/sarsa_code.png}
+\caption{Pseudocode for Sarsa.}
+\label{fig:sarsa_code}
+\end{figure}
+
+\section{Q-learning: Off-policy TD Control}
+
+\begin{equation}
+    Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha\left[R_{t+1} + \gamma \max_a Q(S_{t+1},a) - Q(S_t,A_t)\right]
+\end{equation}
+
+This is an off-policy TD control algorithm known as \textbf{Q-learning}. Here, the learnied action-value function, $Q$, direcly approximated $q_*$, the optimal action-value function, independent of the policy being followed. The policy still has an effect in that it determines which state-action pairs are visited and updated. However, all that is required for the correct convergence is that all pairs continue to be updated . This is a minimal requirement in the sense that any method guaranteed to find optimal behavior in the general case must require it. $Q$ has been shown to converge with probability 1 to $q_*$. The Q-learning algorithm is shown below:
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/q_code.png}
+\caption{Pseudocode for Q-learning.}
+\label{fig:q_learning_code}
+\end{figure}
+
+\section{Expected Sarsa}
+
+Consider the learning algorithm that is just like Q-learning except that instead of the maximum over the next state-action paris it uses the expected value, taking into account how likely each action is under the current policy. That is, consider the algorith, with the update rule:
+
+\begin{align}
+Q(S_t,A_t) &\leftarrow Q(S_t,A_t) + \alpha\left[R_{t+1} + \gamma \mathbb{E}_{\pi}\left[Q(S_t,A_t) | S_{t+1}\right] - Q(S_t,A_t)\right] \\
+&= Q(S_t,A_t) + \alpha\left[R_{t+1} + \gamma\sum_a(a|S_{t+1})Q(S_{t+1},a) - Q(S_t,A_t)\right]
+\end{align}
+
+but that otherwise follows the schema of Q-learning. Given the next state, $S_{t+1}$, this algorithm moves \textit{deterministically} in the same direction as Sarsa moves in \textit{expectation}, and accordingly it is called \textbf{Expected Sarsa}. 
+
+Expected Sarsa is more complex computationally than Sarsa but, in return, it eliminates the variance due to the random selection of $A_{t+1}$. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{assets/expected_sarsa_backup_diagram.png}
+\caption{The backup diagrams for Q-learning (left) and Expected Sarsa (right).}
+\label{fig:expected_sarsa_backup_diagram}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{assets/expected_sarsa_comparison.png}
+\caption{Interim and asymptotic performance of TD control methods on the cliff-walking task as a function of $\alpha$. All algorithms used an $\epsilon$-greedy policy with $\epsilon=0.1$. Asymptotic performance is an average over 100,000 episodes whereas interim performance is an average over the first 100 episodes.}
+\end{figure}
+
+\section{Maximization Bias and Double Learning}
+
+All the control algorithms that we have discussed so far involve a maximization inthe construction of their target policies. In these algorithms, a maximum over estimated values is used implicitly as an estimate of the maximum value, which can lead to a significant positive bias. To see why, consider a single state $s$ where there are many actions $a$ whose true values, $q(s,a)$, are all zero but whose estimated values, $Q(s,a)$, are uncertain and thus distributed some above and some below zero. The maximum of the true values is zero, but the maximum of the estimates is positive, a positive bias. We call this \textit{maximization bias}.
+
+Are there algorithms that avoid this bias? Consider a bandit case in which we have noisy estimates of the value of each of many actions, obtained as simple averages of the rewards received on all the plays with each action. There will be a positive maximization bias if we use the maximum of the estimates as an estimate of the maximum of the true values. 
+
+Suppose we divided the plays in two sets and used them to learn two independent estimates, call them $Q_1(a)$ and $Q_2(a)$, each estimate of the true value $q(a)$, for all $a\in \mathcal{A}$. We could then use one estimate to determine the maximizing action $A^* = \argmax{a}Q_1(a)$ and the other, $Q_2$ in this case, to provide the estimate of its value, $Q_2(A^*) = Q_2(\argmax{a}Q_1(a))$. This estimate will then be unbiased in the sense that $\mathbb{E}\left[Q_2(A^*)\right] = q(A^*)$. 
+
+This is the idea of \textbf{double learning}. Note that although we learn two estimates, only one estimate is updated on each play; double learning doubles the memory requirements, but does not increase the amount of computation per step. 
+
+The idea of double learning extends naturally to algorithms for full MDPs. As an example, the double learning algorithm analogous to Q-learning, called Double Q-learning, divides the time steps in two, perhaps by flipping a coin on each step. If the coin comes up heads, the update is 
+\begin{equation}
+    Q_1(S_t,A_t) \leftarrow Q_1(S_t,A_t) + \alpha\left[R_{t+1} + \gamma Q_2(S_{t+1}, \argmax{a}Q_1(S_{t+1},a)) - Q_1(S_t,A_t)\right].
+\end{equation}
+
+If the coin comes up tails, then the same update is done with $Q-1$ and $Q_2$ switched, so that $Q_2$ is updated. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/double_learning_code.png}
+    \caption{The Double Learning algorithm.}
+    \label{fig:double_learning}
+\end{figure}
+

@@ -1,0 +1,1493 @@
+
+\chapter{Optimization}
+
+\section{Preliminaries}
+
+The objective of this chapter is to provide a general overview over how to optimize the code on single-core. High Performance Computing requires, by the name itself, to squeeze the
+maximum effectiveness from your code on the machine you run it. "Optimizing" is, obviously, a key step in this process.
+
+\begin{observationblock}[Premature optimization]
+    \vspace{0.3cm}
+    \begin{quote}
+    \textit{Premature optimization is the root of all evil}.
+    \end{quote}
+    \vspace{0.3cm}
+    Which means that even if some of the stuff you'll learn may sound cool, you first focus must be in:
+    \begin{itemize}
+        \item the \textbf{correctedness} of your code,
+        \item the \textbf{data model},
+        \item the \textbf{algorithm} you choose.
+    \end{itemize}
+
+    You'd better start thinking in terms of "improved" code. 
+\end{observationblock}
+
+Do neither add unnecessary code nor duplicate code. 
+\begin{itemize}
+    \item \textbf{Unnecessary code} icreases the amount of needed work to maintain the code (debugging or updating it) or to extend its functionalities
+    \item \textbf{Dupliated code} increases you bad technical debt, that alreasy has a large enough number of sources.
+\end{itemize}
+
+Writing \textbf{comments} is a good practice, but do not overdo it. Comments should explain \textbf{why} something is done, not \textbf{what} is done (the code itself should be clear enough to explain what is done).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/opt1.png}
+    \caption{Design}
+    \label{fig:design}
+\end{figure}
+
+\textbf{Testing} is part of the design, and it is a key step in the optimization process (unit test, integration test, system test).
+\textbf{Validation} ensures that the code does what it was meant to do, and ensures the results are correct. \textbf{Verification} ensures that the codes does what it does correctly. 
+
+\subsection*{First things first}
+\textbf{1.} The first goal is to have a program that delivers the \textbf{correct answers} and behaves correctly under all conditions.\\
+The code must be as much clear, clean, concise, and documented as possible.
+
+\textbf{2.} The first step towards optimization is to adopt the \textbf{best-suited algorithms} and data structures. What "best-suited" means must be related to the constraints framing your activity (time-to-solution, energy-to-solution, memory, ...).
+
+\textbf{3.} The second step is that the \textbf{source code be optimizable by the compiler}.\\
+Then, you must have a firm understanding of the compiler's capabilities and limitations, as well as those of your target architecture.\\
+Understand the best trade-off between portability and "performance" (accounting for the human effort into the latter).
+
+\textbf{4.} The third step is to get a \textbf{data-driven, task-based workflow}, which possibly, almost certainly, will be parallel in either distributed- or shared-memory paradigms, or both.
+
+\textbf{5.} Profile the code under different conditions (workload/problem size, parallelism, platforms, ...) and \textbf{spot bottlenecks and inefficiencies}.
+
+\textbf{6.} Apply optimization techniques by modifying hot-spots in your code to \textbf{remove optimization blockers} and/or to better expose intrinsic instruction/data parallelisms.
+
+\textbf{7.} \textbf{IF (needed) GOTO point 1.}
+
+\vspace{0.5cm}
+That is not a simple and linear process. Optimizing a code may require several trial-and-error steps, and modern architectures evolve so fast that modeling a code’s performance accurately can be challenging. Even promising techniques may sometimes fail.
+
+\begin{observationblock}[Compiler job]
+    Recalling the job of the compiler:
+    \begin{itemize}
+        \item \textbf{Syntax analysis} (parsing)
+        \item \textbf{Semantic analysis} (type checking)
+        \item \textbf{Intermediate code generation}
+        \item \textbf{Optimization}
+        \item \textbf{Code generation}
+    \end{itemize}
+    The compiler is a tool that can help you in the optimization process.
+    
+    It is also able to perform \textbf{sophisticated analysis} of the source code so that to produce a target code (usually assembly) which is highly optimized for a given target architecture.
+\end{observationblock}
+
+To optimize your code through the compiler, use \texttt{-Os} flag, where \texttt{s} typically is 1,2,3 and refers to the level of optimization.\\
+\texttt{-O3} is the highest level of optimization, and it is the most aggressive one.\\
+It is not granted, though, that the highest level of optimization is the best one for your code.\\
+For instance, sometimes expensive optimization may generate more code that on some architecture (e.g. with smaller caches) run slower, and using \texttt{-Os} may be better.
+
+Obviously, the compiler knows the architecture it is compiling on, but it will generate a \textbf{portable} code, i.e. a code that can run on any cpu belonging to that class of architecture. 
+Using appropriate switch (in gcc \texttt{-march=native -mtune=native}), the compiler will generate code that is optimized for the specific architecture it is running on.
+
+
+\textbf{Profile-guided optimization} is a technique that uses the information gathered by the compiler when the code is run to optimize the code. Compilers are able to instrument the code so to generate run-time information to be used in a subsequent compilation. 
+
+Knowing the typical execution patterns enables the compiler to perform more focused optimizations, especially if several branches are present.
+\begin{codeblock}[language=bash]
+gcc -O3 -fprofile-generate -o myprog myprog.c
+./myprog
+gcc -O3 -fprofile-use -o myprog myprog.c
+\end{codeblock}
+
+\begin{tipsblock}[Some C-specific hints]
+    \begin{itemize}
+        \item \texttt{extern}: Global variables, exist forever.
+        \item \texttt{auto}: Local variables, allocated on the stack for a limited scope and then destroyed. 
+        \item \texttt{register}: Suggests that the compiler puts this variable directly in a CPU register.
+        \item \texttt{const}: Indicates that this variable won't be changed in the current variable's scope.
+        \item \texttt{volatile}: Indicates that this variable can be accessed and modified from outside the program.
+        \item \texttt{restrict}: A memory address is accessed only via the specified pointer. 
+    \end{itemize}
+\end{tipsblock}
+
+\begin{observationblock}[Optimization blockers]
+    \textbf{Optimization blockers} are those parts of the code that prevent the compiler from applying optimizations.\\
+    They can be:
+    \begin{itemize}
+        \item \textbf{Aliasing}: when two pointers point to the same memory location
+        \item \textbf{Loop-carried dependencies}: when a loop iteration depends on the result of the previous one
+        \item \textbf{Function calls}: when the compiler cannot inline the function
+        \item \textbf{Memory access patterns}: when the memory access pattern is not predictable
+    \end{itemize}
+\end{observationblock}
+
+\subsection*{Memory Aliasing}
+
+
+
+Memory Aliasing necessitates some attention.
+
+We said that it refers to the situation where two pointers point to the same memory location.\\
+This is a problem because the compiler cannot assume that the memory location is not modified by the other pointer, and it must reload the value from memory each time it is accessed.
+Help your C compiler in doing the best effort, either writing a clean code or using restrict or using \texttt{-fstrict-aliasing -Wstrict-aliasing} options.
+
+Consider the following functions:
+\begin{codeblock}[language=C++]
+void func1 (int *a, int *b) {
+    *a += *b;
+    *a += *b;
+}
+void func2 (int *a, int *b) {
+    *a += 2 * *b; 
+}
+\end{codeblock}
+
+An incautious analysis may conclude that a compiler should prefer \texttt{func2()}, since it contains less pointers. However, is it really true that the two functions behave the same way in all possible conditions? What if \textbf{a = b} (if a and b point to the same memory location)?
+
+\begin{codeblock}[language=C++]
+// a and b point to the same memory location, and let's say that *a = 1
+void func1 (int *a, int *b) {
+    *a += *b; // -> *a and *b now contains 2
+    *a += *b; // -> *a and *b now contains 4
+}
+void func2 (int *a, int *b) {
+    *a += 2 * *b; // -> *a and *b now contains 3
+}  
+\end{codeblock}
+
+This condition, i.e., when 2 pointer variables reference the same memory address is called \textbf{memory aliasing} and is a major performance blocker in those languages that allows pointer arithmetic like C and C++.
+
+\begin{exampleblock}[Memory aliasing]
+    \begin{codeblock}[language=C++]
+void my_fun(double *a, double *b, int n) {
+    for (int i = 0; i < n; i++) {
+        a[i] = b[i] + 1.0;
+    }
+}
+
+// The compiler can not optimize the access to a and b because it can not assume that a and b are pointing to the same memory locations or, in general, that the references will never overlap.
+
+// can be optimized to
+void my_fun(double *restrict a, double *restrict b, int n) {
+    for (int i = 0; i < n; i++) {
+        a[i] = b[i] + 1.0;
+    }
+}
+    \end{codeblock}
+    Now you are telling the compiler that the memory regions
+    referenced by a and b will never overlap.
+    So, it will feel confident in optimizing the memory accesses as
+    much as it can (basically avoiding to re-read locations).
+\end{exampleblock}
+
+
+
+\newpage
+
+\section{Modern Architectures}
+
+This section presents the fundamental traits of the \textbf{single-core} modern architectures.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{assets/opt2.png}
+    \caption{At a glance}
+\end{figure}
+
+In the \textbf{Von Neumann} architecture there is only 1 processing unit, 1 instruction is executed at a time and the memory is "flat".  It was much simpler than today's architectures, but it is still the basis of modern computers.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/opt3.png}
+    \caption{Von Neumann architecture}
+\end{figure}
+        
+Today, instead:
+\begin{itemize}
+    \item there are many processing UniTs
+    \item many instructions can be executed at a time 
+    \item many data can be processed at a time 
+    \item "instructions" are internally broken down into many simpler operations that are pipelined 
+    \item memory is strongly not "flat", there is a strong memory hierarchy, access memory can have very differnt costs depending on the location and accessing RAM is way more costly than performing operations on internal registers.
+\end{itemize}
+
+We have seen that the power required per transistor is 
+\[
+    C \times V^2 \times f   
+\]
+
+Roughly the capacitance and the voltage of transistor shrinks with the feature size, whereas the scaling is much more complicated for the wires. Overall, a typical CPU got from ~2W power to ~100W which is at the limit of the air cooling capacity. 
+
+To cope with the power wall one can:
+\begin{itemize}
+    \item Turn off inactive circuits 
+    \item Downscale Voltage and Frequency for both cores and DRAM 
+    \item Thermal Power Design, or design for typical case 
+    \item Overclocking for a short period of time and possibly for just a fraction of the chip
+\end{itemize}
+
+\begin{observationblock}
+  CPU became faster than memory in the early 90s.
+\end{observationblock}
+
+The CPU may spend more time waiting for data coming from RAM than executing operations. That is part of the so called "memory wall". The solution is to use a memory hierarchy, where the data is stored in different levels of memory, each one with different access times and sizes.
+Furthermore, to be faster it ought to be extremelty closer. The new memory that will be called \textbf{cache}, will be much smaller than the RAM.
+
+The cache itself has a hierarchy:
+\begin{table}
+\centering
+\caption{Cache levels}
+\begin{tabular}{l c c c c}
+\toprule
+\textbf{Level} & \textbf{Size} & \textbf{Latency (cycles)} & \textbf{Bandwidth (GB/s)} & \textbf{Location} \\
+\midrule
+L1 & 32-64KB & 3-4 & 1000+ & On-chip \\
+L2 & 256KB-1MB & 10-12 & 100-300 & On-chip \\
+L3 & 2-32MB & 30-40 & 20-100 & On-chip \\
+RAM & 4-512GB & 100-200 & 10-20 & Off-chip \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/opt4.png}
+    \caption{Memory hierarchy}
+\end{figure}
+
+\begin{definitionblock}[Principle of Locality]
+    Data are defined "local" when they reside in a small portion of the address space that is accessed in some short period of time.
+
+    There are two types of locality:
+    \begin{itemize}
+        \item \textbf{Temporal locality}: if an item is referenced, it will tend to be referenced again soon.
+        \item \textbf{Spatial locality}: if an item is referenced, items whose addresses are close by will tend to be referenced soon.
+    \end{itemize}
+\end{definitionblock}
+
+\subsection*{Cache Coherency}
+
+There is a difference between \textbf{SMP (Symmetric Multi-Processing)} and \textbf{Distributed NUMA (Non-Uniform Memory Access)}. In SMP, all processors share the same physical memory and have equal access to it, while in NUMA, each processor has its own local memory and can access remote memory with higher latency.
+Consider an SMP node, with tens of sockets interconnected by a bus (a colletive interconnect in which messages are broadcasted and everyone is listening for a message dedicated to itself).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/opt13.png}
+    \caption{SMP architecture}
+    \label{fig:smp}
+\end{figure}
+
+The memory is \textbf{shared}, and everybody sees the whole amount of RAM.
+
+Let's now say that the CPUs have caches and some data are loaded in more than one cache. What happens to all the caches and actual data in memory when one CPU modifies the data? 
+This is called the \textbf{cache coherency problem}, and the overwhelming difficulty and cost to manage it on too large SMP nodes is the main limit to their size. So, after having introduced the hierarchy of cache memories, you have to deal with a strong memory hierarchy and the fact that your CPU is much faster than the central memory. 
+
+Even if you are good in designing the data model and the workflow of your code, that complexity may result in a real performance disaster if you do not understand how the memory hierarchy works and how to exploit it. For instance, the CPU may stall for hundreds of cycles waiting for data coming from RAM, while it could be doing something else if the data were in cache. 
+This leads to the so called "memory wall" and thus to some improvements in the architecture, like the cache hierarchy.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/opt14.png}
+    \caption{$6^{th}$ generation SkyLake micro-arch.}
+    \label{fig:superscalar_cpu}
+\end{figure}
+
+\begin{itemize}
+  \item \textbf{Multiple ports:} more than 1 port is available to execute CPU instructions, although different units have different specializations (ALU, LEA, SHIFT, FMA, ...). This is \textbf{superscalar capacity}, meaning the capacity of executing more than 1 instruction per cycle.
+  \item \textbf{Front-end:} it basically fetches instructions and the data they operate on from instruction and data caches, decodes instructions, predicts branches and dispatches the instructions to different ports. 
+  \item \textbf{Back-end:}: it is responsible for the actual instructions execution and for the back-writing of results in memory locations. It is responsible for orchestrating out-of-order operations' execution depending on their instructions/data dependencies. 
+\end{itemize}
+
+\subsection*{Pipelining}
+
+Nowadays, CPUs are \textbf{pipelined}, meaning that the execution of an instruction is broken down into several stages, each one executed in a different clock cycle.
+
+\begin{minipage}{0.45\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.9\textwidth]{assets/opt15.png}
+  \end{figure}
+\end{minipage}
+\begin{minipage}{0.45\textwidth}
+  \begin{enumerate}
+    \item \textbf{Fetch}: the instruction is fetched from memory.
+    \item \textbf{Decode}: the instruction is decoded and the operands are fetched from
+    \item \textbf{Execute}: the instruction is executed.
+    \item \textbf{Write-back}: the result is written back to memory.
+  \end{enumerate}
+\end{minipage}
+
+If all the four stages take $\sim400ps$, then we would obtain a throughput of 2.5GIPS (Giga Instructions Per Second). It is the time required to get a result from an instruction and thus the latency of it. 
+However, if we were able to detach the four stages, we could increase the throughput, since we could have 4 instructions in the pipeline at the same time, each one in a different stage.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/opt16.png}
+    \caption{Pipelining}
+\end{figure}
+
+If many independent logical units exist to perform each step, they could operate subsequently on \textbf{different instructions}. 
+This is called \textbf{instruction-level parallelism} (ILP), and it is a key feature of modern CPUs.
+
+However, pipelining has some limitations:
+\begin{itemize}
+    \item \textbf{Data hazards}: when an instruction depends on the result of a previous instruction
+    \item \textbf{Control hazards}: when the pipeline is flushed due to a branch instruction
+    \item \textbf{Structural hazards}: when two instructions require the same hardware resource
+\end{itemize}
+
+\textbf{Vector registers} are special registers that can hold multiple data elements, allowing the CPU to perform the same operation on multiple data elements simultaneously. This is called \textbf{data-level parallelism} (DLP) or \textbf{single instruction, multiple data} (SIMD).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/opt17.png}
+    \caption{Vector registers}
+\end{figure}
+
+\section{Avoid the avoidable}
+
+Let's consider the following example:
+
+\begin{minipage}{0.55\textwidth}
+\begin{itemize}
+  \item We have a distribution of random data points on a 3D plane which we subdivide in sub-regions using a grid.
+  \item For each point $p$, we want to collect all the grid cells whose center is closer to $p$ than a given radius $r$, and to perform some operations accordingly.
+\end{itemize}
+\end{minipage}
+\begin{minipage}{0.35\textwidth}
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.6\textwidth]{assets/opt18.png}
+      \caption{Points and grid cells}
+  \end{figure}
+\end{minipage}
+
+\begin{codeblock}[language=C]
+for (int p=0; p<Npoints; p++){ //loop over points
+  for (int i=0; i<Ncells; i++){ //loop over cells in x dim
+    for (int j=0; j<Ncells; j++){ //loop over cells in y dim
+      for (int k=0; k<Ncells; k++){ //loop over cells in z dim
+        // assuming 3D grid spans from -half_size to +half_size in each dim
+        double dist = sqrt(
+          pow(x[p] - (double)i/Ncells - half_size, 2) + 
+          pow(y[p] - (double)j/Ncells - half_size, 2) + 
+          pow(z[p] - (double)k/Ncells - half_size, 2)
+        );
+        if (dist < r){
+          // do something with cell(i,j,k)
+        }
+      }
+    }
+  }
+}
+\end{codeblock}
+
+This code is very inefficient, even if correct. Let's try to improve it:
+\begin{enumerate}
+  \item \textbf{Avoid expensive function calls:} functions like \texttt{sqrt()}, \texttt{pow()} and \texttt{floating point division} are very expensive, it is better to avoid (or reduce) them as much as possible. Moreover, the computation \texttt{(double)i/Ncells - half\_size} was performed $N^3 + N^2 + N$ times, always returning the same values. We can precompute them outside the innermost loop.
+  
+  \begin{codeblock}[language=C]
+// precompute cell centers
+double i[Ncells], j[Ncells], k[Ncells];
+for (int idx=0; idx<Ncells; idx++){
+  i[idx] = (double)idx/Ncells - half_size;
+  j[idx] = (double)idx/Ncells - half_size;
+  k[idx] = (double)idx/Ncells - half_size;
+}
+
+for (int p=0; p<Npoints; p++){ //loop over points
+  for (int i=0; i<Ncells; i++){ //loop over cells in x dim
+    for (int j=0; j<Ncells; j++){ //loop over cells in y dim
+      for (int k=0; k<Ncells; k++){ //loop over cells in z dim
+        dx = x[p] - i[i];
+        dy = y[p] - j[j];
+        dz = z[p] - k[k];
+
+        dist2 = dx*dx + dy*dy + dz*dz; // avoid pow()
+        if (dist2 < r*r){ // avoid sqrt()
+          // do something with cell(i,j,k)
+        }
+      }
+    }
+  }
+}
+  \end{codeblock}
+
+  \item \textbf{Clarify the variable's scope:} variables should be defined in the smallest possible scope. This helps the compiler to optimize the code better, and it also helps the programmer to understand the code better. For example, we can move the computation of \texttt{dx} and \texttt{dy} in their smallest possible scope.
+  
+  \begin{codeblock}[language=C]
+for (int p=0; p<Npoints; p++){ //loop over points
+  for (int i=0; i<Ncells; i++){ //loop over cells in x dim
+    dx = x[p] - i[i];
+    for (int j=0; j<Ncells; j++){ //loop over cells in y dim
+      dy = y[p] - j[j];
+      for (int k=0; k<Ncells; k++){ //loop over cells in z dim
+        dz = z[p] - k[k];
+
+        dist2 = dx*dx + dy*dy + dz*dz; // avoid pow()
+        if (dist2 < r*r){ // avoid sqrt()
+          // do something with cell(i,j,k)
+        }
+      }
+    }
+  }
+}
+  \end{codeblock}
+
+  \item \textbf{Suggest what is important:} If there are some variables that are often calculated and reused subsequently, keeping a register dedicated to them may be useful. Note that this is a suggestion to the compiler, after analyzing the code it may decide to ignore it.
+  
+  \begin{codeblock}[language=C]
+double register Ng_inv = 1.0/Ncells; // suggest to keep in register
+for (int idx=0; idx<Ncells; idx++){
+  i[idx] = (double)idx*Ng_inv - half_size;
+  j[idx] = (double)idx*Ng_inv - half_size;
+  k[idx] = (double)idx*Ng_inv - half_size;
+}
+
+for (int p=0; p<Npoints; p++){ //loop over points
+  for (int i=0; i<Ncells; i++){ //loop over cells in x dim
+    dx = x[p] - i[i];
+    for (int j=0; j<Ncells; j++){ //loop over cells in y dim
+      dy = y[p] - j[j];
+      double register dist2_xy = dx*dx + dy*dy; // suggest to keep in register
+      for (int k=0; k<Ncells; k++){ //loop over cells in z dim
+        double register dz = z[p] - k[k]; // suggest to keep in register
+        double register dist2 = dist2_xy + dz*dz; // suggest to keep in register
+
+        if (dist2 < r*r){ // avoid sqrt()
+          // do something with cell(i,j,k)
+        }
+      }
+    }
+  }
+}
+  \end{codeblock}
+
+  \begin{observationblock}[Importance of being earnest]
+    Paying attention to the scope of the variables and keeping local what is local has a twofold advantage:
+    \begin{itemize}
+      \item All the local variables will reside in the stack, however also the stack is better to be clearly organized, so that the CPU can manage it better. For instance in the example above the variables \texttt{dx}, \texttt{dy}, \texttt{dz} are defined in the smallest possible scope, so that they can be allocated and deallocated in the stack as soon as they are needed, and they are all used packed together in the innermost loop.
+      \item Keep your mind clear and sharp. Think carefully to what you need and where, and make it clear.
+    \end{itemize}
+    Moreover, \textbf{don't suppose the compiler is always able to re-arrange calculations}, it may be able to do that for integers but not for floating point numbers, since the order of operations may change the result due to rounding errors. Floating point math is commutative but not associative. For better understanding look at \cite{goldberg1991every} or \href{https://simonbyrne.github.io/notes/fastmath/}{this link}.
+  \end{observationblock}
+
+  \item \textbf{Don't repeat unnecessary checks:} if you have to check a condition that is always true or always false, do it once outside the loop and then use a flag to avoid checking it again and again. Moreover, if you are checking a condition that does not change, as an example if you are checking if \texttt{dist < r*r} you know that \texttt{r*r} does not change, so you can compute it once outside the loop.
+  \item \textbf{Avoid unnecessary memory accesses:} if you are accessing a memory location that is not changing, as an example if you are accessing \texttt{x[p]}, you can store it in a local variable and use it instead of accessing the memory location again and again.
+\end{enumerate}
+
+\vspace{1cm}
+Let's now check how much time we have saved with these optimizations:
+
+\begin{table}[H]
+\centering
+\caption{Time comparison}
+\begin{tabular}{l c}
+\toprule
+\textbf{Version} & \textbf{Time (s)} \\
+\midrule
+Original & 0.216138 \\
+Optimized & 0.020303 \\
+Optimized + \texttt{-O3} & 0.000006 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\newpage
+\begin{itemize}
+  \item \textbf{Original code:}
+  
+  \begin{codeblock}[language=C]
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+
+#define CPU_TIME ({ struct timespec ts; clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts); (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9; })
+
+int main(int argc, char **argv){
+    int Npoints = 1000;
+    int Ncells = 20;
+    double half_size = 1.0;
+    double r = 0.1; // example radius
+    
+    // Example point arrays (you'd initialize these with actual data)
+    double *x = malloc(Npoints * sizeof(double));
+    double *y = malloc(Npoints * sizeof(double));
+    double *z = malloc(Npoints * sizeof(double));
+    
+    double Tstart = CPU_TIME;
+    
+    for (int p=0; p<Npoints; p++){ //loop over points
+        for (int i=0; i<Ncells; i++){ //loop over cells in x dim
+            for (int j=0; j<Ncells; j++){ //loop over cells in y dim
+                for (int k=0; k<Ncells; k++){ //loop over cells in z dim
+                    // Grid cell center coordinates
+                    double cell_x = -half_size + (i + 0.5) * (2.0 * half_size) / Ncells;
+                    double cell_y = -half_size + (j + 0.5) * (2.0 * half_size) / Ncells;
+                    double cell_z = -half_size + (k + 0.5) * (2.0 * half_size) / Ncells;
+                    
+                    double dist = sqrt(
+                        pow(x[p] - cell_x, 2) +
+                        pow(y[p] - cell_y, 2) +
+                        pow(z[p] - cell_z, 2)
+                    );
+                    if (dist < r){
+                        // do something with cell(i,j,k)
+                    }
+                }
+            }
+        }
+    }
+    
+    double dT = CPU_TIME - Tstart;
+    printf("Time taken: %fs\n", dT);
+    
+    free(x);
+    free(y);
+    free(z);
+    
+    return 0;
+}
+    \end{codeblock}
+
+    \item \textbf{Optimized code:}
+    
+    \begin{codeblock}[language=C]
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <time.h>
+#define CPU_TIME ({ struct timespec ts; clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts); (double)ts.tv_sec + (double)ts.tv_nsec * 1e-9; })
+
+int main(int argc, char **argv){
+    int Npoints = 1000;
+    int Ncells = 20;
+    double half_size = 1.0;
+    double r = 0.1;
+    double dx, dy, dz;
+    
+    double *x = malloc(Npoints * sizeof(double));
+    double *y = malloc(Npoints * sizeof(double));
+    double *z = malloc(Npoints * sizeof(double));
+    
+    double Tstart = CPU_TIME;
+    
+    // Precompute all cell centers
+    double *cell_centers = malloc(Ncells * sizeof(double));
+    double cell_size = (2.0 * half_size) / Ncells;
+    for (int idx = 0; idx < Ncells; idx++){
+        cell_centers[idx] = -half_size + (idx + 0.5) * cell_size;
+    }
+    
+    double r2 = r * r;
+    
+    for (int p = 0; p < Npoints; p++){
+        for (int i = 0; i < Ncells; i++){
+            dx = x[p] - cell_centers[i];
+            double dx2 = dx * dx;
+            for (int j = 0; j < Ncells; j++){
+                dy = y[p] - cell_centers[j];
+                double dist2_xy = dx2 + dy * dy;
+                for (int k = 0; k < Ncells; k++){
+                    dz = z[p] - cell_centers[k];
+                    double dist2 = dist2_xy + dz * dz;
+                    if (dist2 < r2){
+                        // do something with cell(i,j,k)
+                    }
+                }
+            }
+        }
+    }
+    
+    double dT = CPU_TIME - Tstart;
+    printf("Time taken: %fs\n", dT);
+    
+    free(x);
+    free(y);
+    free(z);
+    free(cell_centers);
+    return 0;
+}
+    \end{codeblock}
+\end{itemize}
+
+\section{Heap and Stack Memory}
+
+What happens when we execute a program on a machine? How does the code interact with the OS and how can it find the way to memory and cpu? 
+It needs at least the memory where the code itself and the data must be uploaded, along with access to other resources, the cpu but also I/O. 
+
+\begin{observationblock}[*nix systems]
+  Here we only consider *nix systems, meaning any OS that is Unix-like or Unix-based. The asterisk is used as a wildcard to represent the various prefixes or variations of Unix-style systems. 
+\end{observationblock}
+
+We will also clarify the difference between the \textbf{stack} and the \textbf{heap}, the two fundamental memory regions we will deal with. 
+
+\subsection*{Memory Model}
+
+When we execute a program, the OS provides a sort of "memory sandbox" in which our code will run and that offers a \textbf{virtual address space} that appear to be homogeneous to our program (this is to enhance portability and security).
+
+The amount of memory that can be addressed in this virtual box depends on the machine we are running on and on the operating system:
+
+\begin{itemize}
+    \item 32 bit systems: 4GB of addressable memory
+    \item 64 bit systems: 16EB of addressable memory (but usually limited to a few TB by the OS)
+\end{itemize}
+
+In the very moment it is created, not the whole memory is obviously at hand for the program, but it is allocated on demand.
+
+The virtual memory inside the sandbox must ne related to the physical memory where the data is actually stored: when the cpu executes a read or write instruction, it translates the virtual address to a physical address that is then given to the memory controller which deals with the physical memory. 
+
+The translation from virtual addresses to physical ones is done with the \textbf{paging} mechanism. Basically, the physical memory is seen as split in pages, whose size is specific to each architecture. Each physical page can be translated in more than one virtual page. The mappings is described in hierarchical table that the kernel keeps in memory, containing a \textbf{Page Table Entry (PTE)} for each page addressed. 
+Since the translation of virtual to physical addresses is done very often, the CPU keeps a cache of the most recent translations in a special memory called \textbf{Translation Lookaside Buffer (TLB)}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/opt19.png}
+    \caption{TLB}
+    \label{fig:tlb}
+\end{figure}
+
+Typically a TLB can have 12 bits of addressing, meaning that it can store 4096 entries. If the TLB is full and a new entry must be added, one of the existing entries is evicted (typically the least recently used one).
+Moreover, a hit time of 1 cycle is typical, while a miss can cost up to 100 cycles. This is why TLB miss have a high cost in terms of performance, even if it usually stays around $\sim1-2\%$.
+
+\subsection*{Stack vs Heap}
+
+\begin{itemize}
+  \item \textbf{Stack:} is a bunch of local memory that is meant to contain local variables of each function. They are all the variables used to serve the workflow of the function, and they are allocated when the function is called and deallocated when the function returns. The stack is managed by the CPU, which keeps track of the stack pointer (SP) that points to the top of the stack and of the base pointer (BP) that points to the bottom of the stack. The stack grows downwards, meaning that when a new variable is pushed onto the stack, the SP is decremented. The stack is usually limited in size (typically a few MB), and if it overflows, a \textbf{stack overflow} occurs.
+  \item \textbf{Heap:} is meant to host the mare magnum of data that our program needs to work. \textbf{Global} variables and data are those that must be accessible from all our functions in all the code units. They are allocated when the program starts and deallocated when the program ends. The heap is managed by the OS, which keeps track of the free and used memory blocks. The heap grows upwards, meaning that when a new variable is allocated on the heap, the heap pointer (HP) is incremented. The heap is usually much larger than the stack (typically a few GB), but it is also more fragmented and slower to access. Its most natural use is then for \textbf{dynamic allocation}.
+\end{itemize}
+
+Below in Figure \ref{fig:stack_vs_heap} you can see a typical memory layout of a process in a *nix system. The \textbf{text segment} contains the executable code of the program, the \textbf{data segment} contains the global variables and the \textbf{bss segment} contains the uninitialized global variables. The \textbf{heap} is located above the bss segment and grows upwards, while the \textbf{stack} is located below the text segment and grows downwards. The space between the heap and the stack is called \textbf{unused memory}, and it is usually not used by the program. Above the stack there is the \textbf{kernel space}, which is reserved for the OS and is not accessible by the program.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/opt20.png}
+    \caption{Stack vs Heap}
+    \label{fig:stack_vs_heap}
+\end{figure}
+
+We will use the work of \href{https://yuriygeorgiev.com/2024/02/19/x86-64-cpu-architecture-the-stack/}{Yuriy Georgiev} to better understand what happens in the stack when we call a function. 
+
+As introduced before, we have three pointers to keep track of the stack:
+\begin{itemize}
+  \item \textbf{Stack Pointer (SP):} points to the top (the end) of the stack.
+  \item \textbf{Base Pointer (BP):} points to the bottom (the beginning) of the stack.
+  \item \textbf{Instruction Pointer (IP):} points to the next instruction to be executed by the CPU.
+\end{itemize}
+
+The heap is a dynamically allocated memory. You don’t have control over where within the memory it will be allocated – the operating system takes care of that.
+However, the heap grows upwards. Let’s say we have a block of heap memory starting at address 1000 with a size of 200 bytes. This block of memory will occupy the addresses between 1000 and 1200 (decimal).
+The stack, however, grows in the opposite direction. Therefore the stack base pointer (RBP) is set at an address higher than the tip of the heap memory and grows downwards.
+For example, if the allocated memory ends at address 1200, the stack Base Pointer could be pointing at 1300 and it will grow down to address 1200 (meaning that the stack is 100 bytes big).  These are just imaginary numbers and examples to illustrate the way it works.
+The important thing you need to remember is that the stack “grows” from higher addresses to lower addresses as items are pushed onto it.
+
+When we enter a function, pass arguments to it, declare a local variable or leave a function, the stack is used by the CPU in one way or another. 
+\newpage
+\begin{exampleblock}[Function call and stack usage]
+  Consider the following sample code:
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.8\textwidth]{assets/opt21.png}
+  \end{figure}
+
+  When the \texttt{call} instruction is executed, the value of the RIP (instruction pointer) register is pushed onto the stack which saves the address before entering the \texttt{sum()} function, to which the program should return execution after leaving the function. 
+  After the \texttt{call} instruction, the CPU jumps to the address of the \texttt{sum()} function and starts executing its instructions. The 3 arguments are moved to 3 32-bit general purpose registers (RDI, RSI, RDX) as per the x86-64 calling convention. 
+
+  In the \texttt{sum()} function, the first thing that happens is the creation of a stack frame (a portion of the stack that will be available only for the current function), that will be destroyed when the function returns. This is done by pushing the current value of the RBP register onto the stack (to save the previous stack frame) and then moving the value of the RSP register to the RBP register (to set the new stack frame base). 
+  To use the arguments saved in the registers, they are copied to the stack frame. They are an offset relative to the RBP. 
+
+  After doing its job, the function \texttt{sum()} prepares to return to its caller, the \texttt{main()}. The code \texttt{add eax,edx} adds the value of the third argument (in EDX) to the value of the first argument (in EAX) and stores the result in EAX. The \texttt{pop rbp} instruction restores the previous stack frame by popping the value of the old RBP from the stack and restoring the previous "bottom" of the stack frame. The \texttt{ret} instruction transfers control to the return address located on the stack (the RIP) pushed to the stack before calling the \texttt{sum()} function.
+\end{exampleblock}
+
+Why the stack is faster than the heap?
+\begin{itemize}
+  \item Stack is allocated when the thread starts - this is really the first and foremost thing. You do not have to ask your OS for memory; instead, you get a preallocated chunk. For ARM64, x86, and x64 machines, the default stack size is 1 MB. 
+  \item Stack variables do not require allocating on the heap, which is managed by a memory allocator, which is a slow process. Stack variables do not need to be “freed”, which is also a slow process. These are the major reasons why people say the “stack” is faster than the “heap”, even though they all come from the same memory place physically. Also, stack variables are put one next to another. This plays well with the CPU cache.
+  \item Deallocating is a simple matter of moving the Base Pointer and Stack Pointer - given that we are really just moving up and down inside our own 1MB of space, all we need to do in order to allocate and wipe out data is to move a pointer that tells us where's our stack bottom.
+  \item Addresses can be precalculated at compile time, while the heap is allocated dynamically at run time and retrieves its address after the allocation.
+  \item When the CPU requests data from a certain address in the memory it retrieves a whole cache line, which is 64 bytes in x64 systems (128 in Apple’s M2), instead of simply the value it will work with. Once the data is retrieved from the RAM it is stored in the CPU cache L1 which is an extremely fast memory. The only memory faster than the L1 Cache is the registers. If the stack variables are stored one after another, requesting the value of one variable leads to retrieving everything after it up to 64 bytes. This leads to caching the following stack variables in the L1 cache making them available for fast access.
+\end{itemize}
+
+\begin{warningblock}
+  However, not always the stack is faster than the heap. Accessing an array on the heap in the fastest way will possibly generate less instructions than accessing an array on the stack. This is because the compiler can optimize the access to the heap array better than the access to the stack array.
+  So, depending on how things are set-up, the stack can be faster or slower than the heap. The only thing that is certain is that the stack is limited in size, while the heap is not.
+\end{warningblock}
+
+\section{Cache Optimization}
+
+The RAM contains $\sim10^9$ bytes, while L1 contains $\sim10^4$ bytes (32KB for data and 32KB for instructions). So, how do we map the RAM into a given level of cache, for instance L1, in an effective way?
+
+\begin{itemize}
+    \item Where to map an address?
+    \item What if the location in L1 is already occupied?
+\end{itemize}
+
+Let's say that both the RAM and the cache are subdivided in blocks of equal size (64B): you do not load just a byte in your cache, but an entire block (called \textit{line})
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/opt5.png}
+\end{figure}
+
+\newpage
+There exist three main strategies to map the RAM into the cache:
+
+\begin{table}[H]
+\centering
+\caption{Cache Mapping Strategies}
+\begin{tabular}{l p{3.5cm} p{2.8cm} p{2.8cm}}
+\toprule
+\textbf{Strategy} & \textbf{Description} & \textbf{Pros} & \textbf{Cons} \\
+\midrule
+Full mapping 
+& Any block can store any address 
+& Very flexible, good space use
+& More complex to search, higher hardware cost \\
+\addlinespace
+Direct mapping 
+& Each address maps to exactly one cache block 
+& Simple design, fast lookups
+& Higher chances of conflicts, limited flexibility \\
+\addlinespace
+n-way associative 
+& Cache is divided into sets of n blocks 
+& Balances speed and flexibility 
+& More complex than direct mapping \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{minipage}{0.33\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/opt6.png}
+        \caption{Full mapping}
+    \end{figure}
+\end{minipage}
+\begin{minipage}{0.33\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/opt7.png}
+        \caption{Direct mapping}
+    \end{figure}
+\end{minipage}
+\begin{minipage}{0.33\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/opt8.png}
+        \caption{n-way associative}
+    \end{figure}
+\end{minipage}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/opt9.png}
+    \caption{A typical today cache}
+\end{figure}
+
+\newpage
+\begin{advancedblock}[Cache mapping]
+  \textbf{How a byte is actually mapped into a cache location?}
+  
+  The elemental unit of the cache is a \textbf{line}, composed by 64 bytes. Thus, 64 consecutive bytes in the RAM are mapped in the same line of the cache. 
+  Let's suppose that we have 256B of memory. Then 8 bits are sufficient to address our memory since $2^8 = 256$.
+
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.6\textwidth]{assets/opt22.png}
+      \caption{Cache mapping}
+      \label{fig:cache_mapping}
+  \end{figure}
+  
+  This is possible considering the 6 least significant bits, which will cycle (faster than the others) and determine a cycle over 64 bytes. So, the least significant bits decides the position of a given address in a cache line, by group of 64.
+  The 2 remaining bits (8-6=2) are used to address to which cache line the address belongs to. In this case, we have only 4 lines ($2^2=4$).
+
+  In general, if we have a cache size of \textbf{c} bytes in total and it is \textbf{w}-way associative with lines of size \textbf{L} bytes, then there are \textbf{C/(LW)} = $2^s$ sets. In our example:
+  \begin{itemize}
+    \item $L = 64$B
+    \item $c = 256$B
+    \item $w = 2$
+    \item $C/(LW) = 256/(64*2) = 2 = 2^1$
+  \end{itemize}
+
+  As you can see in Figure \ref{fig:entire_memory_address}, the least $b+s$ significant bits uniquely determines the position of the byte in the line ($b$) and to which line it belongs to ($s$). The rest of the bits ($t$) are used to uniquely identify the address in the RAM. This is why the space used by the address is 48-52 bits, even if we are in a 64 bit architecture.
+
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.6\textwidth]{assets/opt23.png}
+      \caption{Entire memory address}
+      \label{fig:entire_memory_address}
+  \end{figure}
+  
+\end{advancedblock}
+
+\subsection*{The memory access pattern}
+
+Consider a simple direct mapped \textbf{16 byte data cache} with \textbf{two cache lines}, each of size 8B. 
+
+Consider the following code sequence, in which the array \texttt{X} is cache-aligned (i.e., \texttt{x[0]} is always loaded into the beginning of the first cache line) and accessed twice in consecutive order:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/opt10.png}
+    \caption{The hit-miss pattern is: MH MH MH MH MH MH MH MH, the miss-rate is 50\% (the first miss is compulsory miss)}
+\end{figure}
+
+Let's consider another code sequence that access the array twice as before, but with a strided access.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/opt11.png}
+    \caption{The hit-miss pattern now is: MM MM MM MM MM MM MM MM, the miss-rate is 100\%}
+\end{figure}
+
+Finally, consider a third code sequence that again access the array twice:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/opt12.png}
+    \caption{The hit-miss pattern now is: MH MH HH HH MH MH HH HH, the miss-rate is 25\%}
+\end{figure}
+
+\begin{definitionblock}[Compulsory cache miss]
+  A \textbf{cache miss} is an event that occurs when the data requested by the CPU is not found in the cache memory. This results in a delay as the data must be fetched from the main memory or a lower level cache.
+  A \textbf{compulsory miss} occurs when data is accessed for the very first time and is not yet in the cache. It's called "compulsory" because this miss is unavoidable - no matter how large your cache is or how it's organized, you cannot avoid this miss since the data has never been loaded before.
+  In the examples above, the first access to \texttt{X[0]} results in a compulsory miss because it is the first time this data is being accessed and it is not yet in the cache. It is then loaded into the cache for future accesses.
+  
+  \begin{enumerate}
+    \item \textbf{Initial state:} The cache is empty 
+    \item \textbf{First access to X[0]:} The cache controller looks for this memory address in the cache
+    \item \textbf{Cache miss:} Since the cache is empty, it results in a cache miss
+    \item \textbf{Load cache line:} The cache controller fetches the data from the main memory and loads the entire cache line containing \texttt{X[0]} into the cache
+    \item \textbf{Subsequent accesses:} Future accesses to \texttt{X[0]} will result in cache hits, as the data is now in the cache
+  \end{enumerate}
+\end{definitionblock}
+
+Thus, \textbf{memory access pattern is of primary importance}.
+
+\subsection*{Strided Access}
+
+Let's now consider a common problem: the transposition of a matrix.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/opt24.png}
+    \caption{Matrix transposition}
+    \label{fig:matrix_transposition}
+\end{figure}
+
+The naive approach is the following:
+\begin{codeblock}[language=C]
+for (int i = 0; i < N; i++) {
+    for (int j = 0; j < N; j++) {
+        B[j][i] = A[i][j];
+    }
+}
+\end{codeblock}
+
+In this case, the access to \texttt{A[i][j]} is \textbf{row-major}, while the access to \texttt{B[j][i]} is \textbf{column-major}. This means that the access to \texttt{B} is strided, and thus it will lead to a high number of cache misses.
+
+\begin{observationblock}
+  When we modify the content of a variable, that change amounts to overwrite a memory location. When the variable is loaded in the cache memory, what is loaded is a \textbf{copy} of the variable, that maintains the original location in the main memory. 
+  So, if we modify its value, shall we modify it in the cache only or in the main memory too?
+
+  There are two main strategies to deal with this problem:
+  \begin{itemize}
+    \item \textbf{Write-through:} every time a variable is modified in the cache, it is also modified in the main memory. This strategy is simple to implement, but it is slow, since every write operation requires a write to the main memory.
+    \item \textbf{Write-back:} every time a variable is modified in the cache, it is marked as dirty, but it is not immediately written to the main memory. The dirty cache line is written to the main memory only when it is evicted from the cache. This strategy is faster, since it reduces the number of write operations to the main memory, but it is more complex to implement, since it requires a mechanism to keep track of dirty cache lines.
+  \end{itemize}
+\end{observationblock}
+
+Going back to our matrix transposition problem, since strided access is unavoidable, is it better to have it on \textbf{read} or \textbf{write}? Due to write-allocate transactions in the cache, strided writes are more expensice than strided loads. Thus, it is better to have strided access on read.
+Thus, swapping the loops is a good idea:
+\begin{codeblock}[language=C]
+for (int j = 0; j < N; j++) {
+    for (int i = 0; i < N; i++) {
+        B[j][i] = A[i][j];
+    }
+}
+\end{codeblock}
+
+And we can compare the two approaches:
+\begin{table}[htbp]
+\centering
+\caption{Matrix Transpose Performance Comparison}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Matrix Size} & \textbf{Strided BW (MB/s)} & \textbf{Contiguous BW (MB/s)} & \textbf{Ratio} \\
+\hline
+1023 & 6573.67 & 5571.80 & 1.18 \\
+\hline
+4095 & 2214.94 & 2067.50 & 1.07 \\
+\hline
+8191 & 3143.78 & 2583.68 & 1.22 \\
+\hline
+16383 & 2176.67 & 1177.84 & 1.85 \\
+\hline
+\end{tabular}
+\label{tab:performance_comparison}
+\end{table}
+
+\subsection*{Traversing data to enhance locality}
+
+A common technique in matrix-matrix multiplication or in matrix inversion is to process the matrices by blocks instead of traversing entire rows or columns. This way, if the block size is choosen wisely, that could enhance the possibility that all the data needed is already in the cache.
+We should pursue the generation of blocks in a "natural" way, without hard-coding or fine tuning for a given platform, so that the code is portable and maintainable.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/opt25.png}
+    \caption{Traversing orders}
+    \label{fig:traversing_orders}
+\end{figure}
+
+\begin{advancedblock}[The $z$-Order]
+  Let's say we want to map a linear access order ($1,2,3,\dots,n$) on some spatially-distributed data with integer coordinates (e.g. a 2D grid). 
+  First, rewrite the linear index in binary form ($0000, 0001, 0010, \dots$), then define the coordinates of the data points in binary form too ($00, 01, 10, 11$). 
+  Then, interleave the bits of the coordinates to get the linear index. This is called \textbf{z-order} or \textbf{Morton order}.
+
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.6\textwidth]{assets/opt26.png}
+      \caption{Z-order traversal}
+      \label{fig:z_order}
+  \end{figure}
+
+  The result of this interleaving is a mapping from the 2D plane to the 1D line known as Z-line which is one of the \textbf{plane-filling curves} discovered by Peano in 1890.
+\end{advancedblock}
+
+\subsection*{Organizing the data to enhance locality}
+
+Whenever the memory bandwidth is limited, \textbf{data locality optimization} can play a strong role. Re-organizing data in "space" so that the access pattern is optimal for a given algorithm is related to such locality optimization.
+
+\begin{enumerate}
+  \item \textbf{Hot and Cold fields:} they refer to the frequency of access of different fields within a data structure. Hot fields are those that are accessed frequently, while cold fields are those that are accessed infrequently. By organizing data structures so that hot fields are stored together and cold fields are stored separately, we can improve cache performance and reduce memory access times.
+  
+  As an example, consider the following data structure:
+  
+  \begin{codeblock}[language=C]
+struct node {
+  double jey;
+  char data[300];
+  node *next;
+}
+  \end{codeblock}
+
+  If we traverse a linked list of such nodes, we will access the \texttt{key} and the \texttt{next} fields frequently, while the \texttt{data} field will be accessed infrequently. Thus, we can reorganize the structure as follows:
+  \begin{codeblock}[language=C]
+struct node {
+  double key;
+  node *next;
+  char data[300];
+}
+  \end{codeblock}
+
+  \begin{figure}[H]
+      \centering
+      \includegraphics[width=0.6\textwidth]{assets/opt27.png}
+      \caption{Hot and Cold fields}
+      \label{fig:hot_and_cold_fields}
+  \end{figure}
+
+  \item \textbf{Space filling curves:} they are a way to map multi-dimensional data to one-dimensional data while preserving locality. By organizing data in a space-filling curve, we can improve cache performance and reduce memory access times.
+  
+  \begin{minipage}{0.45\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{assets/opt28.png}
+        \caption{Data space}
+        \label{fig:data_space}
+    \end{figure}
+  \end{minipage}
+  \begin{minipage}{0.45\textwidth}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.8\textwidth]{assets/opt29.png}
+        \caption{Sort data according to the index}
+        \label{fig:sort_data_according_to_index}
+    \end{figure}
+  \end{minipage}
+\end{enumerate}
+
+\section{Branches Optimization}
+
+\begin{definitionblock}[Conditional execution]
+  Whenever either \textbf{(i)} the sequence of operations that must be executed or \textbf{(ii)} the sequence of data to be processed depends on some condition, i.e. on the outcome of a test performed on some data or result, we have a \textbf{conditional execution}.
+\end{definitionblock}
+
+On modern architectures, conditional executions are implemented in two low-level ways:
+\begin{enumerate}
+  \item \textbf{Modifying the control flow:} this uses \textbf{branch instructions} to change the sequence of instructions executed by the CPU. Branch instructions can be either conditional or unconditional. Conditional branch instructions change the control flow based on the outcome of a test, while unconditional branch instructions always change the control flow to a specific address. At machine level, a \textbf{jump instruction} is used to implement a branch. \texttt{jmp} is an unconditional jump, while \texttt{je}, \texttt{jne}, \texttt{jl}, \texttt{jle}, \texttt{jg}, \texttt{jge} are conditional jumps that depend on the status of the flags in the FLAGS register.
+  
+  \begin{observationblock}[True branch]
+    Note that the \textbf{true branch} is the closest to the test condition, while the \textbf{false branch} is reached upon a jump. When coding, if possible pay attention to what is most likely to be true, to preserve \textbf{code locality}.
+  \end{observationblock}
+
+  However, control flow modification is quite inefficient on modern CPUs.
+
+  \item \textbf{Modifying the data flow:} can only be done on cases with simple values involved, but yields better performance. This is done using \textbf{conditional move instructions} that move data from one location to another based on the outcome of a test. The most common conditional move instruction is \texttt{cmov}, which can be used to move data from one register to another based on the status of the flags in the FLAGS register.
+  
+  \begin{itemize}
+    \item two registers contain the two possible values
+    \item the conditional move checks the result of cmp 
+    \item the content of one of the two registers is moved to the destination register
+  \end{itemize}
+\end{enumerate}
+
+We saw that modern processors achieve great performance thanks to the \textbf{pipelines} and \textbf{out-of-order execution}. However, that requires the pipelines to be always full, otherwise penalties in terms of wasted cpu cycles is to be paid. To achieve this, the scheduler has to \textbf{predict} in advance what will be the sequence of instructions to be executed. How can this be done?
+Modern cpus use a \textbf{branch predictor}, which is an internal unit of highly sophisticated logic that guesses whether a jump instruction will succeed or not. 
+This is why the conditional change of data flow is preferred whenever possible and the compiler will try to use it as much as possible. 
+
+\begin{tipsblock}
+  Conditional branches should be \textbf{avoided} as much as possible inside loops. 
+\end{tipsblock}
+
+Basically, there are two possible cases:
+\begin{itemize}
+  \item Variables tested in the conditions \textbf{do not} change during the loop
+  \item Variables tested in the conditions \textbf{change} during the loop
+\end{itemize}
+
+We will now see 4 examples of how to revise our code to optimize branches:
+\begin{enumerate}
+  \item \textbf{Clean loops from branches}
+  
+  \begin{codeblock}[language=C]
+for (int i=0; i<N, i++){
+  if (case1==0){
+    // do something
+  } else {
+    // do something else
+  }
+}
+  \end{codeblock}
+  
+  can be rewritten as:
+  
+  \begin{codeblock}[language=C]
+if (case1==0){
+  for (int i=0; i<N, i++){
+    // do something
+  }
+} else {
+  for (int i=0; i<N, i++){
+    // do something else
+  }
+}
+  \end{codeblock}
+  
+  Normally, the compiler should be able to do this automatically, but it is not always the case. If you do it manually, remember to define a specialized function for each case and set a function pointer before and outside the loop to point to the right function.
+
+  In cases where the conditions are more complex, then having multiple for loops may be highly unpractical. In this cases it is better to use \texttt{switch} constructor instead. 
+
+  \begin{codeblock}[language=C]
+switch (case){
+  case 0:
+    for (int i=0; i<N, i++){
+      // do something
+    }
+    break;
+  case 1:
+    for (int i=0; i<N, i++){
+      // do something else
+    }
+    break;
+  ...
+}
+  \end{codeblock}
+
+  In fact, the switch constructor is translated in a static table of code pointers that can be addressed directly. 
+
+  \item \textbf{Unpredictable datastreams}
+  
+  \begin{codeblock}[language=C]
+// generate random numbers
+for (cc=0; cc<SIZE; cc++){
+  data[cc] = rand() % TOP;
+}
+
+// take action depending on their value 
+for (ii=0; ii<SIZE; ii++){
+  if (data[ii] < PIVOT){
+    sum += data[ii];
+  }
+}
+  \end{codeblock}
+  
+  can be rewritten as:
+  
+  \begin{codeblock}[language=C]
+// generate random numbers
+for (cc=0; cc<SIZE; cc++){
+  data[cc] = rand() % TOP;
+}
+
+qsort(data, SIZE, sizeof(int), compare);
+
+// take action depending on their value 
+for (ii=0; ii<SIZE; ii++){
+  if (data[ii] < PIVOT){
+    sum += data[ii];
+  }
+}
+  \end{codeblock}
+
+  of course, an overhead is added, however we should focus here on how in general it is better to avoid conditionals inside loops.
+
+  We can do even better, by rewriting the last loop as:
+  \begin{codeblock}[language=C]
+for (ii=0; ii<SIZE; ii++){
+  t = (data[ii] - PIVOT - 1) >> 31;
+  sum += ~t & data[ii]; 
+}
+  \end{codeblock}
+
+  \item \textbf{Sorting two arrays}
+  
+  Let's say we have two arrays A and B, and we want to swap their elements so that \texttt{A[i] >= B[i]} for all i. A simple approach should be:
+  \begin{codeblock}[language=C]
+for (int i=0; i<N; i++){
+  if (A[i] < B[i]){
+    t = B[i];
+    B[i] = A[i];
+    A[i] = t;
+  }
+}
+  \end{codeblock}
+  
+  However, that implementation suffers exactly of the same problem we have just discussed. An alternative implementation is:
+  \begin{codeblock}[language=C]
+for (int i=0; i<N; i++){
+  int min = A[i] > B[i] ? B[i] : A[i];
+  int max = A[i] > B[i] ? A[i] : B[i];
+  A[i] = max;
+  B[i] = min;
+}
+  \end{codeblock}
+
+  \begin{observationblock}
+    Note that there are other smarter implementations, but we won't discuss them here.
+    The standard implementation relies on the ability of your CPU's branch predictor to guess the correct data pattern. When it is successful, it is really so and exhibits the lowest CPE (cycles per element) and IPE (instructions per element).
+
+    However, whenever the data pattern is unpredictable things quickly become really weird. Writing the code differently may make you loosing something in terms of CPE/IPE but not really in terms of time-to-solution. And, above all, the code behaviour is stable with both predictable and unpredictable patterns. 
+  \end{observationblock}
+
+  \item \textbf{Are design and simplicity the best move?}
+  
+  Just changing the point of view sometimes can help. The following code initializes a NxM matrix so that the elements in top-right triangle are set to $1.0$, the entries in the diagonal $i=j$ are set to $0.0$ and the bottom-left part is set to $1.0$. 
+
+  \begin{codeblock}[language=C]
+for (int j=0; j<N; j++){
+  for (int i=0; i<M; i++){
+    if (i < j){
+      matrix[i][j] = 1.0;
+    } else if (i == j){
+      matrix[i][j] = 0.0;
+    } else {
+      matrix[i][j] = 1.0;
+    }
+  }
+}
+  \end{codeblock}
+
+  can be easily rewritten without conditional evaluations at all:
+
+  \begin{codeblock}[language=C]
+for (int j=0; j<N; j++){
+  for (int i=0; i<M; i++){
+    int i;
+    for (int i=0; i<j; i++){
+      matrix[i][j] = 1.0;
+    }
+    matrix[j][j] = 0.0;
+    for (int i=j+1; i<M; i++){
+      matrix[i][j] = 1.0;
+    }
+  }
+  \end{codeblock}
+\end{enumerate}
+
+\section{Loops Optimization and Prefetching}
+
+\begin{definitionblock}[Arithmetic Intensity]
+  \textbf{Arithmetic Intensity} is the ration between the number of floating point operations and the number of memory operations.
+  \[
+  A_I = \frac{f(n)}{n}
+  \]
+\end{definitionblock}
+
+There are three main types of loops:
+\begin{itemize}
+  \item \textbf{Linear loops} $O(N)/O(N)$: they have low arithmetic intensity, since they perform a number of floating point operations proportional to the number of memory operations. An example is the vector addition. Here, optimization come from avoiding \textbf{unnecessary operations} and/or \textbf{repeated memory accesses}, and increasing \textbf{data reuse}.
+  \item \textbf{2-level loops} $O(N^2)/O(N^2)$: they have low arithmetic intensity, since they perform a number of floating point operations proportional to the number of memory operations. An example is the matrix addition. Here, optimization comes again from increasing \textbf{data reuse}, exploiting \textbf{locality} and \textbf{avoiding unnecessary loads / stores}.
+  \item \textbf{3-level loops} $O(N^3)/O(N^2)$: they have high arithmetic intensity, since they perform a number of floating point operations proportional to the square of the number of memory operations. An example is the matrix-matrix multiplication. Here, more optimization can be exploited, and is at the core of the \textbf{Linpack} library.
+\end{itemize}
+
+Let's now dive deeper into each of these types of loops.
+
+\subsection*{1-level loops}
+
+Examples for this type of loops are scalar products, vector sums, sparse matrix vector multiplications. There is an inevitable memory bound for very large $N$. Consider the following code on \textbf{loop fusion}:
+
+\begin{codeblock}[language=C]
+for (int i=0; i<N; i++){
+  A[i] = B[i] x C[i];
+}
+for (int i=0; i<N; i++){
+  Q[i] = B[i] + D[i];
+}
+\end{codeblock} 
+
+can be rewritten as:
+
+\begin{codeblock}[language=C]
+for (int i=0; i<N; i++){
+  A[i] = B[i] x C[i];
+  Q[i] = B[i] + D[i];
+}
+\end{codeblock}
+
+In the optimized version, the array \texttt{B} is loaded only once instead of twice.
+    
+\subsection*{2-level loop}
+
+Examples for this type of loops are dense matrix-vector multiplications, matrix transposition, matrix addition. There are three main strategies to optimize these loops:
+\begin{itemize}
+\item \textbf{Avoid unecessary loads / stores}
+
+\begin{codeblock}[language=C]
+for (int i=0; i<N; i++){
+  for (int j=0; j<N; j++){
+    C[j] += A[i][j] x B[i]; // 3xNxN memory accesses
+  }
+}
+\end{codeblock}
+
+can be rewritten as:
+
+\begin{codeblock}[language=C]
+for (int j=0; j<N; j++){
+  c_temp = C[j]; // C[j] is loaded and stored only once
+  for (int i=0; i<N; i++){
+    c_temp += A[i][j] x B[i]; // 2x(NxN + N) memory accesses
+  }
+  C[j] = c_temp;
+}
+\end{codeblock}
+
+\item \textbf{Loop unrolling}: Unroll outer loop and fuse in the inner loop; there is potential for vectorisation
+
+  \begin{codeblock}[language = C]
+  for (int i=0; i<N; i++){
+    for (int j=0; j<N; j++){
+      C[i] += A[i][j] x B[j]; 
+    }
+  }
+  \end{codeblock}
+  can be rewritten as:
+  \begin{codeblock}[language = C]
+for (int i=0; i<N; i+=m){
+  for (int j=0; j<N; j++){
+    b_temp = B[j];
+    C[i] += A[i][j] x b_temp;
+    C[i+1] += A[i+1][j] x b_temp; 
+    ...
+    C[i+m-1] += A[i+m-1][j] x b_temp; // NxNx(1+1/m)+N memory accesses
+  }
+}
+  \end{codeblock}
+
+  \begin{warningblock}[Unrolling and register spill]
+    Using a too large \textbf{m} in the previous example while the target CPU does not have enough registers to keep all the needed operands results in a \textbf{code bloating} and in a \textbf{register spill}, which is a situation where the CPU has to temporarily store some register values in memory (usually in the stack) because there are not enough registers available to hold all the necessary data. This can lead to a significant performance degradation, as accessing data from memory is much slower than accessing data from registers. Thus:
+    \begin{itemize}
+      \item Learn to inspect the compiler's log 
+      \item Hand code effort to clarify the code
+      \item Hints/directives to the compiler
+    \end{itemize}
+  \end{warningblock}
+
+  Sometimes no magic wand can cure the fact that you have to access $N^2$ memory locations. Then:
+  \begin{itemize}
+    \item \textbf{Unroll and Jam} strategy can bring benefits as long as the cache can hold $N$ lines. An $L_c$-way unrolling is too much aggressive and may easily result in register pressure. 
+    \item \textbf{Loop tailing (or blocking)} strategy does not save memory loads but increase dramatically the cache hit ratio.
+  \end{itemize}
+
+  \item \textbf{Locality of referenced data:} cut TLB misses by accessing 2D arrays by blocks.
+  
+  \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/opt30.png}
+    \caption{Loop blocking}
+    \label{fig:loop_blocking}
+  \end{figure}
+\end{itemize}
+
+\subsubsection*{Loop unrolling and vectorization}
+
+\textbf{Loop unrolling} is a fundamental code transformation which usually helps significantly in improving code performance:
+\begin{itemize}
+  \item Reduces the loop overhead (counter update, branching)
+  \item Exposes critical data path and dependencies 
+  \item Helps in exploiting ILP, especially in case of memory aliasing 
+\end{itemize}
+
+Consider the following code:
+
+\begin{codeblock}[language = C]
+for (int i = 0; i < N; i++)
+  S += A[i]
+\end{codeblock}
+
+Using optimization level \texttt{-O3}, the compiler is able to unroll the loop, managing much better the loop overhead. However, it does not optimize the Floating Point operations, since they are not associative. Using \texttt{int}, in fact, the compiler opts for the complete \textbf{vectorization} of the loop, with a significant performance boost.
+
+Our aim, then, is to to reorganize the code so that the compiler could exploit the CPU's ILP.
+
+First, we can unroll the loop manually:
+
+\begin{codeblock}[language = C]
+for (int i = 0; i < N; i++)
+  S = S + A[i]
+\end{codeblock}
+
+\begin{observationblock}
+  Note that when unrolling, we always have to care about the final iterations that would be left behind. A common way to do this for an unrolling factor $U$ (usually in the range $[2\dots 16]$) is:
+  \begin{codeblock}[language = C]
+int N_ = (N/U)*U // largest multiple of U <= N
+for (int i = 0; i < N_; i+=U)
+  // unrolled loop body
+for (int i = N_; i < N; i++)
+  // clean-up loop body
+  \end{codeblock}
+\end{observationblock}
+
+then,
+
+\begin{codeblock}[language = C]
+for (int i = 0; i < N; i+=2)
+  S = (S + A[i]) + A[i+1];
+\end{codeblock}
+
+but we can do better, just moving a parenthesis:
+
+\begin{codeblock}[language = C]
+for (int i = 0; i < N; i+=2)
+  S = S + (A[i] + A[i+1]);
+\end{codeblock}
+
+\begin{observationblock}[Why this is better?]
+  The reason why this is better is that now the two additions of \texttt{A[i]} and \texttt{A[i+1]} are independent, thus they can be executed in parallel. 
+  The compiler is now able to vectorize the code, using SIMD instructions.
+\end{observationblock}
+
+and finally we can separate partial results in multiple accumulators:
+
+\begin{codeblock}[language = C]
+for (int i=0; i<N-2; i+=2){
+S0 = S0 + A[i];
+S1 = S1 + A[i+1];
+}
+S = S0 + S1;
+\end{codeblock}
+
+In this case the compiler is able to \bfit{vectorize} the operations.
+
+\begin{observationblock}
+  The unrolling is expressed in general as $n\times m$ where $n$ refers to the number of iterations that are unrolled and $m$ refers to the number of accumulators that are being used. 
+\end{observationblock}
+
+\subsection*{3-level loops}
+
+These algorithms like matrix-matrix multiplication or dense matrix diagonalization are very good candidates for optimizations that lead flop/s performance close to the theoretical peak. Techniques like Tailing, unrolling and jamming, vectorization and reorganization of operations to exploit CPU's pipelines and out-of-order capability are all used by extremely specialized libraries like \textbf{BLAS} and \textbf{LAPACK}.
+
+\begin{tipsblock}
+  Whenever you have to deal with these kind of problems, use these libraries instead of reinventing the wheel.
+\end{tipsblock}
+
+Let's now dive deeper into the \textbf{matrix-matrix multiplication} task, which is very common in HPC. 
+\begin{definitionblock}[Matrix-matrix multiplication]
+  Given two matrices $A$ and $B$ having respectively $(m,n)$ and $(n,p)$ rows and columns, the matrix-matrix multiplication is defined as:
+  \[
+  C_{i,j} = \sum_{k=0}^n A_{i,k}\times B_{k,j}
+  \]
+  where $C_{i,j}$ is the resulting matrix.
+\end{definitionblock}
+
+The naive implementation is the following:
+
+\begin{codeblock}[language=C]
+for (int i=0; i<m; i++){ // traverse A's and C's rows 
+  for (int k=0; k<p; k++){ // traverse B's rows (A's columns = B's rows)
+    for (int j=0; j<n; j++){
+      C[i][j] += A[i][k] * B[k][j];
+    }
+  }
+}
+\end{codeblock}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{assets/opt31.png}
+  \caption{Matrix-matrix multiplication}
+  \label{fig:matrix_matrix_multiplication}
+\end{figure}
+
+This implementation is inefficient, since it has an issue with data locality for large enough matrices. For each $C$'s element, possibly all accesses to $B$ results in a cache miss. Then, the total number of expected misses is:
+\[
+\text{misses} = \underbrace{\frac{mp}{L}}_{\text{C is traversed once}} + \underbrace{\frac{mnp}{L}}_{\text{A is scanned p times}} + \underbrace{mnp}_{\text{B is accessed sparsely p times}}
+\]
+where $m$, $n$ and $p$ are the dimensions of the matrices and $L$ is the cache line size.
+
+How to fix this?
+
+Transposing the matrix $B$ before entering the loop is a good idea, although the transposition requires some additional work. The new code is:
+\begin{codeblock}[language=C]
+for (int i=0; i<m; i++){ // traverse A's and C's rows 
+  for (int k=0; k<p; k++){ // traverse B's columns (A's columns = B's rows)
+    for (int j=0; j<n; j++){
+      C[i][j] += A[i][k] * B[j][k];
+    }
+  }
+}
+\end{codeblock}
+
+Now we expect to have:
+\[
+\text{misses} = \underbrace{\frac{mnp}{L}}_{\text{running over C}} + \underbrace{\frac{mnp}{L}}_{\text{running over A}} + \underbrace{\frac{mnp}{L}}_{\text{running over B}}
+\]
+which is a significant improvement ($\approx mnp$ less cache misses).
+
+We can do even better using \textbf{loop tailing} (or blocking). The idea is to cut the matrices in smaller blocks that fit in the cache, and then perform the multiplication on these blocks. 
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{assets/opt32.png}
+  \caption{Matrix-matrix multiplication with tailing}
+  \label{fig:matrix_matrix_multiplication_with_tailing}
+\end{figure}
+
+The idea is to keep in the cache a segment of the $A$'s line, re-using it against the columns of $B$ (or better against a columns section tall as the line segment of $A$). This will reduce the number of cache misses by a factor $\frac{L}{l\times h \times g}$, where $l$ is the size of the data type, $h$ is the height of the block and $g$ is the width of the block. The optimal values for $h$ and $g$ depend on the cache size and on the cache line size.
+
+The code is the following:
+\begin{codeblock}[language=C]
+for (int i=0; i<m; i+=h){ // traverse A's and C's rows 
+  for (int k=0; k<p; k+=g){ // traverse B's columns (A's columns = B's rows)
+    for (int j=0; j<n; j+=l){
+      // multiply the blocks A[i:i+h][k:k+g] and B[j:j+l][k:k+g]
+      for (int ii=i; ii<i+h; ii++){
+        for (int kk=k; kk<k+g; kk++){
+          for (int jj=j; jj<j+l; jj++){
+            C[ii][jj] += A[ii][kk] * B[jj][kk];
+          }
+        }
+      }
+    }
+  }
+}
+\end{codeblock}
+
+\newpage
+\begin{advancedblock}[Prefetching]
+  Waiting for data and instructions is a major performance killer. Thus, modern CPUs have the capability of pre-emptively bring from memory into cache levels data that \textbf{will be needed shortly afterwards}. 
+  They can do this by following some speculative algorithms based on the current execution flow and assuming spatial locality and temporal locality. 
+
+  \textbf{Both data and instructions can be pre-fetched.}
+
+  (It can be both hardware-based and software-based.) There are two possible ways to deal with prefetching:
+  \begin{itemize}
+    \item \textbf{Explicit:} The programmer explicitly inserts a pre-fetching directive. This is difficult since the directive must be inserted timely but not too early (data eviction) or too late (load latency).
+    \item \textbf{Induced:} The programmer consciously organizes the code and execution flow so that the compiler can insert pre-fetching directives automatically. This is easier and more portable.
+  \end{itemize}
+\end{advancedblock}
+

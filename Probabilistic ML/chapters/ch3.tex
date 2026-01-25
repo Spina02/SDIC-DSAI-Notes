@@ -183,7 +183,7 @@ One can start to sample from the top of the network (our \textbf{ancestrals}), i
 \subsection{Conditional Independence in BN}
 
 \begin{definitionblock}[Conditional Independence]
-    Consider the RVs $a, b, c$. We say that $a$ is \textbf{conditional independent} of $b$ given $c$ (written $a \perp \!\!\! \perp b | c$) if:
+    Consider the RVs $a, b, c$. We say that $a$ is \textbf{conditional independent} of $b$ given $c$ (written $a \perp\!\!\!\perp \!\!\! \perp\!\!\!\perp b | c$) if:
     \[
         p(a,b|c) = p(a|c)p(b|c)
     \]
@@ -214,7 +214,7 @@ Also
 \[
     p(a,b|c) = \frac{p(a,b,c)}{p(c)} = \frac{p(a|c)p(b|c)p(c)}{p(c)} = p(a|c)p(b|c)
 \]
-Which means that $a \perp \!\!\! \perp b \not \perp \!\!\! \perp b | c$.
+Which means that $a \perp\!\!\!\perp \!\!\! \perp\!\!\!\perp b \not \perp\!\!\!\perp \!\!\! \perp\!\!\!\perp b | c$.
 
 \subsubsection{Head to Tail}
 
@@ -240,7 +240,7 @@ Also
 \[
     p(a,b|c) = \frac{p(b|c)p(c|a)p(a)}{p(c)} = p(b|c)p(a|c)
 \]
-Which means, again, that $a \perp \!\!\! \perp b \not \perp \!\!\! \perp b | c$.
+Which means, again, that $a \perp\!\!\!\perp \!\!\! \perp\!\!\!\perp b \not \perp\!\!\!\perp \!\!\! \perp\!\!\!\perp b | c$.
 
 \subsubsection{Head to Head}
 
@@ -261,8 +261,8 @@ Also
     p(a,b|c) = \frac{p(c|a,b)p(b)p(a)}{p(c)} \neq p(b|c)p(a|c)
 \]
 
-Which means, this time, that $a \perp\!\!\!\perp b and a \not \perp\!\!\!\perp b|c$.\\
-Notice that also $a \perp\!\!\!\perp b|d, \forall d$ descendant of $c$. 
+Which means, this time, that $a \perp\!\!\!\perp\!\!\!\perp\!\!\!\perp b and a \not \perp\!\!\!\perp\!\!\!\perp\!\!\!\perp b|c$.\\
+Notice that also $a \perp\!\!\!\perp\!\!\!\perp\!\!\!\perp b|d, \forall d$ descendant of $c$. 
 
 \subsubsection*{Formalization}
 Formalizing the notion of conditional independence on Bayesian Network that we just saw,
@@ -274,7 +274,7 @@ Formalizing the notion of conditional independence on Bayesian Network that we j
     \end{itemize}
 \end{definitionblock}
 
-\textbf{Proposition:} Let $A,B,C$ subsets, if all paths from a node in $A$ to a node in $B$ are blocked by a node in $C$ then $A \perp\!\!\!\perp B|C$.
+\textbf{Proposition:} Let $A,B,C$ subsets, if all paths from a node in $A$ to a node in $B$ are blocked by a node in $C$ then $A \perp\!\!\!\perp\!\!\!\perp\!\!\!\perp B|C$.
 
 \subsubsection{Markov Blanket}
 
@@ -393,7 +393,7 @@ Random Markov Fields are an undirected graph representation of a graphical model
 
 
 \begin{Proposition}
-Consider three subsets $A, B, C$. $A \perp B|C iff$ all paths from a node $a \in A$ to any node $b \in B$ pass from $C$ (i.e. are blocked by a node in $C$).
+Consider three subsets $A, B, C$. $A \perp\!\!\!\perp B|C iff$ all paths from a node $a \in A$ to any node $b \in B$ pass from $C$ (i.e. are blocked by a node in $C$).
 \end{Proposition}
 
 \begin{definitionblock}[Markov Blanket]
@@ -402,7 +402,7 @@ Consider three subsets $A, B, C$. $A \perp B|C iff$ all paths from a node $a \in
 
 \subsection*{Factorization}
 
-Consider two nodes $x_i$ and $x_j$. If there is no edge from $x_i$ to $x_j$ we know that $x_i \perp x_j|x_{-\{i,j\}}$. Therefore 
+Consider two nodes $x_i$ and $x_j$. If there is no edge from $x_i$ to $x_j$ we know that $x_i \perp\!\!\!\perp x_j|x_{-\{i,j\}}$. Therefore 
 
 $$
 p(x_i,x_j|x_{-\{i,j\}}) = p(x_i|x_{-\{i,j\}})p(x_j|x_{-\{i,j\}})
