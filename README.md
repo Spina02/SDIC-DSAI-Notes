@@ -77,30 +77,30 @@
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Multi-Agent%20Systems/main.pdf">Multi-Agent Systems</a></td>
       <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
     </tr>
-      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Galaxy%20Astrophysics/main.pdf">Galaxy Astrophysics</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/Spina/Galaxy%20Astrophysics/main.pdf">Galaxy Astrophysics</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
       <td>...</td>
       <td></td>
       <tr>
-      <td><a href="https://github.com/Spina02/SDIC-DSAI-Notes/blob/main/Advanced%20Deep%20Learning/main.pdf">Advanced Deep Learning</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Deep%20Learning/main.pdf">Advanced Deep Learning</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
       <td>...</td>
       <td></td>
     </tr>
     <tr>
-      <td><a href="https://github.com/Spina02/SDIC-DSAI-Notes/blob/main/Computer%20Vision/main.pdf">Computer Vision</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Computer%20Vision/main.pdf">Computer Vision</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
       <td>...</td>
       <td></td>
     </tr>
     <tr>
-      <td><a href="https://github.com/Spina02/SDIC-DSAI-Notes/blob/main/Natural%20Language%20Processing/main.pdf">Natural Language Processing</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Natural%20Language%20Processing/main.pdf">Natural Language Processing</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
       <td>...</td>
       <td></td>
     </tr>
     <tr>
-      <td><a href="https://github.com/Spina02/SDIC-DSAI-Notes/blob/main/Advanced%20High%20Performance%20Computing/main.pdf">Advanced High Performance Computing</a></td>
+      <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20High%20Performance%20Computing/main.pdf">Advanced High Performance Computing</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
       <td>...</td>
       <td></td>
