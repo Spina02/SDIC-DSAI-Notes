@@ -95,7 +95,7 @@
     </tr>
     <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Natural%20Language%20Processing/main.pdf">Natural Language Processing</a></td>
-      <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
+      <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
       <td>...</td>
       <td></td>
     </tr>
