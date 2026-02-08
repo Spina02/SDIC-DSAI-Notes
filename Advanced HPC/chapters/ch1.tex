@@ -456,7 +456,40 @@ In addition to enabling vectorization flags, we can provide the compiler with ad
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %       Starting of the section to review  complete
 
-\missing{auto-vectorization example (slide 47-50)}
+\begin{exampleblock}[Auto vectorizing a simple loop]
+Here we perform a simple reduction of an array, with datatype \plaintt{dtype} that is determined at compile time (\plaintt{int} or \plaintt{float}).
+\begin{codeblock}[language=C]
+    dtype sum_loop ( dtype *array, uint N ) 
+    {
+        dtype sum = 0;
+        for ( uint32_t i = 0; i < N; i++ ) {
+            sum += array[i];
+        }
+        return sum;
+    }
+\end{codeblock}
+Let's compile the code with GCC using different flags:
+\begin{itemize}
+    \item To get the generated assembler in itel syntax:
+    
+    \plaintt{-S -fverbose-asm -masm=intel}
+    \item To enable vectorization and optimization:
+    
+    \plaintt{-O3 -march=native -mtune=native -ftree-vectorize -funroll-loops}
+    \item To get a report on vectorization:
+    
+    \plaintt{-fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop}
+\end{itemize}
+
+Now, inspecting the assembly code for the integer version:
+\begin{codeblock}[language={[x86masm]Assembler}, morekeywords={vpaddd}, basicstyle=\ttfamily\scriptsize]
+.L4:
+    vpaddd  ymm0, ymm0, YMMWORD PTR [rax]
+    add    rax, 32
+    cmp   rdx, rax 
+    jne   .L4
+\end{codeblock}
+which means take what is inside register \plaintt{rax} (the square brackets mean dereferencing), sum it with the value in \plaintt{ymm0} and store the result in \plaintt{ymm0} (all of 32 bytes, or 256 bits). Then increment \plaintt{rax} by 32 bytes (the size of the vector) and repeat until \plaintt{rax} reaches \plaintt{rdx} (the end of the array). This is a clear example of vectorization: we are summing 8 integers at once, instead of one by one.
 
 Vectorizing loops operating on integers works well, but for floating point numbers, we need to be careful.
 
@@ -475,13 +508,121 @@ Vectorizing loops operating on integers works well, but for floating point numbe
     jne     .L4
 \end{codeblock}
 
-Here, we are using the \plaintt{vaddss} instruction which is actually a scalar instruction.
+Here, we are using the \plaintt{vaddss} instruction which is actually a scalar instruction, thus we are not actually vectorizing the loop. 
+\end{exampleblock}
 
-\missing{profileing table, loop unrolling -> clear vectorization (slides 52-71)}
+What we have just seen should convince you that integers can be easily vectorized by the compiler because there are no constraints on the reshuffling of the operations. Floating points, instead, don't have this advantage: even when some vectorization is possible, the critical paths that we insert through the semantics hinder the expression of data-level parallelism. To further test the result of the compilation, let's profile the codes using \plaintt{perf}:
 
-% profiling tables
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+    \hline 
+    & \textbf{Int} & \textbf{Float} \\
+    \hline
+    \textbf{Not vectorized} & 0 int\_vec.add\_256 & \begin{tabular}[c]{@{}c@{}}
+        0 \quad vector \\
+        1,000,000 \quad scalar \\
+    \end{tabular} \\
+    \hline
+    \textbf{Vectorized} & 0 int\_vec.add\_256 & \begin{tabular}[c]{@{}c@{}}
+        250,000 \quad vector \\
+        1,000,000 \quad scalar \\
+    \end{tabular} \\
+    \hline
+\end{tabular}
+\end{table}
 
-% loop unrolling -> clear vectorization
+Of the $250,000$ int\_vec.add\_256, 125k are vector operations to initialize the loop and 12k are vector addition in the summation loop. For the float, 125k are to convert vectors of int to floats and 125k are to mov regs in memory. The $1,000,000$ scalar are not vectorized at all. Hence, autovectorization works nicely for integers but not at all for the floats. This descends from the compiler not being entitled to reshuffle operations in the summation loop. For as we have written it, $s += a_i$, there is a clear critical path on $s$ that must be respected by the compiler. 
+
+\begin{observationblock}[Critical path]
+    From the basic course of HPC you should remember that when trying to optimize a loop, if we are accumulating on a single variable ($S$) it may lead to the execution of a lot of bit reshuffling and scalar add, in place of clean vector operations. 
+    To fix this, we can use partial accumulators:
+\begin{codeblock}[language=C]
+    for (int i=0; i < N; i+=VL) {
+        sum0 += array[i];
+        sum1 += array[i+1];
+        sum2 += array[i+2];
+        sum3 += array[i+3];
+        ...
+    }
+    sum = sum0 + sum1 + sum2 + sum3 + ...;
+\end{codeblock}
+    This exposes a natural vector pattern.
+\end{observationblock}
+
+Now we can rewrite the loop differently, using multiple accumulators to break the critical path:
+\begin{codeblock}[language=C]
+    dtype sum_loop ( dtype * restrict array, const uint N ) 
+    {
+        double sum0 = 0;
+        double sum1 = 0;
+        double sum2 = 0;
+        double sum3 = 0;
+        uint N4 = N\%0xFFFFFFFC;
+        for ( uint32_t i = 0; i < N4; i+=4 ) {
+            sum0 += array[i];
+            sum1 += array[i+1];
+            sum2 += array[i+2];
+            sum3 += array[i+3];
+        }
+        ... 
+        return sum;
+    }
+\end{codeblock}
+
+This way we obtain:
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+    \hline 
+    & \textbf{unroll vectorized} & \textbf{vectorized unsafe-math} \\
+    \hline
+    \textbf{metrics} & 
+    \begin{tabular}[c]{@{}c@{}}
+        500,000 \quad vector \\
+        0 \quad scalar \\
+    \end{tabular} & 
+    \begin{tabular}[c]{@{}c@{}}
+        500,000 \quad vector \\
+        0 \quad scalar \\
+    \end{tabular} \\
+    \hline
+\end{tabular}
+\end{table}
+
+Hence, re-engineering the code before using the auto-vectorization of the compiler can greatly enhance the achieved vectorization because we expose more parallelism while explicitly relaxing the order of the operations.
+
+\begin{exampleblock}[Another example]
+    Consider this loop:
+\begin{codeblock}[language=C]
+    for (int i = 0; i < N; i++) {
+        sum += A[i]*B[i] + C[i];
+    }
+\end{codeblock}
+    This case has a higher possible parallelism since the reduction comes after the multiply-and-add vector operation. This means that a vector of partial results 
+\begin{codeblock}[language=C]
+    D[i:i+n] = A[i:i+n]xB[i:i+n] + C[i:i+n];
+\end{codeblock}
+    can be preemptively prepared, waiting for the entries to be summed up serially. The compiler in fact opts for this implementation. 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\textwidth]{assets/auto_vectorization_example2.png}
+        \caption{Auto-vectorization of a loop with multiply-and-add operation.}
+    \end{figure}
+    Lots of computation are performed via FMA on vector registers, 256b or 512b depending on what is available on the cpu. However, lots of reshuffling is needed and all the reduction summations are serial. 
+    Opting either for the usage of the \plaintt{associative math} flag or for explicit loop unrolling (using separate accumulators) results in a different, fully vectorizable pattern.
+\end{exampleblock}
+
+So, to express the whole inherent loop-data and instruction-level parallelism is of primary importance to either 
+\begin{itemize}
+    \item authorizing the compiler to \textbf{re-shuffle floating-point} operations or 
+    \item \textbf{unroll the loops} to expose more instruction-level and data-level parallelism.
+\end{itemize}
+
+\begin{tipsblock}
+    Professor tip is to manually refactor the code, so that you can test for the correctness of the results while achieving the same vectorization.
+\end{tipsblock}
+
 
 The ideal situation is to have \bfit{countable} loops.
 
@@ -502,6 +643,8 @@ while (i < N) {
     Note that a countable while loop is vectorizable as a for loop is.
 \end{tipsblock}
 
+Moreover, there should not be branches, since the SIMD instructions are meant to perform exactly the same operation on multiple data and so different iterations can not have different control flows (if statements are admitted if they can result in a mask-like implementation). For the same reason, we should avoid function calls (vectorizable functions are an exception).
+
 Sometimes it is essential to use specific compiler flags to enable or enhance vectorization of floating-point code, especially in the presence of math library calls or exception handling.
 
 \begin{itemize}
@@ -511,104 +654,122 @@ Sometimes it is essential to use specific compiler flags to enable or enhance ve
 
 By default, compilers like GCC have \plaintt{-fmath-errno} and \plaintt{-ftrapping-math} \textbf{enabled} (\plaintt{ON}).
 
-% add stuff about loop vectorization (01b_compiler_reports)
-
-\missing{non contiguous memory access (slides 77-78)}
-
-\subsection{Data dependencies}
-
-\todo{enhance this section}
-
-$S_1, S_2 \rightarrow M$
-
-\begin{center}
-\begin{tabular}{|c|c|c|}
-    \hline
-    $S_1$ W & $S_2$ R & RAW | TRUE | FLOW \\
-    $S_1$ R & $S_2$ W & WAR | ANTI-DEP \\
-    $S_1$ W & $S_2$ W & WAW | OUT-DEP \\
-    \hline
-\end{tabular}
-\end{center}
-
-where:
+There are many situations where something could go wrong. The first case is when using \textbf{non-contiguous memory access}. It refers to loops that access data with a non-unit stride, or even worse with an irregular pattern. They are rarely vectorized, and that is because while consecutive data can be loaded in a single cache line, or in a register, with a single memory operation, sparse memory access need separate loads and data gathering; if the compiler estimates that this overhead is larger than the benefits, the loop is not vectorized. 
+Another case is when there are \textbf{data dependencies} between iterations of the loop. If the compiler detects that there is a dependency, it can not vectorize the loop because it can not reshuffle the operations without changing the semantics of the code. For this case, we can identify:
 \begin{itemize}
-    \item RAW: Read After Write
-    \item WAR: Write After Read
-    \item WAW: Write After Write
-\end{itemize}
+    \item \textit{Read-After-Write (flow-dependency)} $\to$ A variable is written in an iteration and read on a subsequent one. This loop can NOT be vectorized without leading to wrong results.
 
-\begin{codeblock}
-$S_1$: ... = A[i+2];
-$S_2$: A[i+2] = ...;
-$S_3$: ... = A[i];
-\end{codeblock}
+    However, let's consider the following 2D case: 
 
-$S_1 \delta^a S_2$ FWD loop-indep
-$S_2 \delta^t S_3$ FWD loop-dep
-
-An of false dependency is:
-
-\begin{codeblock}
-$S_1$: A[i] = ;
-$S_2$: ... = A[i+1];
-\end{codeblock}
-
-This is a FWD loop-dep dependency. And it is a false dependency: if we simply invert the order of the statements, the code will be semantically correct and completely vectorizable.
-
-\textbf{Loop independent}: there can be a dependency but inside the same iteration of the loop
-
-\subsubsection{Non-contiguous memory access}
-
-A contiguous memory access results in fetching and using of entire lines of cache; the bandwidth utilization is optimal.
-
-strided memory access results in gathering sparse memory location, accessed with separate memory calls, with a lot of overhead in memory calls and in mem moves from/to registers.
-
-Also in this case, the \bfit{Read-After-Write (flow-dependency)} are the main issue.
-
-A variable is written in an interation and read on a subsequent one. 
-\begin{codeblock}
-for (int i = 0; i < N; i++) {
-    A[i] = A[i-1] + C[i];
-}
-\end{codeblock}
-This loop can NOT be vectorized without leading to wrong results.
-
-However, let's consider the following 2D case: 
-
-\begin{codeblock}
+    \begin{codeblock}
 for (int i = 0; i < N; i++) {
     A[i][0] = C[i][0];
     for (int j = 0; j < M; j++) {
         A[i][j] = A[i][j-1] + C[i][j];
     }
 }
-\end{codeblock}
+    \end{codeblock}
 
-the dependency is carried in the inner loop, while the outer loop iterations do not exhibit any dependency and the \textbf{outer loop vectorization} can be performed.
+    the dependency is carried in the inner loop, while the outer loop iterations do not exhibit any dependency and the \textbf{outer loop vectorization} can be performed.
+
+    \begin{figure}[H]
+        \centering
+        \begin{minipage}[c]{0.5\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{assets/data-dep.png}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[c]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{assets/data-dep-2.png}
+        \end{minipage}
+        \caption{RAW data dependency: 4 (or 8) outer iterations can be executed together because there are no vertical dependencies (outer loop vectorization)}
+        \label{fig:data_dep}
+    \end{figure}
+
+    Consider the dependency graph of the iteration space. It clearly shows that there are no vertical dependencies. Hence, the outer loop can be vectorized: 4 (or 8) outer iterations can be executed together because there are no vertical dependencies. However, if the elements are stored in memory in row-major order that require a lot of memory gather and scatter operations. If not supported in hw, they must be emulated, which is even more expensive. Thus, we may consider to write the data column-major if possible. 
+
+    \item \textit{Write-After-Read (anti-dependency)} $\to$ A variable is read in one iteration and written in a subsequent one. Unsafe for parallelism (no strict order among iterations assigned to tasks), normally safe for vectorization. Consider this example:
+    \begin{codeblock}[language=C]
+for (int i = 1; i < N; i++) {
+    a[i-1] = a[i] + c[i];
+}
+    \end{codeblock}
+    while the following cannot be vectorized because it's unclear if \plaintt{a[i]} may be overwritten before the summation to \plaintt{sum}:
+    \begin{codeblock}[language=C]
+for (int i = 0; i < N; i++) {
+    a[i-1] = a[i] + c[i];
+    sum += a[i];
+}
+    \end{codeblock}
+
+    \item \textit{Write-After-Write (output dependency)} $\to$ The same variable is written in more than one iteration. Generally unsafe both in parallelization and in vectorization.
+    \begin{codeblock}[language=C]
+double sum = 0;
+for (int i = 1; i < N; i++) {
+    a[i-1] = function1(i);
+    a[i] = function2(i);
+}
+    \end{codeblock}
+    \item \textit{Memory ambiguity} $\to$ Typically due to memory aliasing. It may be impossible for the compiler to decide whether, for some value of \plaintt{i, a[i], b[i]} and \plaintt{c[i]} will somehow overlap. If that is the case, it will not issue a vector code. When it is possible, the compiler will issue more than one version of the loop and a code that performs an overlap test among the pointers. Then the execution will be routed to the correct version at run-time. 
+    \begin{codeblock}[language=C]
+void function (int *a, int *b, int *c, int N) {
+    for (int i = 0; i < N; i++) {
+        c[i] = a[i] + b[i];
+    }
+}
+    \end{codeblock}
+    We can disambiguate using the \plaintt{restrict} qualifier, which tells the compiler that the pointers do not alias each other. This allows the compiler to vectorize the loop without generating multiple versions and runtime checks. Also the \plaintt{const} qualifier can help, as it tells the compiler that the data pointed to by the pointer will not be modified, which can also enable vectorization.
+
+\end{itemize}
+
+A variable is said to be \textbf{aligned} in memory when its first byte's address is a multiple of the variable's type size:
+\begin{itemize}
+    \item \plaintt{short int} $\to$ 2 bytes: 0, 2, 4, 6, 8, ... are aligned placements;
+    \item \plaintt{int / float} $\to$ 4 bytes: 0, 4, 8, 12, ... are aligned placements;
+    \item \plaintt{long long / double} $\to$ 8 bytes: 0, 8, 16, 24, ... are aligned placements.
+\end{itemize}
+Consequently, an aligned variable is also aligned w.r.t. the cache line it belongs to: it means that an aligned variable will never cross 2 cache lines! 
+However, let's imagine that we allocate a bunch of memory and we consider it as an array of elements with byte size $s_B$. Let's say that:
+\begin{itemize}
+    \item its starting byte is aligned at $a_B$ bytes ($a_B$ is a multiple of $s_B$);
+    \item we access this array by vectors of element-size $V_L$ (meaning that every vector has $V_L$ elements); hence we will access $V_L\times s_B$ bits every time.
+\end{itemize}
+Then if 
+\[
+(a_B + V_L \times s_B) \% C_L == 0 \quad (C_L\text{ being the cache capacity in terms of elements})
+\]
+all the vectors will stay in the same cache line and will require 1 load; otherwise, a vector will be mapped into two differnt cache lines and will require 2 loads. 
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}[c]{0.5\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{assets/data-dep.png}
-    \end{minipage}
-    \hfill
-    \begin{minipage}[c]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth]{assets/data-dep-2.png}
-    \end{minipage}
-    \caption{RAW data dependency: 4 (or 8) outer iterations can be executed together because there are no vertical dependencies (outer loop vectorization)}
-    \label{fig:data_dep}
+    \includegraphics[width=0.8\textwidth]{assets/ex1_unaligned_mem.png}
+    \caption{Example 1: an array of float aligned at 64 bits accessed as vector of size 4 (cache capacity is 16 with a std cache line of 64B) $a_B = 8B, V_L = 4, s_B = 4, C_L = 16$ every vector will occupy exactly 1 cache line.}
+    \label{fig:ex1_unaligned_mem}
 \end{figure}
 
-% notes about aligned memory
-\missing{notes about aligned memory}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ex2_unaligned_mem.png}
+    \caption{Example 2: an array of float aligned at 16 bits accessed as vector of size 4 (cache capacity is 16 with a std cache line of 64B) $a_B = 8B, V_L = 4, s_B = 4, C_L = 16$ every vector will occupy exactly 2 cache lines.}
+    \label{fig:ex2_unaligned_mem}
+\end{figure}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% The following part is a bit confusing
-
-\subsubsection{AoS over SoA}
+\begin{tipsblock}[Data structures]
+    \begin{itemize}
+        \item Keep together data that are used together in vector operations;
+        \item The smallest the data type you use, the larger the number of data that you can fit in the cache and in the vector registers;
+        \item Do not mix same-type different-size data:
+        \begin{codeblock}
+func ( float *A, float *B, double *C, int N ) {
+    for ( int i = 0; i < N; i++ ) {
+        A[i] = B[i] * C[i];
+    }
+}
+        \end{codeblock}
+        the type conversion renders things less efficient (\plaintt{long double} type is not supported on GPUs).
+    \end{itemize}
+\end{tipsblock}
 
 Very commonly the data are multi-dimensional and hence the most natural representation is by a structure that encapsulates all the quantities for a single data point. Every entry of the array that contains all the data points is then a structure:
 
@@ -619,7 +780,7 @@ data[i].pos[3], data[i].acc[3], data[i].mass, ...
 This is the \textbf{Array of Structures (AoS)} representation. and is a very convenient
 representation in many respects. However, when the structures collects many and diverse data, the SoA have several inconvenience too when computational performance is considered.
 
-Let's consider the following example:
+Let's consider the following example that occupies 96 bytes:
 
 \begin{codeblock}
     struct particle {
@@ -636,7 +797,15 @@ Very likely every of these calculations may have a high degree of vectorization.
 
 So, a very first step consist in opting for \textbf{Structures of Arrays of (small)Structures} (SoAoS):
 
-...
+\begin{codeblock}
+struct Ppos       { double pos[3], double mass; };  Ppos *mpositions;
+struct Paccel     { double accel[3]; };             Paccel *accelerations;
+struct Pvel       { double vel[3]; };               Pvel *velocities;
+struct Pchemistry {float elements[n_el];};          Pelems *Pchemistry;
+                                                    long long int *PIds;
+\end{codeblock}
+
+Clearly, that alleviates the aforementioned issues but it is still sub-optimal. 
 
 If, instead, we opt for a \textbf{Structure of Arrays} (SoA) approach:
 
@@ -645,7 +814,7 @@ double *x, *y, *z, *mass, *xacc, *yacc, *zacc, ...
 long long *ids;
 \end{codeblock}
 
-Data rearranged in SoA approach definitely would expose more, and more efficient, vectorization opportunities.
+the possible vectorization is definitely higher. Data rearranged in SoA approach definitely would expose more, and more efficient, vectorization opportunities.
 
 \begin{figure}[H]
     \centering
