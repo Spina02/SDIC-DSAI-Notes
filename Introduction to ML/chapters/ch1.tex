@@ -1,123 +1,286 @@
 \chapter{Basic Concepts}
 
-\section*{What is Machine Learning?}
+\vspace{-0.5em}
+
+\section{What is Machine Learning?}
+
+Machine learning is a research area at the intersection of computer science, statistics and optimization; its goal is to design systems that make useful decisions from data.
 
 \begin{definitionblock}[Machine Learning]
-\textbf{Machine Learning} is the science of getting computers to learn something without being explicitly programmed.
+\bfit{Machine Learning} is the science of getting computers to learn without being explicitly programmed.
 \end{definitionblock}
 
-\begin{itemize}
-    \item What science?
-    \item Who is doing that?
-    \item To learn what?
-    \item Who is not being explicitly programmed?
-\end{itemize}
+Each part of this sentence hides important questions: what kind of \textit{science} is this field? who is actually building and running these computer systems? what does it mean for a computer to \textit{learn}, and learn \textit{what} exactly? in which sense is the system not being explicitly programmed?
 
+To answer these questions we start from a very simple view of learning as \textit{decision making} based on observations.
 Let's formalize the decision making process:
 
-\begin{multicols}{2}
+\medskip
+
+\begin{minipage}{0.33\textwidth}
     \centering
     \texttt{$y = f(x)$}
-    \columnbreak
-
+\end{minipage}
+\hfill
+\begin{minipage}{0.65\textwidth}
     \begin{itemize}
-        \item $x$ is the entity about which the decision has to be made
-        \item $y$ is the decision
-        \item $f$ is the procedure that, given an \curlyquotes{x} results in a decision \curlyquotes{y}
+        \item \texttt{$x$} is the entity about which the decision has to be made
+        \item \texttt{$y$} is the decision
+        \item \texttt{$f$} is the procedure that, given an \texttt{$x$} results in a decision \texttt{$y$}
     \end{itemize}
+\end{minipage}
 
-\end{multicols}
+\medskip
 
-X is an \textbf{observation}, while Y is a \textbf{response}.
+We call $x$ an \textbf{observation} and $y$ the \textbf{response}. When we view $f$ as an information-processing system, $x$ is often referred to as the \textbf{input} and $y$ as the \textbf{output}. The observation $x$ may also be called a \textbf{data point} or an \textbf{instance}.                        
 
-So, the function $f$ is what has to be learned, and is also denoted as $f_{predict}$, since it predicts a response ($\hat{y}$) given an observation.
+The central point is \emph{what} the computer learns: how to make a decision $y$ about an observation $x$, i.e.\ a function $f : X \to Y$. We want the computer not only to learn $f$ but to use it; in practice, once $f$ is fixed, we use it to predict $y$ for new $x$. The function is therefore often denoted $f_{\text{predict}}$. When we use it on new data, we are in the \textbf{prediction phase}; the value it outputs is a prediction for the (possibly unknown) true response, often written $\hat{y}$.
 
-$$f: R^2 \to R$$
+\begin{definitionblock}[Machine Learning (refined)]
+\bfit{Machine Learning} is the science of getting computers to learn $f_{\text{predict}} : X \to Y$ \textbf{autonomously}.
+\end{definitionblock}
+
+Here, ``autonomously'' means that $f_{\text{predict}}$ is \emph{not} written by a human: we ask the computer to \emph{find} a program (a function $f$) that behaves as desired, instead of writing it by hand. Formally: 
+
+\begin{enumerate}
+    \item consider the set of all functions from $X$ to $Y$, $\mathcal{F}_{X \to Y} = \{ f : X \to Y \}$;
+    \item choose one $f \in \mathcal{F}_{X \to Y}$ that does what is expected.
+\end{enumerate}
+
+Step 2 is what we mean by learning; specifying ``what is expected'' in general is difficult, and in practice we need some form of \textbf{supervision} to guide the search for a good $f$.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.3\textwidth]{assets/fig1.png}
-    \caption{Abstract definition of the learning process}
+
+    \vspace{-0.5em}
+    \caption{Abstract view of the learning process.}
     \label{fig:ML1}
 \end{figure}
 
-The learning process is not written by a human, so we can say that the machine learns \texttt{autonomously}.
+\subsection{Learning paradigms and supervision}
+
+The way supervision is provided leads to different learning paradigms.
+
 \begin{itemize}
-    \item condsider the universe of functions $F_{X \to Y} = \{f, f:X \to Y\}$
-    \item choose the function that does what expected
+  \item \textbf{Supervised learning}: we observe example pairs $(x,y)$ of observations and desired responses, and we want $f$ to reproduce this behaviour.
+  \item \textbf{Unsupervised learning}: we only observe $x$'s and look for structure or regularities in the data without explicit labels.
+  \item \textbf{Reinforcement learning}: the system interacts with an environment and receives a \textbf{reward} signal instead of explicit target responses.
 \end{itemize}
 
-\begin{definitionblock}[New Definition]
-\textbf{Machine Learning} is the science of getting computers to learn $f_{predict}:X \to Y$ \textbf{autonomously}.
-\end{definitionblock}
+\vspace{-0.3em}
 
-There has to be some sort of \texttt{supervision} facilitating the search of a good $f$ and when it is in the form of some \textbf{examples} and the function should process them correctly we are in the field of \textbf{Supervised Machine Learning}.
+\subsubsection{Supervised learning}
+
+We focus on the supervised case. Examples are pairs $(x,y)$; the finite set of examples used for learning is the \textbf{training set} (or \textbf{learning set}), often denoted $D_{\text{learn}}$. A training set is a particular kind of \textbf{dataset}, i.e.\ a collection of observations and responses. It should be compatible with the chosen $X$ and $Y$; more precisely, each pair in $D_{\text{learn}}$ must belong to $X \times Y$. 
+We write:
+$$
+f_{\text{predict}} = f_{\text{learn}}(D_{\text{learn}})
+$$
+to highlight that the predictor is produced by applying a learning procedure $f_{\text{learn}}$ to the data. Conceptually we distinguish two phases:
 \begin{itemize}
-    \item \textbf{Supervised Learning}: the function is learned from a set of labeled examples
-    \item \textbf{Unsupervised Learning}: finds structures in the data without any labels
-    \item \textbf{Reinforcement Learning}: the function is learned from a set of examples and a reward signal
-\end{itemize}
-
-Examples are pairs of observations and responses ($x,y$), and the set of examples is called \textbf{training set} (or learning set). The \texttt{dataset} is a bag of pairs of observations and responses.
-
-The learning set has to be consistent with the domain and codomain of the function $f_{predict}$ to be learned.
-
-$$f_{predict} = f_{learn}(D_{learn})$$
-
-\begin{itemize}
-    \item \textbf{learning phase}: the function $f_{learn}$ is learned from the learning set(i.e. is applied to obtain $f_{predict}$ from $D$)
-    \item \textbf{prediction phase}: the function $f_{predict}$ is used to predict the response ($y$) of new observations
+  \item the \textbf{learning phase}, in which $f_{\text{learn}}$ processes $D_{\text{learn}}$ and outputs $f_{\text{predict}}$;
+  \item the \textbf{prediction phase}, in which $f_{\text{predict}}$ is used to predict responses for new observations.
 \end{itemize}
 
 \begin{definitionblock}[Supervised Learning Technique]
-A \textbf{Supervised Learning Technique} is a way to learn an $f_{predict} \in F_{X\to Y}$ given a $D_{learn} \in P^{*}(X \times Y)$
+A \bfit{Supervised Learning Technique} is a method that, given a learning set $D_{\text{learn}} \in \mathcal{P}^{*}(X \times Y)$, returns a predictor $f_{\text{predict}} \in \mathcal{F}_{X \to Y}$.
 \end{definitionblock}
 
-Different SL techniques differ in applicability, efficiency and effectiveness.
+Where $X \times Y$ is the cartesian product of $X$ and $Y$, and $\mathcal{P}(A)$ is the power set of $A$ (the set of all subsets of $A$), and $\mathcal{P}^{*}(A)$ is the power set of $A$ with duplicates.
+
+Different supervised learning techniques can be compared along several axes:
 \begin{itemize}
-    \item \textbf{Applicability}: with respect to X and\/or Y, e.g. some require $X = R^{p}$, some require $Y = R$
-    \item \textbf{Efficiency}: the computational resources needed to learn the function wrt $|D_{learn}|$, e.g. some are fast and other slow
-    \item \textbf{Effectiveness}: the quality of the learned functions $f_{predict}$
+  \item \textbf{applicability}, i.e.\ the kinds of $X$ and $Y$ they can handle (e.g. $X = \mathbb{R}^{p}$ or $Y$ real-valued);
+  \item \textbf{efficiency}, i.e.\ the computational resources they require as a function of $|D_{\text{learn}}|$;
+  \item \textbf{effectiveness}, i.e.\ the quality of the predictor they learn.
+  \item \textbf{interpretability}, i.e.\ the ease with which the predictor can be understood by humans.
 \end{itemize}
 
-There is another view of it, and I like it more:
-\begin{definitionblock}[SL Technique as Optimisation]
-A \textbf{Supervised Learning Technique} is a way to solve the optimization problem:
+\vspace{-0.3em}
 
+\subsubsection{Supervised learning as optimisation}
 
-$$f_{predict} = argmin_{f \in F_{X \to Y}} L(f, D_{learn})$$
-    
-where $L$ is a loss function that measures the quality of the function $f$ wrt the learning set $D_{learn}$ and $F_{X \to Y}$ is the set of functions that can be learned.
-\end{definitionblock}
+A particularly fruitful viewpoint is to see supervised learning as an optimisation problem. A supervised learning technique $f_{\text{learn}} \colon \mathcal{P}^{*}(X \times Y) \to \mathcal{F}_{X \to Y}$ can be seen as a form of optimisation. The general approach consists of two steps:
+\begin{enumerate}
+  \item consider $\mathcal{F}_{X \to Y} = \{ f, f \colon X \to Y \}$;
+  \item find the one $f_{\text{predict}} \in \mathcal{F}_{X \to Y}$ that \textbf{works best} on $D_{\text{learn}}$.
+\end{enumerate}
 
-The most practical solution is to reduce $F_{X \to Y}$ size by considering only the $f$ of some nature.
+Could we use a general optimisation technique? In principle yes, but there are practical obstacles. The space $X$ (and maybe $Y$) might be infinite (for example $X = \mathbb{R}^{p}$); the space $X \times Y$ is ``more'' infinite; and the space $\mathcal{F}_{X \to Y}$ of all functions from $X$ to $Y$ is enormously larger still.
 
-\texttt{Templating $f$} means defining a relationship between data as we do in statistics, specifying it with some coefficients that we can evaluate.
+\vspace{-0.5em}
 
-We can then explicit the unknown parameters and specify the template as a reduced $F'$. 
+\subsection*{Templating $f$ and learning a model}
 
-$$f_{predict} = f'_{predict}(x,m)$$
+A practical way to make the search feasible is to restrict $\mathcal{F}_{X \to Y}$ to a smaller family of functions of a particular structure. We introduce a \textbf{template} function $f'$ and a reduced hypothesis space $\mathcal{F}'_{X \to Y} \subseteq \mathcal{F}_{X \to Y}$ consisting of all functions that are obtained by instantiating this template.
 
-Where $m$ is the \texttt{model} of how $y$ depends on $x$.
+Most parts of $f'$ are fully specified; only some components are left \emph{undefined} and will later be chosen from data. The template $f'$ can be used for prediction only after these undefined parts have been fixed.
+
+\begin{exampleblock}[Univariate linear regression as a template]
+Suppose $X = Y = \mathbb{R}$ and consider the family of affine functions
+$$
+f'(x; a, b) = ax + b, \qquad a, b \in \mathbb{R}.
+$$
+Here $f'$ is the template; the parameters $a$ and $b$ are the undefined parts. This is called \emph{univariate linear regression}: it is \emph{univariate} because $X$ has one dimension, a regression problem because $Y = \mathbb{R}$, and \emph{linear} because of the affine template.
+\end{exampleblock}
+
+We collect the free parameters of the template in a vector $m \in M$; this vector is called the \textbf{model}. Once $m$ is fixed, the template becomes a concrete predictor
+$$
+f_{\text{predict}}(x) = f'_{\text{predict}}(x, m),
+$$
+so that $m$ completely determines how $y$ depends on $x$.
+
+In the most general (non-templated) view a supervised learning technique is a function
+$$
+f_{\text{learn}} \colon \mathcal{P}^{*}(X \times Y) \to \mathcal{F}_{X \to Y}, 
+\qquad
+f_{\text{predict}} \colon X \to Y,
+$$
+that maps a learning set $D_{\text{learn}}$ to a predictor $f_{\text{predict}}$.
+
+For techniques based on a template we separate these two roles:
+$$
+f'_{\text{learn}} \colon \mathcal{P}^{*}(X \times Y) \to M,
+\qquad
+f'_{\text{predict}} \colon X \times M \to Y.
+$$
+The learning technique is now defined by the pair $(f'_{\text{learn}}, f'_{\text{predict}})$: from data $D_{\text{learn}}$, the procedure $f'_{\text{learn}}$ selects a model $m \in M$, and the templated predictor $f'_{\text{predict}}(\cdot, m)$ can then be used to map any new observation $x$ to a response $y$.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.3\textwidth]{assets/fig2.png}
-    \caption{Learning a model with template function}
-    \label{fig:template}
+  \centering
+  \includegraphics[width=0.85\textwidth]{assets/fig2.png}
+  \caption{\centering the learning phase produces a model $m$, which is used by $f'_{\text{predict}}$ to compute $y$ from $x$.}
+  \label{fig:template-learning}
 \end{figure}
 
+\subsection{Notation and terminology}
+
+Several terms are used interchangeably in literature to describe the process of obtaining a model from data. We say that a model $m$ is \textbf{learned}, \textbf{trained}, or \textbf{fitted} on a dataset $D$; all three expressions mean that $m$ is adjusted until it works well on the examples in $D$. Formally, a model is one specific $m \in M$ that has been found through the learning process. However, the word ``model'' is sometimes used more loosely to denote a also an untrained template.
+
+Supervised learning techniques can be categorized according to the nature of $X$, $Y$, and $M$. The most important distinction concerns the output space $Y$:
+
+\begin{itemize}
+  \item \textbf{Classification}: $Y$ is a finite set with no ordering. The label $y$ is called \textbf{categorical} (or \textbf{nominal}). If $|Y| = 2$ we speak of \textbf{binary classification}; otherwise it is \textbf{multiclass classification}.
+  \item \textbf{Regression}: $Y = \mathbb{R}$ (or $Y \subseteq \mathbb{R}$). The response $y$ is called a \textbf{numerical variable}.
+\end{itemize}
+
+Regarding the input space $X$, common cases include:
+\begin{itemize}
+  \item \textbf{Multivariate}: $X = X_1 \times X_2 \times \cdots \times X_p$, where each $X_j$ is either $\mathbb{R}$ or a finite unordered set. Each observation $x$ is a $p$--tuple, and each component $x_j$ is either numerical or categorical.
+  \item \textbf{Text mining}: $X$ is the set of all strings (or sequences of symbols).
+\end{itemize}
+
+\subsubsection*{Variables terminology}
+
+In the multivariate case $X = X_1 \times X_2 \times \cdots \times X_p$:
+
+\begin{itemize}
+  \item each component $x_j$ is called an \textbf{independent variable}. Alternative names are \textbf{feature} (since it is a feature of an observation $x \in X$), \textbf{attribute}, or \textbf{predictor} (since it helps predict $y$). 
+  \item $y$ is called the \textbf{dependent variable} or \textbf{response variable}, since it is hoped to depend on $x$.
+\end{itemize}
+  
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\textwidth]{assets/fig2-1.png}
+  \label{fig:var-terminology}
+\end{figure}
+
+\subsubsection{Size of the "problem"}
+
+The common notation for the size of a multivariate dataset (i.e. $X = X_1 \times X_2 \times \cdots \times X_p$) is:
+
+\begin{itemize}
+  \item $n$: number of observations
+  \item $p$: number of (independent) variables
+\end{itemize}
+
+On the assumption that a dataset $D$ implicitly defines the problem (since it bounds $X$ and $Y$ and hence $\mathcal{F}_{X \to Y}$), $n$ and $p$ also describe the size of the problem.
+
+\subsubsection{Common models we will see}
+
+Throughout this course, we will encounter several families of learning techniques:
+
+\begin{itemize}
+  \item \textbf{Tree-based methods} 
+  
+  Tree-based methods work with multivariate inputs $X = X_1 \times \cdots \times X_p$, where each component can be categorical or numerical. They handle both classification (binary or multiclass) and regression tasks.
+  \item \textbf{Support Vector Machines (SVM)}
+  
+  Support Vector Machines (SVM) are designed for numerical inputs $X = \mathbb{R}^p$ and are primarily used for binary classification.
+  \item \textbf{k-Nearest Neighbours (kNN)} 
+  
+  k-Nearest Neighbours (kNN) can be applied to any input space $X$ equipped with a similarity metric (including $X = \mathbb{R}^p$). It supports both classification and regression.
+  \item \textbf{Naive Bayes} 
+  
+  Naive Bayes is suited for multivariate inputs $X = X_1 \times \cdots \times X_p$ where each component is categorical (though hybrid cases exist). It is used for classification tasks.
+\end{itemize}
+
+\medskip
+
+If none of these techniques fits the problem we will also cover several adaptation methods:
+\begin{itemize}
+  \item encoding categorical variables so that techniques designed for $X = \mathbb{R}^p$ can be applied to mixed-type inputs;
+  \item transforming text data into numerical representations, enabling techniques for $X = \mathbb{R}^p$ to handle string inputs;
+  \item extending binary classifiers ($|Y| = 2$) to multiclass problems ($|Y| \geq 2$).
+\end{itemize}
+
+\subsection{Machine learning systems}
+
+In realistic applications, a learning algorithm is only one component of a larger information-processing pipeline. Raw data must often be \textbf{pre-processed} before learning (for example by normalisation, feature extraction or handling missing values), and the outputs of the predictor may need to be \textbf{post-processed} before they are used to take actions.
+
 \begin{definitionblock}[ML system]
-An \textbf{information processing system} in which there is a SL technique and a pair of \textbf{pre-processing} and \textbf{post-processing} steps.
+An \bfit{ML system} is an information-processing system that combines a (supervised) learning technique with suitable pre-processing and post-processing steps.
 \end{definitionblock}
 
-The designer of the ML system has to choose the learning technique, the pre/post processing steps and the relative parameters. The steps are:
+The designer of the ML system must choose the learning technique, the pre/post-processing steps, and the relevant parameters. The typical workflow consists of the following steps:
+
+\begin{enumerate}
+  \item \textbf{Decide}: determine whether the problem at hand actually calls for an ML approach;
+  \item \textbf{Choose the learning paradigm}: supervised, unsupervised, reinforcement;
+  \item \textbf{Define the problem} (problem statement):
+  \begin{itemize}
+    \item define the input space $X$ and output space $Y$;
+    \item define a \emph{way for assessing} solutions. This should be done before designing, so that it is applicable to any compatible ML solution;
+  \end{itemize}
+  \item \textbf{Design} the ML system:
+  \begin{itemize}
+    \item choose a learning technique;
+    \item choose or design pre- and post-processing steps;
+  \end{itemize}
+  \item \textbf{Implement} the ML system:
+  \begin{itemize}
+    \item execute the learning and prediction phases;
+    \item obtain the data;
+  \end{itemize}
+  \item \textbf{Assess} the ML system on relevant tasks.
+\end{enumerate}
+
+Steps 4-6 are usually iterated many times during development.
+
+\subsubsection{When to use Machine Learning?}
+
+Machine learning is not always the right tool for every problem. It is worth considering both \emph{why} we might want a machine to execute $f_{\text{predict}}$, and \emph{why} we might want the machine to learn it autonomously rather than having a human design it. There are several scenarios where running $f_{\text{predict}}$ on a machine is preferable:
+
 \begin{itemize}
-    \item Decide if to use a ML system
-    \item Supervised vs Unsupervised vs Reinforcement
-    \item Define the problem (X, Y, way of assessing solutions)
-    \item Design the ML system (choose the ML technique, pre/post processing steps)
-    \item Implement the ML system (learning/prediction phases, obtaining the data)
-    \item Assess the system
+  \item The response $y$ must be computed \textbf{very quickly}, faster than a human could manage.
+  \item The prediction must be made in a \textbf{dangerous/inaccessible place} where humans can't be present.
+  \item The \textbf{value of $y$ is very low}, making human involvement economically unjustifiable.
+  \item There is concern that a human would be \textbf{biased} in deciding $y$.
+\end{itemize}
+
+Even when $f_{\text{predict}}$ is executed by a machine, it could still be designed by a human. The question then becomes: why should the machine \emph{learn} the predictor instead?
+
+\begin{itemize}
+  \item The relationship between $x$ and $y$ may be too complex or poorly understood.
+  \item A human-designed predictor would be \textbf{too costly or slow} to develop.
+  \item A human-designed predictor is simply \textbf{not good enough}.
+\end{itemize}
+
+When deciding whether to adopt ML, three factors should be weighed:
+\begin{itemize}
+  \item \textbf{Efficiency}: how quickly and cheaply can predictions be made?
+  \item \textbf{Effectiveness}: how accurate are the predictions?
+  \item \textbf{Human dignity}: are there ethical or social reasons to prefer human involvement?
 \end{itemize}
 

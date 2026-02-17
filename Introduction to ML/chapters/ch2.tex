@@ -3,927 +3,1857 @@
 
 \section{Assessment}
 
-The main axes of assessment are:
+When assessing something with respect to a given \textbf{goal}, three main axes are considered:
 \begin{itemize}
-    \item \texttt{Effectiveness}: how well the model performs on the test set.
-    \item \texttt{Efficiency}: how much time and resources are needed to train the model (achieving the goal).
-    \item \texttt{Interpretability}: how well the model can be understood by humans.
+    \item \textbf{Effectiveness}: to which degree is the goal achieved?
+    \item \textbf{Efficiency}: how many resources are consumed for achieving the goal (to some degree)?
+    \item \textbf{Interpretability} (or explainability): to which degree is the way the goal is achieved explainable?
 \end{itemize}
 
-There are two purposes for assessment:
+\medskip
+
+Given an axis $a$ of assessment, there are two purposes:
 \begin{itemize}
-    \item \textbf{Absolute Assessment:} does something meet the expectation with respect to a determined axis?
-    \item \textbf{Comparison:} is one thing better than one other thing in terms of the determined axis? 
+    \item \textbf{Absolute assessment}: does something meet expectations in terms of $a$? (is effective \textit{enough}?)
+    \item \textbf{Comparison}: is a thing better than another in terms of $a$? (is $m_1$ more effective than $m_2$?)
 \end{itemize}
 
-If the output of the assessment is a \texttt{quantity}, than a simple check for < or > is enough, so we want a number as output.
+If the outcome of assessment is a \textbf{quantity} (with monotonic semantics), then comparison reduces to checking $>$ or $<$, while absolute assessment requires establishing a threshold and then checking against it. For this reason, we want assessment to produce a number.
 
-A \textbf{ML system} can be seen as a composite learning technique. It has two running modes: one in which it tunes itself and the other in which it makes decisions. The goals are:
-\begin{itemize}
-    \item \textbf{Training:} tune the model to minimize the error on the training set (tuning properly).
-    \item \textbf{Testing:} evaluate the model on the test set (making good decisions).
-\end{itemize}
+\medskip
 
-The SLT has then this two goals, while a \textbf{model} has the only goal to make good decision when used in an $f'_{predict}$.
+A \textbf{ML system} can be seen as a composite learning technique with two running modes: \textbf{training} in which it tunes itself, and \textbf{testing} in which it makes decisions. Its goals are to tune properly (so that it makes good decisions after tuning) and to make good decisions. 
 
-To measure the \textbf{effectiveness} of a model and to have a number as output, we need to compare our system with the real system that generated the data (assuming there is one).
+\medskip
+
+A \textbf{supervised learning technique} (SLT) is a pair $f_{\text{learn}}, f_{\text{predict}}$; its goals are to learn a good $f_{\text{predict}}$ (one that makes good decisions) and to make good decisions. A \textbf{model}, instead, has the single goal of making good decisions when used in an $f'_{\text{predict}}$.
+
+\medskip
+
+Ultimately, \textbf{effectiveness is about making good decisions}. To measure the effectiveness of a model and to have a number as output, we need to compare our system with the real system that generated the data (assuming there is one).
+
+\subsubsection{Model vs Real System}
+
+How do we measure whether $f'_{\text{predict}}$ is making good decisions? Recall that $f_{\text{predict}}$ (possibly implemented via $f'_{\text{predict}}$ and a model $m$) attempts to capture the dependency of $y$ on $x$.
+
+\medskip
+
+The key underlying assumption is that $\mathbf{y}$ \textbf{depends on} $\mathbf{x}$. That is, there exists a real system $s: X \to Y$ which, given an input $x$, produces an output $y$; formally, $s \in \mathcal{F}_{X \to Y}$. Alternatively, there may exist a system $s^{-1}: Y \to X$ that, given a $y$, produces an $x$ based on it.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{assets/fig3.png}
-    \caption{Model vs Real System}
+    \includegraphics[width=0.9\textwidth]{assets/fig3.png}
+    \caption{A templated $f'_{\text{predict}} : X \times M \to Y$ with a fixed model $m$ is an $f_{\text{predict}} : X \to Y$.}
 \end{figure}
 
-\begin{definitionblock}[Model vs Real System]
+\newpage
+
+To compare $m$ and $s$, we adopt a \textbf{comparison of behaviors} approach:
+\begin{enumerate}
+    \item \textcolor{blue}{Collect some examples of the behavior of $s$}
+    \item \textcolor{magenta}{Feed $m$ with the same examples}
+    \item \textcolor{orange}{Compare responses of $s$ and $m$}
+\end{enumerate}
+
+Ideally, we want the comparison (3) to produce a number. This procedure can be formalized as:
+$$f_{\text{comp-behavior}} : \mathcal{F}_{X \to Y} \times \mathcal{F}_{X \to Y} \to \mathbb{R}$$
+or, to highlight the presence of a model in a templated $f'_{\text{predict}}$:
+$$f_{\text{comp-behavior}} : \mathcal{F}_{X \times M \to Y} \times M \times \mathcal{F}_{X \to Y} \to \mathbb{R}$$
+
+In both cases:
+
+\begin{codeblock}[escapeinside={(*@}{@*)}, mathescape=true, numbers=none, basicstyle=\small\ttfamily]
+function comp-behavior((*@$f_{\text{predict}}$@*), s) {
+    (*@\textcolor{blue}{$\{x^{(i)}\}_i \leftarrow \text{collect}()$}@*)
+    (*@\textcolor{blue}{$\{y^{(i)}\}_i \leftarrow \text{foreach}(\{x^{(i)}\}_i, s)$}@*)
+    (*@\textcolor{magenta}{$\{\hat{y}^{(i)}\}_i \leftarrow \text{foreach}(\{x^{(i)}\}_i, f_{\text{predict}})$}@*)
+    (*@\textcolor{orange}{$v_{\text{eff}} \leftarrow \text{comp-resp}(\{\{y^{(i)}, \hat{y}^{(i)}\}\}_i)$}@*)
+    (*@\textcolor{black}{return $v_{\text{eff}}$}@*)
+}
+\end{codeblock}
+
+More correctly:
+
+{\small
+$\{(y^{(i)}, \hat{y}^{(i)})\}_i = \forall (\{x^{(i)}\}_i, \text{both}(\cdot, s, f_{\text{predict}}))$ with $f_{\text{both}} : X \times \mathcal{F}_{X \to Y}^2 \to Y$ and $f_{\text{both}}(x, f_1, f_2) = (f_1(x), f_2(x))$.
+}
+
+Note that $f_{\text{comp-behavior}}$ is a partially abstract function: $f_{\text{collect}}$ and $f_{\text{comp-resp}}$ are \textbf{abstract} (i.e., not concretely specified). We reason about the effectiveness and efficiency of $f_{\text{comp-behavior}}$ based on concrete choices for $f_{\text{collect}}$ and $f_{\text{comp-resp}}$:
+\begin{itemize}
+    \item \textbf{Effectiveness}: to which degree $f_{\text{comp-behavior}}$ measures if $m$ behaves like $s$
+    \item \textbf{Efficiency}: how many resources are consumed to apply $f_{\text{comp-behavior}}$
+\end{itemize}
+
+\begin{warningblock}[Remarks on $f_{\text{collect}}$]
+    The data collection step is crucial:
     \begin{itemize}
-        \item Collect examples of \textbf{s} behavior
-        \item Feed \textbf{m} with examples 
-        \item Compare responses of \textbf{s} and \textbf{m}
+        \item small $n$ $\to$ \textbf{poor effectiveness, high efficiency}
+        \item large $n$ $\to$ \textbf{good effectiveness, poor efficiency}
     \end{itemize}
-    \textbf{Effectiveness:} to which degree the comparison step measures if m behaves like s.
-\end{definitionblock}
-
-\begin{center}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.5\textwidth]{assets/fig4.png}
-        \caption{Comparing the responses}
-    \end{figure}
-\end{center}
-
-\vspace{-1em}
-
-where $(y^{(i)}, \hat{y}^{(i)})_i \in P^* (Y^2)$ is a multiset of pairs of y.
-
-\begin{warningblock}[$f_{collect}$]
-    The data collection is really important, since:
-    \begin{itemize}
-        \item small $n$ $\to$ \textbf{poor} effectiveness, \textbf{great} efficiency
-        \item large $n$ $\to$ \textbf{good} effectiveness, \textbf{poor} efficiency
-    \end{itemize}
-    (effectiveness = accuracy, efficiency = resources)
-
-    and also:
-    \begin{itemize}
-        \item poor coverage $\to$ \textbf{poor} effectiveness
-        \item good coverage $\to$ \textbf{good} effectiveness
-    \end{itemize}
-    where coverage = how well the data represents the real system.
+    Also, \textbf{coverage} (how data represents the real system) affects effectiveness regardless of $n$.
 \end{warningblock}
 
+\begin{minipage}{0.58\textwidth}
+    \textbf{Formally:}
+    $$f_{\text{comp-resps}} : \mathcal{P}^*(Y^2) \to \mathbb{R}$$
+    where $\{(y^{(i)}, \hat{y}^{(i)})\}_i \in \mathcal{P}^*(Y^2)$ is a multiset of pairs of $y$.
+
+    Depends only on $Y$, not on $X$!
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/fig4.png}
+    \caption{Comparing the responses}
+\end{figure}
+\end{minipage}
+    
 \begin{exampleblock}[Performance Indexes]
     \textbf{Classification:}
-    \begin{itemize}
-        \item all types $\to$ error, accuracy 
-        \item binary $\to$ EER, AUC, FPR, FNR and variants
-        \item multi-class $\to$ weighted accuracy
+    \begin{itemize}[noitemsep]
+        \item all (i.e., agnostic with respect to $|Y|$): \textbf{error}, \textbf{accuracy}
+        \item binary: \textbf{FPR}, \textbf{FNR} (and variants), EER, AUC
+        \item multiclass: \textbf{weighted accuracy}
     \end{itemize}
     \textbf{Regression:}
-    \begin{itemize}
-        \item MSE, MAE, R2
+    \begin{itemize}[noitemsep]
+        \item \textbf{MAE}, \textbf{MSE}, MRE, R2
     \end{itemize}
 \end{exampleblock}
 
 \subsection{Classification}
 
-In \texttt{Classification} Y is a finite set with no ordering.
+In Classification, $Y$ is a finite set with no ordering.
 
-The \textbf{Classification Error} is then 
-\begin{center}
-    $f_{err}({y^{(i)}, \hat{y^{(i)}}}) = \frac{1}{n}\sum_{i=1}^{i=n}\textbf{1}(y^{(i)} \neq \hat{y^{(i)}})$
-\end{center}
+The \textbf{Classification Error} measures the fraction of incorrect predictions:
 
-where \textbf{1(b)} is the indicator function and takes value 1 when (in this case) the prediction is wrong.
+$$
+f_{err}\left(\left\{(y^{(i)}, \hat{y}^{(i)})\right\}_{i=1}^{n}\right) = \frac{1}{n}\sum_{i=1}^{n}\mathbf{1}(y^{(i)} \neq \hat{y}^{(i)})
+$$
 
-The \textbf{Classification Accuracy} is instead:
-\begin{center}
-    $f_{acc}({y^{(i)}, \hat{y^{(i)}}}) = \frac{1}{n}\sum_{i=1}^{i=n}\textbf{1}(y^{(i)} = \hat{y^{(i)}})$
-\end{center}
+where $\mathbf{1} : \{\text{false}, \text{true}\} \to \{0, 1\}$ is the \textbf{indicator function}:
 
-\textbf{Reminder:} $f_{acc} = 1 - f_{err}$
+$$
+\mathbf{1}(b) = \begin{cases} 1 & \text{if } b \text{ is true} \\ 0 & \text{otherwise} \end{cases}
+$$
 
-Extreme cases for accuracy (and errors) are:
+The lower the error, the better.
+
+\medskip
+
+The \textbf{Classification Accuracy} measures the fraction of correct predictions:
+
+$$
+f_{acc}\left(\left\{(y^{(i)}, \hat{y}^{(i)})\right\}_{i=1}^{n}\right) = \frac{1}{n}\sum_{i=1}^{n}\mathbf{1}(y^{(i)} = \hat{y}^{(i)}) = 1 - f_{err}\left(\left\{(y^{(i)}, \hat{y}^{(i)})\right\}_{i}\right)
+$$
+
+The higher the accuracy, the better.
+
+\medskip
+
+Extreme cases for accuracy (and error) are:
 \begin{itemize}
-    \item m is s: \textbf{perfect model}
-    \item m is random: does not model any dependence
+    \item $m$ is $s$: \textbf{perfect model} $\to$ $f_{acc} = 1$, $f_{err} = 0$
+    \item $m$ is random: does not model any dependence $\to$ $f_{acc} \approx \frac{1}{|Y|}$
 \end{itemize}
 
-\begin{exampleblock}[Random Classifier - Lower Bound]
-    $f_{random}(x) = y_i$ with $i ~ U({1, \dots, |Y|})$     just pick random uniformly
-\end{exampleblock}
-\begin{exampleblock}[Dummy Classifier - Better Lower Bound]
-    $f_{dummy}(x) = argmax \frac{1}{n} \sum_{i=1}^{i=n}\textbf{1}(y = y^{(i)})$     just pick the category with more example always
-\end{exampleblock}
-\begin{exampleblock}[Perfect Classifier - Upper Bound]
-    $f_{perfect}(x)= s(x)$
-\end{exampleblock}
-But the world is not deterministic, so a Bayes (stochastic) classifier may be better:
-\begin{exampleblock}[Bayes Classifier - Better Upper Bound]
-    $f_{Bayes}(x) = argmax \Pr(s(x) = y | x)$
+\begin{exampleblock}[Classifier Bounds]
+    
+    Since accuracy lies in $[0, 1]$, we can establish reference points for evaluating classifiers. Recall that $f_{acc}$ measures how well a model $m$ approximates the true system $s$. The \textbf{ideal extreme cases} in practice are: (i) $m$ is random and captures no dependency of $y$ on $x$ (lower bound), or (ii) $m$ perfectly models $s$ (upper bound).
+
+    \medskip
+
+    \begin{itemize}
+        \item \textbf{Lower Bounds:}
+        \begin{itemize}[noitemsep]
+            \item \bfit{Random Classifier:} pick uniformly at random \hfill $\quad \text{acc} \sim \frac{1}{|Y|}$
+            
+            $$f_{random}(x) = y_i,\ \ i \sim U(\{1, \dots, |Y|\})$$
+
+            \item \bfit{Dummy Classifier:} pick the most frequent class \hfill $\quad \text{acc} \sim \max_{y \in Y} Fr(y, \{y^{(i)}\}_i)$
+            $$f_{dummy}(x) = \underset{y}{\arg\max} \frac{1}{n} \sum_{i=1}^{n}\mathbf{1}(y = y^{(i)}) = \underset{y \in Y}{\arg\max}\ Fr(y, \{y^{(i)}\}_i)$$
+
+        \end{itemize}
+        \item \textbf{Upper Bounds:}
+        \begin{itemize}[noitemsep]
+            \item \bfit{Perfect Classifier:} deterministic ideal \hfill $\quad \text{acc} = 1$
+             
+            $$f_{perfect}(x) = s(x)$$
+
+            \item \bfit{Bayes Classifier:} stochastic ideal \hfill $\quad \text{acc} = \max_{y \in Y} \Pr(s(x) = y \mid x)$
+            
+            $$f_{Bayes}(x) = \underset{y}{\arg\max} \Pr(s(x) = y \mid x)$$
+        \end{itemize}
+    \end{itemize}
+    
+    \smallskip
+    \textit{Note:} Since the world is not deterministic, the Bayes classifier (stochastic) may be a better upper bound than the perfect classifier.
 \end{exampleblock}
 
-\subsection{Binary Classification}
+\subsection{Binary Classification}\label{subsec:binary-classification}
 
-The main problem here are the \texttt{skewed datasets}, meaning the datasets with more example of a category than the other (we are considering only two categories here).
+In binary classification, we assign standard names to the two possible $y$ values: \textbf{positive} (denoted pos) and \textbf{negative} (denoted neg). The common practice is to associate positive with the \textbf{rarest case}; otherwise, if no rarest case exists, one should clearly state which class is considered positive.
 
-\begin{definitionblock}[FPR - False Positive Rate]
-    It is the rate of \textbf{negatives} that are wrongly classified as positives
+The goal of FPR and FNR is to measure the error on each of the two classes separately.
 
-    $FPR = \frac{FP}{N}$
+\begin{definitionblock}[FPR and FNR]
+    The \textbf{False Positive Rate (FPR)} is the rate of negatives wrongly classified as positives:
+
+    $$\text{FPR} = \frac{\sum_i \mathbf{1}(y^{(i)} = \text{neg} \land \hat{y}^{(i)} \neq y^{(i)})}{\sum_i \mathbf{1}(y^{(i)} = \text{neg})} = \frac{\text{FP}}{\text{N}}$$
+    
+    The \textbf{False Negative Rate (FNR)} is the rate of positives wrongly classified as negatives:
+
+    $$\text{FNR} = \frac{\sum_i \mathbf{1}(y^{(i)} = \text{pos} \land \hat{y}^{(i)} \neq y^{(i)})}{\sum_i \mathbf{1}(y^{(i)} = \text{pos})} = \frac{\text{FN}}{\text{P}}$$
+    
+    For both: the codomain is $[0,1]$, and \textbf{the lower, the better}.
 \end{definitionblock}
-\begin{definitionblock}[FNR - False Negative Rate]
-    It is the rate of positives that are wrongly classified as negatives.
-    $FNR = \frac{FN}{P}$
-\end{definitionblock}
-Where
-\begin{itemize}
-    \item FP = False Positives 
-    \item FN = False Negatives 
-    \item P = Total positives 
-    \item N = Total Negatives 
-\end{itemize}
 
-\begin{center}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.5\textwidth]{assets/fig5.png}
-        \caption{Confusion Matrix}
-    \end{figure}
-\end{center}
+In the shorthand notation: FP and FN are the counts of false positives and false negatives (requiring both $y^{(i)}$ and $\hat{y}^{(i)}$), while P and N are the counts of actual positives and negatives (requiring $y^{(i)}$).
 
-\texttt{TPR:} True Positive Rate = 1 - FNR
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/fig5.png}
+    \caption{Confusion matrix for binary classification.}
+\end{figure}
 
-\texttt{FPR:} False Positive Rate = 1 - TNR
+The \textbf{True Positive Rate (TPR)} and \textbf{True Negative Rate (TNR)} measure correct classifications:
 
-\texttt{Err:} Error Rate = $\frac{FP + FN}{P + N}$
+$$\text{TPR} = \frac{\text{TP}}{\text{P}} = 1 - \text{FNR} \qquad \text{TNR} = \frac{\text{TN}}{\text{N}} = 1 - \text{FPR}$$
+For both, \textbf{the greater, the better} (codomain is $[0,1]$).
 
-\texttt{Acc:} Accuracy = $\frac{TP + TN}{P + N}$
+\medskip
+
+Error and accuracy can be expressed in terms of these rates:
+
+$$\text{Err} = \frac{\text{FP} + \text{FN}}{\text{P} + \text{N}} = \frac{\text{P} \cdot \text{FNR} + \text{N} \cdot \text{FPR}}{\text{P} + \text{N}} \qquad \text{Acc} = 1 - \text{Err} = \frac{\text{P} \cdot \text{TPR} + \text{N} \cdot \text{TNR}}{\text{P} + \text{N}}$$
+
+\begin{warningblock}[Accuracy alone is dangerous]
+    Consider a rare disease affecting $\approx 2$ persons per 1000. A trivial test that \textit{always} predicts ``no disease'' achieves $\text{Acc} = 99.8\%$, $\text{FPR} = 0\%$, but $\text{FNR} = 100\%$. This illustrates why \textbf{accuracy alone in binary classification can be misleading}: always report FPR and FNR (or related metrics) alongside accuracy.
+\end{warningblock}
 
 \begin{definitionblock}[Balanced Data]
-    In classification, a dataset is \textbf{balanced} with respect to the response variable y, if the frequency of each value of y is roughly the same.
+    A dataset is \textbf{balanced} with respect to $y$ if the frequency of each class is roughly the same. In skewed (unbalanced) datasets, accuracy becomes particularly unreliable.
 \end{definitionblock}
 
-\texttt{Precision:} $\frac{TP}{TP + FP}$
+Other commonly used metrics include:
+\begin{itemize}
+    \item \textbf{Precision}: $\dfrac{\text{TP}}{\text{TP} + \text{FP}}$ (fraction of predicted positives that are correct)
+    \item \textbf{Recall} (Sensitivity, TPR): $\dfrac{\text{TP}}{\text{TP} + \text{FN}} = \text{TPR}$
+    \item \textbf{Specificity} (TNR): $\dfrac{\text{TN}}{\text{TN} + \text{FP}} = \text{TNR}$
+    \item \textbf{F1 Score}: $2 \cdot \dfrac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}$ (harmonic mean)
+\end{itemize}
 
-\texttt{Recall:} $\frac{TP}{TP + FN}$
+\medskip
 
-\texttt{F1:} $2 \cdot \frac{Precision \cdot Recall}{Precision + Recall}$
-
-\texttt{Sensitivity:} $\frac{TP}{TP + FN} = TPR$
-
-\texttt{Specificity:} $\frac{TN}{TN + FP} = TNR$
-
-\texttt{Type I error:} False Positive Rate = FPR 
-
-\texttt{Type II error:} False Negative Rate = FNR
+In hypothesis testing terminology: FPR is the \textbf{Type I error} and FNR is the \textbf{Type II error}.
 
 \begin{warningblock}[Cost of the error]
     Once $f_{predict}$ outputs a y, some action is taken, and if the action is wrong, there is some cost to be paid wrt the correct action.
-
-    $c = c_{FP} \times FPR \times N + c_{FN} \times FNR \times P$
-
+    $$c = c_{FP} \times FPR \times N + c_{FN} \times FNR \times P$$
     If one knows the costs and N,P, it is possible to compute the overall cost and find a good trade-off for FPR and FNR.
 \end{warningblock}
 
-Given a model, we can "tune" it to prefer avoiding FPs rather than FNs, just by modifying the threshold that is used to determine the choice to be made wrt the category.
-Many learning techniques compute a probability distribution over Y before returning one y, and in the case of Binary Classification the threshold is 0.5. 
+\subsubsection{Balancing FPR and FNR}
+\label{subsec:balancing-fpr-fnr}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig6.png}
-    \caption{Threshold}
-\end{figure}
+In many binary classification problems we want to \emph{balance} the two kinds of mistakes (FP and FN) according to their relative importance. For many learning techniques, the model internally computes \emph{more} than just the final class label: for classification it often computes a \emph{probability} for each class, and then converts it into a label by comparing it with a \emph{threshold}.
 
-So, by varying the threshold we can change FPR and FNR:
+\smallskip
+
+\textbf{Probabilistic classifiers}, instead of returning only a label $f'_{\text{predict}} : X \times M \to Y$, return a \emph{discrete probability distribution} over $Y$:
+$$
+  f''_{\text{predict}} : X \times M \to P_Y,
+\qquad \quad \text{output: }
+  p = f''_{\text{predict}}(x,m)
+$$
+where $P_Y$ is the set of all discrete distributions over $Y$.
+
+The corresponding hard prediction is obtained by picking the most probable class:
+$$
+  f'_{\text{predict}}(x,m)
+  = \argmax{y \in Y} \, p(y)
+  = \argmax{y \in Y} \, f''_{\text{predict}}(x,m)(y).
+$$
+In the \textbf{binary} case $Y = \{\text{pos}, \text{neg}\}$, the distribution $p$ is completely determined by the probability of the positive class, $\hat{p}_{\text{pos}} = p(\text{pos}) \in [0,1]$, since $p(\text{neg}) = 1 - \hat{p}_{\text{pos}}$. We can define a dedicated predictor:
+$$
+  f'''_{\text{predict}} : X \times M \to [0,1],
+  \qquad
+  \hat{p}_{\text{pos}} = f'''_{\text{predict}}(x,m),
+$$
+and then use a threshold $\tau$ to obtain a label:
+$$
+  f_{\text{predict}}(x,m) =
+  \begin{cases}
+    \text{pos} & \text{if } \hat{p}_{\text{pos}} \ge \tau,\\[0.2em]
+    \text{neg} & \text{otherwise.}
+  \end{cases}
+$$
+Most software libraries use the \bfit{default threshold} $\tau = 0.5$, which corresponds to choosing the most probable class. However, \emph{there is nothing special about $0.5$}; other values of $\tau$ may be better when the costs $c_{FP}, c_{FN}$ or the class frequencies are unbalanced.
+
+In the binary case, the closer $\hat{p}_{\text{pos}}$ is to $0.5$, the less confident the model is in its decision; values close to $0$ or $1$ indicate high confidence. We can define a simple \textbf{confidence} measure
+$$
+  \text{conf}(x,m)
+  = \frac{\lvert \hat{p}_{\text{pos}} - 0.5 \rvert}{0.5}
+  \in [0,1],
+$$
+so that $\text{conf} = 0$ means total uncertainty (the model is “on the fence”) and $\text{conf} = 1$ means maximal confidence. This is a basic form of \emph{local explainability} for the prediction on a single $x$.
+
+If we \textbf{change the threshold} $\tau$, we change the trade-off between FPR and FNR for the \emph{same} model $m$ and dataset $\{(x^{(i)}, y^{(i)})\}_i$.
+
+\medskip
+
 \begin{itemize}
-    \item the greater the threshold, the lower FPR and the greater FNR
-    \item the lower the threshold, the greater FPR and the lower FNR
+  \item If we \textbf{increase} $\tau$ (for example from $0.5$ to $0.7$), the classifier predicts “pos” less often:
+  \begin{itemize}
+    \item many borderline pos become neg; $\quad\rightarrow\quad$ FNR tends to \textbf{increase}, FPR tends to \textbf{decrease}.
+  \end{itemize}
+  \smallskip
+  \item If we \textbf{decrease} $\tau$ (for example from $0.5$ to $0.3$), the classifier predicts “pos” more often:
+  \begin{itemize}
+    \item many borderline neg become pos; $\quad\rightarrow\quad$ FNR tends to \textbf{decrease}, FPR tends to \textbf{increase}.
+  \end{itemize}
 \end{itemize}
 
+\medskip
+
+Intuitively, a high threshold is conservative: the classifier says “positive” only when very sure; a low threshold is aggressive: it prefers to avoid false negatives, at the cost of more false positives.
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig7.png}
-    \caption{Threshold}
+    \includegraphics[width=0.58\textwidth]{assets/thr.png}
+    \caption{Effect of the decision threshold on the decision boundary.}
 \end{figure}
 
-\begin{definitionblock}[ROC Curve (Receiver Operating Characteristic)]
-    The ROC curve is a graphical representation of the trade-off between the True Positive Rate (TPR) and the False Positive Rate (FPR) for every possible threshold.
+\vspace{-1em}
+
+The threshold therefore allows us to \emph{navigate the trade-off} between FPR and FNR, and possibly to account for the error cost
+$$
+  c(\tau) = c_{FP} \cdot FPR(\tau) \cdot N + c_{FN} \cdot FNR(\tau) \cdot P.
+$$
+In principle, if $c_{FP}, c_{FN}, P, N$ are known, one could choose $\tau$ so as to minimise $c(\tau)$.
+
+\subsubsection{Equal Error Rate (EER)}
+\label{subsec:eer}
+Often one is interested in a single operating point that balances the two kinds of errors.
+
+\begin{definitionblock}[Equal Error Rate]
+\begin{minipage}{0.48\textwidth}
+For a model $m$ and a dataset $\{(x^{(i)}, y^{(i)})\}_i$, the \bfit{Equal Error Rate (EER)} is the value
+
+$$
+  \text{EER} = FPR(\tau_{\text{EER}}) = FNR(\tau_{\text{EER}})
+$$
+
+where $\tau_{\text{EER}}$ is the threshold for which
+
+$$FPR(\tau) = FNR(\tau)$$
+\end{minipage}
+\hfill
+\begin{minipage}{0.5\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/fig7.png}
+    % \caption{Equal Error Rate (EER): the threshold $\tau_{\text{EER}}$ where $FPR(\tau) = FNR(\tau)$.}
+\end{figure}
+\end{minipage}
 \end{definitionblock}
 
+The EER is an \emph{index} of classifier quality: \textbf{the lower, the better} (like error). Its codomain is $[0,1]$, and in practice values lie in $[0, 0.5]$. 
+
+The EER is particularly useful when the two types of errors have comparable costs.
+
+\subsubsection{Receiver Operating Characteristic (ROC) curve}
+
+The behaviour of a binary classifier as the threshold $\tau$ varies can be summarised by the \emph{ROC curve}.
+
+\begin{definitionblock}[ROC curve (Receiver Operating Characteristic)]
+Given a fitted model $m$ and a dataset $\{(x^{(i)}, y^{(i)})\}_{i=1}^{n}$, the \bfit{ROC curve} is the plot of
+$$
+  \bigl( FPR(\tau),\, TPR(\tau) \bigr)
+$$
+for all possible values of the threshold $\tau$.
+\end{definitionblock}
+
+Each threshold $\tau$ gives one point on the ROC plane; moving $\tau$ from $0$ to $1$ traces a curve. The diagonal line $TPR = FPR$ corresponds to a \emph{random classifier}. A good classifier has a ROC curve that lies well above this diagonal and is close to the top-left corner $(FPR = 0, TPR = 1)$.
+
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig8.png}
-    \caption{ROC Curve}
+    \begin{minipage}{0.43\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{assets/fig8.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.55\textwidth}
+        \captionsetup{singlelinecheck=false}
+        \raggedright
+        \caption{ROC curve}
+        \vspace{-0.5em}
+
+        \begin{itemize}
+            \item \bfit{Red line}: ROC curve; each point corresponds to $(FPR, TPR)$ for a given $\tau$.
+            \item \bfit{Solid black line}: $FPR = FNR$; its intersection with the red line gives the EER, and the top-left point ($FPR = FNR = 0$) is the perfect classifier.
+            \item \bfit{Dashed black line}: $TPR = FPR$; the intersection with the solid line is the random classifier, points along it represent random classifiers with $\tau \neq 0.5$.
+            \item A healthy classifier's ROC should \bfit{never lie to the right} of this diagonal.
+        \end{itemize}
+    \end{minipage}
 \end{figure}
 
-The dotted line represents the random classifier, while the closer the curve is to the top-left corner, the better the classifier is.
+\vspace{-1em}
 
-How to choose the threshold? Take different values and compute the ROC curve, then choose the one that is closer to the top-left corner. To do this, the best way is to take the \textbf{midpoints} of the sorted probabilities.
+\subsubsection{Area Under the Curve (AUC)}
 
-\newpage 
+Sometimes the threshold $\tau$ at which the classifier will be used in practice is not known in advance, or may vary. In such cases it is useful to have a \emph{threshold-independent} measure of performance.
 
-\subsection{Multiclass Classification and Regression}
+\begin{definitionblock}[Area Under the ROC Curve (AUC)]
+The \bfit{AUC} is the area under the ROC curve:
+$$
+  \text{AUC} = \int_{0}^{1} TPR(FPR^{-1}(u)) \, \dd{u},
+$$
+computed numerically from the ROC points.
+\end{definitionblock}
 
-Here we use the concept of \textbf{weighted accuracy}, which is 
-    
-    $f_{acc} = \frac{1}{|Y|}\sum_{y \in Y}^{}Acc_y$
+\begin{minipage}{0.7\textwidth}
+The AUC provides a single scalar summary of classifier performance across all thresholds.
 
+\smallskip
+
+It satisfies:
+
+\smallskip
+
+\begin{itemize}[itemsep=0.5em]
+  \item $\text{AUC} = 0.5$ for a random classifier (the diagonal baseline);
+  \item $\text{AUC} = 1$ for a perfect classifier (ideal separation);
+  \item in practice, $0.5 \le \text{AUC} \le 1$ for any reasonable model;
+  \item \bfit{the larger, the better}: higher AUC indicates better discrimination.
+\end{itemize}
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.27\textwidth}
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig9.png}
-    \caption{Multiclass Confusion Matrix}
+    \includegraphics[width=\textwidth]{assets/auc.png}
+    % \caption{AUC}
 \end{figure}
+\end{minipage}
 
-Moreover, the error there is different from the classification one: here we measure the \texttt{distance} from the real value.
+\subsubsection{Choosing the threshold values}
+
+To compute EER and AUC, and thus evaluate FPR and TPR across many values of $\tau$, we need:
+\begin{itemize}
+  \item a fitted model $m$ and the prediction function $f_{\text{predict}}$;
+  \item a labelled dataset $\{(x^{(i)}, y^{(i)})\}_{i=1}^{n}$;
+  \item a sequence of thresholds $(\tau_j)_{j=0}^{k}$.
+\end{itemize}
+
+\smallskip
+
+Three common strategies to choose the threshold sequence are:
+
+\begin{enumerate}[noitemsep]
+  \item \textbf{Uniform grid on $[0,1]$}: choose $k+1$ evenly spaced points,
+  
+  $$
+    \tau_j = \frac{j}{k}, \quad j = 0, 1, \ldots, k.
+  $$
+  \item \textbf{Uniform grid on the prediction range}: let $\hat{p}^{(i)} = f_{\text{predict}}(x^{(i)}, m)$ and define
+  
+  $$
+    \tau_{\min} = \min_i \hat{p}^{(i)}, \qquad \tau_{\max} = \max_i \hat{p}^{(i)}.
+  $$
+  Then take $k+1$ evenly spaced points in $[\tau_{\min}, \tau_{\max}]$:
+
+  $$
+    \tau_j = \tau_{\min} + \frac{j}{k}(\tau_{\max} - \tau_{\min}), \quad j = 0, 1, \ldots, k.
+  $$
+  \item \textbf{Unique prediction values}: sort the predicted probabilities $\{\hat{p}^{(i)}\}$ and use each distinct value (or their midpoints) as a threshold.
+\end{enumerate}
+
+\smallskip
+
+The third approach is the most efficient: it yields exactly the distinct operating points that the classifier can achieve on the dataset, without redundant evaluations.
+
+
+\begin{warningblock}[Which index should I use?]
+  \begin{itemize}
+    \item If the operating threshold $\tau$ is fixed (for example $\tau = 0.5$) and the error costs are known, evaluate FPR, FNR (and possibly the cost $c(\tau)$) at that threshold.
+    \item If the threshold will be tuned later or may change over time, AUC is often a more informative index than accuracy.
+    \item If you want a \emph{single} threshold-independent scalar index, EER and AUC are common choices; AUC is more widely used.
+  \end{itemize}
+\end{warningblock}
+
+\vspace{-1em}
+
+\begin{minipage}{0.56\textwidth}
+    \subsubsection{Confusion matrix}
+
+Given a multiset $\{(y^{(i)}, \hat{y}^{(i)})\}_{i=1}^{n}$ of true and predicted labels, the \bfit{confusion matrix} is a $|Y| \times |Y|$ table where:
+\medskip
+\begin{itemize}[itemsep=0.5em]
+    \item each row corresponds to a true class $y \in Y$;
+    \item each column corresponds to a predicted class $\hat{y} \in Y$;
+    \item the entry $c_{y,\hat{y}}$ counts how many examples have true label $y$ and predicted label $\hat{y}$.
+\end{itemize}
+\medskip
+
+In general it holds, being $c$ the confusion matrix:
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/conf-mat.png}
+    % \caption{Multiclass confusion matrix. \\ Each row corresponds to the true class; each column to the predicted class.}
+\end{figure}
+\end{minipage}
 
 \begin{itemize}
-    \item \texttt{MAE:} Mean Absolute Error = $\frac{1}{n}\sum_{i=1}^{i=n}|y^{(i)} - \hat{y^{(i)}}|$
-    \item \texttt{MSE:} Mean Squared Error = $\frac{1}{n}\sum_{i=1}^{i=n}(y^{(i)} - \hat{y^{(i)}})^2$   
-    \item \texttt{RMSE:} Root Mean Squared Error = $\sqrt{MSE}$
-    \item \texttt{MAPE:} Mean Absolute Percentage Error = $\frac{1}{n}\sum_{i=1}^{i=n}\frac{|y^{(i)} - \hat{y^{(i)}}|}{y^{(i)}}$
+    \item the \textbf{accuracy} is the ratio between the sum of the diagonal and the sum of the matrix:
+    $$
+        \text{Acc} = \frac{\|\text{diag}(c)\|_1}{\|c\|_1};
+    $$
+    \item \textbf{TPR} is the ratio of $c_{\text{pos},\text{pos}}$ on the sum of the first row, i.e., the row for which $y = \text{pos}$;
+    \item \textbf{TNR} is the ratio of $c_{\text{neg},\text{neg}}$ on the sum of the second row, i.e., the row for which $y = \text{neg}$.
+\end{itemize}
+
+\subsection{Multiclass Classification and Regression}
+\label{subsec:multiclass-regression}
+
+In multiclass classification ($|Y| > 2$) accuracy and error can still be defined as in \cref{subsec:binary-classification}, but they may hide class imbalances. A useful alternative is the \emph{weighted} (or \emph{balanced}) accuracy.
+
+\subsubsection{Weighted accuracy for multiclass classification}
+
+Let $Acc_y$ be the accuracy computed \emph{on class $y$ only}, that is, the fraction of examples of class $y$ which are correctly classified. The \bfit{weighted accuracy} (here with uniform weights) is
+$$
+  f_{acc} = \frac{1}{|Y|}\sum_{y \in Y} Acc_y.
+$$
+
+In terms of confusion matrix, $Acc_y$ is the ratio between the element on the diagonal for class $y$ and the sum of the row for class $y$. The weighted accuracy gives each class the same importance, regardless of its frequency in the dataset; this is particularly useful when the dataset is unbalanced.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/fig9.png}
+
+    \caption{Multiclass confusion matrix. Rows correspond to true classes; cols to predicted ones.}
+\end{figure}
+
+\vspace{-1.5em}
+
+\subsubsection{Errors in regression}
+
+In regression the output space is numerical; a prediction can be \emph{more or less wrong} depending on how far it is from the true value. Several error measures are commonly used.
+
+\smallskip
+
+Let $\{(y^{(i)}, \hat{y}^{(i)})\}_{i=1}^{n}$ be the multiset of true and predicted responses. Then:
+
+\medskip
+
+\begin{itemize}[itemsep=1em]
+  \item \textbf{Mean Absolute Error (MAE)} \hfill
+  $\displaystyle
+    \text{MAE} = \frac{1}{n}\sum_{i=1}^{n} \lvert y^{(i)} - \hat{y}^{(i)} \rvert
+  $
+  \item \textbf{Mean Squared Error (MSE)} \hfill
+  $\displaystyle
+    \text{MSE} = \frac{1}{n}\sum_{i=1}^{n} \bigl(y^{(i)} - \hat{y}^{(i)}\bigr)^2
+  $
+  \item \textbf{Root Mean Squared Error (RMSE)} \hfill
+  $\displaystyle
+    \text{RMSE} = \sqrt{\text{MSE}}
+  $
+  \item \textbf{Mean Absolute Percentage Error (MAPE)} \hfill
+  $\displaystyle
+    \text{MAPE} = \frac{1}{n}\sum_{i=1}^{n} \frac{\lvert y^{(i)} - \hat{y}^{(i)} \rvert}{\lvert y^{(i)} \rvert}
+  $
+\end{itemize}
+
+For all these indexes:
+\begin{itemize}
+  \item the \emph{lower}, the better;
+  \item the domain is $[0, +\infty)$ (MAPE might be $\infty$);
+  \item MAE and RMSE \textbf{retain the unit of measure} of $y$ (e.g., if $y$ is in meters, MAE is in meters);
+  \item MAPE is \textbf{scale-independent} (dimensionless);
+  \item MSE and RMSE are \textbf{more influenced} by observations with \textbf{large errors};
+  \item MAPE ``does not work'' if the true $y^{(i)} = 0$.
 \end{itemize}
 
 \subsection{Assessing Learning Techniques}
-\begin{itemize}
-    \item an \textbf{effective} learning technique is a pair of $f'_{learn}$, $f'_{predict}$ that learns a good model $m$
-    \item a good \textbf{model} is one that has the same behavior of the real system $s$
+\label{subsec:assessing-learning-techniques}
+
+A supervised learning technique is effective if it learns a model that \emph{generalises}, i.e.\ that performs well on new (unseen) observations drawn from the same real system.
+
+\begin{itemize}[noitemsep]
+    \item an \textbf{effective} learning technique is a pair $(f'_{\text{learn}}, f'_{\text{predict}})$ that learns a good model $m$ from data;
+    \item a good \textbf{model} is one whose behaviour is close to the behaviour of the real system $s$.
 \end{itemize}
 
-We, then, want to measure the effectiveness of the learning techniques (learning and prediction).
-To do so, we need to divide the dataset, since we want to see if the $f'_{predict}$ generalises well.
+To measure the effectiveness of a learning technique, one must:
+\begin{itemize}[noitemsep]
+    \item learn a model $m$ from a dataset (learning phase);
+    \item evaluate the model on data (prediction phase plus performance index).
+\end{itemize}
+The core design choice concerns the split of the available dataset $D$ into training and testing portions.
 
-\begin{definitionblock}[Static Train/Test Division]
-    \begin{itemize}
-        \item \textbf{Effectiveness:} generalization is assessed, but there is no robustness wrt D division 
-        \item \textbf{Efficiency:} learning is executed only once 
-    \end{itemize}
-    $D_{test}$ is the unseen data and we treat is as said even if it has been collected at once with $D_{train}$.
+\begin{definitionblock}[Effectiveness of a learning technique on a dataset]
+Let $(f'_{\text{learn}}, f'_{\text{predict}})$ be a learning technique and let $D$ be a dataset.
+An assessment procedure returns a number
+$$
+\text{Eff}\bigl(f'_{\text{learn}}, f'_{\text{predict}}; D\bigr) \in \mathbb{R}
+$$
+
+\vspace{-0.3em}
+by (i) learning a model on (part of) $D$ and (ii) evaluating it on (another part of) $D$ using a chosen performance index (accuracy, AUC, MAE, \dots).
+
+\medskip
+
+Formally, we define the \textbf{learning-effectiveness function}:
+$$
+f_{\text{learn-effect}} : \mathcal{L}_{X \to Y} \times \mathcal{P}^*(X \times Y) \to \mathbb{R}
+$$
+
+\vspace{-0.4em}
+where $\mathcal{L}_{X \to Y}$ is the set of learning techniques:
+\begin{itemize}
+    \item $\mathcal{L}_{X \to Y} = \mathcal{F}_{\mathcal{P}^*(X \times Y) \to \mathcal{F}_{X \to Y}}$, or
+    \item $\mathcal{L}_{X \to Y} = \mathcal{F}_{\mathcal{P}^*(X \times Y) \to M} \times \mathcal{F}_{X \times M \to Y}$ (when the model space $M$ is explicit).
+\end{itemize}
 \end{definitionblock}
 
-\begin{definitionblock}[Repeated random train/test division]
-    \begin{itemize}
-        \item \textbf{Effectiveness:} generalization is assessed, and there is robustness wrt D division 
-        \item \textbf{Efficiency:} learning is executed multiple times \propto k
-    \end{itemize}
+The dataset used for testing should be \textbf{unseen} with respect to the model $m$. This ensures that the evaluation measures the model's ability to \textbf{generalise} to new data:
+
+\begin{itemize}[itemsep=0.4em]
+\item \textbf{Same dataset (training = testing)}:
+
+The simplest (\textbf{but usually wrong!}) approach is to train and test on the same dataset:
+$$
+D_{\text{learn}} = D_{\text{test}} = D.
+$$
+
+\begin{warningblock}[Training accuracy is not a generalisation estimate]
+Using $D$ both for learning and assessment does \textbf{not} measure generalisation.
+A learning technique can overfit $D$ (learn noise and artefacts) resulting in high training performance even when test performance is poor.
+\end{warningblock}
+
+This approach can be used as a quick \emph{sanity check}, but should not be used to estimate performances.
+
+\item \textbf{Static train/test split}: 
+
+A standard alternative is to split the dataset once:
+$$
+D_{\text{learn}} \cup D_{\text{test}} = D,
+\qquad
+D_{\text{learn}} \cap D_{\text{test}} = \emptyset,
+\qquad
+|D_{\text{learn}}| \approx r|D|,
+$$
+where $r \in (0,1)$ is a chosen fraction (typical values are $r = 0.7$ or $r = 0.8$).
+
+\begin{definitionblock}[Static train/test division]
+\begin{itemize}[noitemsep]
+    \item \textbf{Effectiveness:} generalisation is assessed (test set is unseen);
+    \item \textbf{Efficiency:} learning is executed only once;
+    \item \textbf{Weakness:} the estimate depends on the particular split (it may be lucky or unlucky).
+\end{itemize}
 \end{definitionblock}
 
-\begin{definitionblock}[Cross-Validation]
-    \begin{itemize}
-        \item \textbf{Effectiveness:} generalization is assessed, and there is robustness wrt D division 
-        \item \textbf{Efficiency:} learning is executed multiple times \propto k
-    \end{itemize}
+\begin{observationblock}[On the meaning of ``unseen'']
+$D_{\text{test}}$, with respect to the model $m$, is \textbf{unseen} data because it has not been used for learning. Assessing $m$ on unseen data answers the following questions:
+\begin{itemize}
+    \item To what degree does the model generalise \textbf{beyond examples}?
+    \item Does the model work well on \textbf{new data}?
+\end{itemize}
+In practice, $D_{\text{test}}$ and $D_{\text{learn}}$ are obtained from a dataset $D$ that is collected all at once; hence $D_{\text{test}}$ might represent future data only roughly.
+\end{observationblock}
+
+\item \textbf{Repeated random train/test split}: 
+
+To reduce the dependency on a single random split, the procedure is repeated $k$ times:
+
+$$
+(D_{\text{learn}}^{(j)}, D_{\text{test}}^{(j)}) \quad \text{for } j=1,\dots,k,
+$$
+
+and average the resulting performance values. Generalisation is assessed, and robustness w.r.t.\ the split increases; the cost is that learning is executed $k$ times (proportional to $k$). Common values: $k = 5$ or $k = 10$. This produces not only an average performance but also a notion of variability, which is useful when comparing techniques.
+
+\item \textbf{Cross-validation (CV)}:
+
+In $k$-fold cross-validation, the dataset is partitioned into $k$ disjoint folds of equal size:
+
+$$
+D = F_1 \cup \cdots \cup F_k,
+\qquad
+F_i \cap F_j = \emptyset \;\; (i \neq j).
+$$
+
+For each fold $j$, the model is trained on the union of all other folds and evaluated on $F_j$:
+
+$$
+D_{\text{test}}^{(j)} = F_j,
+\qquad
+D_{\text{learn}}^{(j)} = D \setminus F_j.
+$$
+
+\begin{definitionblock}[$k$-fold Cross-Validation]
+\begin{itemize}
+    \item \textbf{Effectiveness:} generalisation is assessed; robustness is usually better than a single split;
+    \item \textbf{Efficiency:} learning is executed $k$ times (cost $\propto k$);
+    \item \textbf{Common choices:} $k = 5$ or $k = 10$.
+\end{itemize}
 \end{definitionblock}
 
-\begin{definitionblock}[Leave-One-Out]
-    \begin{itemize}
-        \item \textbf{Effectiveness:} generalization is assessed, and there is robustness wrt D division 
-        \item \textbf{Efficiency:} learning is executed multiple times \propto n 
-    \end{itemize}
-    This is the worst case for efficiency, since we repeat the learning phase n times.
-\end{definitionblock}
+An advantage of CV is that every example is used for testing once and for training $k-1$ times.
+
+\item \textbf{Leave-One-Out cross-validation (LOOCV)}: 
+
+LOOCV is the extreme case of cross-validation where $k = |D|$: each fold contains exactly one observation. Generalisation is assessed with high robustness, but learning is executed $|D|$ times, which is often very expensive. In practice, LOOCV is mainly used when the dataset is very small and training is cheap.
+\end{itemize}
+
+\subsubsection{Summary: effectiveness vs.\ efficiency}
+
+\vspace{-1em}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Method} & \textbf{Generalisation} & \textbf{Learning runs} \\
+        \midrule
+        Same dataset & no (poor) & 1 \\
+        Static ($r$) & yes, no robustness & 1 \\
+        Repeated random ($k$) & yes, robust & $k$ \\
+        CV ($k$-fold) & yes, robust & $k$ \\
+        LOOCV & yes, robust & $|D|$ \\
+        \bottomrule
+    \end{tabular}
+    \caption{Effectiveness and efficiency of train/test division methods.}
+    \label{tab:train-test-methods}
+\end{table}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig10.png}
-    \caption{Train/Test Division Methods}
+    \includegraphics[width=0.9\textwidth]{assets/fig10.png}
+    \caption{Train/Test division methods (conceptual view).}
+    \label{fig:train-test-division}
 \end{figure}
 
-For comparison btw learning techniques, we can use the mean and standard deviation of the performance indexes obtained with the previous division methods. \textbf{Boxplots} are useful in this case.
+Increasing robustness (repeated splits, CV, LOOCV) improves the \textbf{quality of the estimate} of generalisation by reducing variance in the assessment, but requires training more models and thus reduces \textbf{computational efficiency}. This presents a fundamental \textbf{trade-off}: more reliable estimates come at the cost of increased computational resources. The choice of method should balance the need for accurate generalisation against available computational budget and dataset size.
+
+\begin{observationblock}[Assessment vs.\ Reality]
+Even when assessment on $D_{\text{test}}$ is high, the model may fail on actual unseen or future data. Two main causes:
+\begin{itemize}
+    \item $D$ was not \textbf{representative} of the real system (low coverage, or data is old);
+    \item $D$ is not \textbf{informative} w.r.t.\ $s$ (data is noisy or $y$ in $D$ doesn't depend on $x$).
+\end{itemize}
+\end{observationblock}
+
+\subsubsection{Mean and standard deviation of performance}
+\label{subsec:mean-std-performance}
+
+Repeated splits and cross-validation naturally produce a collection of performance values $v_1, v_2, \dots, v_k$, where each $v_j$ is computed on a different test set. It is then useful to report:
+
+$$
+\mu_v = \frac{1}{k}\sum_{j=1}^{k} v_j,
+\qquad
+\sigma_v = \sqrt{\frac{1}{k}\sum_{j=1}^{k}(v_j - \mu_v)^2}.
+$$
+
+\begin{itemize}
+    \item $\mu_v$ indicates the average effectiveness of the learning technique;
+    \item $\sigma_v$ indicates sensitivity to the specific training set (high $\sigma_v$ signals instability or high variance).
+\end{itemize}
+
+\begin{minipage}{0.7\textwidth}
+\subsubsection{Comparing learning techniques}
+\label{subsec:comparing-learning-techniques}
+
+When comparing two learning techniques, one can compare:
+\begin{itemize}
+    \item a single number (e.g.\ $\mu_{\text{AUC}}$);
+    \item both mean and variability (e.g.\ $\mu_{\text{AUC}} \pm \sigma_{\text{AUC}}$);
+    \item the full distribution of the values via \textbf{boxplots}.
+\end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.23\textwidth}
+
+    \vspace{-1em}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{assets/boxplot.png}
+        
+        \vspace{-1em}
+        \caption{Boxplots}
+    \end{figure}
+\end{minipage}
+
+\begin{tipsblock}[Boxplots as a practical comparison tool]
+Boxplots are useful because they make differences in \emph{central tendency} (median/mean) and in \emph{dispersion} (variability across folds/splits) visible at a glance.
+\end{tipsblock}
+
+\begin{warningblock}[Beyond boxplots: statistical significance]
+When the difference between two techniques is small compared to the variability across folds, it may be unclear whether one method is truly better or whether the observed difference is attributable to noise.
+In such cases, a statistical significance test (e.g.\ Wilcoxon, Friedman) allows one to support the comparison. Such tests return a \textbf{$p$-value} $p \in [0,1]$: if $p < \alpha$ (typically $\alpha = 0.05$), one concludes that there is a statistically significant difference.
+\end{warningblock}
 
 \section{Tree-based Learning Techniques}
+\label{sec:tree-based}
 
-\subsection{Decision Trees}
+This section introduces tree-based learning techniques with a motivating example: replacing a human attendant at a carousel with an automatic decision system.
 
-A \textbf{Decision Tree} is a tree where each node is a decision on the value of a feature, and each branch is a possible value of the feature. The leaves are the categories. It can be understood in simpler terms by considering a basic \texttt{if-then-else} nested structure.
+\subsection{The Decision Tree Model}
+\label{subsec:decision-tree-model}
 
+Consider an amusement park where an attendant decides who can ride the carousel. The goal is to replace the attendant with a robotic gate. One observes the attendant's behaviour and collects datas $D = \{(x^{(i)}, y^{(i)})\}$ where $x$ encodes the person approaching (\texttt{height} in cm, \texttt{age} in years) and $y$ is the decision (\texttt{can ride}, \texttt{cannot ride}). Hence $X = \mathbb{R}^+ \times \mathbb{R}^+$ and $Y = \{\text{pos}, \text{neg}\}$.
+
+By exploring the data, we can notice that the decision logic can be represented by a series of checks (``if age $\le 10$ then check height\ldots''). This hierarchical structure of conditions is a \textbf{decision tree}.
+
+\begin{definitionblock}[Decision tree]
+A \bfit{decision tree} is a model $m \in T_{p,Y}$ defined over the input space $X$ and output space $Y$.
+
+It consists of a binary tree where:
+\begin{itemize}
+    \item \textbf{Non-terminal nodes} (branch nodes) hold a pair $(j, \tau)$, where $j \in \{1, \ldots, p\}$ is the index of the variable to check and $\tau \in \mathbb{R}$ is the threshold;
+    \item \textbf{Terminal nodes} (leaf nodes) hold a prediction $y \in Y$ (or a probability distribution over $Y$).
+\end{itemize}
+\end{definitionblock}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{assets/fig11.png}
-    \caption{Decision Tree example}
+    \caption{Decision tree example: branch nodes hold (variable, thr) pairs; leaves hold class labels.}
+    \label{fig:decision-tree}
 \end{figure}
 
-This is a binary tree, but it can be n-ary as well. The tree is built by recursively splitting the dataset into subsets, and the splitting is done by selecting the feature that best splits the dataset into the purest subsets. The purity is measured by the \texttt{Gini Index} or the \texttt{Entropy}, usually.
-
-One can also represent the tree in a compact way:
-
-$$t = [l, t', t'']$$
-
-where $l \in L$ is the \textbf{label} and $t', t'' \in T_L \cup \{\emptyset\}$ are the left and right children.
-
-Also, each \textbf{non-terminal} node is a pair ($j, \tau$), where $j \in \{1, \dots, p\}$ is the index of the independent variable and $\tau \in R$ is the threshold for comparison.
-
-The above figure is then represented as:
+In a compact representation, a tree $t$ is either a leaf $[l]$ or a branch node $[(j, \tau); t_{\text{left}}; t_{\text{right}}]$, where $l \in L = (\{1,\ldots,p\} \times \mathbb{R}) \cup Y$ and $t_{\text{left}}, t_{\text{right}} \in T_L \cup \{\emptyset\}$.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.5\textwidth]{assets/fig12.png}
-    \caption{Compact representation of the Decision Tree}
+    \caption{Compact representation of the decision tree.}
+    \label{fig:tree-compact}
 \end{figure}
 
+The prediction function $f'_{\text{predict}}(x, t)$ works recursively:
+
 \begin{algorithm}
-    \caption{Templated $f'_{predict}$}
+    \caption{Templated $f'_{\text{predict}}$}
     \begin{algorithmic}[1]
-        \Function{predict}{x, t}
-            \If{$\neg$ has-children(t)}
-                \State \Return label(t)
-            \Else
-                \State (j, $\tau$) $\gets$ label(t)
-                \If{x[j] $\leq \tau$}
-                    \State \Return predict(x, left(t))
+        \Function{predict}{$x, t$}
+            \If{$\neg$ has-children($t$)} \Comment{true iff $t$ is not a leaf (i.e., $t$ is a terminal node)}
+                \State \Return label($t$) \Comment{return the class label $y \in Y$}
+            \Else \Comment{$t$ is a branch node}
+                \State $(j, \tau) \gets \text{label}(t)$ \Comment{extract variable index and threshold}
+                \If{$x[j] \leq \tau$}
+                    \State \Return \Call{predict}{$x$, left-child-of($t$)} \Comment{recurse on left subtree}
                 \Else
-                    \State \Return predict(x, right(t))
+                    \State \Return \Call{predict}{$x$, right-child-of($t$)} \Comment{recurse on right subtree}
                 \EndIf
             \EndIf
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
 
+This model partitions the input space $X$ into axis-parallel hyper-rectangles, assigning a constant value (class or mean) to each region.
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.3\textwidth]{assets/fig13.png}
+%     \caption{Templated $f'_{\text{predict}} : \mathbb{R}^p \times T_{p,Y} \to Y$.}
+%     \label{fig:fpredict-templated}
+% \end{figure}
+
+\subsection{Learning Decision Trees}
+\label{subsec:learning-decision-trees}
+
+The search space of all trees is too large to enumerate. Instead, one uses a greedy heuristic.
+
+\subsubsection{Recursive binary splitting}
+\label{subsubsec:recursive-binary-splitting}
+
+The learning function $f'_{\text{learn}}(D)$ builds the tree using a top-down (divide-et-impera) approach known as \textbf{recursive binary splitting}. The algorithm proceeds as follows:
+\begin{enumerate}
+    \item Until a stopping criterion is satisfied (e.g., all labels are identical, or the node is too small);
+    \item Find a split (i.e., a variable $j$ and threshold $\tau$) that best separates the data;
+    \item Recursively apply steps 1-2 to each of the two resulting regions.
+\end{enumerate}
+When recursion stops, the node becomes a leaf labelled with the \textbf{most frequent class} in that region.
+
+\begin{algorithm}[H]
+    \caption{Templated $f'_{\text{learn}}$}
+    \begin{algorithmic}[1]
+        \Function{learn}{$\{(x^{(i)}, y^{(i)})\}_i$}
+            \If{should-stop($\{y^{(i)}\}_i$)}
+                \State $y^* \gets \argmax{y \in Y} \sum_i \mathbf{1}(y^{(i)} = y)$ \Comment{$y^*$ is the most frequent class}
+                \State \Return node-from($y^*, \emptyset, \emptyset$)
+            \Else \Comment{hence $r$ is a branch node}
+                \State $(j, \tau) \gets \text{find-best-branch}(\{(x^{(i)}, y^{(i)})\}_i)$
+                \State $t \gets \text{node-from}($
+                \State \hspace{2em} $(j, \tau),$
+                \State \hspace{2em} \Call{learn}{$\{(x^{(i)}, y^{(i)})\}_i|_{x^{(i)}_j \leq \tau}$}, \Comment{recursion}
+                \State \hspace{2em} \Call{learn}{$\{(x^{(i)}, y^{(i)})\}_i|_{x^{(i)}_j > \tau}$}) \Comment{recursion}
+                \State \Return $t$
+            \EndIf
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
+
+\subsubsection{Finding the best branch}
+\label{subsubsec:finding-best-branch}
+
+To find the best split, we iterate through all variables $j$ and all possible thresholds $\tau$. For each feature $j$, we only need to consider the midpoints between consecutive values of $(x^{(i)}_j)$.
+
+\begin{minipage}{0.55\textwidth}
+Intuitively:
+\begin{itemize}
+    \item Consider all variables and all threshold values;
+    \item Choose the pair (var, thr) that results in the lowest rate of \textbf{misclassified} examples.
+\end{itemize}
+
+\medskip
+
+
+    Each split is evaluated using an \textbf{impurity measure}.
+    For a dataset $D$ (or node $t$), let $p_y$ denote the frequency of class $y$ in $D$. Common impurity measures are:
+
+    \begin{itemize}
+        \item \textbf{Classification error}: $1 - \max_y p_y$;
+        \item \textbf{Gini index}: $\sum_y p_y (1 - p_y) = 1 - \sum_y p_y^2$;
+        \item \textbf{Cross-entropy}: $-\sum_y p_y \log_2(p_y)$.
+    \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+
+    \vspace{-1em}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=\textwidth]{assets/fig14.png}
+        \caption{Gini, entropy and error.}
+        \label{fig:gini-entropy-error}
+    \end{figure}
+\end{minipage}
+
+\vspace{-0.8em}
+
+\begin{algorithm}[H]
+    \caption{find-best-branch}
+    \begin{algorithmic}[1]
+        \Function{find-best-branch}{$\{(x^{(i)}, y^{(i)})\}_i$}
+            \State $(j^*, \tau^*) \gets \argmin{j, \tau} \Bigl( \text{impurity}(\{y^{(i)}\}_i|_{x^{(i)}_j \leq \tau}) + \text{impurity}(\{y^{(i)}\}_i|_{x^{(i)}_j > \tau}) \Bigr)$
+            \State \Return $(j^*, \tau^*)$
+        \EndFunction
+        \State
+        \Function{error}{$\{y^{(i)}\}_i$} \Comment{the error of the dummy classifier on $\{y^{(i)}\}$}
+            \State $y^* \gets \argmax{y} \sum_i \mathbf{1}(y^{(i)} = y)$ \Comment{$y^*$ is the most frequent class}
+            \State \Return $\frac{1}{n} \sum_i \mathbf{1}(y^{(i)} \neq y^*)$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+
 \vspace{-1em}
 
-This is a recursive function that works with every tree and always returnns a $y \in Y$.
+This approach is \textbf{greedy}, since it tries to obtain the maximum result (finding the branch), with the minimum effort (using just two dummy classifiers; later on): in practice, it makes this learning technique \textbf{computationally light}!
+
+\begin{tipsblock}[Gini vs.\ entropy]
+Gini and cross-entropy are strictly convex and smoother than classification error, making them more sensitive to changes in node purity. Gini is generally preferred as it is computationally cheaper (no logarithms).
+\end{tipsblock}
+
+\subsubsection{Stopping criteria and complexity}
+\label{subsubsec:stopping-criteria}
+If the tree grows indefinitely, it will eventually isolate every training example. This leads to maximal complexity. Stopping criteria are required:
+\begin{itemize}
+    \item \textbf{Data size}: stop if $|D| \le n_{\min}$ or $\text{error}(\{y^{(i)}\}_i) = 0$, it is the most common parameter;
+    \item \textbf{Depth}: stop if the node depth exceeds a maximum depth $\tau_d$;
+    \item \textbf{Impurity}: stop if the impurity is below a threshold $\tau_\epsilon$.
+\end{itemize}
+For the same dataset, in general, parameters impact the tree size as follows:
+\begin{itemize}[noitemsep]
+    \item the lower $n_{\min}$, the \textbf{larger} the tree;
+    \item the greater $\tau_d$, the \textbf{larger} the tree;
+    \item the lower $\tau_\epsilon$, the \textbf{larger} the tree.
+\end{itemize}
+
+
+\subsection{Tree learning with probabilities}
+\label{subsec:tree-probabilities}
+
+In standard formulation, leaves hold a single class label $y \in Y$. Alternatively, they can hold \textbf{discrete probability distributions} over $Y$, corresponding to the frequencies of each class in the leaf.
+
+\begin{definitionblock}[Tree learning with probability]
+The node labels are $L = (\{1,\ldots,p\} \times \mathbb{R}) \cup \mathcal{P}_Y$: branch nodes hold $(j, \tau)$; terminal nodes hold discrete distributions $p \in \mathcal{P}_Y$ instead of a single class.
+
+The learning and prediction functions are:
+$$
+f'_{\text{learn}} : \mathcal{P}^*(X_1 \times \cdots \times X_p \times Y) \to T_{(\{1,\ldots,p\} \times \mathbb{R}) \cup \mathcal{P}_Y},
+$$
+$$
+f''_{\text{predict}} : X_1 \times \cdots \times X_p \times T_{(\{1,\ldots,p\} \times \mathbb{R}) \cup \mathcal{P}_Y} \to \mathcal{P}_Y.
+$$
+A hard prediction is obtained as $\hat{y} = \argmax{y \in Y} p(y)$ given $p = f''_{\text{predict}}(x, m)$.
+\end{definitionblock}
+
+\subsubsection{Learning: $f'_{\text{learn}}$ with probability}
+
+The only change w.r.t.\ the standard algorithm is the treatment of leaves. When a stopping condition is met, instead of assigning the most frequent class, we assign the \textbf{empirical frequency distribution}:
+$$
+p = y \mapsto \mathrm{Fr}(y, \{y^{(i)}\}_i),
+$$
+where $\mathrm{Fr}(y, \{y^{(i)}\}_i)$ is the frequency of class $y$ in the labels at that node. The leaf then returns $\text{node-from}(p, \emptyset, \emptyset)$ instead of $\text{node-from}(y^*, \emptyset, \emptyset)$.
+
+\begin{exampleblock}[Before vs.\ after]
+Consider a leaf with 5 observations: 3 of class $\bullet$, 1 of class $\circ$, 1 of class $\star$.
+
+\textbf{Without probability:} the leaf returns the single label $\bullet$ (the majority class).
+
+\textbf{With probability:} the leaf returns $p = (\frac{3}{5}\,\bullet, \frac{1}{5}\,\circ, \frac{1}{5}\,\star)$, i.e. empirical frequencies of each class.
+\end{exampleblock}
+
+\subsubsection{Prediction: $f'_{\text{predict}}$ vs.\ $f''_{\text{predict}}$}
+
+Two prediction functions can be defined:
+
+\begin{itemize}
+    \item \textbf{$f'_{\text{predict}} : X \times M \to Y$} (hard prediction): at a leaf, compute $\hat{y} = \argmax{y \in Y} p(y)$, and return $\hat{y}$;
+    \item \textbf{$f''_{\text{predict}} : X \times M \to \mathcal{P}_Y$} (soft prediction): at a leaf, return the distribution $p$ directly.
+\end{itemize}
+
+In practice, ML libraries often provide both $\hat{y}$ and $p$ from a single tree traversal.
+
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.5\textwidth]{assets/fig15.png}
+%     \caption{Tree learning with probabilities: terminal nodes return discrete distributions.}
+%     \label{fig:tree-probabilities}
+% \end{figure}
+
+\subsection{Model complexity and generalisation}
+\label{subsec:model-complexity}
+
+The learned tree may be too large w.r.t.\ the real system. Almost every learning technique has at least one parameter affecting the maximum complexity of the learnable models, often called \textbf{flexibility}: more flexibility $\to$ more complex models; less flexibility $\to$ simpler models.
+
+The model strives for maximum accuracy on the training set, but \textbf{noise} in the data makes a perfect score impossible (and undesirable). The goal is to model the real system $s$, not $s$ plus noise.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.3\textwidth]{assets/fig13.png}
-    \caption{Templated $f'_{predict} : (R^p \times T_{p,Y}) \to Y$}
+    \includegraphics[width=0.47\textwidth]{assets/fig16.png}
+    
+    \vspace{-1em}
+    \caption{Noise in the data: the goal is to model $s$, not $s + \text{noise}$.}
+    \label{fig:noise-data}
 \end{figure}
 
-\begin{warningblock}[When to stop?]
-    The tree can grow indefinitely, so we need to stop it at some point. We can do this by:
-    \begin{itemize}
-        \item \textbf{Depth Limit:} stop when the depth is reached
-        \item \textbf{Leaf Size:} stop when the leaf size is reached
-        \item \textbf{Impurity:} stop when the impurity is below a certain threshold
-    \end{itemize}
-\end{warningblock}
+\subsubsection{Overfitting and underfitting}
+\label{subsubsec:overfitting-underfitting}
 
-Also, how to find where to split the data? The algorithm searches for the best point wrt the accuracy, meaning it will find the point where accuracy (or misclassification to the contrary) is the best, that's why it is called \texttt{greedy}. Other approaches are:
-\begin{itemize}
-    \item \textbf{Gini Index:} $Gini(t) = 1 - \sum_{y \in Y}^{}(\Pr(y|t))^2$
-    \item \textbf{Entropy:} $Entropy(t) = -\sum_{y \in Y}^{}\Pr(y|t)log_2(\Pr(y|t))$
+\begin{definitionblock}[Overfitting]
+Given a \textbf{noisy dataset} and \textbf{large complexity} (a flexibility parameter set high), the learning technique may \textbf{fit the noisy data} instead of the real system $s$; \textbf{overfitting} occurs.
+\end{definitionblock}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Overfitting}: the model fits the training data \emph{too well}, capturing noise and artefacts rather than the underlying system $s$. This happens if the model is too complex (high flexibility, e.g., \small{$n_{\min} = 1$}).
+    \item \textbf{Underfitting}: the model is too simple to capture the structure of $s$. This happens if flexibility is too low (e.g., \small{$n_{\min} \to \infty$}, resulting in a single root node).
 \end{itemize}
 
-They are both measures of impurity, and the best split is the one that minimizes the impurity. \textbf{The lower the better}.
+\vspace{-0.3em}
+
+\begin{minipage}{0.6\textwidth}
+
+    \subsubsection{Bias and variance}
+    \label{subsubsec:bias-variance}
+
+These concepts correspond to statistical properties of the learning technique:
+
+\medskip
+\begin{itemize}
+    \item \textbf{High bias (underfitting)}: the technique systematically errs in the same way regardless of the training data (e.g., a dummy classifier always predicts the majority class). It is blind to the data.
+    \item \textbf{High variance (overfitting)}: the model changes drastically with small changes in training data. The technique is too sensitive to the specific dataset instance.
+\end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \begin{figure}[H]
+
+        \vspace{-1.2em}
+        \centering
+        \includegraphics[width=0.95\textwidth]{assets/fig17.png}
+
+        \vspace{-0.7em}
+        \caption{Bias-variance trade-off.}
+        \label{fig:bias-variance}
+    \end{figure}
+\end{minipage}
+
+\begin{exampleblock}[Practical procedure for choosing flexibility]
+    \begin{enumerate}[leftmargin=*, noitemsep]
+        \item Consider different values of the flexibility parameter;
+        \item Choose a suitable effectiveness index and learning/testing division method;
+        \item For each value, learn a model and compute performance index on both train and test sets.
+    \end{enumerate}
+\end{exampleblock}
+
+\subsection{Hyperparameter tuning}
+\label{subsec:hyperparameter-tuning}
+
+Parameters like $n_{\min}$ or $\tau_d$ are not learned from data but set by the designer. These are called \textbf{hyperparameters}. Choosing the right hyperparameters is crucial for balancing bias and variance.
+
+\begin{definitionblock}[Hyperparameter tuning]
+Given a learning technique with $h$ parameters $p_1, ..., p_h$ and $p_j \in P_j$ for each $j$, \bfit{hyperparameters} are parameters whose values are not learned from data but are set by the designer before training. \bfit{Hyperparameter tuning} is the task of finding the tuple of hyperparameters $(p_1^*, ..., p_h^*)$ that maximises effectiveness:
+$$
+(p_1^*, ..., p_h^*) = \argmax{(p_1, ..., p_h) \in P_1 \times \cdots \times P_h} f_{\text{effectiveness}}(p_1, ..., p_h).
+$$
+\end{definitionblock}
+
+ The most common method is \textbf{grid search}:
+
+\begin{enumerate}[leftmargin=*, noitemsep]
+    \item For $j = 1, ..., h$, the hyperparameter designer chooses a finite set $P'_j \subseteq P_j$ of candidate Values;
+    \item Construct the cartesian product $P'_1 \times \cdots \times P'_h$ (the \textbf{grid});
+    \item For each configuration \small{$(p_1, ..., p_h)$}, estimate effectiveness using a robust method (e.g. $k$-fold CV):
+    $$
+    (p_1^*, ..., p_h^*) = \argmax{(p_1, ..., p_h) \in P'_1 \times \cdots \times P'_h} \hat{f}_{\text{effectiveness}}(p_1, ..., p_h);
+    $$
+
+    \vspace{-0.7em}
+    \item Select the configuration with the best estimated performance.
+\end{enumerate}
+
+The choice of $P'_j$ sets is crucial: too small may miss good values; too large is expensive.
+
+\subsubsection{Hyperparameter-free learning}
+
+The combination of (grid search + learning technique) can be viewed as a new, \textbf{hyperparameter-free} learning technique. It is more effective (it adapts to the problem) but computationally more expensive (it trains many models). The chosen values may overfit the specific dataset used for tuning, thus lacking generalisation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.5\textwidth]{assets/fig18.png}
+    \caption{Hyperparameter-free learning: grid search wraps any learning technique.}
+    \label{fig:hyperparameter-free}
+\end{figure}
 
 \vspace{-1em}
 
-\begin{center}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.5\textwidth]{assets/fig14.png}
-        \caption{Gini Index, Entropy and Error}
-    \end{figure}
-\end{center}
+\subsection{Categorical independent variables and regression}
+\label{subsec:tree-categorical-regression}
 
-Gini and Entropy are both smoother than the error, and they are similar, but Gini is faster to compute.
+For categorical variables, the split is defined by a variable $x_j$ and a subset $X'_j \subset X_j$: observations with $x^{(i)}_j \in X'_j$ go to one child, those with $x^{(i)}_j \notin X'_j$ to the other.
 
-\subsection{Tree Learning with probabilities}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.28\textwidth]{assets/fig19.png}
 
-In this context terminal nodes \textbf{return discrete probability distributions}:
+    \vspace{-0.7em}
+    \caption{Tree with categorical variables: split on $x_j \in X'_j$ vs.\ $x_j \notin X'_j$.}
+    \label{fig:tree-categorical}
+\end{figure}
 
-\begin{center}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.5\textwidth]{assets/fig15.png}
-        \caption{Tree Learning with probabilities}
-    \end{figure}
-\end{center}
+\vspace{-1em}
 
-\begin{center}
-    $f''_{predict} : X_1 \times \dots \times X_p \times T_{(\{1, \dots, p\} \times R)\cup P_y}$
-\end{center}
+For a given \textbf{categorical variable} $x_j \in X_j$, one chooses $X'_j \subset X_j$ such that:
+$$
+X'_j = \argmin{X'_j \in \mathcal{P}(X_j)} \Bigl( f_{\text{impurity}}(\{y^{(i)}\}_i \mid_{x^{(i)}_j \in X'_j}) + f_{\text{impurity}}(\{y^{(i)}\}_i \mid_{x^{(i)}_j \notin X'_j}) \Bigr).
+$$
+In a \textbf{regression tree}, terminal nodes hold numerical values instead of classes. Impurity and classification error no longer apply; the split criterion and stopping condition must be adapted. The best branch minimises the residual sum of squares,  $\mathrm{RSS}(\{y^{(i)}\}_i) = \sum_i (y^{(i)} - \hat{y}^{(i)})^2$:
+$$
+(j^*, \tau^*) = \argmin{j, \tau} \Bigl( \mathrm{RSS}(\{y^{(i)}\}_i \mid_{x^{(i)}_j \leq \tau}) + \mathrm{RSS}(\{y^{(i)}\}_i \mid_{x^{(i)}_j > \tau}) \Bigr).
+$$
+The stopping criterion uses RSS instead of error; recursion stops when $\mathrm{RSS} = 0$ or when $n \leq n_{\min}$. Note that $\mathrm{RSS} = 0$ is much rarer than $\text{error} = 0$ in classification trees.
 
-So the output will be the \texttt{frequency} of the categories.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fig20.png}
 
-\begin{warningblock}[Model Complexity]
-    Sometimes the tree could be too large wrt the real system. Almost every learning technique has at least one parameter that affects the maximum complexity of the learnable models, often called \textbf{flexibility}:
-    \begin{itemize}
-        \item more flexibility $\to$ more complex models
-        \item less flexibility $\to$ simpler models
-    \end{itemize}
-\end{warningblock}
+    \vspace{-0.7em}
+    \caption{Classification tree vs.\ regression tree.}
+    \label{fig:class-vs-reg-tree}
+\end{figure}
 
-The point is: the model tries to reach the maximum accuracy possible, but there is \texttt{noise} in the data, that leads to an impossible perfect score. 
+\section{Ensemble methods: Tree Bagging and Random Forest}
 
-\begin{center}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.5\textwidth]{assets/fig16.png}
-        \caption{Noise in the data}
-    \end{figure}
-\end{center}
+Single decision trees, while easy to interpret, suffer from a significant drawback: high variance. 
 
-However, out goal is to \textbf{model s}, not $s+$noise.
-
-\begin{definitionblock}[Overfitting]
-    When we have a \textbf{noisy dataset} and we allow for \textbf{large complexity}, by setting a flexibility parameter to a high flexibility, the learning technique \textbf{fits the noisy data} instead of the real system $s$, and \textbf{overfitting} occurs.
-\end{definitionblock}
-
-\textbf{Underfitting} is the opposite, when the model is too simple to capture the real system.
-
-\begin{itemize}
-    \item Underfitting exibits \textbf{high bias} and \textbf{low variance}, since it tends to generate models that incorporate a bias towards some y values 
-    \item Overfitting, instead, exibits \textbf{low bias} and \textbf{high variance}, since it tends to generate different models if the learning is repeated with different datasets 
+If we learn a regression tree with \textbf{low flexibility} (e.g., small depth):
+\begin{itemize}[noitemsep]
+    \item the model will not capture the system behavior;
+    \item it will \textbf{underfit} the data and the system (high bias).
 \end{itemize}
 
-\begin{exampleblock}[Practical Procedure]
-    \begin{itemize}
-        \item consider different values of the flexibility parameter
-        \item choose a suitable \textbf{effectiveness index }
-        \item choose a suitable \textbf{learning/testing division method} 
-        \item learn a model and compute the performance index on the train and test set 
-    \end{itemize}
-\end{exampleblock}
+If we learn a regression tree with \textbf{high flexibility} (e.g., fully grown):
+\begin{itemize}[noitemsep]
+    \item the model will likely better capture the system behavior, but\dots
+    \item it will model also some noise;
+    \item it will \textbf{overfit} the data (high variance).
+\end{itemize}
 
-\begin{center}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.4\textwidth]{assets/fig17.png}
-        \caption{Bias-Variance Trade-off}
-    \end{figure}
-\end{center}
+\smallskip
 
-\begin{definitionblock}[Hyperparameter tuning]
-    It is the task of finding the tuple of hyperparameters $p^*_1, \dots, p^*_h \in P_j$ that maximizes the effectiveness index.
+\textbf{Ensemble methods} are techniques that combine multiple \textbf{weak learners} (models that perform slightly better than random guessing, in this case decision trees) to create a stronger, more robust predictor. The goal is to combine the power of high-flexibility models (low bias) while reducing their variance. Ideally, we want to average out the noise by combining multiple models.
+
+\begin{definitionblock}[Wisdom of the crowds theorem]
+    \begin{center}
+    \textit{A collective opinion may be better than a single expert's opinion.}
+    \end{center}
 \end{definitionblock}
 
-Hyperparameters are the parameters that are not learned by the learning technique, but are set by the user.
-
-\begin{exampleblock}[Grid Search]
-    It is a simple form of hyperparameter tuning, where the user specifies a grid of values for each hyperparameter, and the learning technique is executed for each combination of hyperparameters. To be feasible, the set of hyperparameters must be small.
-\end{exampleblock}
-
-So why we can't just always use hyperparameter tuning instead of choosing a value? Well, it is expensive and probably lacks of generalization since it is specific fot that dataset.
-
-\begin{center}
-    \begin{figure}[H]
-        \centering 
-        \includegraphics[width=0.5\textwidth]{assets/fig18.png}
-        \caption{Hyperparameter-free Learning}
-    \end{figure}
-\end{center}
-
-\subsection{Categorical Independent Variables and Regression}
-
-Here we find a variable $x_j$ and a set of values $X'_j \in X_j$ that well separates the data. It's a simple binary split, where the $x_j$ is contained either in a group or the other.
-
-\begin{center}
-    \begin{figure}[H]
-        \centering 
-        \includegraphics[width=0.3\textwidth]{assets/fig19.png}
-        \caption{Tree with categorical variables}
-    \end{figure}
-\end{center}
-
-For a given \textbf{categorical variable} $x_j \in X_j$, we choose $X'_j \subset X_j$ such that:
-
-\begin{center}
-    $X'_j = \operatorname*{argmin}_{X'_j \in P(X_j)} f_{impurity}(\{y^{(i)}\}_i |_{x^{(i)}_j \in X'_j}) + f_{impurity}(\{y^{(i)}\}_i |_{x^{(i)}_j \in X'_j})$
-\end{center}
-
-In a \textbf{Regression Tree}, instead, the terminal nodes are no more categorical values, they are instead numerical ones. For this reason concepts like $f_{impurity}$ or minimizing the error to stop do not hold anymore: they must be changed.
-
-To find the best branch, RSS is the solution. 
-
-\begin{center}
-    $(j^*, \tau^*) = \operatorname*{argmin}_{j, \tau} RSS(\{y^{(i)}\}_i |_{x^{(i)}_j \leq \tau}) + RSS(\{y^{(i)}\}_i |_{x^{(i)}_j \leq \tau})$
-\end{center}
-
-Also for the \textbf{Stopping Criterion}, we should use RSS instead of the error, then stopping when $RSS=0$ or when $n \leq n_{min}$. To notice that $RSS=0$ is much more unfrequent than error$=0$.
-
-\begin{center}
-    \begin{figure}[H]
-        \centering 
-        \includegraphics[width=\textwidth]{assets/fig20.png}
-        \caption{Classification Tree vs Regression Tree}
-    \end{figure}
-\end{center}
-
-\newpage
-
-\section{Tree Bagging and Random Forest}
+The aggregation of models works only if:
+\begin{itemize}[noitemsep]
+    \item we have \textbf{many opinions} $\qquad\ \, \; \qquad \to \quad$ we learn many trees;
+    \item the opinions are \textbf{independent} $\; \; \qquad \to \quad$ each tree is learned on a different dataset;
+    \item we have a way to \textbf{aggregate} them $\ \ \ \to \quad$ we average predictions or take a majority vote.
+\end{itemize}
 
 \subsection{Tree Bagging}
 
-If we learn a regression tree with \textbf{low flexibility}:
-\begin{itemize}
-    \item the model will not capture the system behavior 
-    \item it will underfit the data and the system 
-\end{itemize}
-If we learn a regression tree with \textbf{high flexibility}:
-\begin{itemize}
-    \item the model will likely better capture the system behavior, but\dots
-    \item it will model also some noise
-    \item it will overfit the data 
-\end{itemize}
+To satisfy the independence requirement, we need different learning sets. Since we usually only have one dataset $D$, we simulate having multiple datasets using \textbf{bootstrapping}.
 
-\texttt{What if we combine the power of the high flexibility obtained from different models?}
-
-\begin{definitionblock}[Wisdom of the crowds theorem]
-    A collective opinion may be better than a single expert's opinion
-\end{definitionblock}
-
-\begin{warningblock}[Wisdom of the crowds theorem]
-    Yes, but only if:
-    \begin{itemize}
-        \item we have many opinions \to (learn many trees)
-        \item they are independent \to (each tree is learned on a dataset obtained with sampling with repetition)
-        \item we have a way to aggregate them \to (aggregate the predictions)
-    \end{itemize}
-\end{warningblock}
-
-For the \textbf{independency} part, we just have to use \texttt{different learning sets}, using for example the Cross-Validation technique or, even better, the Bootstrap technique.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/fig21.png}
-    \caption{Tree bagging}
-\end{figure}
+\textbf{Bootstrap aggregating}, or \textbf{Bagging}, involves generating $B$ different training datasets by sampling with replacement from the original dataset $D$. We then train a tree on each bootstrapped dataset and aggregate their predictions.
 
 \begin{definitionblock}[Tree Bagging]
     \begin{itemize}
-        \item \textbf{Learning:} the model is a bag of trees and we can specify the number of trees as an hyperparameter. Remember that the learning technique is not deterministic due to the random sampling part.
-        \item \textbf{Predict:} for classification consider the majority of votes for every $y \in Y$ (label), for regression simply return the mean of the relative values (better if also the $\sigma$ is returned, to have a measure of the uncertainty)
+        \item \textbf{Learning:} The model is an ensemble (a ``bag'') of $n_{\text{tree}}$ trees. 
+        \begin{itemize}[noitemsep]
+            \item Each tree is trained on a bootstrap sample of the data.
+            \item The learning process is \textbf{non-deterministic} due to the random sampling.
+        \end{itemize}
+        \item \textbf{Predict:} 
+        \begin{itemize}[noitemsep]
+            \item \textbf{Classification:} Majority vote among the trees (return the most frequent class).
+            \item \textbf{Regression:} Average of the predictions of individual trees. Ideally, the standard deviation $\sigma$ across trees is also returned as a measure of \textbf{uncertainty}.
+        \end{itemize}
     \end{itemize}
 \end{definitionblock}
 
-\begin{warningblock}[$n_{tree} hyperparameter$]
-    It is a flexibility parameter, but if increased changes overfitting and generalisation in the same way. Experimentally turns out 
-    that with a reasonably large $n_{tree}$ bagging is better than single tree learning, and after that number there is no tendency to overfit.
-    The problem is that the higher the parameter, the less efficient is the model. Simple trade-off.
-\end{warningblock}
+\begin{minipage}{0.63\textwidth}
+The hyperparameter $n_{\text{tree}}$ is \textbf{not} a flexibility parameter in the traditional sense. Unlike other hyperparameters that control model complexity, increasing $n_{\text{tree}}$ does not cause overfitting; it simply stabilizes the error convergence. 
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \vspace{-1em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/fig21.png}
+    % \caption{Tree Bagging}
+\end{figure}
+\end{minipage}
+
+\medskip
+
+With too few trees, the aggregation exhibits high variance, leading to unstable predictions. Conversely, using too many trees yields diminishing returns in predictive performance while incurring higher computational costs.
+Therefore, choosing $n_{\text{tree}}$ is primarily a trade-off between \textbf{efficiency} and stability, rather than a bias-variance consideration.
 
 \subsection{Random Forest}
 
-The question is: can we further increase the independency such that the model will possibly learn different patterns in the data? The answer is yes, and we can do it by including more independency not only in the learning set, but also in the way the learning technique chooses the predictors each time. A sort of \textbf{independency in the predictors' sets}.
+While bagging reduces variance, the trees in a bagged ensemble can still be highly \textbf{correlated}. If there is one very strong predictor (feature) in the dataset, most trees will use it for the first split, making them look very similar.
+To further increase \textbf{independence}, we need to decorrelate the trees. We do this by injecting randomness not just in the \emph{rows} (bootstrapping) but also in the \emph{columns} (features).
 
-\textbf{Idea:} when learning each tree, \textbf{remove some randomly chosen independent variables} from the observations. This is called \textbf{Random Forest}, and is a learning technique that enhances the capabilities of Tree Bagging with variables removal.
-\begin{itemize}
-    \item \textbf{Random:} because there are two sources of randomness, hence of independency
-    \item \textbf{Forest:} because it gives a bag of trees 
-\end{itemize}
-
-
-\begin{figure}[H]
-    \centering 
-    \includegraphics[width=0.5\textwidth]{assets/fig22.png}
-    \caption{Random Forest}
-\end{figure}
-
-The model is a bag of $n_{vars}$ trees, as in bagging, where that parameter is $\leq p$ that is the number of variables. Two parts of this learning technique are \textbf{not deterministic}: where it samples observations to create the various learning sets for the various trees and where it chooses the predictors to use.
-
-For prediction just refer to bagging, it is the same.
-
-Is the fact that not all predictors are uses in each tree a problem? Well, no. The model still considers all the predictors but chooses not to use some of them.
-
-\begin{warningblock}[Random Forest]
-    The opposite, i.e. when the variable is in the tree but valued not in x, is a problem.
-\end{warningblock}
-
-Experimentally turns out that $n_{vars}$ does not impact the tendency to overfit, hence it is not a proper flexibility parameter. 
-Good default values are:
-\begin{itemize}
-    \item $\sqrt{p}$ for classification 
-    \item $\frac{1}{3}p$ for regression 
-\end{itemize}
-
-For this reason (remember that also $n_tree$ does not impact overfitting) Random Forest is almost a \textbf{hyperparameter-free learning technique!} (\to just use default values)
-
-\begin{figure}[H]
-    \centering 
-    \includegraphics[width=0.4\textwidth]{assets/fig23.png}
-    \caption{Random Forest}
-\end{figure}
-
-\begin{definitionblock}[OOB error]
-    This value is computed on the unseen observations at each step of the ensemble.
-    \begin{itemize}
-        \item For each observation, find the out-of-bag trees and obtain their prediction on the observations
-        \item compute the error on the predictions 
-    \end{itemize}
-    To remark that this is an \textbf{estimate} of the test error, but does not need a test dataset and is computed at learning time.
-\end{definitionblock}
-
-\begin{figure}[H]
-    \centering 
-    \includegraphics[width=0.38\textwidth]{assets/fig24.png}
-    \caption{Error}
-\end{figure}
+\begin{definitionblock}[Random Forest]
+    \bfit{Random Forest} is a learning technique that enhances Tree Bagging by introducing a random restriction on the features available for splitting. 
     
+    When building each tree, at \textbf{each split}, the algorithm is only allowed to consider a random subset of $n_{\text{vars}}$ features chosen from the total $p$ features.
+\end{definitionblock}
+
+\begin{minipage}{0.63\textwidth}
+\begin{itemize}
+    \item \textbf{Random:} because there are two sources of randomness (bootstrap samples and feature sampling).
+    \item \textbf{Forest:} because the model is a collection of trees.
+\end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \vspace{-1em}
+\begin{figure}[H]
+    \centering 
+    \includegraphics[width=\textwidth]{assets/fig22.png}
+    % \caption{Random Forest adds feature subsampling to Bagging.}
+\end{figure}
+\end{minipage}
+
+\medskip
+
+The model is a bag of $n_{\text{tree}}$ trees. The parameter $n_{\text{vars}}$ (or $m$, in literature) controls the correlation between trees:
+\begin{itemize}
+    \item If $n_{\text{vars}} = p$, Random Forest matches Bagging.
+    \item If $n_{\text{vars}}$ is small, trees are very diverse (decorrelated).
+\end{itemize}
+
+Experimentally, $n_{\text{vars}}$ does not strongly impact the tendency to overfit. Therefore, Random Forest is often considered practically \textbf{hyperparameter-free} because robust default values exist:
+\begin{itemize}
+    \item Classification: $n_{\text{vars}} \approx \sqrt{p}$
+    \item Regression: $n_{\text{vars}} \approx \frac{p}{3}$
+\end{itemize}
+
+% \begin{warningblock}[Random Forest Applicability]
+%     The technique works well even if some variables are not used in a specific tree. However, if a variable is included in a tree's logic but is missing (not valued) in a specific observation $x$ during prediction, the tree cannot process that branch. Handling missing values usually requires imputation or surrogate splits.
+% \end{warningblock}
+
+\subsection{Out-Of-Bag (OOB) Assessment}
+
+Since each tree is trained on a bootstrap sample, it leaves out approximately one-third of the observations. These leftover observations are called \textbf{Out-Of-Bag (OOB)} samples for that specific tree.
+We can use these OOB to estimate the test error without requiring a separate validation set.
+
+
+\begin{definitionblock}[OOB Error]
+\begin{minipage}{0.6\textwidth}
+    The \bfit{OOB error} is an unbiased estimate of the generalization error computed during training:
+
+    \medskip
+    \begin{enumerate}[leftmargin=*, itemsep=0.5em]
+        \item For each observation $x^{(i)}$, identify the trees for which $x^{(i)}$ was OOB (not in the bootstrap).
+        \item Aggregate the predictions of only those trees for $x^{(i)}$.
+        \item Compute the error (accuracy/MSE) based on these aggregated predictions.
+    \end{enumerate}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.39\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/fig24.png}
+    % \captionof{figure}{Convergence of OOB error and Test error as $n_{\text{tree}}$ increases.}
+\end{minipage}
+\end{definitionblock}
+
+\medskip
+
 \begin{warningblock}[Interpretability]
-    Ensemble methods lack of Interpretability, since they consider different scenarios and use the computational power to find human-invisible patterns in the data.
+    Ensemble methods \textbf{lack of Interpretability}, since they consider different scenarios and use the computational power to find human-invisible patterns in the data.
 \end{warningblock}
 
-\textbf{Variable importance:} compute teh RSS/Gini before and after each branch-node and assign the increase/decrease to the branch-node variable; this way a ranking of variables can be created (the larger, the more important).
-But this process is not so effective, since tends to prefer numerical variables and works with learning data. 
+\subsection{Variable Importance}
 
-A better option is the \textbf{mean accuracy decrease}, just after learning.
+One downside of ensemble methods is the loss of interpretability. We can no longer look at a single tree to understand the decision process. To mitigate this, we calculate \textbf{variable importance} metrics to understand which features drive the predictions.
+
+\subsubsection*{Method 1: Mean Decrease Impurity (MDI)}
+During training, every time a node splits on variable $x_j$, the impurity (Gini or Entropy) decreases. We can sum these decreases for each variable across all trees.
+\begin{itemize}
+    \item \textbf{Pros:} Fast to compute (done during training).
+    \item \textbf{Cons:} Biased towards numerical variables and categorical variables with high cardinality (many categories).
+\end{itemize}
+
+\subsubsection*{Method 2: Mean Decrease Accuracy (Permutation Importance)}
+This method measures importance by breaking the association between a feature and the target.
+
 \begin{enumerate}
-    \item for each j-th variable and each tree t in the bag 
+    \item For each tree $t$ and its OOB data:
     \begin{enumerate}
-        \item take the observations in $D_t$ not used for t 
-        \item measure the accuracy of t on $D_t$
-        \item shuffle the j-th variable in the observations, obtaining $D'_t$
-        \item measure again the accuracy 
-        \item assigne the decrease in accuracy to the j-th variable 
+        \item Record the accuracy of $t$ on the OOB data.
+        \item \textbf{Shuffle} the values of variable $x_j$ in the OOB data (breaking the relationship with $y$).
+        \item Measure accuracy again on the shuffled data.
+        \item The \textbf{decrease in accuracy} is the importance of $x_j$ for tree $t$.
     \end{enumerate}
-    \item build a ranking of variables based on the sum of decreases (the larger, the more important)
+    \item Average the decreases across all trees.
 \end{enumerate}
 
-\textbf{Rationale:} if the decrease is low, shuffling the variable has no meaning (variable is not so important).
+\begin{tipsblock}[Rationale]
+    If a variable is important, shuffling it should drastically effectively destroy the model's ability to predict, leading to a large drop in accuracy. If shuffling makes no difference, the variable was not used or not useful.
+\end{tipsblock}
 
-A more general approach comes with \textbf{feature ablation}:
+\subsubsection*{Method 3: Feature Ablation}
+A more general (but computationally expensive) approach applicable to any model:
 \begin{enumerate}
-    \item measure the effectiveness of $f'_{learn}, f'_{predict}$ on the dataset D 
-    \item for each j-th variable $x_j$
+    \item Measure effectiveness of the model on the full dataset $D$.
+    \item For each variable $x_j$:
     \begin{enumerate}
-        \item build a D' by removing $x_j$ from D 
-        \item measure the effectiveness of $f'_{learn}, f'_{predict}$ on D' 
-        \item compute the j-th variable importance as the decrease of effectiveness in D' wrt D 
+        \item Create dataset $D'$ by \textbf{removing} $x_j$.
+        \item Retrain and measure effectiveness on $D'$.
+        \item The decrease in effectiveness represents the importance of $x_j$.
     \end{enumerate}
-    \item build a ranking of variables based on the decrease in effectiveness (as always, the larger, the more important)
 \end{enumerate}
 
-Here some variables are removed to see what happens.
-
-\begin{definitionblock}[No free lunch theorem]
-    Any two optimization algorithms are equivalent when their performance is averaged across all possible problems
+\begin{definitionblock}[No Free Lunch Theorem]
+    The \bfit{No Free Lunch Theorem} states that no single machine learning algorithm is universally better than all others across all possible domains. 
+    
+    While Random Forests are robust and effective in many scenarios, there are specific problems where other techniques (like linear models or neural networks) may perform better.
 \end{definitionblock}
+
+\newpage
 
 \section{Support Vector Machines}
 
-Previous learning techniques are ineffective for certain datasets, such as the one below:
+\vspace{-0.5em}
 
-\begin{figure}[H]
+\begin{minipage}[t]{0.52\textwidth}
+\vspace{0pt}
+Previous learning techniques, such as Decision Trees, divide the input space into hyper-rectangles with boundaries parallel to the axes. In many scenarios, they can be ineffective for datasets where the optimal separation between classes is linear but \textbf{oblique} (not axis-aligned), or follows a more complex boundary. In such cases, a tree would require many splits to approximate a single diagonal line, leading to complex models and potential overfitting.
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.28\textwidth}
+\vspace{0pt}
     \centering
-    \includegraphics[width=0.4\textwidth]{assets/fig25.png}
-\end{figure}
+    \includegraphics[width=\textwidth]{assets/fig25.png}
+    \label{fig:svm-motivation}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.17\textwidth}
+\vspace{0pt}
+    \captionof{figure}{A dataset where an oblique decision boundary is better than an axis-parallel one.}
+\end{minipage}
 
-\vspace{-1em}
+\vspace{-2.5em}
 
-Here, a \textbf{Hyperplane} can be used to tell apart the points with different labels. SVMs are intended for the binary classification setting in which there are two classes.
+\subsection{The Separating Hyperplane}
+
+
+Support Vector Machines (SVMs) are intended for the \textbf{binary classification}. The fundamental idea is to find a \textbf{hyperplane} that separates the two classes in the feature space $X = \mathbb{R}^p$.
 
 \begin{definitionblock}[Hyperplane]
-    In a p-dimensional space, a hyperplane is a flat affine subspace of dimension $p-1$. 
-    
-    $$\beta_0 + \beta^T_x = 0$$
-
-    Since it divides the space in two parts, if the data is contained in one subspace it will be classified as $y_1 \in Y$, otherwise as $y_2 \in Y$.
+    In a $p$-dimensional space, a \bfit{hyperplane} is a flat affine subspace of dimension $p-1$. It is defined by the equation:
+    $$f(x) = \beta_0 + \beta^\top \bm{x} = 0$$
+    where $\beta \in \mathbb{R}^p$ is the normal vector (determining the orientation) and $\beta_0$ is the intercept. The term ``separating'' indicates that the hyperplane divides the space into two parts; ``hyperplane'' refers to the geometry ($p = 1$: threshold; $p = 2$: line; $p = 3$: plane; $p > 3$: hyperplane).
 \end{definitionblock}
+\vspace{-1em}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.4\textwidth]{assets/fig26.png}
-    \caption{SVM $f_{predict}$}
+    \vspace{-1em}
+    \caption{SVM $f'_{\text{predict}}$: classify as Pos if $\beta_0 + \beta^\top \bm{x} \geq 0$, else Neg.}
+    \label{fig:svm-predict}
 \end{figure}
+\vspace{-1em}
 
-\textbf{Assumptions:}
+The hyperplane divides the space into two parts. We use it as a prediction function $f'_{\text{predict}}$:
 \begin{itemize}
-    \item Y = Pos,Neg $\to$ binary classification only!
-    \item X $= R^{p}$ $\to$ numerical independent variables only!
+    \item If $f(x) > 0$, we classify $x$ as \textbf{Positive}.
+    \item If $f(x) < 0$, we classify $x$ as \textbf{Negative}.
 \end{itemize}
 
-It is computationally very fast, since there are just p multiplications and sums.
+\textbf{Assumptions:} $Y = \{\text{Pos}, \text{Neg}\}$ (binary classification only); $X = \mathbb{R}^p$ (numerical inputs only). Prediction is computationally very fast: just $p$ multiplications and sums.
 
-The \texttt{magnitude} of a vector of predictors is the distance from the hyperplane, meaning that the greater the magnitude, the more the point is far from the hyperplane and the more confident is the prediction.
-But, how to choose the best hyperplane?
+The \textbf{magnitude} of $f(x)$ tells us the (signed) distance of the point from the hyperplane. The larger $|f(x)|$, the further the point is from the boundary, and the more \textbf{confident} we are in the prediction. Note that $f(x)$ is not bounded in $[0, 1]$, so it cannot be interpreted as a probability.
 
-\begin{figure}[H]
+\subsection{The Maximal Margin Classifier}
+
+\vspace{-0.5em}
+
+\begin{minipage}[t]{0.55\textwidth}
+    \vspace{0pt}
+    If the data is linearly separable, infinitely many hyperplanes separate the classes. Which one is the best? 
+    
+    Intuitively, we want the hyperplane that passes right in the middle of the two classes, maximizing the distance to the nearest points on both sides. 
+    
+    This creates the widest possible ``safety margin.''
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.27\textwidth}
+\vspace{0pt}
     \centering
-    \includegraphics[width=0.45\textwidth]{assets/fig27.png}
-\end{figure}
+    \includegraphics[width=0.95\textwidth]{assets/fig27.png}
+    \label{fig:svm-motivation}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.15\textwidth}
+\vspace{0pt}
+    \captionof{figure}{Choosing the best separating hyperplane.}
+\end{minipage}
+    
+\vspace{-2em}
 
 \begin{definitionblock}[Maximal Margin Hyperplane]
-    The best hyperplane is the one that maximizes the distance from the closest point to the hyperplane. This distance is called \textbf{margin} and is the (perpendicular) distance from each training observation to a given separating hyperplane; the smallest such distance is the minimal distance from the observations to the hyperplane.
-    The maximal margin hyperplane is the separating hyperplane for which the margin is largest,that is, it is the hyperplane that has the farthest minimum distance to the training observations.
+    The \bfit{margin} is the perpendicular distance from the separating hyperplane to the closest training observation.
+    
+    The \bfit{Maximal Margin Hyperplane} is the specific separating hyperplane that maximizes this margin. The corresponding classifier is called the \bfit{Maximal Margin Classifier (MMC)}.
 \end{definitionblock}
 
-\begin{figure}[H]
+\vspace{-0.3em}
+
+\begin{minipage}[t]{0.5\textwidth}
+    \vspace{0pt}
+    The training observations that lie exactly on the margin boundary are called \textbf{Support Vectors}. They ``support'' the hyperplane; if we move any point that is not a support vector (within limits), the separating hyperplane stays the same. If we move a support vector, the model changes.
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.27\textwidth}
+\vspace{0pt}
     \centering
-    \includegraphics[width=0.4\textwidth]{assets/fig28.png}
-    \caption{Maximal Margin Hyperplane}
+    \includegraphics[width=0.95\textwidth]{assets/fig28.png}
     \label{fig:hyperplane2}
-\end{figure}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.2\textwidth}
+\vspace{0pt}
+    \captionof{figure}{\\Maximal Margin Hyperplane. Points lying on the dashed lines are Support Vectors.}
+\end{minipage}
 
-In fig.\ref{fig:hyperplane2} three training observations are equidistant from the maximal margin hyperplane and lie along the dashed lines indicating the width of the margin. These three observations are known as support vectors,since they are vectors in p-dimensional space and they “support” the maximal margin hyperplane in the sense that if these points were moved slightly then the maximal margin hyperplane would move as well.
+\vspace{-1.8em}
 
-How to learn an hyperplane:
-\begin{itemize}
-    \item must perfectly separates the data
-    \item must maximize the margin
-\end{itemize}
+\subsubsection{Learning as Optimization}
 
-It is an optimization problem, searching for the best $m$ with the constraint that every point must be on the proper size and at a distance $\geq m$ from the hyperplane.
+Finding the Maximal Margin Hyperplane is a constrained optimization problem. Assume by convention that $\text{Pos} = +1$ and $\text{Neg} = -1$. We look for the coefficients $\beta$ that maximize the margin $M$, subject to the constraint that every point is correctly classified and at least distance $M$ from the hyperplane:
 
-\begin{warningblock}[Applicability]
-    What if some noise is introduced in the predictors? The \textbf{support vectors} change just a bit and the hyperplane changes as well, it can even not exist anymore! \textbf{Tolerance} must be introduced.
-\end{warningblock}
+\vspace{-1em}
+
+\begin{align*}
+    &\text{maximize } M \\
+    &\text{subject to } \sum_{j=1}^{p} \beta_j^2 = \beta^\top \beta = 1 \\
+    &y^{(i)}(\beta_0 + \beta^\top \bm{x}^{(i)}) \geq M, \quad \forall i = 1, \dots, n
+\end{align*}
+
+If $\beta^\top \beta = 1$, then $\beta_0 + \beta^\top \bm{x}$ is the Euclidean distance of $x$ from the hyperplane (with sign). The constraint holds with equality for support vectors and with strict inequality for the others. In practice, this is an easy optimization problem and solving it is fast.
+
+\subsubsection{Issues with Maximal Margin}
+
+The MMC is theoretically elegant but has two major practical issues:
+
+\begin{minipage}[t]{0.62\textwidth}
+    \vspace{0pt}
+\begin{enumerate}
+    \item \textbf{Sensitivity to noise (high variance):} The margin is determined solely by the support vectors. If we move a support vector slightly (e.g., by applying noise to some $x^{(i)}$), the separating hyperplane can shift dramatically; the model exhibits high sensitivity to small perturbations in the training data, leading to poor generalization.
+    \item \textbf{Non-separability:} If we apply noise to some label $y^{(i)}$, or if the classes are inherently overlapping, a separating hyperplane may not exist at all. In such cases, the optimization problem has no solution.
+\end{enumerate}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.35\textwidth}
+    \vspace{0pt}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/noise.png}
+    \captionof{figure}{Noise in the data.}
+\end{minipage}
+
+\medskip
+
+\begin{tipsblock}[Applicability]
+    How did the tree cope with label noise? By tolerating some misclassifications on the learning data. Can we make the MMC tolerant too?
+\end{tipsblock}
+
+\subsection{Soft Margin Classifier (Support Vector Classifier)}
+
+To make the model robust to noise and applicable to non-separable data, we introduce \textbf{tolerance}. We allow some points to violate the margin (or even be on the wrong side of the hyperplane). This is the \textbf{Soft Margin Classifier (SMC)}, also called \textbf{Support Vector Classifier}.
+
+We introduce \textbf{slack variables} $\epsilon^{(i)} \geq 0$ for each observation. There are two equivalent formulations.
 
 \begin{definitionblock}[Soft Margin Classifier]
-    \begin{itemize}
-        \item $\operatorname*{argmax}_{\beta_0 \dots \beta_p, \epsilon^(1) \dots \epsilon^(n)}$ m 
-        \item subject to $\sum_{j=1}^{j=p}\beta_j^2 = \beta \beta^T = 1$
-        \item $y^{(i)}(\beta_0 + \beta^T x^{(i)}) \geq m(1 - \epsilon^{(i)}) \forall i = 1 \dots n$
-        \item $\epsilon^{(i)} \geq 0 \forall i = 1 \dots n$
-        \item $\sum_{i=1}^{n} \epsilon^{(i)} = c$
-    \end{itemize}
-    $\epsilon^{(1)} \dots \epsilon^{(i)}$ are positive slack variables: they act as tolerance wrt the margin.
     
-    Due to the tolerance (c), the margin can be pushed. $c \in R^+$ is a budget of tolerance.
+\begin{itemize}
+\item \textbf{1st Formulation: Budget Constraint}
+
+    \begin{itemize}
+        \item Maximize $M$
+        \item subject to $\beta^\top \beta = 1$
+        \item $y^{(i)}(\beta_0 + \beta^\top \bm{x}^{(i)}) \geq M(1 - \epsilon^{(i)}) \quad \forall i$
+        \item $\epsilon^{(i)} \geq 0 \quad \forall i$
+        \item $\sum_{i=1}^{n} \epsilon^{(i)} \le C$
+    \end{itemize}
+    The parameter $C \in \mathbb{R}^+$ is a \textbf{budget of tolerance}. If $\epsilon^{(i)} = 0$, the point is on the correct side of the margin; if $0 < \epsilon^{(i)} \le 1$, it is inside the margin but correctly classified; if $\epsilon^{(i)} > 1$, it is misclassified.
+    
+\item\textbf{2nd Formulation: Penalty Cost}
+
+    \begin{itemize}
+        \item Maximize $M - c \sum_{i=1}^{n} \epsilon^{(i)}$
+        \item subject to $\beta^\top \beta = 1$
+        \item $y^{(i)}(\beta_0 + \beta^\top \bm{x}^{(i)}) \geq M(1 - \epsilon^{(i)}) \quad \forall i$
+        \item $\epsilon^{(i)} \geq 0 \quad \forall i$
+    \end{itemize}
+    The slack sum is unbounded but penalized in the objective. The parameter $c \in \mathbb{R}^+$ is a \textbf{weighting factor} balancing margin width vs.\ tolerance. Most ML libraries (e.g., scikit-learn, R) use this formulation or an equivalent such as $\min_{\beta} \bigl( \frac{1}{2}\|\beta\|^2 + C \sum_i \epsilon^{(i)} \bigr)$.
+\end{itemize}
 \end{definitionblock}
 
-\textbf{c} is a flexibility parameter:
-\begin{itemize}
-    \item $c = \infty$ \to infinite tolerance, you can move a lot the points and the line stay the same hence the model is the same irrespective of learning data (\textbf{high bias})
-    \item $c = 0$ \to no tolerance, the model is the best wrt the learning data but it is not generalizable (\textbf{high variance})
-\end{itemize}
+\subsubsection{The Parameter $C$ (Bias-Variance Trade-off)}
 
-\textbf{Variable scale} plays an important role here, since we are computing a matrix multiplication and the high coefficients' difference can be subject to noise. For this reason, the data must be \textbf{standardized}:
-\begin{itemize}
-    \item \textbf{min-max scaling}: $x^{(i)}_j = \frac{x^{(i)}_j - \operatorname*{min}_i x^{(i')}_j}{\operatorname*{max}_i x^{(i')}_j - \operatorname*{min}_i x^{(i')}_j}$
-    \item \textbf{standardization}: $\frac{1}{\sigma_j} (x^{(i)}_j - \mu_j)$
-\end{itemize}
+The two formulations assign \emph{opposite} meanings to extreme values of the parameter.
 
-Since scaling must be done both in learning and in prediction, the coefficients needed for scaling do \textbf{belong to the model}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig29.png}
-    \caption{Learning with standardization}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig30.png}
-    \caption{Prediction with standardization}
-\end{figure}
-
-\newpage
-
-Another formulation for the tolerance is the following:
-\begin{itemize}
-    \item $\operatorname*{max}_{\beta_0,\dots,\beta_p,\epsilon^{(1)},\dots,\epsilon^{(i)}} m - c\sum_{i=1}^{n}\epsilon^{(i)}$
-    \item subject to the previous constraints
-\end{itemize}
-
-Regarding c, it is a weighting factor that balances the trade-off between the margin and the tolerance. It is a flexibility parameter, and it is usually set by the user.
-\begin{itemize}
-    \item $c = 0 \to$ points that are inside the margin cost zero, you can put the line wherever you want, the model is always the same (\textbf{high bias})
-    \item $c = \infty \to$ points that are inside the margin cost infinite, the model is the best wrt the learning data but it is not generalizable (\textbf{high variance})
-\end{itemize}
-
-\begin{warningblock}[Differences between SMCs]
-    There is one learning parameter c, it is a flexibility parameter.
-    \textbf{Differences}:
     \begin{itemize}
-        \item c extreme values:
+        \item \textbf{1st formulation} (budget $\sum \epsilon \le C$):
         \begin{itemize}
-            \item $c = +\infty$ (1st) and $c = 0$ (2nd) $\to$ high bias 
-            \item $c = 0$ (1st) and $c = +\infty$ (2nd) $\to$ high variance
+            \item $C = 0$: no tolerance $\Rightarrow$ Maximal Margin Classifier (high variance).
+            \item $C \to \infty$: infinite budget $\Rightarrow$ high bias.
         \end{itemize}
-        \item learnability:
+        \item \textbf{2nd formulation} (penalty $M - c\sum\epsilon$):
         \begin{itemize}
-            \item with the 2nd, a model can \textbf{always} be learned 
-            \item with the 1st, there is a $c \leq 0$ such that a c value lower than that leads to an impossibility to learn a model from D 
+            \item $c = 0$: no penalty for violations $\Rightarrow$ points inside the margin cost zero; the model is the same irrespective of data (high bias).
+            \item $c \to \infty$: infinite penalty $\Rightarrow$ maximum effort to put all points outside the margin; the margin is very sensitive to point positions (high variance). A model can always be learned.
         \end{itemize}
     \end{itemize}
-\end{warningblock}
+    \textbf{Learnability:} With the 2nd formulation, a model can always be learned from any dataset $D$. With the 1st formulation, there exists $c_{\text{learnable}} \ge 0$ such that if $C < c_{\text{learnable}}$, no model can be learned ($c_{\text{learnable}} = 0$ when the data is linearly separable).
+
+\subsubsection{Importance of Scaling}
+
+The coefficients $\beta_j$ depend on the scales of the variables. If $x_j \in [1.4, 2.1]$ (e.g., height in metres) and $x_{j'} \in [20000, 50000]$ (e.g., income in euros), then $\beta_j$ and $\beta_{j'}$ will differ greatly, making the model sensitive to noise.
+
+\begin{tipsblock}[Pre-processing for SVM]
+    You \textbf{must} rescale numerical variables before applying MMC, SMC, or SVM. Options:
+    \begin{itemize}
+        \item \textbf{Min-max scaling:} $x'_j = \frac{x_j - \min_{i'} x^{(i')}_j}{\max_{i'} x^{(i')}_j - \min_{i'} x^{(i')}_j}$
+        \item \textbf{Standardization:} $x'_j = \frac{1}{\sigma_j}(x_j - \mu_j)$ (preferred, more robust to outliers)
+    \end{itemize}
+    The scaling parameters ($\mu$, $\sigma$ or min, max) become part of the model, since scaling must be applied both in learning and prediction.
+\end{tipsblock}
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.7\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/fig29.png}
+        \caption{Learning with standardization: scaling parameters are stored in the model.}
+    \end{subfigure}
+    
+    \vspace{1em}
+    
+    \begin{subfigure}[b]{0.7\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/fig30.png}
+        \caption{Prediction with standardization: apply the same scaling before $f'_{\text{predict}}$.}
+    \end{subfigure}
+    \caption{Standardization in learning and prediction phases.}
+\end{figure}
+
+\vspace{-1em}
+
+\subsection{Support Vector Machines (Kernels)}
+
+The Soft Margin Classifier yields a linear decision boundary. Many real-world problems are not linearly separable. We can extend linear classifiers by \textbf{enlarging the feature space}: transform inputs $\bm{x}$ into a higher-dimensional space via $\phi(\bm{x})$, find a linear separating hyperplane there, and project it back to obtain a non-linear boundary in the original space.
+
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \renewcommand{\arraystretch}{0.9}
+    \begin{tabular}{@{}l>{}p{4cm}>{\centering}p{1.2cm}>{\centering\arraybackslash}p{1.2cm}@{}}
+        \toprule
+        \textbf{$X_j$} & \textbf{$Y$} & \textbf{RF} & \textbf{SVM} \\
+        \midrule
+        Numerical & Binary classification & \textcolor{green!60!black}{\checkmark} & \textcolor{green!60!black}{\checkmark} \\
+        Categorical & Binary classification & \textcolor{green!60!black}{\checkmark} & \textcolor{red}{\texttimes} \\
+        Numerical + Categorical & Binary classification & \textcolor{green!60!black}{\checkmark} & \textcolor{red}{\texttimes} \\
+        \midrule
+        Numerical & Multiclass classification & \textcolor{green!60!black}{\checkmark} & \textcolor{red}{\texttimes} \\
+        Categorical & Multiclass classification & \textcolor{green!60!black}{\checkmark} & \textcolor{red}{\texttimes} \\
+        Numerical + Categorical & Multiclass classification & \textcolor{green!60!black}{\checkmark} & \textcolor{red}{\texttimes} \\
+        \midrule
+        Numerical & Regression & \textcolor{green!60!black}{\checkmark} & \textcolor{red}{\texttimes} \\
+        Categorical & Regression & \textcolor{green!60!black}{\checkmark} & \textcolor{red}{\texttimes} \\
+        Numerical + Categorical & Regression & \textcolor{green!60!black}{\checkmark} & \textcolor{red}{\texttimes} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of applicability: Random Forest (RF) vs Support Vector Machine (SVM).}
+    \label{tab:rf-svm-comparison}
+\end{table}
+
+\vspace{-2em}
+
+\subsubsection{Alternative Formulation and the Kernel Trick}
+
+The prediction function can be written in two equivalent forms:
+$$f(\bm{x}) = \beta_0 + \beta^\top \bm{x} = \beta_0 + \sum_{j=1}^{p} \beta_j x_j \qquad \text{or} \qquad f(\bm{x}) = \beta_0 + \sum_{i=1}^{n} \alpha^{(i)} \langle \bm{x}, \bm{x}^{(i)} \rangle$$
+where $\langle \bm{x}, \bm{x}' \rangle = \bm{x}^\top \bm{x}'$ is the inner product. The $\alpha^{(i)}$ are determined by the optimization; $\alpha^{(i)} = 0$ for every $\bm{x}^{(i)}$ that is \emph{not} a support vector. Each $\alpha^{(i)}$ indicates the contribution of $\bm{x}^{(i)}$ when classifying $\bm{x}$.
+The second form generalizes to a \textbf{kernel function} $k : \mathbb{R}^p \times \mathbb{R}^p \to \mathbb{R}$:
+$$f(\bm{x}) = \beta_0 + \sum_{i=1}^{n} \alpha^{(i)} k(\bm{x}, \bm{x}^{(i)})$$
 
 \begin{definitionblock}[Kernel]
-    We can formuate alternatilvely the $f'_{predict}$ in this way:
-    \begin{center}
-        $f'_{predict}(x) = \beta_0 + \sum_{i=1}^{n}\alpha^{(i)}K(x, x^{(i)})$
-    \end{center}
-    where $K(x, x^{(i)})$ is the kernel function, that is a function that computes the similarity between two points.
-
-    The idea behind this function is to:
-    \begin{itemize}
-        \item transform the data in a higher-dimensional space ($X = R^p \to X = R^q$) and then 
-        \item compute the inner product in the destination space, i.e., $k(x,x^{(i)}) = \phi(x^T)\phi(x^{(i)})$
-    \end{itemize}
-    hoping that an hyperplane in the destination space is a non-linear hyperplane in the original space.
+    The idea behind the kernel is to:
+    \begin{enumerate}
+        \item Transform the original space \small{$X = \mathbb{R}^p$} into another space $X' = \mathbb{R}^q$ (possibly $q \gg p$) via $\phi : X \to X'$, and
+        \item Compute the inner product in the destination space: $k(\bm{x}, \bm{x}') = \phi(\bm{x})^\top \phi(\bm{x}')$
+    \end{enumerate}
+    hoping that a hyperplane in $X'$ separates the points better than in $X$. This is the \textbf{kernel trick}. When using a kernel, the technique is called \textbf{Support Vector Machines (SVM)}.
 \end{definitionblock}
 
-When using a kernel function, the learing technique is called \texttt{Support Vector Machines}.
-
-\begin{exampleblock}[Common Kernel Functions]
+Some common kernels are:
     \begin{itemize}
-        \item \textbf{Linear Kernel:} $K(x, x^{(i)}) = x^T x^{(i)}$, the most efficient and computationally cheapest
-        \item \textbf{Polynomial Kernel:} $K(x, x^{(i)}) = (x^T x^{(i)} + 1)^d$, where d is the degree of the polynomial
-        \item \textbf{Radial Basis Function (RBF) Kernel:} $K(x, x^{(i)}) = exp(-\gamma ||x - x^{(i)}||^2)$, where $\gamma$ is a flexibility parameter, this is the most widely used 
+        \item \textbf{Linear kernel:} $k(\bm{x}, \bm{x}') = \bm{x}^\top \bm{x}'$. The most efficient (computationally cheapest); equivalent to the Soft Margin Classifier.
+        \item \textbf{Polynomial kernel:} $k(\bm{x}, \bm{x}') = (1 + \bm{x}^\top \bm{x}')^d$. The degree $d$ is a parameter.
+        \item \textbf{Gaussian (RBF) kernel:} $k(\bm{x}, \bm{x}') = \exp(-\gamma \|\bm{x} - \bm{x}'\|^2)$. The most widely used; $\gamma$ is a flexibility parameter. Also called radial basis function (RBF) or radial kernel.
     \end{itemize}
-\end{exampleblock}
 
-\textbf{Intuition of RBF:} it maps an x to the space where coordinates are the distances to relevant observations of the learning data. In practice, the decision boundary can smoothly follor any path (with risk of overfitting).
-
-How can improve the SVM applicability to other types of data?
+\textbf{Intuition of the Gaussian kernel:} It maps $\bm{x}$ to a space where coordinates are (implicitly) the distances to relevant observations of the learning data. The decision boundary can smoothly follow any path, with some risk of overfitting. The larger $\gamma$, the faster $e^{-\gamma \|\bm{x} - \bm{x}'\|^2}$ goes to 0 with distance; high $\gamma$ yields a more complex boundary.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig31.png}
-    \caption{Applicability?}
+    \begin{minipage}{0.55\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/gk.png}
+    \end{minipage}
+    \begin{minipage}{0.3\textwidth}
+        \centering
+        \caption{Gaussian kernel: the decision boundary is a smooth curve that can follow any path, with some risk of overfitting.}
+    \end{minipage}
 \end{figure}
 
-\begin{definitionblock}[Encoding]
-    The idea is to encode the data in a way that the SVM can learn a model from it. This is done by:
-    \begin{itemize}
-        \item \textbf{One-Hot Encoding:} for categorical variables, each category is transformed in a binary variable, increasing the number of predictors
-        \item \textbf{Ordinal Encoding:} for ordinal variables, each category is transformed in a numerical variable
-    \end{itemize}
-\end{definitionblock}
+\begin{observationblock}[SVM Summary]
+    \textbf{Efficiency:} very fast. \textbf{Effectiveness:} in general good with the Gaussian kernel; complex interactions between $C$ and $\gamma$ require careful parameter tuning. \textbf{Applicability:} $Y$ binary only; $X$ numerical only; models give a confidence (not a probability); two parameters ($C$ and $\gamma$). \textbf{Interpretability:} few numbers, hardly interpretable; knowing the support vectors helps as a basic form of local explainability.
+\end{observationblock}
 
-\textbf{One-vs-One}
+\subsection{Applicability and Extensions}
 
-Technique to extend the SVM to multiclass classification. The idea is to learn a binary classifier for each pair of classes, and then to use a voting system to classify the new data. $\to M^{\frac{k(k-1)}{2}}$ 
+SVMs are designed for $Y \in \{\text{Pos}, \text{Neg}\}$ and $X \in \mathbb{R}^p$. we can extend to handle other settings.
 
-\textbf{One-vs-All}
+\subsubsection{Handling Categorical Variables}
 
-Technique to extend the SVM to multiclass classification. The idea is to learn a binary classifier for each class, and then to use a voting system to classify the new data. $\to M^k$
+SVMs cannot interpret categorical levels directly. We must perform \textbf{encoding}:
+\begin{itemize}
+    \item \textbf{One-hot encoding:} Replace a categorical variable $x_j \in \{x_{j,1}, \ldots, x_{j,k}\}$ with $k$ binary variables $x_{h_1}, \ldots, x_{h_k} \in \{0, 1\}$ such that $x_{h_\ell}^{(i)} = \mathbf{1}(x_j^{(i)} = x_{j,\ell})$. Each resulting binary variable is a \textbf{dummy variable}. This increases the number of predictors.
+    \item \textbf{Ordinal encoding:} Assign integers to levels; only valid when there is an intrinsic order (e.g., Low, Medium, High).
+\end{itemize}
+
+\subsubsection{Handling Multiclass Problems ($|Y| > 2$)}
+
+Since SVMs are binary classifiers, we decompose the problem:
+\begin{itemize}
+    \item \textbf{One-vs-One (OvO):} Train a classifier for every pair of classes ($k(k-1)/2$ models). Classify by majority voting over the $\binom{k}{2}$ predictions.
+    \item \textbf{One-vs-All (OvA) / One-vs-Rest:} Train one classifier per class, distinguishing it from all others ($k$ models). Requires a base learner with confidence/probability output; assign the class whose classifier gives the highest confidence.
+\end{itemize}
 
 \begin{warningblock}[Missing Values]
+    SVMs cannot handle missing values (they cannot compute $\bm{x}^\top \bm{x}^{(i)}$). You must:
     \begin{itemize}
-        \item drop the relative observations
-        \item drop the relative predictors
-        \item impute the missing values
+        \item Drop observations (if few) or predictors (if mostly empty).
+        \item \textbf{Impute} the missing values (e.g., with mean, median, or KNN imputation) before training.
     \end{itemize}
 \end{warningblock}
 
 \section{Naive Bayes}
 
-This learning techniques utilizes the \textbf{Bayes' Theorem} to classify the data. It is a probabilistic approach, and it is based on the assumption that the predictors are independent. Here there are the concepts of \textbf{prior probability} and \textbf{posterior probability}.
+This family of learning techniques is based on \textbf{Bayes' Theorem}. It classifies data calculating the probability of a data point belonging to a specific class given its features.
 
-$$Pr(A|B) = \frac{Pr(A)Pr(B|A)}{Pr(B)}$$
+\begin{definitionblock}[Bayes' Theorem]
+
+Recall the fundamental theorem of probability theory:
+$$
+\Pr(A \mid B) = \frac{\Pr(B \mid A) \cdot \Pr(A)}{\Pr(B)}
+$$
+\end{definitionblock}
+
+In the context of supervised learning, we want to find the most probable class $y$ given an observation vector $x = (x_1, \dots, x_p)$. Let $A = y$ (the class) and $B = x$ (the evidence). The equation becomes:
+
+$$
+\Pr(y \mid x_1, \dots, x_p) = \frac{\Pr(x_1, \dots, x_p \mid y) \cdot \Pr(y)}{\Pr(x_1, \dots, x_p)}
+$$
 
 where:
 \begin{itemize}
-    \item $\Pr(A|B)$ is the posterior probability
-    \item $\Pr(A)$ is the prior probability
-    \item $\Pr(B|A)$ is the likelihood
-    \item $\Pr(B)$ is the evidence
+    \item $\Pr(y \mid x)$: \textbf{Posterior probability}. The probability of class $y$ given the observed features. This is what we want to calculate.
+    \item $\Pr(y)$: \textbf{Prior probability}. The probability of class $y$ being seen in general (frequency in dataset).
+    \item $\Pr(x \mid y)$: \textbf{Likelihood}. The probability of observing features $x$ given that the class is $y$.
+    \item $\Pr(x)$: \textbf{Evidence}. The probability of observing features $x$. Since this is constant for all classes $y$, it serves only as a normalization factor and can often be ignored during comparison.
 \end{itemize}
 
-Assumptions:
-\begin{itemize}
-    \item X = $X_1 \times \dots \times X_p$
-    \item Y = \{$y_1, \dots, y_k$\}
-\end{itemize}
+\subsection{The ``Naive'' Assumption}
 
-\begin{definitionblock}[Naive Bayes]
+Estimating the full likelihood $\Pr(x_1, \dots, x_p \mid y)$ is computationally expensive and requires a massive amount of data because it involves the joint probability of all features appearing together.
+
+To make this feasible, Naive Bayes makes a strong (and ``naive'') assumption: \textbf{all independent variables (features) are independent of each other}, given the class label.
+Mathematically, this simplifies the likelihood into a product of individual probabilities:
+
+$$
+\Pr(x_1, \dots, x_p \mid y) \approx \prod_{j=1}^{p} \Pr(x_j \mid y)
+$$
+
+The classification rule becomes:
+
+$$
+\hat{y} = \argmax{y \in Y} \left( \Pr(y) \cdot \prod_{j=1}^{p} \Pr(x_j \mid y) \right)
+$$
+
+\begin{definitionblock}[Naive Bayes Learning Technique]
     \begin{itemize}
-        \item \textbf{Learning:} the model is a set of conditional probabilities, one for each predictor and each category
-        \item \textbf{Predict:} for each category, compute the product of the conditional probabilities and the prior probability, then choose the category with the highest value
+        \item \textbf{Learning Phase ($f'_{\text{learn}}$)}: The model computes and stores the \textbf{prior probabilities} $\Pr(y)$ for each class and the \textbf{conditional probabilities} $\Pr(x_j \mid y)$ for every feature value given every class.
+        \item \textbf{Prediction Phase ($f'_{\text{predict}}$)}: For a new observation $x$, computes the product of the priors and conditional probabilities for each class, then selects the class with the highest score.
     \end{itemize}
 \end{definitionblock}
 
-Hence, $p(y_m | x_{1,l_1},\dots,x_{p,l_p}) = p(y_m)\frac{p(x_{1,l_1},\dots,x_{p,l_p} | y_m)}{p(x_{1,l_1},\dots,x_{p,l_p})}$
-
-In the \textbf{Naive} approach, where the predictors are independent, it becomes:
-
-$p(y_m | x_{1,l_1},\dots,x_{p,l_p}) = \frac{p(y_m)}{p(x_{1,l_1},\dots,x_{p,l_p})}p(x{1,l_1} | y_m) \dots p(x_{p,l_p} | y_m)$
-
-that can be found in the dataset.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{assets/fig32.png}
-    \caption{Naive Bayes}
-\end{figure}
-
-The model p is some data structure holding $k + \sum_{j=1}^{p}kh_j$ numbers.
-
-\section{k-Nearest Neighbors (KNN)}
-
-This learning technique is based on the idea that similar data points are close to each other in the space. The model is the dataset itself, and the learning technique is just a function that computes the distance between the new data and the dataset.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig33.png}
-\end{figure}
-
-$f'_{learn}$ does nothing, $f'_{predict}$ computes the distance between the new data and the dataset, then selects the k-nearest neighbors and returns the majority class. k and d are parameters!
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig34.png}
-\end{figure}
-
-For regression, return $\frac{1}{k}\sum_{i \in I}y^{(i)}$
-
-With the proper distance function, the KNN can be used for any type of data.
-
-\begin{exampleblock}[Common distance functions]
-    \begin{itemize}
-        \item \textbf{Euclidean Distance:} $d(x, x^{(i)}) = \sqrt{\sum_{j=1}^{p}(x_j - x^{(i)}_j)^2}$
-        \item \textbf{Manhattan Distance:} $d(x, x^{(i)}) = \sum_{j=1}^{p}|x_j - x^{(i)}_j|$
-        \item \textbf{Minkowski Distance:} $d(x, x^{(i)}) = (\sum_{j=1}^{p}|x_j - x^{(i)}_j|^q)^{\frac{1}{q}}$
-    \end{itemize}
-\end{exampleblock}
-
-k is a flexibility parameter, and it is usually set by the user. It is a trade-off between bias and variance:   
+\subsubsection{Model Complexity}
+The model is simply a data structure holding the probability tables.
 \begin{itemize}
-    \item $k = 1$ \to high variance, low bias
-    \item $k = n$ \to high bias, low variance
+    \item $k$ values for priors $\Pr(y)$.
+    \item $\sum_{j=1}^{p} k \cdot h_j$ values for conditional probabilities (where $h_j$ is the \# of possible values of feature $j$).
+\end{itemize}
+This makes Naive Bayes extremely \textbf{space-efficient} and \textbf{fast} for both training and prediction.
+
+\begin{warningblock}[The Zero-Frequency Problem]
+    If a specific feature value $x_j$ never appears with class $y$ in the training set, $\Pr(x_j \mid y) = 0$. Because of the product, the entire probability becomes 0, erasing all other information.
+    To fix this, we often use \textbf{Laplace smoothing} (adding a small count, usually +1, to every frequency).
+\end{warningblock}
+
+\section{k-Nearest Neighbors (kNN)}
+
+k-Nearest Neighbors (kNN) is a completely different approach based on the intuition that similar data points exist in close proximity in the feature space. It is an example of \textbf{Instance-based Learning} (or Lazy Learning).
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/fig33.png}
+        \caption{\small{\textbf{Learning}: $f'_{\text{learn}}$ stores the entire training dataset.}}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/fig34.png}
+        \caption{\small{\textbf{Prediction}: $f'_{\text{predict}}$ uses stored data, $k$ and $d$.}}
+    \end{subfigure}
+    \caption{\small{kNN stores the entire training dataset during learning and uses it directly for prediction.}}
+\end{figure}
+
+\vspace{-1em}
+
+\subsubsection{The Algorithm}
+
+Unlike other methods, kNN does not ``learn'' a compressed model (like coefficients or trees).
+\begin{itemize}
+    \item \textbf{Learning ($f'_{\text{learn}}$)}: Simply stores the whole dataset $D_{\text{learn}}$. Effectively, the \textit{model} is the data itself.
+    \item \textbf{Prediction ($f'_{\text{predict}}$)}:
+    \begin{enumerate}
+        \item Computes the distance $d(x, x^{(i)})$ between the new point $x$ and every point $x^{(i)}$ in the database.
+        \item Selects the set $I$ of the $k$ points with the smallest distance.
+        \item \textbf{Classification}: Returns the majority class among the neighbors (voting).
+        \item \textbf{Regression}: Returns the average value of the neighbors: $\hat{y} = \frac{1}{k}\sum_{i \in I}y^{(i)}$.
+    \end{enumerate}
+\end{itemize}
+
+\subsubsection{Distance Metrics}
+
+The performance of kNN relies heavily on how ``similarity'' is defined. We need a distance metric $d: X \times X \to \mathbb{R}^+$.
+For $X = \mathbb{R}^p$, some common distance functions are:
+    
+\begin{itemize}
+    \item \textbf{Euclidean Distance} ($L_2$ norm): The straight-line distance.
+    \small{
+        $$ d(x, x') = \sqrt{\sum_{j=1}^{p}(x_j - x'_j)^2} $$
+    }
+    \item \textbf{Manhattan Distance} ($L_1$ norm): Sum of absolute differences (taxicab geometry).
+    \small{
+        $$ d(x, x') = \sum_{j=1}^{p}|x_j - x'_j| $$
+    }
+    \item \textbf{Minkowski Distance} (Generalization):
+    \small{
+        $$ d(x, x') = \left(\sum_{j=1}^{p}|x_j - x'_j|^q\right)^{\frac{1}{q}} $$
+    }
+\end{itemize}
+
+For text or categorical data, metrics like \textbf{Hamming distance} or \textbf{Jaccard similarity} are used.
+
+\begin{tipsblock}[Importance of Scaling]
+    Since kNN calculates distances based on feature magnitudes, features with large ranges (e.g., Salary) will dominate features with small ranges (e.g., Age). \textbf{Standardization} (z-score) or Normalization of inputs is mandatory for kNN to work correctly.
+\end{tipsblock}
+
+\subsubsection{The Hyperparameter $k$}
+
+The number of neighbors $k$ is a \textbf{flexibility parameter} that controls the Bias-Variance trade-off.
+
+\begin{itemize}
+    \item \textbf{Small $k$} (e.g., $k=1$): The model is extremely flexible. The decision boundary is jagged and adapts to every single training point.
+    \begin{itemize}
+        \item \textbf{Low Bias}: It fits the training data perfectly.
+        \item \textbf{High Variance}: It is very sensitive to noise (a single mislabeled neighbor flips the prediction).
+    \end{itemize}
+
+    \item \textbf{Large $k$} (e.g., $k=n$): The model is very rigid. The decision boundary smooths out.
+    \begin{itemize}
+        \item \textbf{High Bias}: It ignores local structure (at $k=n$, it just predicts the majority class of the dataset).
+        \item \textbf{Low Variance}: It is robust to noise in individual points.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Properties of kNN}
+
+\begin{itemize}
+    \item \textbf{Efficiency}: kNN struggles with large datasets in prediction. Each prediction requires computing distances to all $n$ training points ($O(n \cdot p)$ complexity, where $p$ is the number of features). There is no actual learning phase, the algorithm only stores the data.
+    
+    \item \textbf{Explainability/Interpretability}: The neighborhood itself is a local explanation of the decision. You can inspect the $k$ nearest neighbors to understand why a prediction was made.
+    
+    \item \textbf{Effectiveness}: Not particularly good in practice. Performance depends on $k$: too small overfits, too large underfits.
+    
+    \item \textbf{Applicability}: Works for both regression and classification ($Y$). Handles any input space ($X$) if you have a proper distance metric $d$ (though mixed numerical/categorical cases are tricky). Naturally gives probability estimates. Has two parameters ($d$ and $k$), with $k$ impacting bias-variance trade-off.
 \end{itemize}
 
 

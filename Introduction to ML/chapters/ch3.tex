@@ -1,134 +1,228 @@
 \chapter{Unsupervised Learning}
 
+\section{Introduction}
+
+In supervised learning, we are given examples $(x, y)$ and the goal is to learn a mapping to predict $y$ from $x$. In \textbf{unsupervised learning}, there are no labels $y$. We only observe the data $X$ and we want to find interesting structures within it.
+
 \begin{definitionblock}[Unsupervised Learning]
-Unsupervised Learning is a type of machine learning that looks for previously undetected patterns in a data set with no pre-existing labels and with a minimum of human supervision.
+\bfit{Unsupervised Learning} is a type of machine learning that looks for previously undetected patterns in a dataset with no pre-existing labels and with a minimum of human supervision.
 \end{definitionblock}
+
+Since we do not have a ``ground truth'' to compare against, the goal is often to \textbf{discover} knowledge rather than to learn a specific predictor.
+\begin{itemize}
+    \item The input is a dataset $D \in \mathcal{P}^*(X)$.
+    \item The output is a \textbf{pattern} or structure describing the data.
+\end{itemize}
 
 \section{Clustering}
 
-We assume that the system that generated the data followed some scheme (\textbf{pattern}), we do not know it and we want to discover it from a dataset.
-
-\begin{itemize}
-    \item the example is the dataset $P^{*}(X)$
-    \item what we learn from the dataset is not, in general, usable in another dataset $\to$ \textbf{find} patterns is fairer than \textbf{learn} patterns
-\end{itemize}
-
-We first look for a \textbf{grouped} data, but we do not know the groups. This is the \textbf{clustering} problem.
+The most common form of unsupervised learning is \textbf{clustering}. We assume that the system generated the data following some grouping scheme, but we do not know the groups.
 
 \begin{definitionblock}[Clustering]
-Clustering is the task of grouping a set of objects in such a way that objects in the same group (called a cluster) are more similar to each other than to those in other groups.
+\bfit{Clustering} is the task of grouping a set of objects in such a way that objects in the same group (called a \bfit{cluster}) are more similar to each other than to those in other groups.
 \end{definitionblock}
 
-Given a dataset $D \in P^*(X)$, find a partitioning $\{D_1,\dots,D_k\}$ such that each $D_i$ is a cluster.
-
+Formally, given a dataset $D \in \mathcal{P}^*(X)$, we want to find a partitioning $\mathcal{C} = \{D_1, \dots, D_k\}$ such that:
 \begin{itemize}
-    \item close toghether?
-    \item how close?
-    \item where does k come from?
+    \item $\bigcup_{i=1}^k D_i = D$ (the union covers all data);
+    \item $D_i \cap D_j = \emptyset$ for $i \neq j$ (clusters do not overlap);
+    \item Elements within $D_i$ are ``close'' to each other;
+    \item Elements in different clusters $D_i$, $D_j$ are ``far'' from each other.
 \end{itemize}
 
-This is an optimization problem, where for any k,d, there exists at least one optimal solution. In principle one can try all the partitions and measure the distance, but in practice k is unknown and trying all the partitions is unfeasible.
-
-\begin{center}
-    $\operatorname*{argmax}_{D_1,\dots,D_k}(\sum \sum d(x,x'))-(\sum\sum d(x,x'))$
-
-    subject to $\bigcup D_i = D$ and $D_i \cap D_j = \emptyset$
-\end{center}
-
-\begin{itemize}
-    \item \textbf{maximize} the distance between any two $x,x'$ when they belong to different clusters
-    \item minimize the distance between any two $x,x'$ when they belong to the same cluster
-    \item clusters ave to form a partition
-\end{itemize}
-
-Can't be also optimized k? No, it is pointless.
-\begin{itemize}
-    \item $k = 1 \to $no clustering
-    \item $k = n \to $each point is a cluster
-\end{itemize}
+\vspace{-0.5em}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig35.png}
-    \caption{Clustering}
+    \includegraphics[width=0.45\textwidth]{assets/fig35.png}
+    \vspace{-0.5em}
+    \caption{Visual representation of clustering.}
 \end{figure}
 
-How to access clustering in practice?
+\subsubsection{Clustering as Optimization}
+
+Clustering can be viewed as an optimization problem where we try to maximize distinction between groups. We want to maximize \textbf{inter-cluster distance} (separation) and minimize \textbf{intra-cluster distance} (compactness). Let $d: X \times X \to \mathbb{R}^+$ be a distance metric. The objective function is:
+\small{
+$$
+\argmax{D_1, \dots, D_k} \left( \left( \sum_{i \neq j} \sum_{x \in D_i, x' \in D_j} d(x, x') \right) - \left( \sum_{i} \sum_{x, x' \in D_i} d(x, x') \right) \right)
+$$
+}
+
+\vspace{-0.4em}
+subject to $\bigcup_{i=1}^k D_i = D$ and $D_i \cap D_j = \emptyset$ for $i \neq j$.
+
+However, finding the global optimum is often computationally unfeasible. Furthermore, the number of clusters $k$ cannot simply be optimized without constraints, because trivial solutions exist:
 \begin{itemize}
-    \item inspect D manually
-    \item insert the clustering inside the larger information processyng system and measure some other indexes
-    \item measure some performance indexes 
+    \item If $k=1$, compactness is minimized (bad), but separation is undefined.
+    \item If $k=n$ (every point is a cluster), compactness is perfect (0), but separation is uninformative.
+\end{itemize}
+Therefore, $k$ is usually a hyperparameter or determined by heuristics.
+
+\subsubsection{Assessing Clustering}
+
+Since we often lack labels, assessment is difficult.
+\begin{enumerate}[leftmargin=*, noitemsep]
+    \item \textbf{Manual Inspection}: Visualize the data (e.g., using PCA) and verify if groups make sense.
+    \item \textbf{Extrinsic Evaluation}: Use clusters in a downstream task and check if performance improves.
+    \item \textbf{Intrinsic Evaluation}: Measure mathematical properties of clusters (compactness, separation).
+\end{enumerate}
+
+\subsubsection{The Silhouette Index}
+
+The \textbf{Silhouette Index} measures how similar an object is to its own cluster compared to others.
+
+\begin{definitionblock}[Silhouette Score]
+    For a single data point $x \in D_i$ (where $D_i$ is the cluster $x$ belongs to):
+
+    \medskip
+\begin{minipage}{0.56\textwidth}
+\begin{enumerate}[leftmargin=*, noitemsep]
+    \item \textbf{mean intra-cluster distance} $a(x)$:
+    
+    average distance between $x$ and all other points in $D_i$.
+    $$ a(x) = \frac{1}{|D_i| - 1} \sum_{x' \in D_i, x' \neq x} d(x, x') $$
+    \item \textbf{mean nearest-cluster distance} $b(x)$: 
+    
+    average distance between $x$ and all points in the nearest neighboring cluster.
+    $$ b(x) = \min_{j \neq i} \frac{1}{|D_j|} \sum_{x' \in D_j} d(x, x') $$
+    \item The \textbf{silhouette} $s(x)$ is:
+    $$ s(x) = \frac{b(x) - a(x)}{\max\{a(x), b(x)\}} $$
+\end{enumerate}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/silhouette.png}
+    % \vspace{-0.5em}
+    % \captionof{figure}{Silhouette index interpretation.}
+\end{minipage}
+
+\medskip
+
+The global Silhouette Score is the mean of $s(x)$ over all observations: $S = \frac{1}{n}\sum_{x} s(x)$.
+
+\end{definitionblock}
+
+
+Interpretation of $s(x) \in [-1, 1]$:
+\begin{itemize}
+    \item \textbf{Close to 1}:
+    The point is well-clustered (far from neighbors, close to its own group).
+    \item \textbf{Close to 0}: 
+    The point is on the boundary between two clusters.
+    \item \textbf{Close to $-1$}:
+    The point is likely assigned to the wrong cluster.
 \end{itemize}
 
-\begin{exampleblock}[Performance Index: Silhouette Index]
-It considers, form each observation, the average distance to the observations in the same cluster and the min distance to the observations in other clusters.
-\begin{itemize}
-    \item $a(i) = \frac{1}{|D_i|} \sum_{x \in D_i} d(x,D_i)$
-    \item $b(i) = \min_{j \neq i} \frac{1}{|D_j|} \sum_{x \in D_j} d(x,D_i)$
-    \item $s(i) = \frac{b(i)-a(i)}{\max(a(i),b(i))}$
-    \item $S = \frac{1}{n} \sum s(i)$
-\end{itemize}
-The index is between -1 and 1, where 1 is the best clustering. The larger the index, the better the clustering.
-\end{exampleblock}
+\section{Hierarchical Clustering}
 
-\newpage
-\subsection{Hierarchical Clustering}
+Hierarchical clustering builds a clusters' hierarchy, often represented as a tree (or \textbf{dendrogram}). It doesn't require specifying $k$ in advance; cutting the tree at different depths yields different partitions.
 
-\begin{definitionblock}[Hierarchical Clustering]
-It is an iterative method in which:
+\begin{definitionblock}[Hierarchical Clustering Approaches]
 \begin{itemize}
-    \item at each j-th iteration, there exist a partition $D_1,\dots,D_{k_j}$
-    \item at most two clusters differ between partitions at subsequent iterations
-    \item you do not set k 
-\end{itemize}
-It is of two types:
-\begin{itemize}
-    \item \textbf{Agglomerative}: start with each point as a cluster and merge the closest clusters
-    \item \textbf{Divisive}: start with all the points in a cluster and split the farthest points
+    \item \textbf{Agglomerative (Bottom-Up)}: Start with $n$ clusters (each point is a cluster). At each step, merge the two closest clusters until only one remains.
+    \item \textbf{Divisive (Top-Down)}: Start with 1 cluster (containing all points). At each step, split a cluster until $n$ clusters remain.
 \end{itemize}
 \end{definitionblock}
 
-Cluster distance can be computed in different ways:
+\subsection{Agglomerative Clustering Algorithm}
+
+\begin{algorithm}[H]
+    \caption{Agglomerative Hierarchical Clustering}
+    \begin{algorithmic}[1]
+        \State \textbf{Input:} Dataset $X = \{x^{(1)}, x^{(2)}, \dots, x^{(n)}\}$, distance metric $d(\cdot, \cdot)$, linkage criterion
+        \State \textbf{Output:} Dendrogram (hierarchy of clusters)
+        \State \textbf{Initialize:} Assign each observation to its own cluster: $\mathcal{C} = \{\{x^{(1)}\}, \{x^{(2)}\}, \dots, \{x^{(n)}\}\}$
+        \State \textbf{Compute distance matrix:} Calculate pairwise distances $D_{ij} = d(C_i, C_j)$ for all cluster pairs
+        \While{$|\mathcal{C}| > 1$}
+            \State Find the pair of clusters $(C_i, C_j)$ with minimum distance:  $(i^*, j^*) = \arg \min_{i < j} D_{ij}$
+            \State \textbf{Merge:} Create new cluster $C_{i^*} \cup C_{j^*}$
+            \State \textbf{Update:} Remove $C_{i^*}$ and $C_{j^*}$ from $\mathcal{C}$, add $C_{\text{new}}$
+            \State \textbf{Update distance matrix:} Compute distances from $C_{\text{new}}$ to all remaining clusters
+
+            \State \textbf{Record merge:} Store the merge in the dendrogram structure
+        \EndWhile
+
+        \State \Return the dendrogram representing the complete hierarchy
+    \end{algorithmic}
+\end{algorithm}
+
+\textbf{Complexity:} $O(n^3)$ for naive implementation; $O(n^2 \log n)$ with efficient data structures.
+
+\subsubsection{Linkage Methods (Cluster Distance)}
+
+The distance between two clusters $D_i$ and $D_j$ is defined by the \textbf{linkage criterion}, which strongly affects the shape of the resulting clusters.
+
 \begin{itemize}
-    \item \textbf{Single Linkage}: the distance between two clusters is the distance between the closest points in the two clusters
-    \item \textbf{Complete Linkage}: the distance between two clusters is the distance between the farthest points in the two clusters
-    \item \textbf{Average Linkage}: the distance between two clusters is the average distance between all the points in the two clusters
-    \item \textbf{Centroid Linkage}: the distance between two clusters is the distance between the centroids of the two clusters
+    \item \textbf{Single Linkage}: Distance between the \textbf{closest} pair of points.
+    $$ d(D_i, D_j) = \min_{x \in D_i, x' \in D_j} d(x, x') $$
+    \textit{Effect:} Can produce long, ``chain-like'' clusters.
+
+    \item \textbf{Complete Linkage}: Distance between the \textbf{farthest} pair of points.
+    $$ d(D_i, D_j) = \max_{x \in D_i, x' \in D_j} d(x, x') $$
+    \textit{Effect:} Tends to produce compact, spherical clusters.
+
+    \item \textbf{Average Linkage}: Average distance between all pairs.
+    $$ d(D_i, D_j) = \frac{1}{|D_i| \cdot |D_j|} \sum_{x \in D_i} \sum_{x' \in D_j} d(x, x') $$
+
+    \item \textbf{Centroid Linkage}: Distance between the centroids (means) of the clusters.
+    $$ d(D_i, D_j) = d(\mu_i, \mu_j) $$
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{assets/fig36.png}
-    \caption{Hierarchical Clustering in R}
+    \begin{subfigure}[b]{0.38\textwidth}
+        \centering
+        \includegraphics[width=0.87\textwidth]{assets/fig36.png}
+        \caption{\footnotesize{Dendrogram of hierarchical clustering.}}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.6\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/fig37.png}
+        \caption{\footnotesize{Different linkage criteria.}}
+    \end{subfigure}
+    \vspace{-0.5em}
+    \caption{Linkage methods and dendrogram representation.}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig37.png}
-    \caption{Distances in Hierarchical Clustering}
-\end{figure}
+\vspace{-2em}
 
-\vspace{-1.5em}
+\section{k-Means Clustering}
 
-\subsection{k-means}
+k-Means is a \textbf{partitional} clustering algorithm. Unlike hierarchical methods, it requires the number of clusters $k$ to be specified in advance. It attempts to separate samples in $k$ groups of equal variance, minimizing a criterion known as \textbf{inertia} or within-cluster sum-of-squares (WCSS).
 
-\begin{definitionblock}[k-means]
-K-means clustering is a simple and elegant approach for partitioning a data set into K distinct, non-overlapping clusters. To perform K-means clustering, we must first specify the desired number of clusters K; then the K-means algorithm will assign each observation to exactly one of the K clusters.
-It is an iterative method in which:
-\begin{itemize}
-    \item you set k
-    \item you set the initial centroids
-    \item you assign each point to the closest centroid
-    \item you update the centroids
-    \item you repeat until convergence
-\end{itemize}
-A \textbf{centroid} is the average of all the points in a cluster.
+\begin{definitionblock}[k-Means Algorithm]
+Given a set of observations $(x^{(1)}, x^{(2)}, \dots, x^{(n)})$, partition the $n$ observations into $k$ sets $S = \{S_1, S_2, \dots, S_k\}$ so as to minimize the within-cluster sum of squares. The algorithm is as follows:
+
+\begin{enumerate}[leftmargin=*, noitemsep]
+    \item \textbf{Initialization}: Choose $k$ initial centroids $\{\mu_1, \dots, \mu_k\}$ (randomly or using strategies as k-means++).
+    \item \textbf{Assignment}: Assign each observation to the cluster with the nearest mean.
+    \small{
+    $$ S_i^{(t)} = \{x^{(j)} : \|x^{(j)} - \mu_i^{(t)}\|^2 \le \|x^{(j)} - \mu_{l}^{(t)}\|^2 \;\forall l\} $$
+    }
+    \item \textbf{Update}: Recalculate centroids as the mean of observations assigned to the cluster.
+    \small{
+    $$ \mu_i^{(t+1)} = \frac{1}{|S_i^{(t)}|} \sum_{x^{(j)} \in S_i^{(t)}} x^{(j)} $$
+    }
+    \item \textbf{Repeat} steps 2 and 3 until convergence (centroids do not change).
+\end{enumerate}
 \end{definitionblock}
 
-This technique is not deterministic, due to the random initialization of the centroids. It is also sensitive to the initial centroids, so it is better to run it multiple times and choose the best result.
+\begin{itemize}
+    \item \textbf{Pros:} Efficient ($O(t \cdot k \cdot n)$ per iteration), simple to implement.
+    \item \textbf{Cons:} Requires to set $k$; sensitive to initialization (local minima) and outliers; assumes spherical clusters.
+\end{itemize}
+
+\begin{tipsblock}[Sensitivity to Initialization]
+k-Means is not deterministic, due to the random initialization of the centroids. It is sensitive to the initial centroids, so it is better to run it multiple times and choose the result with the lowest inertia.
+\end{tipsblock}
+    
+\vspace{-1em}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig38.png}
-    \caption{k-means}
+    \includegraphics[width=0.48\textwidth]{assets/fig38.png}
+    \vspace{-0.5em}
+    \caption{k-Means iterations.}
 \end{figure}
+% \end{minipage}
