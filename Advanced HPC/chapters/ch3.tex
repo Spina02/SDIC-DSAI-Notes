@@ -175,7 +175,7 @@ double a = 0.0;
     // pi, a : shared
     #pragma omp single private (a)
     {
-        int 1 = 1;
+        int i = 1;
         // a : private but not initialized
         // i : private because it's a local variable
         #pragma omp task
@@ -227,6 +227,63 @@ We have already seen that constructs such as \texttt{taskwait}, \texttt{taskgrou
     
     \item \texttt{taskgroup}: This construct provides more sophisticated synchronization by waiting for all \textit{descendant} tasks (children, grandchildren, etc.) created within the taskgroup region to complete. This is useful for complex workflows with nested task generation.
 \end{itemize}
+
+\subsubsection{Task reductions}
+
+Reductions on a \texttt{parallel} or \texttt{for} construct combine private partial results when the worksharing region ends. Tasks complicate this picture: tasks may be deferred, picked up by any thread in the team, and they do not participate in the enclosing \texttt{reduction(...)} clause. A naive ``parallel reduction'' on a variable updated from inside tasks therefore loses the contribution of every task.
+
+A first attempt is to fall back to an \texttt{atomic update} on a shared accumulator:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double result = 0;
+#pragma omp parallel reduction(+:result)
+{
+    #pragma omp single nowait
+    while (more_work()) {
+        #pragma omp task firstprivate(first, last) shared(result) untied
+        {
+            double myresult = 0;
+            for (int ii = first; ii < last; ii++)
+                myresult += heavy_work(array[ii]);
+            #pragma omp atomic update
+            result += myresult;
+        }
+    }
+}
+\end{codeblock}
+
+This is correct, but every task contends on the same memory location at the end of its work, and the enclosing \texttt{reduction(+:result)} is misleading because the actual combination happens inside the tasks, not at the end of the parallel region.
+
+OpenMP 5.0 introduced a dedicated mechanism: a \texttt{taskgroup} can declare a \texttt{task\_reduction(op:var)}, and individual tasks join the reduction with the \texttt{in\_reduction(op:var)} clause. Each participating task receives a private copy of \texttt{var}; partial values are combined when the taskgroup ends.
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double result = 0;
+#pragma omp parallel
+{
+    #pragma omp single nowait
+    {
+        #pragma omp taskgroup task_reduction(+:result)
+        {
+            while (more_work()) {
+                #pragma omp task in_reduction(+:result) \
+                    firstprivate(first, last) untied
+                {
+                    double myresult = 0;
+                    for (int ii = first; ii < last; ii++)
+                        myresult += heavy_work(array[ii]);
+                    result += myresult;   // local private copy
+                }
+            }
+        } // results combined here
+    }
+}
+\end{codeblock}
+
+Inside the task, \texttt{result} refers to a thread-private copy associated with the reduction; no atomic update is needed. The OpenMP runtime can also combine partial results in a tree, so even with many participating tasks the final reduction does not serialize on a single cache line.
+
+\begin{tipsblock}[\plaintt{atomic update} vs \plaintt{task\_reduction}]
+Use \plaintt{task\_reduction}/\plaintt{in\_reduction} whenever many tasks contribute to the same accumulator: it removes contention on the shared variable and expresses the intent at the construct level. Reserve \plaintt{atomic update} for cases where only a few tasks update a shared counter, or where the accumulator is structurally not a reduction (e.g. a histogram bin chosen at runtime).
+\end{tipsblock}
 
 \subsection{Memory consistency model}
 
@@ -339,6 +396,88 @@ The consistency model specifies which orderings between reads (R), writes (W), a
 
 Recall that under sequential consistency, all memory operations appear to execute in some global order that respects each thread's program order, and all threads observe the same ordering. In this case, the program order, code order, and commit order are effectively equivalent. Relaxed consistency lifts some of these constraints: threads may observe memory updates in different orders, and only synchronization points enforce a consistent view across threads to ensure safe, predictable parallel execution.
 
+\subsection{NUMA, affinity and the first-touch policy}
+
+The relaxed consistency model tells us \textit{when} a memory update becomes visible; on a multi-socket machine we also have to worry about \textit{where} a memory page physically lives. Modern HPC nodes are \textbf{NUMA} (Non-Uniform Memory Access) systems: each socket has its own memory controller, and a thread accessing a page on a remote socket pays a latency and bandwidth penalty compared to a local access. Thread placement and data placement therefore become first-class performance concerns alongside synchronization.
+
+\subsubsection{The first-touch rule}
+
+Linux (and most modern operating systems) allocates virtual address space lazily: \texttt{malloc} only reserves the range, while a physical page is actually mapped on the first write. The kernel then places the page on the NUMA node of the thread that performed that first write. This is the \textbf{first-touch policy}, and it has a sharp consequence for OpenMP: the thread that initialises the data effectively decides which socket owns it for the rest of the program.
+
+\subsubsection{Touch by one --- the wrong default}
+
+The simplest pattern (initialise serially, then process in parallel) places \emph{all} of the data on the master thread's NUMA node:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double *array = malloc(N * sizeof(double));
+
+// Serial init: master thread first-touches every page
+for (int ii = 0; ii < N; ii++)
+    array[ii] = (double)ii;
+
+#pragma omp parallel for reduction(+:S)
+for (int ii = 0; ii < N; ii++)
+    S += array[ii];
+\end{codeblock}
+
+Every worker thread that does not live on the master's socket has to fetch the data over the inter-socket link. The reduction loop is now bandwidth-bound on a single memory controller, no matter how many cores participate.
+
+\subsubsection{Touch by all --- first-touch via parallel init}
+
+The fix is to initialise the array in a \texttt{parallel for} with the same schedule that will be used to process it. Each thread first-touches the slice it will later read:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double *array = malloc(N * sizeof(double));
+
+#pragma omp parallel for schedule(static)
+for (int ii = 0; ii < N; ii++)
+    array[ii] = (double)ii;
+
+#pragma omp parallel reduction(+:S)
+{
+    #pragma omp for schedule(static) reduction(+:S)
+    for (int ii = 0; ii < N; ii++)
+        S += array[ii];
+}
+\end{codeblock}
+
+The two loops use the same \texttt{schedule(static)} chunking, so iteration $ii$ is touched and later read by the same thread, on the same socket. The data is now spread across all NUMA nodes, and aggregate memory bandwidth scales with the number of sockets.
+
+\begin{warningblock}[Schedules must match]
+First-touch only pays off if the init schedule matches the use schedule. A \plaintt{schedule(dynamic)} use loop after a \plaintt{schedule(static)} init loop scrambles the mapping and reintroduces remote accesses.
+\end{warningblock}
+
+\subsubsection{threadprivate arrays --- explicit local allocation}
+
+For maximum locality, each thread can allocate its own array via \texttt{threadprivate}. The array variable itself is replicated per thread, and each thread calls \texttt{calloc} (or \texttt{malloc} + write) inside the parallel region:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double                 *array  = NULL;
+unsigned long long int  mywork = 0, first_iteration = 0;
+#pragma omp threadprivate(array, mywork, first_iteration)
+
+#pragma omp parallel
+{
+    int nthreads = omp_get_num_threads();
+    mywork = N / nthreads + 1;
+    array  = calloc(mywork, sizeof(double));   // first-touch is local
+
+    #pragma omp for schedule(static)
+    for (unsigned long long ii = 0; ii < N; ii++)
+        array[ii - first_iteration] = (double)ii;
+
+    #pragma omp for schedule(static) reduction(+:S)
+    for (unsigned long long ii = 0; ii < N; ii++)
+        S += array[ii - first_iteration];
+}
+\end{codeblock}
+
+Each thread now owns a contiguous, NUMA-local buffer. The trade-off is that \texttt{array} is no longer a single contiguous region visible from outside the parallel region: code that needs to operate on the whole array as one object (gather, MPI send, file I/O, \dots) has to reassemble the partitions or use a different layout.
+
+\begin{tipsblock}[Pinning threads with \plaintt{proc\_bind} and \plaintt{OMP\_PLACES}]
+First-touch only works if threads stay on the core that did the first write. Use \plaintt{OMP\_PROC\_BIND=true} (or a placement policy: \plaintt{close}, \plaintt{spread}, \plaintt{master}) and \plaintt{OMP\_PLACES=cores} (or \plaintt{sockets}, \plaintt{threads}) at runtime, and the \plaintt{proc\_bind(close|spread|master)} clause on a \plaintt{parallel} region for finer control. Without binding, the kernel scheduler is free to migrate a thread to another socket and the locality argument collapses.
+\end{tipsblock}
+
 \subsection{FLUSH operations}
 
 OpenMP \texttt{flush} operations are used to enforce the consistency between a thread's temporary view of the main memory and the main memory itself, or between multiple threads' temporary views.
@@ -438,7 +577,7 @@ Named critical regions ensure that only one thread at a time executes each named
 \subsubsection{Implicit flushes}
 
 OpenMP provides implicit flushes at specific synchronization points, eliminating the need for explicit \texttt{flush} directives in most cases:
-but allow recursive acquisition by the owning thread
+
 \begin{codeblock}[language = C]
 #pragma omp barrier     // Implicit flush of all variables
 #pragma omp critical    // Flush on entry and exit
@@ -517,31 +656,6 @@ omp\_test\_lock(omp\_lock\_t *) & \textbf{Non-blocking} attempt to acquire the l
 
 Nested lock variants (\texttt{omp\_init\_nest\_lock}, \texttt{omp\_set\_nest\_lock}, etc.) follow the same pattern.
 
-Consider a scenario where multiple threads insert elements into a linked list. A global lock serializes all insertions, eliminating parallelism:
-
-\begin{codeblock}[language=C]
-omp_lock_t global_lock;
-omp_init_lock(&global_lock);
-
-#pragma omp parallel
-{
-  #pragma omp single nowait
-  {
-    for (int i = 0; i < N; i++) {
-      #pragma omp task firstprivate(i)
-      {
-        omp_set_lock(&global_lock); // All insertions serialized
-        insert_into_list(list, i);
-        omp_unset_lock(&global_lock);
-      }
-    }
-  }
-}
-omp_destroy_lock(&global_lock);
-\end{codeblock}
-
-A more efficient approach uses \textbf{per-node locks}, allowing concurrent insertions at different positions. However, to avoid deadlocks, locks must be acquired in a consistent order.
-
 The function \texttt{omp\_set\_lock} blocks until the lock becomes available, which can lead to deadlock if threads hold locks while waiting for others. The non-blocking \texttt{omp\_test\_lock} returns immediately, allowing the caller to take alternative action if the lock is unavailable:
 
 \begin{codeblock}[language=C]
@@ -583,7 +697,7 @@ These hints allow the runtime to select appropriate implementations: an unconten
 
 \begin{tipsblock}[Memory ordering decisions]
     Do you need atomicity of an operation?
-    
+
     ├─ YES: Use atomic\\
     │ $\quad$ └─ Single variable access?\\
     │ $\qquad\quad$ ├─ YES: atomic read/write with acquire/release\\
@@ -594,6 +708,126 @@ These hints allow the runtime to select appropriate implementations: an unconten
     \phantom{$\qquad$} │ $\quad$ └─ NO: Consider atomic release/acquire pattern\\
     \phantom{$\qquad$} └─ NO: Use reduction or thread-private variables
 \end{tipsblock}
+
+\subsubsection{Case study: from critical to locks}
+
+To see why the lock zoo exists, consider a recurrent pattern from $N$-body tree codes: each thread iterates over a list of \emph{active} particles, and before computing a force on a particle it must first \emph{drift} that particle to the current time. Many threads may need the same particle, so the drift must be protected from data races, but only \emph{distinct} particles really conflict --- two threads updating two different particles should run in parallel.
+
+\paragraph{Stage 1 --- coarse-grained \texttt{critical}.} The minimal protection is a critical section around the update:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+if (P[idx].time < update_time) {
+    #pragma omp critical
+    {
+        if (P[idx].time < update_time)        // double-check
+            update_particle(&P[idx], update_time);
+    }
+}
+\end{codeblock}
+
+Entry to the critical region performs an implicit acquire flush; exit performs a release flush, so the new \texttt{time} is visible to subsequent readers. The cost is that \emph{every} update is serialised, even between threads working on different particles: the critical region behaves as a global lock.
+
+\paragraph{Stage 2 --- per-particle \texttt{omp\_lock\_t}.} Move the lock from the algorithm to the data: give every particle its own lock, and use \texttt{omp\_test\_lock} so a thread that finds the particle already busy can do something else instead of blocking.
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+if (omp_test_lock(&P[idx].lock)) {
+    update_particle(&P[idx], update_time);
+    omp_unset_lock(&P[idx].lock);
+} else {
+    // Another thread is updating this particle.
+    // Don't acquire the lock; just wait for the work to be done.
+    while (P[idx].time < update_time)
+        nanosleep(...);
+}
+\end{codeblock}
+
+This unlocks parallelism between disjoint particles, but \texttt{omp\_lock\_t} is an opaque, runtime-managed structure: it is large (taking memory away from useful state) and every \texttt{set}/\texttt{unset} is a function call into the OpenMP runtime.
+
+\paragraph{Stage 3 --- custom atomic spinlock.} If the contention is low and the runtime overhead dominates, the lock can be replaced by an \texttt{int} field updated through atomic operations, with explicit acquire/release semantics:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+int my_lock;
+#pragma omp atomic capture
+{ my_lock = P[idx].lock; P[idx].lock++; }   // fetch-and-add
+
+if (my_lock == 0) {                         // we got the lock
+    update_particle(&P[idx], update_time);
+
+    #pragma omp atomic write release        // publish the update
+    P[idx].lock = 0;
+} else {
+    #pragma omp atomic read acquire         // see the latest time
+    double t = P[idx].time;
+    while (t < update_time) { /* spin */ }
+}
+\end{codeblock}
+
+The \texttt{release} on the unlock guarantees that everything written inside \texttt{update\_particle} is visible to any thread that subsequently performs the \texttt{acquire} read.
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{} l c c c c @{}}
+\toprule
+\textbf{Stage} & \textbf{Complexity} & \textbf{Memory} & \textbf{Concurrency} & \textbf{Latency} \\
+\midrule
+\texttt{critical}        & low    & none              & very low (global)    & high \\
+\texttt{omp\_lock\_t}    & medium & high (opaque)     & high (per-particle)  & medium (runtime) \\
+atomic spinlock          & high   & low (\texttt{int})& high (per-particle)  & low (CPU-level) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{observationblock}[False sharing on tightly packed structures]
+If \texttt{P[idx]} is small (say 16 bytes), several particles share a 64-byte cache line. Locking \texttt{P[0]} invalidates that line on every other socket, and a thread reading \texttt{P[1]} or \texttt{P[2]} suffers a cache miss even though the data it wants is logically untouched. Padding each entry to a full cache line removes the false sharing at the cost of memory footprint --- a trade-off worth measuring on the target machine.
+\end{observationblock}
+
+\subsubsection{Case study: optimistic concurrency on a sorted linked list}
+
+Lock granularity also shapes the design of concurrent data structures. Consider a sorted, doubly linked list into which many threads insert in parallel. A single global lock around \texttt{find\_and\_insert} would serialise all insertions; per-node locks open the door to real concurrency, but the algorithm becomes subtle.
+
+\paragraph{Optimistic search, then validate.} The standard pattern is: search without holding any lock, then lock the two neighbours of the candidate insertion point and \emph{validate} that the structure has not changed under us:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+llnode_t *prev = NULL, *next = NULL;
+find(start, value, &prev, &next);             // optimistic, lock-free
+
+// Acquire prev then next, in a fixed order, with non-blocking try-lock
+while (!try_lock_pair(prev, next))
+    #pragma omp taskyield;
+
+// Validate: did somebody insert between prev and next while we waited?
+if (prev->next != next || next->prev != prev) {
+    unlock_pair(prev, next);
+    continue;                                 // restart from head
+}
+insert_between(prev, value, next);
+unlock_pair(prev, next);
+\end{codeblock}
+
+The validation step is what makes the algorithm correct: between the lock-free \texttt{find} and the moment we own the locks, another thread may have inserted a new node exactly where we wanted to insert ours.
+
+\paragraph{Pitfall 1 --- blocking lock during repair walk.} A natural optimisation is, on a failed validation, to walk locally from \texttt{prev} to find the new \texttt{next} instead of restarting from the head. The temptation is to grab each successive lock with the blocking \texttt{omp\_set\_lock}, since we already hold one lock and ``only'' need to acquire one more. This reintroduces the classic deadlock:
+
+\begin{warningblock}[Never block while holding a lock]
+Two threads walking in opposite directions can each block on the lock the other one holds, forming a circular wait. Inside a repair walk, use \plaintt{omp\_test\_lock} with a bounded number of attempts; if the limit is reached, release everything and restart. Blocking acquisitions are only safe when no other lock is currently held.
+\end{warningblock}
+
+\paragraph{Pitfall 2 --- accidentally shared cursor.} A subtler bug shows up in the surrounding task code. The repair walk needs a per-task cursor, e.g.\ \texttt{start}, that each task updates as it advances:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+llnode_t *start = head;          // declared OUTSIDE the task
+
+#pragma omp task                 // BUG: start is implicitly shared
+{
+    for (int b = 0; b < batch; b++)
+        find_and_insert(start, new_value, &start);
+}
+\end{codeblock}
+
+By the implicit data-sharing rules introduced earlier in this chapter, a variable that is shared in the enclosing parallel region remains shared in the task. Every task therefore reads and writes the same \texttt{start}, racing on the cursor. The fix is to declare \texttt{firstprivate(start)} (or \texttt{firstprivate(head)} and let each task maintain its own cursor) so that each task gets an independent copy.
+
+\paragraph{Putting it together.} The correct version combines (i) optimistic search, (ii) deadlock-free local repair walk via bounded \texttt{omp\_test\_lock} attempts with fall-back to a full restart, (iii) a second validation after the repair walk in case the structure changed again while we were re-acquiring locks, and (iv) \texttt{firstprivate} on the per-task cursor. Once the locks provide acquire/release fences at every \texttt{set}/\texttt{unset}, the underlying atomic loads on \texttt{prev}/\texttt{next} pointers can use \texttt{memory\_order\_relaxed} --- the lock pair is doing the heavy synchronization.
 
 \subsection{Controlling the task creation - Clauses}
 
