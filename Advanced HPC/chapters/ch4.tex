@@ -1,10 +1,10 @@
 \chapter{MPI}
 
-Advanced Usage of some MPI features on Topology awareness, Shared memory and One-sided communications.
+Advanced usage of some MPI features on topology awareness, shared memory and one-sided communications.
 
 \begin{itemize}
-    \item Basics of the One-sided communication
-    \item Buildinga  hierarchy of Communicators that reflects the topology
+    \item Basics of the one-sided communication
+    \item Building a hierarchy of Communicators that reflects the topology
     \item Exchanging data in shared memory windows among MPI processes
 \end{itemize}
 
@@ -16,19 +16,56 @@ and we will see briefly other advanced features of MPI:
     \item Non-blocking collectives
 \end{itemize}
 
-\subsubsection{Two-Sided communications}
+\section{Two-Sided Communications}
 
-By its very nature, the message-passing paradigm is designed around the concept of cooperative exchange of informations among two or more processes whose address space are isolated and not directly inaccessible by other processes.
+By its very nature, the message-passing paradigm is designed around the cooperative exchange of information among two or more processes whose address spaces are isolated and not directly accessible by other processes. In the two-sided model (\plaintt{MPI\_Send}/\plaintt{MPI\_Recv}, \plaintt{MPI\_Isend}/\plaintt{MPI\_Irecv}, collectives) every transfer requires the active participation of \emph{both} endpoints: the sender posts a send, the receiver posts a matching receive, and the MPI library is responsible for matching the two. This is a clean abstraction, but it tightly couples \emph{data movement} with \emph{synchronization}: the receiver's progress is tied to its willingness to enter the library and look for a matching message.
 
+\section{One-Sided Communication}
 
-    
-% \section{One-Sided Communication}
+In one-sided communication a process can read, write or update memory in a remote process \emph{without} that process making a matching MPI call. The sender (here called the \textbf{origin}) specifies both buffers --- its own and the remote one --- and issues a \plaintt{MPI\_Put}, \plaintt{MPI\_Get} or \plaintt{MPI\_Accumulate} into a region of memory that the remote process (the \textbf{target}) has previously \emph{exposed} as a window. The target need not stop its computation to handle the request.
 
-\section{Remote Memory Access - RMA}
+This decoupling of data movement from process synchronization is the conceptual gain: the application controls when synchronization happens (via fences, PSCW or locks) independently of when data is transferred. On hardware that supports it (RDMA-capable NICs, on-node shared memory, GPUs with peer access), one-sided operations can map directly onto remote DMA, side-stepping the CPU on the target side entirely.
 
-\subsection{Memory Windows}
+The price is that correctness becomes much subtler than in two-sided code: visibility of remote updates is governed by an explicit memory model (Section~\ref{sec:rma-memory-model}), and the absence of a matching call on the target means there is no automatic ordering. We will return to these caveats throughout the chapter.
 
-% TODO: talk about the window creation
+\subsection{Remote Memory Access - RMA}
+
+\subsubsection{Memory Windows}
+
+To allow remote processes to access part of its memory, a process must explicitly \emph{expose} that region as a \plaintt{MPI\_Win} (a window). The window is the unit of RMA: every \plaintt{MPI\_Put}/\plaintt{MPI\_Get}/\plaintt{MPI\_Accumulate} addresses a (rank, displacement) pair within a specific window. The MPI standard offers four routines to create one, differing in who allocates the memory and how it is laid out across the communicator.
+
+\begin{codeblock}[language=C]
+// (a) wrap memory the user has already allocated
+int MPI_Win_create(void *base, MPI_Aint size, int disp_unit,
+                   MPI_Info info, MPI_Comm comm, MPI_Win *win);
+
+// (b) let MPI allocate (often pinned) memory and expose it
+int MPI_Win_allocate(MPI_Aint size, int disp_unit, MPI_Info info,
+                     MPI_Comm comm, void *baseptr, MPI_Win *win);
+
+// (c) like (b) but allocate in a shared-memory segment so processes
+//     on the same node can also load/store the window directly
+int MPI_Win_allocate_shared(MPI_Aint size, int disp_unit, MPI_Info info,
+                            MPI_Comm comm, void *baseptr, MPI_Win *win);
+
+// (d) create an empty window; attach/detach memory dynamically
+int MPI_Win_create_dynamic(MPI_Info info, MPI_Comm comm, MPI_Win *win);
+\end{codeblock}
+
+All four are collective on \plaintt{comm}. They differ in the following way:
+
+\begin{itemize}
+    \item \plaintt{MPI\_Win\_create} is the most flexible: you bring your own buffer (typically from \plaintt{malloc}). The library may need to register that buffer with the NIC at first use, and on some implementations cannot perform zero-copy RDMA into a region the OS may page out. It is the right choice when the memory must be allocated by the application (e.g.\ a third-party library returns it).
+    \item \plaintt{MPI\_Win\_allocate} lets MPI allocate the memory and the window in one shot. Implementations are free to use pinned/registered memory, symmetric heaps or other tricks, so on RDMA hardware this is usually the highest-performance option.
+    \item \plaintt{MPI\_Win\_allocate\_shared} requires \plaintt{comm} to be a shared-memory communicator (see Section~\ref{sec:rma-memory-model} and the Shared Memory section); the resulting window is directly addressable via plain C loads and stores from any rank in \plaintt{comm}, in addition to the usual RMA operations.
+    \item \plaintt{MPI\_Win\_create\_dynamic} creates a window with no associated memory; processes then \plaintt{MPI\_Win\_attach}/\plaintt{MPI\_Win\_detach} buffers as the application allocates/frees them. Useful for irregular data structures that grow and shrink at runtime, at the cost of additional bookkeeping (origins must learn the address of attached regions out-of-band).
+\end{itemize}
+
+The \plaintt{size} argument is in bytes; \plaintt{disp\_unit} is the unit (in bytes) used to interpret displacements supplied in subsequent RMA calls. Setting \plaintt{disp\_unit = sizeof(T)} lets you address window slots as if they were a typed array.
+
+\begin{tipsblock}[Don't churn windows]
+    Window creation can be expensive: it may register memory with the NIC and synchronize all ranks in \plaintt{comm}. As a rule of thumb, \emph{create windows once at the start of the program (or of a phase) and keep them alive}; do not create and free a window per message.
+\end{tipsblock}
 
 \begin{warningblock}[\plaintt{disp\_unit}]
     The \plaintt{disp\_unit} parameter is often misunderstood. Setting it to anything other than 1 (byte) can cause subtle bugs when mixing datatypes. The displacement calculation becomes:
@@ -37,38 +74,88 @@ target_addr = base + (target_disp * disp_unit)
 \end{codeblock}
 \end{warningblock}
 
-% \subsection{Data Movement}
+\subsubsection{Data Movement}
 
-\begin{observationblock}[Flush vs Sync]
+Once a window exists, the origin can issue three families of RMA operations against it. They are all \emph{non-blocking}: the call returns when the request has been queued, not when the data has reached its destination --- completion is the job of a synchronization call (Section on Ordering and Synchronization below).
 
-The fundamental difference between \plaintt{MPI\_Win\_flush} and \plaintt{MPI\_Win\_sync} is that:
+\begin{codeblock}[language=C]
+// remote write: origin -> target
+int MPI_Put(const void *origin_addr, int origin_count, MPI_Datatype origin_datatype,
+            int target_rank, MPI_Aint target_disp,
+            int target_count, MPI_Datatype target_datatype, MPI_Win win);
+
+// remote read: target -> origin
+int MPI_Get(void *origin_addr, int origin_count, MPI_Datatype origin_datatype,
+            int target_rank, MPI_Aint target_disp,
+            int target_count, MPI_Datatype target_datatype, MPI_Win win);
+
+// remote update: target = target  op  origin
+int MPI_Accumulate(const void *origin_addr, int origin_count, MPI_Datatype origin_datatype,
+                   int target_rank, MPI_Aint target_disp,
+                   int target_count, MPI_Datatype target_datatype,
+                   MPI_Op op, MPI_Win win);
+\end{codeblock}
+
+The signature is symmetric: the origin describes its own buffer (\texttt{origin\_addr}, \texttt{origin\_count}, \texttt{origin\_datatype}) and the target slice in the window (\texttt{target\_rank}, \texttt{target\_disp}, \texttt{target\_count}, \texttt{target\_datatype}). The displacement is in units of \plaintt{disp\_unit} as specified at window creation.
+
+\plaintt{MPI\_Accumulate} composes a remote read-modify-write into a single message: it applies an \plaintt{MPI\_Op} (\plaintt{MPI\_SUM}, \plaintt{MPI\_MAX}, \plaintt{MPI\_REPLACE}, \dots) to the target memory. Two atomic RMW primitives complete the picture:
+
+\begin{codeblock}[language=C]
+// fetch-and-op: returns the previous value while applying op
+int MPI_Fetch_and_op(const void *origin_addr, void *result_addr,
+                     MPI_Datatype datatype, int target_rank,
+                     MPI_Aint target_disp, MPI_Op op, MPI_Win win);
+
+// compare-and-swap: atomic CAS on a single element
+int MPI_Compare_and_swap(const void *origin_addr, const void *compare_addr,
+                         void *result_addr, MPI_Datatype datatype,
+                         int target_rank, MPI_Aint target_disp, MPI_Win win);
+\end{codeblock}
+
+\plaintt{MPI\_Fetch\_and\_op} is the canonical building block for distributed counters and queue indices --- a single-element \plaintt{MPI\_Accumulate} that also returns the prior value. The Mandelbrot example in \plaintt{MPI/codes/Mandelbrot/backend\_lock.c} uses it exactly that way: workers atomically increment the queue tail with \plaintt{MPI\_Fetch\_and\_op(\&one, \&tail, MPI\_INT64\_T, PRODUCER\_RANK, OFFSET\_TAIL, MPI\_SUM, win)} to claim a slot, then \plaintt{MPI\_Accumulate} the new entry into it.
+
+\begin{warningblock}[Atomicity is per element]
+    Plain \plaintt{MPI\_Put} and \plaintt{MPI\_Get} are \emph{not} atomic with respect to overlapping operations from other origins. Atomicity is provided only by \plaintt{MPI\_Accumulate}, \plaintt{MPI\_Fetch\_and\_op} and \plaintt{MPI\_Compare\_and\_swap}, and even then only on individual elements (and on predefined operations). Two concurrent \plaintt{MPI\_Put}s on overlapping byte ranges yield undefined data.
+\end{warningblock}
+
+\subsubsection{Ordering and Synchronization}
+\label{sec:rma-sync}
+
+A non-blocking RMA call only \emph{schedules} a transfer; the application is responsible for declaring when transfers are allowed and when they must have completed. MPI defines two coarse styles:
+
 \begin{itemize}
-    \item \texttt{MPI\_Win\_flush}: Forces completion of RMA operations from the origin to the target.
-    \item \texttt{MPI\_Win\_sync}: Synchronizes local memory with the window (target-side operation).
+    \item \textbf{Active target}: the target is aware of the epoch and participates in opening or closing it. Two flavors exist: collective \emph{fence} epochs and finer-grained \emph{Post--Start--Complete--Wait} (PSCW) epochs over arbitrary process subgroups.
+    \item \textbf{Passive target}: the target makes no MPI call at all. The origin opens the epoch with \plaintt{MPI\_Win\_lock} (or \plaintt{MPI\_Win\_lock\_all}) and closes it with \plaintt{MPI\_Win\_unlock}; the local progress engine on the target services the requests.
 \end{itemize}
 
-Or, in other words:
+In all cases the rule is the same: every RMA call must lie inside an \emph{access epoch} on the origin, and every byte being read or written must lie inside an \emph{exposure epoch} on the target.
 
-\begin{itemize}
-    \item \texttt{MPI\_Win\_flush} is about \textit{Network Completion} (\emph{Did the data arrive?})
-    \item \texttt{MPI\_Win\_sync} is about \textit{Memory Consistency} (\emph{Is the data visible to the CPU?})
-\end{itemize}
+\paragraph{Fences} are the simplest mechanism. A single collective call opens and closes epochs at all ranks of the window's communicator:
 
-This distinction is critical and often misunderstood: these calls operate on different sides of the communication and serve completely different purposes.
-\end{observationblock}
-    
+\begin{codeblock}[language=C]
+int MPI_Win_fence(int assert, MPI_Win win);
+\end{codeblock}
 
-% \subsection{Ordering and Synchronization}
+Between two fences, every rank may simultaneously be origin and target for any other rank: it is a Bulk-Synchronous-Parallel pattern. The first fence opens the epoch on all processes, RMA operations are issued by whichever ranks need to communicate, and the second fence guarantees both \emph{remote completion} of every queued RMA and that no new RMA can start until the next fence. Conceptually, if $E_i^{(n)}$ is the $n$-th epoch on process $i$, a fence enforces a happens-before edge $\forall i,j:\ E_i^{(n)} \to E_j^{(n+1)}$.
 
-% \subsubsection{Fences}
+This is the right tool for stencil and ghost-cell exchanges, where every process talks to its neighbors at the same algorithmic step. Its weakness is also its strength: synchronization is collective even when the actual communication pattern is sparse, so fences cost $O(\log p)$ in latency regardless of the message graph and stragglers slow everyone down.
 
-% \subsubsection{Post-Start-Complete-Wait - PSCW}
+\paragraph{Post-Start-Complete-Wait (PSCW)} avoids that global cost by letting only the involved processes synchronize. It introduces two disjoint groups: an \emph{exposure group} (the targets) and an \emph{access group} (the origins).
 
-\subsubsection{Locks}
+\begin{codeblock}[language=C]
+// On a target: open exposure epoch for group of origins
+int MPI_Win_post(MPI_Group group, int assert, MPI_Win win);
+// On an origin: open access epoch toward group of targets
+int MPI_Win_start(MPI_Group group, int assert, MPI_Win win);
+// On an origin: close the access epoch, completing all RMA
+int MPI_Win_complete(MPI_Win win);
+// On a target: wait until every origin has called Win_complete
+int MPI_Win_wait(MPI_Win win);
+\end{codeblock}
 
-Locks are a way to synchronize the access to a shared resource. They are a way to ensure that only one process can access the shared resource at a time.
+The protocol is: targets call \plaintt{Win\_post}, origins call \plaintt{Win\_start} (these can be matched without a barrier --- typically via the \plaintt{MPI\_MODE\_NOCHECK} assert when the application already guarantees the order), the origins issue their RMA operations, and finally \plaintt{Win\_complete}/\plaintt{Win\_wait} terminate the access and exposure epochs respectively. PSCW is the right tool for irregular but \emph{statically known} communication patterns: the application builds the groups once and reuses them. Building and freeing \plaintt{MPI\_Group} objects in the inner loop is a known performance trap.
 
-Passive mode: the target does not participate in opertions: one sided asynchronous communication.
+\paragraph{Locks (passive target).} Locks are the fully one-sided mechanism: the target makes no MPI call to open or close the epoch.
 
 \begin{codeblock}[language=C]
 MPI_Win_lock(int lock_type, int rank, int assert, MPI_Win win);
@@ -78,31 +165,98 @@ MPI_Win_unlock(int rank, MPI_Win win);
 MPI_Win_flush/flush_local(int rank, MPI_Win win);
 \end{codeblock}
 
-where \texttt{lock\_type} is one of the following:
+where \texttt{lock\_type} is one of:
 \begin{itemize}
-    \item \texttt{MPI\_LOCK\_EXCLUSIVE}: only one process can access the shared resource at a time.
-    \item \texttt{MPI\_LOCK\_SHARED}: multiple processes can access the shared resource at a time.
+    \item \texttt{MPI\_LOCK\_EXCLUSIVE}: only one origin can hold the lock on \texttt{rank} at a time --- serialized read--modify--write access.
+    \item \texttt{MPI\_LOCK\_SHARED}: multiple origins can hold the lock concurrently --- safe for parallel reads, or for non-conflicting accumulates.
 \end{itemize}
 
-\texttt{rank} is the rank of the process that will access the shared resource.
+\plaintt{MPI\_Win\_lock\_all(assert, win)} opens a passive epoch toward \emph{every} rank in the communicator at once, which is convenient for global hash tables or work-stealing queues. Be aware, however, that some implementations track $O(p)$ state per origin under \plaintt{lock\_all}, which can hurt scalability on very large jobs.
 
-\texttt{assert} is the assertion that will be used to synchronize the access to the shared resource.
-
+While the lock is held, the origin can issue RMA operations and wait for them to complete \emph{without} releasing the lock by calling:
 \begin{itemize}
-    \item \texttt{MPI\_Win\_flush}: complete operations on remote target process; data will be then available to the target task, or to other tasks
-    \item \texttt{MPI\_Win\_flush\_local}: locally complete operations to the target process
+    \item \plaintt{MPI\_Win\_flush(rank, win)}: completes all outstanding RMA from this origin to \plaintt{rank}, both at the origin (buffers reusable) and at the target (data has landed).
+    \item \plaintt{MPI\_Win\_flush\_local(rank, win)}: completes them only at the origin --- the target may not yet have seen the data.
 \end{itemize}
-
 
 \begin{warningblock}[Misconception about locks]
-    Despite the unfortunate naming, MPI locks are not mutex-like. They do not provide mutual exclusion for the target process's local access. The target can modify its window memory during a locked epoch, leading to race conditions.
+    Despite the unfortunate naming, MPI locks are not mutex-like. They do not provide mutual exclusion against the target's own local loads and stores: the target may freely modify its window memory while an origin holds the lock, which can race with the RMA operations. ``Lock'' here just delimits an RMA epoch with a particular concurrency mode (shared or exclusive) for other \emph{origins}.
 \end{warningblock}
 
-\subsubsection{Assertions}
+\paragraph{Flush vs. sync.} Two different completion calls exist; they look superficially similar and are routinely confused.
 
-% TODO: talk about synchronization asserts, cite the main ones
+\begin{observationblock}[\plaintt{MPI\_Win\_flush} vs.\ \plaintt{MPI\_Win\_sync}]
+\begin{itemize}
+    \item \plaintt{MPI\_Win\_flush}: forces completion of RMA operations from the origin to a (or every) target. It is about \textbf{network completion} --- ``did the data arrive at the target's public copy?''
+    \item \plaintt{MPI\_Win\_sync}: synchronizes the calling process's public and private window copies (Section~\ref{sec:rma-memory-model}). It is about \textbf{memory consistency} --- ``is the data visible to local CPU loads?''. It does not complete any pending RMA.
+\end{itemize}
 
-% \subsection{RMA Memory Model}
+The two calls operate on different sides of the same window and serve different purposes. As a rule of thumb: standard origin-side RMA only needs \plaintt{MPI\_Win\_flush}; you need \plaintt{MPI\_Win\_sync} when you mix RMA traffic with direct loads/stores on the same window (typically with shared-memory windows).
+\end{observationblock}
+
+\subsubsection{Synchronization Asserts}
+
+Each synchronization routine takes an \plaintt{int assert} parameter. Setting it to \plaintt{0} is always correct; non-zero values are \emph{contractual promises} the application makes to the implementation, which the latter is then free to use to skip otherwise-mandatory work (barriers, lock checks, memory fences). Violating an assert is undefined behavior --- there is no error, just silent corruption --- so \emph{add asserts only when you have proven they hold}.
+
+The five flags defined by the standard, and the calls that accept them:
+
+\begin{itemize}
+    \item \plaintt{MPI\_MODE\_NOPRECEDE} --- accepted by \plaintt{MPI\_Win\_fence}: ``no RMA from this process precedes this fence in the current epoch.'' Eliminates the initial barrier (typical use: the first fence after window creation).
+    \item \plaintt{MPI\_MODE\_NOSUCCEED} --- accepted by \plaintt{MPI\_Win\_fence}: ``no RMA from this process will follow this fence in the current epoch.'' Eliminates the final barrier (typical use: the last fence before \plaintt{MPI\_Win\_free}).
+    \item \plaintt{MPI\_MODE\_NOSTORE} --- accepted by \plaintt{MPI\_Win\_fence}, \plaintt{MPI\_Win\_post}, \plaintt{MPI\_Win\_complete}: ``the local window memory was not modified by local stores since the last sync.'' Lets the implementation skip cache flushes / private-to-public sync.
+    \item \plaintt{MPI\_MODE\_NOPUT} --- accepted by \plaintt{MPI\_Win\_fence}, \plaintt{MPI\_Win\_post}, \plaintt{MPI\_Win\_complete}: ``the local window will not be the target of a Put or Accumulate during this epoch.'' Lets the implementation skip incoming-buffer processing.
+    \item \plaintt{MPI\_MODE\_NOCHECK} --- accepted by \plaintt{MPI\_Win\_start}, \plaintt{MPI\_Win\_post}, \plaintt{MPI\_Win\_lock}, \plaintt{MPI\_Win\_lock\_all}: ``the matching synchronization on the other side is already in place / no conflicting locks exist.'' Eliminates the matching/conflict-detection handshake.
+\end{itemize}
+
+The first four are valid only on \plaintt{Win\_fence}/\plaintt{Win\_post}/\plaintt{Win\_complete}; \plaintt{NOCHECK} is valid only on \plaintt{Win\_start}/\plaintt{Win\_post}/\plaintt{Win\_lock}/\plaintt{Win\_lock\_all}. They can be combined with bitwise OR.
+
+\begin{exampleblock}[Common assert combinations]
+\begin{codeblock}[language=C]
+// First fence after window creation: no RMA preceded, nothing stored yet.
+MPI_Win_fence(MPI_MODE_NOPRECEDE | MPI_MODE_NOSTORE, win);
+
+// Read-only epoch: nobody puts, nobody stores.
+MPI_Win_fence(MPI_MODE_NOSTORE | MPI_MODE_NOPUT, win);
+
+// Last fence before Win_free.
+MPI_Win_fence(MPI_MODE_NOSUCCEED, win);
+
+// Application-level coordination guarantees no conflicting locks.
+MPI_Win_lock(MPI_LOCK_EXCLUSIVE, target, MPI_MODE_NOCHECK, win);
+\end{codeblock}
+\end{exampleblock}
+
+\begin{tipsblock}[Develop with \plaintt{assert = 0}]
+    Always make the program correct with \plaintt{assert = 0} first, then add asserts incrementally and benchmark each step. Asserts are not cross-implementation portable in their performance impact, and getting them wrong is invisible in the output until the day you change MPI vendor.
+\end{tipsblock}
+
+\subsection{RMA Memory Model}
+\label{sec:rma-memory-model}
+
+So far we have spoken loosely of ``the window memory.'' MPI is more careful: each window is associated with a memory model that prescribes how RMA traffic and local CPU loads/stores see each other. There are two such models, exposed via the window attribute \plaintt{MPI\_WIN\_MODEL}:
+
+\begin{codeblock}[language=C]
+int model, flag;
+MPI_Win_get_attr(win, MPI_WIN_MODEL, &model, &flag);
+// model is MPI_WIN_UNIFIED  or  MPI_WIN_SEPARATE
+\end{codeblock}
+
+The model is chosen by the implementation, not by the user, and depends on the underlying hardware. Conceptually, MPI describes every window location as having two copies:
+
+\begin{itemize}
+    \item a \textbf{private} copy --- what the local process sees through ordinary loads, stores, sends and receives;
+    \item a \textbf{public} copy --- what remote RMA operations target.
+\end{itemize}
+
+\paragraph{Unified model (\plaintt{MPI\_WIN\_UNIFIED}).} Public and private copies are physically the same memory. This is what you get on cache-coherent CPUs (essentially every modern HPC node) and on shared-memory windows. A local store eventually becomes visible to remote \plaintt{MPI\_Get}/\plaintt{MPI\_Accumulate}, and conversely, without extra MPI calls --- but only \emph{eventually}, and only at the synchronization points (epoch boundaries, flushes). Within an unbounded epoch and without a flush, you can still observe ``torn'' or stale values.
+
+\paragraph{Separate model (\plaintt{MPI\_WIN\_SEPARATE}).} Public and private copies are logically distinct --- the model designed for non-coherent NICs, accelerators on the PCIe path and other exotic memory. A local store updates only the private copy; an incoming \plaintt{MPI\_Put} updates only the public copy. They are reconciled by synchronization calls. In particular, \plaintt{MPI\_Win\_sync} acts as the bidirectional memory fence: it pushes recent local stores into the public copy and pulls recent remote updates into the private copy on the calling process.
+
+\begin{warningblock}[\plaintt{MPI\_Barrier} is not a memory fence]
+    The standard explicitly states that \plaintt{MPI\_Barrier} provides \emph{process} synchronization, not memory synchronization. Any pattern of the form ``I did Puts; everyone calls \plaintt{MPI\_Barrier}; now everyone reads the new values via local loads'' is non-portable: it works on x86 by accident of strong cache coherence and may break on weaker architectures, on GPU memory or under the separate model. Use proper RMA synchronization (\plaintt{MPI\_Win\_flush}, \plaintt{MPI\_Win\_sync}, fence/PSCW/unlock).
+\end{warningblock}
+
+For most clusters made of cache-coherent CPUs the unified model is in force and this discussion may seem pedantic; the reason it matters is portability. As soon as a window backs onto GPU memory across PCIe, or you run on an architecture with weaker ordering, the separate-model rules become real. The portable idiom for ``producer writes via local stores, consumers read via RMA'' is therefore: producer issues local stores then \plaintt{MPI\_Win\_sync} (private $\to$ public), consumers see the data via RMA after synchronization.
 
 \section{Shared Memory}
 
@@ -169,10 +323,16 @@ MPI_Win_allocate_shared (
 
 As with other window-creation routines, the memory allocation for \texttt{MPI\_Win\_allocate\_shared} does not require the allocated size to be uniform: each task may allocate a different amount. There is no strict specification as to where the memory should be physically placed: an MPI implementation will typically attempt to maximize data locality and affinity.
 
-By default, the allocation is \textbf{contiguous}. However, this contiguity does not only refer to the virtual address space: ideally, it also implies allocation in the same physical memory bank. On many systems, though, it is not possible to remap memory at arbitrary sizes to guarantee this property. Specifying a non-contiguous allocation can allow the MPI implementation to more flexibly optimize the placement, possibly enhancing the affinity for each individual task.
+By default, the allocation is \textbf{contiguous}. However, this contiguity does not only refer to the virtual address space: ideally, it also implies allocation in the same physical memory bank. On many systems, though, it is not possible to remap memory at arbitrary sizes to guarantee this property. Specifying a non-contiguous allocation (\plaintt{MPI\_Info\_set(info, "alloc\_shared\_noncontig", "true")}) can allow the MPI implementation to more flexibly optimize the placement, possibly enhancing the affinity for each individual task.
 
-% TODO: mentioning caveats
+A few caveats are worth remembering:
 
+\begin{itemize}
+    \item \textbf{First-touch policy}: on Linux, a virtual page is only bound to a physical NUMA node when it is first written. With contiguous shared allocation, the rank whose process first touches a given page wins it --- if rank~0 zero-initializes the entire shared array, every page ends up on rank~0's NUMA node, regardless of which rank will actually work on it later. The portable workaround is to have each rank initialize its own slice.
+    \item \textbf{Contiguity does not imply locality}: even with the default contiguous allocation, the virtual address range can span pages on different NUMA nodes. The address arithmetic works (it is one big array) but the latency does not (some loads cross sockets). For NUMA-sensitive kernels, request \plaintt{alloc\_shared\_noncontig} so the implementation can place each rank's slice on the rank's local node.
+    \item \textbf{Non-uniform sizes}: each rank may pass a different \plaintt{size} (including \plaintt{0}). This is useful, for instance, when only the host master allocates a control block, but it complicates pointer arithmetic --- which is why \plaintt{MPI\_Win\_shared\_query} (below) exists.
+    \item \textbf{Hugepages and stride}: on systems where the implementation backs the shared region with hugepages, the per-rank slice may be padded up to a hugepage boundary. Pointer-arithmetic that assumes \texttt{baseptr + rank*size} is therefore not portable; always use \plaintt{MPI\_Win\_shared\_query}.
+\end{itemize}
 
 A useful routine related to window allocation and memory sharing is \plaintt{MPI\_Win\_shared\_query}, which allows processes to retrieve a pointer to shared memory in a window, for either direct access or load/store operations. Its prototype is:
 
@@ -201,7 +361,38 @@ The figure above illustrates the difference between default contiguous allocatio
 
 This routine is fundamental for writing portable and generic code utilizing shared memory windows, especially when contiguity cannot be assumed.
 
-% \subsection{Shared Memory Access}
+\subsection{Shared Memory Access}
+
+A shared-memory window is unusual in that it can be accessed in two ways: through standard RMA calls (\plaintt{MPI\_Put}/\plaintt{Get}/\plaintt{Accumulate}) \emph{and} through plain C loads and stores via the pointer returned by \plaintt{MPI\_Win\_shared\_query}. The MPI standard explicitly defines load/store semantics for shared windows only under the unified memory model (Section~\ref{sec:rma-memory-model}), but in practice all major implementations on cache-coherent x86 / aarch64 nodes do provide this.
+
+The freedom to do plain loads and stores is also the source of the only real complication: ordering and visibility between processes are no longer the MPI library's job, they are the application's. There are two clean access patterns.
+
+\paragraph{Pattern A: epoch-based.} Wrap the load/store phases in passive epochs and use \plaintt{MPI\_Win\_sync} as the bidirectional memory fence:
+
+\begin{codeblock}[language=C]
+// once at start: open a long-lived passive epoch toward every rank
+MPI_Win_lock_all(MPI_MODE_NOCHECK, win);
+
+// writer phase
+shared_ptr[my_offset] = new_value;          // plain store
+MPI_Win_sync(win);                          // private -> public
+MPI_Barrier(shared_comm);                   // make all writers reach this point
+
+// reader phase
+MPI_Win_sync(win);                          // public -> private
+int v = shared_ptr[some_offset];            // plain load
+
+// at shutdown
+MPI_Win_unlock_all(win);
+\end{codeblock}
+
+The \plaintt{MPI\_Win\_sync} is what flushes the local CPU's view of the shared region; \plaintt{MPI\_Barrier} provides the temporal synchronization between writer and reader phases (recall it is \emph{not} a memory fence, only a process barrier --- but combined with \plaintt{Win\_sync} on each side it gives the full ordering edge).
+
+\paragraph{Pattern B: atomics.} When writers and readers operate concurrently rather than in disjoint phases, fall back to atomics on the shared memory --- either MPI's atomic RMA primitives (\plaintt{MPI\_Fetch\_and\_op}, \plaintt{MPI\_Compare\_and\_swap}, \plaintt{MPI\_Accumulate} with \plaintt{MPI\_REPLACE}) or, if you are committed to a unified-model platform, C11 atomics on the shared addresses. The Mandelbrot \plaintt{shmem} backend (\plaintt{MPI/codes/Mandelbrot/backend\_shmem.c}) is the canonical example: it allocates a queue with \plaintt{MPI\_Win\_allocate\_shared}, queries the base pointer with \plaintt{MPI\_Win\_shared\_query}, and uses C11 \plaintt{atomic\_fetch\_add} on the queue head/tail so workers can claim work items without any MPI call on the hot path.
+
+\begin{warningblock}[\plaintt{MPI\_Barrier} is still not a memory fence]
+    The same warning as in Section~\ref{sec:rma-memory-model} applies, with extra force here: when reading data written by another rank via plain loads, you need an MPI window-synchronization call (\plaintt{MPI\_Win\_sync}, end-of-fence, \plaintt{Win\_unlock}, \dots) on each side. A bare \plaintt{MPI\_Barrier} between writer and reader is not portable. On x86 with hardware coherence it appears to work because cache snooping silently does the right thing.
+\end{warningblock}
 
 \section{Cartesian Communication}
 
@@ -211,7 +402,7 @@ The fundamental challenge is neighbor communication: processes must exchange bou
 
 \subsubsection{Why not Manual Rank Arithmetic}
 
-Consder a 2D grid decomposition with dimensions ($P_x \times P_y$). Given a process with coordinates ($i, j$), its neighbors are:
+Consider a 2D grid decomposition with dimensions ($P_x \times P_y$). Given a process with coordinates ($i, j$), its neighbors are:
 
 \begin{codeblock}[language=C]
 // Manual neighbor calculation (fragile approach)
@@ -259,7 +450,7 @@ i=2   |  R4  |  R5  |   R4:(0,2) R5:(1,2)
 
 \subsubsection{MPI\_Dims\_create}
 
-Computes a "balanced" distribution of processes across dimensions:
+Computes a ``balanced'' distribution of processes across dimensions:
 
 \begin{codeblock}[language=C]
 int MPI_Dims_create (int nnodes,    // Total number of processes
@@ -267,18 +458,7 @@ int MPI_Dims_create (int nnodes,    // Total number of processes
                      int dims[]);   // IN/OUT: dimension sizes
 \end{codeblock}
 
-
-\subsubsection{MPI\_Cart\_create}
-
-Creates a new communicator with processes laid out on a Cartesian grid:
-
-\begin{codeblock}[language=C]
-int MPI_Cart_create(MPI_Comm comm_old, int ndims, const int dims[], const int periods[], int reorder, MPI_Comm *comm_cart);
-\end{codeblock}
-
-Key behavior: Pre-set dimensions (dims[i] > 0) are preserved; zero entries are computed.
-
-The algorithm tries to minimize surface-to-volume ratio for communication efficiency.
+Key behavior: pre-set dimensions (\plaintt{dims[i] > 0}) are preserved; zero entries are computed by MPI. The algorithm tries to minimize surface-to-volume ratio for communication efficiency.
 
 \begin{exampleblock}[2D grid, 12 processes]
 \begin{codeblock}[language=C]
@@ -292,8 +472,8 @@ MPI_Dims_create(12, 2, dims2); // Result: dims2 = {3, 4}
 \end{codeblock}
 \end{exampleblock}
 
-\begin{warningblock}[MPI\_Dims\_create failure]
-    MPI\_Dims\_create fails if \plaintt{nnodes} is not divisible by the product of pre-set dimensions. Always verify \plaintt{dims[i] > 0} for all \plaintt{i} after the call.
+\begin{warningblock}[\plaintt{MPI\_Dims\_create} failure]
+    \plaintt{MPI\_Dims\_create} fails if \plaintt{nnodes} is not divisible by the product of pre-set dimensions. Always verify \plaintt{dims[i] > 0} for all \plaintt{i} after the call.
 \end{warningblock}
 
 \subsubsection{MPI\_Cart\_create}
@@ -321,4 +501,74 @@ where:
 \begin{tipsblock}[Best practices]
     Set reorder=1 in production code. This allows MPI implementations (especially on clusters with complex interconnects like fat-trees or torus networks) to map logically adjacent processes to physically adjacent nodes, reducing communication latency.
 \end{tipsblock}
+
+\subsubsection{MPI\_Cart\_coords and MPI\_Cart\_rank}
+
+Once a Cartesian communicator exists, two routines translate between linear ranks and grid coordinates:
+
+\begin{codeblock}[language=C]
+// rank --> coords
+int MPI_Cart_coords(MPI_Comm comm, int rank, int maxdims, int coords[]);
+
+// coords --> rank
+int MPI_Cart_rank(MPI_Comm comm, const int coords[], int *rank);
+\end{codeblock}
+
+\plaintt{MPI\_Cart\_coords} is normally the very first call after \plaintt{MPI\_Cart\_create}: each process asks for its own coordinates and uses them to figure out which slice of the global domain it owns. \plaintt{MPI\_Cart\_rank} goes the other way and is the right tool when you need to address a specific position in the grid (e.g.\ ``the process at coordinates $(0, 0)$ collects the global result''). Both functions handle periodic dimensions transparently: a coordinate that falls outside $[0, \texttt{dims[i]}-1]$ in a periodic dimension wraps to a valid one; in a non-periodic dimension it is invalid.
+
+\subsubsection{MPI\_Cart\_shift}
+
+For the central use case --- finding nearest neighbors along an axis --- the dedicated routine is:
+
+\begin{codeblock}[language=C]
+int MPI_Cart_shift(MPI_Comm comm,
+                   int direction,    // dimension index (0, 1, ...)
+                   int disp,         // displacement (typically +1 or -1)
+                   int *rank_source, // rank that would shift INTO me
+                   int *rank_dest);  // rank I would shift TO
+\end{codeblock}
+
+The naming is from the point of view of a directional shift: ``if everybody shifts by \plaintt{disp} along \plaintt{direction}, who would I receive from and who would I send to?'' For a 2D grid, calling it once with \plaintt{direction = 0, disp = +1} gives the left/right neighbors of the current process, and once with \plaintt{direction = 1, disp = +1} gives the down/up neighbors. The example in \plaintt{MPI/codes/example\_of\_cartesian\_communicator/basic.c} does exactly this:
+
+\begin{codeblock}[language=C]
+int up, down, left, right;
+MPI_Cart_shift(cart_comm, 0, 1, &up,   &down);
+MPI_Cart_shift(cart_comm, 1, 1, &left, &right);
+\end{codeblock}
+
+When the shift would cross a non-periodic boundary, \plaintt{MPI\_Cart\_shift} returns \plaintt{MPI\_PROC\_NULL} for that endpoint. \plaintt{MPI\_PROC\_NULL} is safe to pass to \plaintt{MPI\_Send}, \plaintt{MPI\_Recv}, \plaintt{MPI\_Isend}, \plaintt{MPI\_Irecv}, etc.\ --- those calls become no-ops --- so a single code path works for interior \emph{and} boundary processes without explicit conditionals.
+
+\begin{exampleblock}[Halo exchange on a 2D Cartesian grid]
+The canonical pattern: post all receives non-blocking, then all sends, then wait. \plaintt{MPI\_PROC\_NULL} returned by \plaintt{MPI\_Cart\_shift} on the boundary makes the corresponding send/recv a no-op, so no special-case code is needed.
+\begin{codeblock}[language=C]
+int dims[2] = {0, 0}, periods[2] = {0, 0}, coords[2];
+int up, down, left, right;
+MPI_Comm cart_comm;
+
+MPI_Dims_create(world_size, 2, dims);
+MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, /*reorder=*/1, &cart_comm);
+MPI_Cart_coords(cart_comm, my_cart_rank, 2, coords);
+
+MPI_Cart_shift(cart_comm, 0, 1, &up,   &down);
+MPI_Cart_shift(cart_comm, 1, 1, &left, &right);
+
+MPI_Request reqs[8];
+int n = 0;
+
+// post the four receives first
+MPI_Irecv(halo_up,    H, MPI_DOUBLE, up,    0, cart_comm, &reqs[n++]);
+MPI_Irecv(halo_down,  H, MPI_DOUBLE, down,  1, cart_comm, &reqs[n++]);
+MPI_Irecv(halo_left,  H, MPI_DOUBLE, left,  2, cart_comm, &reqs[n++]);
+MPI_Irecv(halo_right, H, MPI_DOUBLE, right, 3, cart_comm, &reqs[n++]);
+
+// then the four sends
+MPI_Isend(edge_up,    H, MPI_DOUBLE, up,    1, cart_comm, &reqs[n++]);
+MPI_Isend(edge_down,  H, MPI_DOUBLE, down,  0, cart_comm, &reqs[n++]);
+MPI_Isend(edge_left,  H, MPI_DOUBLE, left,  3, cart_comm, &reqs[n++]);
+MPI_Isend(edge_right, H, MPI_DOUBLE, right, 2, cart_comm, &reqs[n++]);
+
+MPI_Waitall(n, reqs, MPI_STATUSES_IGNORE);
+\end{codeblock}
+The matching tag on each pair (\texttt{0}/\texttt{1} for the vertical axis, \texttt{2}/\texttt{3} for the horizontal one) is what makes the receives match the corresponding sends from the neighbor on the other side. See \plaintt{MPI/codes/example\_of\_cartesian\_communicator/basic.c} for a complete runnable version, and \plaintt{heat2d\_cartesian.c} in the same directory for a full 2D heat-diffusion solver built on this pattern (using \plaintt{MPI\_Sendrecv} plus a derived \plaintt{MPI\_Type\_vector} for column halos).
+\end{exampleblock}
 
