@@ -104,8 +104,19 @@ When a CPU needs data, it first checks the fastest cache (L1), then proceeds to 
 
 Caching increases effective memory bandwidth and reduces average memory access latency---key for maximizing CPU (and to a certain extent, GPU) performance.
 
-% multicore CPUs
-\missing{multicore CPUs}
+\subsubsection{From single core to multicore}
+
+The end of frequency scaling pushed CPU vendors towards \textbf{multicore} designs, where several physical cores share the package and (typically) the last-level cache. Each core retains the latency-oriented features described above; what changes is that the chip now exposes \emph{thread-level} parallelism in addition to instruction-level parallelism.
+
+A few consequences are worth keeping in mind when reasoning about CPU-side performance:
+\begin{itemize}
+    \item \textbf{Shared last-level cache}. L1 and (usually) L2 are private per core, while the L3 is shared. Threads cooperating on the same data benefit from the shared cache, but threads with disjoint working sets compete for capacity.
+    \item \textbf{Cache coherence}. Hardware protocols (e.g.\ MESI) keep private caches consistent across cores, so a write by one core is eventually visible to the others. Coherence has a cost: ping-ponging a cache line between cores (\textit{false sharing}) is one of the most common performance pitfalls in multithreaded code.
+    \item \textbf{SMT / hyperthreading}. Each physical core often exposes two logical threads that share the execution resources. SMT helps hide short stalls but does \emph{not} double throughput.
+    \item \textbf{NUMA}. On multi-socket nodes, memory is partitioned across sockets and access to a remote socket is slower than to the local one. We discussed first-touch placement and pinning in chapter~3; the same considerations apply whenever a CPU thread feeds work to a GPU.
+\end{itemize}
+
+This is the architectural baseline against which a GPU is compared in the next subsection: many simple cores in place of a few sophisticated ones, no per-thread cache, and a programming model that explicitly partitions work across thousands of execution contexts rather than relying on the hardware to extract parallelism from a serial instruction stream.
 
 \subsubsection{Throughput-Oriented Design (GPUs)}
 A GPU, in contrast, is a \textbf{throughput-oriented} device, designed to execute thousands of parallel threads simultaneously. Its architecture is specialized for data-parallel tasks:
@@ -155,21 +166,43 @@ The SM is designed to keep its execution units busy by rapidly context-switching
 \end{figure}
 \end{minipage}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% End section to modify
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Leonardo as a reference machine}
+
+Throughout this chapter we will use the \textbf{Leonardo} pre-exascale system at CINECA as the reference accelerated machine, since it is the platform the course's exercises target. Each \textit{booster} node packs:
+\begin{itemize}
+    \item 1\,$\times$ Intel Xeon Platinum 8358 CPU (32 cores, host side);
+    \item 4\,$\times$ NVIDIA A100 64\,GB SXM GPUs (Ampere, compute capability 8.0), interconnected via NVLink so that GPU-to-GPU traffic stays inside the node without going over PCIe;
+    \item 512\,GB of host DRAM and a 2\,$\times$ 100\,Gb/s InfiniBand HDR fabric for the inter-node network.
+\end{itemize}
+On the software side, the NVIDIA HPC SDK 24.3 module exposes \plaintt{nvc}/\plaintt{nvc++}/\plaintt{nvfortran} compilers, CUDA, and the Nsight tools. To get an interactive shell on a GPU node from the login node, the course provides a small wrapper script:
+\begin{codeblock}[language=bash]
+# from the login node, source the helper and run get_gpu
+$ source get_gpu
+$ get_gpu     # 10 min, 1 node, 1 GPU, partition boost_usr_prod
+\end{codeblock}
+which under the hood runs an \plaintt{srun} with \texttt{--gres=gpu:1} on the \texttt{boost\_usr\_prod} partition. All Nsight, \plaintt{nvcc} and \plaintt{nvc} commands shown later in this chapter assume the user is sitting on such an interactive node, with the SDK module loaded.
+
+\begin{tipsblock}[Compute capability]
+The \texttt{-arch=sm\_80} flag mentioned later in this chapter is what selects the Ampere instruction set (the A100). On older or newer GPUs the suffix changes (e.g.\ \texttt{sm\_75} for Turing, \texttt{sm\_90} for Hopper); the value can also be set to \texttt{native} when compiling on the same machine that will run the binary.
+\end{tipsblock}
 
 \newpage
 
 \section{CUDA Programming Model}
 
-% skip slide 33
+CUDA is NVIDIA's C/C++ extension for programming the device. The model rests on three pillars: \emph{function qualifiers} that say where a function lives, the \emph{kernel-launch syntax} that schedules a function on the GPU, and the runtime API for moving data between host and device. We start with the syntax and then look at how errors are reported, since CUDA's asynchronous execution makes error handling non-trivial.
 
-\texttt{<<<>>>}: are used to quantify the number blocks and threads to launch the kernel.
+\subsection{Function qualifiers and kernel launches}
 
-We have dirrerent qualifiers for the functions:
+A function annotated with one of CUDA's qualifiers is compiled for the corresponding side of the device boundary:
 \begin{itemize}
-    \item \texttt{\_\_global\_\_}: It indicates that the function will run in the GPU, and can be invoked generally both from the host and the device.
+    \item \plaintt{\_\_global\_\_} --- the function is a \textbf{kernel}: callable from the host (and, on recent GPUs, from the device), executed on the device. It must return \plaintt{void}.
+    \item \plaintt{\_\_device\_\_} --- callable from device code only, executed on the device. Used for helper routines that run inside a kernel.
+    \item \plaintt{\_\_host\_\_} --- ordinary host function. Implicit when no qualifier is given.
+    \item \plaintt{\_\_host\_\_ \_\_device\_\_} --- compiled for both sides; useful for utilities that need to be reused on host and device.
+\end{itemize}
+
+A kernel is launched with the \texttt{<<<\,grid,\,block\,>>>} \textit{execution-configuration} syntax, which fixes how many thread blocks and how many threads per block the GPU will instantiate:
 
 \begin{codeblock}[language=C]
 __global__ void GPUFunction() {
@@ -178,33 +211,14 @@ __global__ void GPUFunction() {
 
 int main() {
     CPUFunction();
-    GPUFunction<<<1, 1>>>();
-    cudaDeviceSynchronize();
+    GPUFunction<<<1, 1>>>();    // 1 block, 1 thread
+    cudaDeviceSynchronize();    // wait for the GPU to finish
 }
 \end{codeblock}
 
-    \item \texttt{\_\_device\_\_}: device function, executed on the device.
-    \item \texttt{\_\_host\_\_}: host function, executed on the host.
-    \item \texttt{\_\_host\_\_ \_\_device\_\_}: host and device function, compiled for both.
-\end{itemize}
+A CUDA kernel runs as a \textit{grid} of threads, all executing the same code. Each thread sees a unique identifier through \texttt{threadIdx}, \texttt{blockIdx} and \texttt{blockDim}; we use it in the next section to map threads to data elements.
 
-A cuda kernel is executed as a grid (array) of threads, each of them runs in the same kernel.
-
-Each thread has a unique index \texttt{threadIdx.x}, which is used to access the data.
-
-To compile a program we must use the NVIDIA \texttt{nvcc} compiler. It is able to identify the functions to be executed on the GPU and the ones to be executed on the host.
-
-\begin{codeblock}[language=bash]
-nvcc -arch=sm_80 -o <output-file> <cuda-code>.cu -run
-\end{codeblock}
-
-Where:
-\begin{itemize}
-    \item \texttt{-arch=sm\_80}: specifies the architecture of the GPU to compile for.
-    \item \texttt{-run}: runs the program after compilation.
-\end{itemize}
-
-\subsubsection{SIMT vs SIMD}
+\subsection{SIMT vs SIMD}
 
 In cuda programming, we use the SIMT (Single Instruction Multiple Thread) model.
 
@@ -237,6 +251,50 @@ In cuda programming, we use the SIMT (Single Instruction Multiple Thread) model.
 \end{itemize}
 
 SIMT allows CUDA GPU to perform “vector” computations on scalar cores. Much easier to vectorise than getting compiler to autovectorize on CPU.
+
+\subsection{Compilation with nvcc}
+
+CUDA source files (\plaintt{.cu}) mix host and device code. The NVIDIA compiler driver \plaintt{nvcc} separates them: device-side code is compiled to PTX (a virtual ISA) and then to a target-specific binary, while host-side code is delegated to the system compiler (\plaintt{gcc}/\plaintt{clang}). A typical invocation on Leonardo is
+
+\begin{codeblock}[language=bash]
+nvcc -arch=sm_80 -O3 -o vecadd vecadd.cu
+\end{codeblock}
+
+\begin{itemize}
+    \item \plaintt{-arch=sm\_80} selects the target compute capability (Ampere = 8.0). Without this flag \plaintt{nvcc} compiles for an older default and you may miss hardware features.
+    \item \plaintt{-O3} enables host-side optimisation (device-side optimisation is on by default).
+    \item \plaintt{-run} (used in many of the course examples) compiles \emph{and} runs the resulting binary, which is convenient for one-off experiments.
+\end{itemize}
+
+\subsection{Error handling and the asynchronous error model}
+
+Every CUDA Runtime API call returns a value of type \plaintt{cudaError\_t}; \plaintt{cudaSuccess} means everything went well, anything else is an error code that \plaintt{cudaGetErrorString()} translates into a human-readable string. The synchronous case is straightforward:
+
+\begin{codeblock}[language=C]
+cudaError_t err = cudaMallocManaged(&a, size);
+if (err != cudaSuccess)
+    fprintf(stderr, "alloc error: %s\n", cudaGetErrorString(err));
+\end{codeblock}
+
+Kernel launches are different: they are \textbf{asynchronous}. The \texttt{<<<...>>>} call enqueues the kernel and returns immediately, even if the kernel cannot start (e.g.\ because the launch configuration is invalid) or fails later (e.g.\ a segmentation fault on the device). For that reason CUDA exposes \emph{two} layers of error reporting around a launch:
+
+\begin{codeblock}[language=C]
+myKernel<<<blocks, threads>>>(args);
+
+// 1) launch-time errors (bad configuration, too much shared memory, ...)
+cudaError_t launchErr = cudaGetLastError();
+if (launchErr != cudaSuccess) { /* handle */ }
+
+// 2) execution-time errors (only visible at the next sync point)
+cudaError_t runErr = cudaDeviceSynchronize();
+if (runErr != cudaSuccess) { /* handle */ }
+\end{codeblock}
+
+\plaintt{cudaGetLastError()} clears the sticky error flag, so calling it once after each launch is the safe pattern. Run-time faults inside a kernel only surface at the next synchronisation, which is why projects routinely wrap launches in a \texttt{CHECK\_CUDA} macro that calls both functions.
+
+\begin{tipsblock}[Debugging tip]
+Setting the environment variable \plaintt{CUDA\_LAUNCH\_BLOCKING=1} forces every kernel launch to be synchronous, so a crash points exactly at the offending kernel instead of at a far-away \plaintt{cudaDeviceSynchronize()}. Do this for debugging only --- it serialises all kernels and destroys the latency-hiding the GPU relies on.
+\end{tipsblock}
 
 \section{GPU Thread Hierarchy}
 
@@ -330,59 +388,42 @@ kernel<<<number_of_blocks, threads_per_block>>>(N);
 The "-1" term is added to round up the division if necessary.
 \end{exampleblock}
 
-A limited number of threads (1024) can fit inside a thread block
-To increase parallelism, we need to coordinate work among thread blocks
-
-This is achieved by mapping element of data vector to threads using global index
+A limited number of threads (1024) can fit inside a thread block, so to increase parallelism we coordinate work across many blocks. Each thread computes its global index and works on the corresponding data element:
 
 \begin{codeblock}[language=C]
 int idx = threadIdx.x + blockIdx.x * blockDim.x;
 \end{codeblock}
 
-\subsubsection{Error handling}
+\subsection{Grid-stride loops}
 
-All CUDA APIs returns an error code of type \texttt{cudaError\_t}. A special value \texttt{cudaSuccess} is returned on success, otherwise an error code is returned.
-
-
-To understand wich problem occurred, we can use the cudaGetErrorString() function.
+The "one-thread, one-element" pattern works well when the number of launched threads matches $N$, but it ties the kernel's correctness to a specific launch configuration. A more flexible idiom is the \textbf{grid-stride loop}: each thread starts at its global index and walks through the array in steps of \texttt{blockDim.x * gridDim.x}, the total number of threads in the grid.
 
 \begin{codeblock}[language=C]
-    cudaError_t err;
-    err = cudaMallocManaged(&a, size);
-    if (err != cudaSuccess)
-        printf("Error: %s\n", cudaGetErrorString(err));
+__global__ void vectorAdd(const float* a, const float* b, float* c, int n) {
+    int idx    = blockIdx.x * blockDim.x + threadIdx.x;
+    int stride = blockDim.x * gridDim.x;
+    for (int i = idx; i < n; i += stride)
+        c[i] = a[i] + b[i];
+}
 \end{codeblock}
 
-To check for errors occurring at the time of kernel execution, we can use the cudaGetLastError() function.
+The kernel now works correctly for \emph{any} grid size: launch a tiny grid and each thread processes many elements; launch a large grid and each thread processes one. This decouples the kernel from the launch configuration and is the recommended idiom in modern CUDA. The course example at \plaintt{cuda/source/vectorAddstride/testStrideNostride.cu} compares the two patterns under three regimes (small vector, large vector with enough threads, large vector with too few blocks) and shows that the strided version stays performant in the under-provisioned case where the non-strided kernel simply does not cover the array.
 
-\section{NVIDIA profiling tools}
+\begin{observationblock}[Why "grid-stride", not "block-stride"?]
+The stride is the number of threads in the entire grid, not just in one block. This makes consecutive iterations of the loop in different threads access \emph{contiguous} memory addresses --- exactly the pattern the GPU coalesces into a single transaction (see section~\ref{sec:cuda-memory}).
+\end{observationblock}
 
-A typical scenario while accelerating a code is to start with a cpu-only version and then accelerate it using cuda. 
+\section{CUDA Memory Hierarchy}
+\label{sec:cuda-memory}
 
-TO understand if everything is working correctly, we start with a \textbf{Nsight System profiler}: it is a system-wide performance viewer, which tracks CPU and GPU interactions across time.
-
-If we find something wrong, we can use the \textbf{Nsight Compute profiler}: it is a GPU-only profiler, which tracks the occupancy, memory usage, and instruction throughput.
-
-Let's see how to use the Nsight System profiler. 
-
-\begin{codeblock}[language=bash]
-nsys profile -t cuda,nvtx,mpi,openacc -stats=true --force-overwrite=true -o <output-file> <executable>
-\end{codeblock}
-
-\subsubsection{Nsight Compute profiler}
-
-\begin{codeblock}[language=bash]
-nsys profile -t cuda -o <output-file> <executable>
-\end{codeblock}
-
----
+The execution model only tells half the story: a kernel is fast only as long as the threads can be fed with data. The GPU exposes a small zoo of memory spaces with very different bandwidth, latency, scope and lifetime, and choosing the right one is the single largest optimisation lever available. The figure below summarises the on-chip / off-chip layout of an SM, and the small table beside it shows the rough bandwidth and latency ratios between the three main tiers (registers, shared memory / L1, global memory).
 
 \begin{minipage}{0.74\textwidth}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{assets/mem-hierarchy.png}
-    \caption{Memory Hierarchy}
-    \label{fig:memory-hierarchy}
+    \caption{CUDA memory hierarchy.}
+    \label{fig:cuda-memory-hierarchy}
 \end{figure}
 \end{minipage}%
 \hfill
@@ -399,75 +440,429 @@ nsys profile -t cuda -o <output-file> <executable>
         $1 \times$ & $15 \times$ \\
         \bottomrule
     \end{tabular}
-    \caption{Bandwidth and Latency comparison}
+    \caption{Bandwidth and latency, normalised.}
     \label{fig:bandwidth-latency-comparison}
     \end{figure}
 \end{minipage}
 
-In such architecture, CUDA provides 4 different memory types:
+The four memory spaces a CUDA programmer normally interacts with are:
 
 \begin{itemize}
-    \item \textbf{Global Memory}: The largest memory space available on the device, but also the slowest in terms of access latency.
-    \begin{itemize}
-        \item Scope: Accessible by all threads (from any block or grid).
-        \item Usage: Memory allocated with \texttt{cudaMalloc()} and data transferred using \texttt{cudaMemcpy()}.
-    \end{itemize}
-
-    \item \textbf{Shared Memory}: Fast and low-latency memory, but much smaller than global memory.
-    \begin{itemize}
-        \item Scope: Shared between all threads within the same block.
-        \item Usage: Useful for data reuse and to reduce global memory accesses. Declared with the \texttt{\_\_shared\_\_} qualifier.
-    \end{itemize}
-
-    \item \textbf{Registers}: The fastest memory available, mapped directly to the hardware registers of each Streaming Multiprocessor (SM).
-    \begin{itemize}
-        \item Scope: Private to each thread; cannot be accessed by other threads.
-        \item Usage: Used for automatic variables declared within a kernel.
-    \end{itemize}
-
-    \item \textbf{Constant Memory}: Read-only memory space cached and optimized for uniform access by all threads. Offers efficient broadcast for all threads reading the same location.
-    \begin{itemize}
-        \item Scope: Accessible from all threads, but cannot be modified from device code.
-        \item Usage: Declared with the \texttt{\_\_constant\_\_} qualifier.
-    \end{itemize}
+    \item \textbf{Global memory}: the off-chip DRAM, the largest space (tens of GB on Ampere) but also the slowest. \textit{Scope}: accessible by all threads of all blocks and grids. \textit{Usage}: \plaintt{cudaMalloc}/\plaintt{cudaMemcpy}.
+    \item \textbf{Shared memory}: a small (up to 164\,KB per SM on A100), fast on-chip scratchpad. \textit{Scope}: shared by all threads within a block. \textit{Usage}: declared with the \plaintt{\_\_shared\_\_} qualifier; used to cache data for reuse inside a block (see~\ref{subsec:shared-tiling}).
+    \item \textbf{Registers}: the fastest storage on the GPU, mapped to the SM's register file. \textit{Scope}: private to each thread. \textit{Usage}: automatic variables inside a kernel. Spilling to "local" memory (which is really global) happens silently when register pressure is too high, and tanks performance --- watch the compiler report.
+    \item \textbf{Constant memory}: a 64\,KB read-only space, cached and optimised for the case where all threads in a warp read the same address. \textit{Scope}: read-only from device code. \textit{Usage}: \plaintt{\_\_constant\_\_} qualifier.
 \end{itemize}
 
+\subsection{Coalesced access in practice}
+
+The Ampere memory subsystem services global-memory transactions in 32-, 64- or 128-byte segments. When the threads of a warp request \emph{contiguous} addresses inside a single segment, the hardware merges them into one transaction --- a \textbf{coalesced} access. When the addresses are spread across multiple segments, the hardware issues several transactions and bandwidth utilisation drops accordingly.
 
 \begin{tipsblock}[Memory coalescing]
-    For optimal performance, threads in a warp should access consecutive memory addresses. Coalesced memory access can improve bandwidth utilization by up to 10x compared to non-coalesced access patterns.    
+For optimal performance, threads in a warp should access consecutive memory addresses. Coalesced access can improve bandwidth utilisation by up to $10\times$ compared to non-coalesced patterns.
 \end{tipsblock}
 
-\subsection{CUDA Streams}
+The classic counter-example is a transposed access pattern. Reading a row of a matrix (\plaintt{A[row*N + col]}, with \texttt{col} varying with \texttt{threadIdx.x}) is coalesced; reading a column (\plaintt{A[col*N + row]}) is not, because successive threads jump by $N$ floats. The course example at \plaintt{cuda/source/matrixTranspose/matrixTranspose.cu} measures both patterns and shows the bandwidth gap.
 
-A CUDA stream is a sequence of CUDA operations. The defaualt stream executes those operations in the order they are issued, therefore, an instruction must be completed before the next one can begin.
+\subsection{Shared memory and tiling}
+\label{subsec:shared-tiling}
 
-Multiple streams or Non-default streams can be created and utilise by CUDA programmers. 
-While single stream kernels must execute in order, kernels in different, non-default streams, can interact concurrently, and therefore have no fixed order of execution
+Shared memory shines when the same global-memory value is read by many threads of a block --- which is exactly what happens in matrix multiplication: every element of $A$ contributes to a whole row of $C$, and every element of $B$ to a whole column. The \textbf{tiled matmul} pattern exploits this by loading TILE$\times$TILE blocks of $A$ and $B$ into shared memory cooperatively, reusing them many times, and then advancing along the $K$ dimension.
 
-This can be useful to overlap the execution of kernels and memory transfers, or to execute kernels in parallel.
+A trimmed version of the kernel from \plaintt{cuda/source/Global\_Shared\_streaming/matmul\_shared.cu} (\texttt{TILE\_SIZE = 16}):
+
+\begin{codeblock}[language=C]
+__global__ void matmul_shared(const float* A, const float* B,
+                              float* C, int M, int N, int K) {
+    __shared__ float s_A[TILE_SIZE][TILE_SIZE];
+    __shared__ float s_B[TILE_SIZE][TILE_SIZE];
+
+    int row = blockIdx.y * TILE_SIZE + threadIdx.y;
+    int col = blockIdx.x * TILE_SIZE + threadIdx.x;
+    float sum = 0.0f;
+
+    for (int k = 0; k < K; k += TILE_SIZE) {
+        s_A[threadIdx.y][threadIdx.x] = A[row*K + k + threadIdx.x];
+        s_B[threadIdx.y][threadIdx.x] = B[(k + threadIdx.y)*N + col];
+        __syncthreads();                      // tile fully loaded
+
+        for (int i = 0; i < TILE_SIZE; ++i)
+            sum += s_A[threadIdx.y][i] * s_B[i][threadIdx.x];
+        __syncthreads();                      // before overwriting
+    }
+    if (row < M && col < N) C[row*N + col] = sum;
+}
+\end{codeblock}
+
+Two ideas are at play here. The cooperative load amortises each global-memory read over \texttt{TILE\_SIZE} multiply-adds, turning a memory-bound kernel into a compute-bound one. And the two \texttt{\_\_syncthreads()} barriers separate the two phases of the loop body: \emph{all} threads must finish loading the tile before \emph{any} thread starts using it, and \emph{all} threads must finish using it before \emph{any} thread overwrites it on the next iteration.
+
+\begin{warningblock}[Shared memory bank conflicts]
+Shared memory is split into 32 \textit{banks}; an access by a warp is conflict-free only if at most one thread accesses each bank (or all threads access the same address, which is broadcast). A common cause of conflicts is column-major access into a 32-wide shared array; the standard fix is to over-pad the array (e.g.\ \plaintt{\_\_shared\_\_ float s[32][33]}) so that successive columns fall into different banks.
+\end{warningblock}
+
+\subsection{Host memory: pageable, pinned, managed}
+
+Allocations on the \emph{host} side also have a performance dimension. The runtime offers three flavours:
+
+\begin{itemize}
+    \item \textbf{Pageable} memory --- ordinary \plaintt{malloc}/\plaintt{new}. The OS may page it out, so before each \plaintt{cudaMemcpy} the runtime has to copy the buffer into an internal pinned staging area. This double-copy roughly halves the achievable PCIe bandwidth.
+    \item \textbf{Pinned} (page-locked) memory --- allocated with \plaintt{cudaMallocHost} or \plaintt{cudaHostAlloc}. The OS cannot page it out, so the GPU's DMA engine reads directly from it. Transfer bandwidth is typically $1.5\times$--$2\times$ that of pageable memory, and pinned buffers are a prerequisite for \emph{asynchronous} \plaintt{cudaMemcpyAsync} (see section on streams).
+    \item \textbf{Managed} memory --- allocated with \plaintt{cudaMallocManaged}. A single virtual address is valid on both host and device; the driver migrates pages on demand. Convenient (one allocator, no explicit \plaintt{cudaMemcpy}) but the migration is implicit, which makes performance harder to predict.
+\end{itemize}
+
+\begin{codeblock}[language=C]
+float *pageable = (float*)malloc(bytes);              // CPU only
+float *pinned;   cudaMallocHost(&pinned, bytes);      // page-locked
+float *managed;  cudaMallocManaged(&managed, bytes);  // unified
+\end{codeblock}
+
+The course example at \plaintt{cuda/source/vecAdd\_pinnedpeageble/vecAdd\_managed.cu} (the directory name is a typo for "pinned/pageable") benchmarks pageable vs.\ pinned transfers side-by-side; the managed version lives at \plaintt{cuda/source/vecAddtion\_managed/vecAdd\_managed.cu}.
+
+\subsection{Unified memory and page faults}
+
+When a kernel touches a managed-memory page that is currently resident on the host, the GPU raises a \textbf{page fault}: execution stalls, the driver migrates the page over PCIe, and only then does the kernel resume. The first kernel after an allocation pays this cost on every page; subsequent kernels see the data already on the device and run at full speed.
+
+To avoid surprises, CUDA exposes two hint APIs:
+\begin{itemize}
+    \item \plaintt{cudaMemPrefetchAsync(ptr, size, deviceId)} --- asynchronously migrate a range to a target device (use \plaintt{cudaCpuDeviceId} for the host) before it is needed. This is the cheapest way to make managed memory perform like an explicit \plaintt{cudaMemcpy}.
+    \item \plaintt{cudaMemAdvise(ptr, size, advice, deviceId)} --- tell the driver about an access pattern, e.g.\ \plaintt{cudaMemAdviseSetReadMostly} or \plaintt{cudaMemAdviseSetPreferredLocation}. The driver uses these as scheduling hints, not as commands.
+\end{itemize}
+
+\begin{exampleblock}[Prefetching managed buffers before launch]
+\begin{codeblock}[language=C]
+cudaMallocManaged(&a, size);
+cudaMallocManaged(&b, size);
+cudaMallocManaged(&c, size);
+
+cudaMemPrefetchAsync(a, size, deviceId);   // warm the GPU
+cudaMemPrefetchAsync(b, size, deviceId);
+cudaMemPrefetchAsync(c, size, deviceId);
+
+addVectors<<<blocks, threads>>>(c, a, b, N);
+cudaDeviceSynchronize();
+
+cudaMemPrefetchAsync(c, size, cudaCpuDeviceId);  // bring result home
+\end{codeblock}
+This is the pattern used in \plaintt{cuda/solution/04-stream/stream1.cu}.
+\end{exampleblock}
+
+\section{Asynchronous Execution and CUDA Streams}
+
+So far we have launched kernels on the implicit \textit{default stream}: every operation issued by the host is appended to a single FIFO queue and executed in order. The default stream is convenient but it forbids exactly the kind of overlap a GPU can exploit --- copying the next batch of data while the current batch is being processed, or running independent kernels side by side.
+
+A \textbf{CUDA stream} is just an ordered queue of operations. Operations within a stream execute in order; operations in \emph{different} streams may run concurrently if the hardware has the resources for it. Creating, using and destroying a stream is straightforward:
+
+\begin{codeblock}[language=C]
+cudaStream_t stream;
+cudaStreamCreate(&stream);
+
+someKernel<<<numberOfBlocks, numberOfThreads, 0, stream>>>();   // 4th launch arg
+
+cudaStreamDestroy(stream);
+\end{codeblock}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{assets/cuda-stream.png}
-    \caption{CUDA Streams Overlap}
+    \caption{Concurrent execution of kernels and transfers using multiple streams.}
     \label{fig:cuda-streams}
 \end{figure}
 
+\subsection{Overlapping H2D, kernel and D2H}
+
+The motivating use case for streams is the classical pipeline: split a large array into chunks, and for each chunk overlap the host-to-device copy of one chunk with the kernel execution of the previous chunk and the device-to-host copy of the chunk before that. This requires two ingredients:
+\begin{itemize}
+    \item a non-blocking copy primitive --- \plaintt{cudaMemcpyAsync(dst, src, n, kind, stream)}, which enqueues the transfer on \texttt{stream} and returns immediately;
+    \item \emph{pinned} host memory, otherwise the runtime cannot DMA directly and silently downgrades the call to a synchronous copy.
+\end{itemize}
+
 \begin{codeblock}[language=C]
-// Create a new stream
-cudaStream_t stream;
-cudaStreamCreate(&stream);
+const int nStreams = 4, chunk = N / nStreams;
+cudaStream_t s[nStreams];
+for (int i = 0; i < nStreams; ++i) cudaStreamCreate(&s[i]);
 
-// Launch a kernel in the new stream
-someKernel<<<numberOfBlocks, numberOfThreads, 0, stream>>>();
-
-// Destroy the stream
-cudaStreamDestroy(stream);
+for (int i = 0; i < nStreams; ++i) {
+    int off = i * chunk;
+    cudaMemcpyAsync(d_x + off, h_x + off, chunk*sizeof(float),
+                    cudaMemcpyHostToDevice, s[i]);
+    kernel<<<blocks, threads, 0, s[i]>>>(d_y + off, d_x + off, chunk);
+    cudaMemcpyAsync(h_y + off, d_y + off, chunk*sizeof(float),
+                    cudaMemcpyDeviceToHost, s[i]);
+}
+for (int i = 0; i < nStreams; ++i) cudaStreamDestroy(s[i]);
 \end{codeblock}
 
-\begin{advancedblock}[non-blocking streams]
-cudaStreamCreate creates a blocking stream, but it exitsts also a non-blocking versions, like \plaintt{cudaStreamNonBlocking}. This topic is not covered in this course.
+The course solution at \plaintt{cuda/solution/04-stream/stream1.cu} applies the same idea to a vector-addition workload, using \plaintt{cudaMallocManaged} + \plaintt{cudaMemPrefetchAsync} on three streams to overlap the initialisation of \texttt{a}, \texttt{b} and \texttt{c} before adding them.
+
+\subsection{Synchronisation: do not over-synchronise}
+
+Streams give the GPU permission to overlap work; you still need synchronisation to know when results are safe to read on the host. Two primitives cover most cases:
+
+\begin{itemize}
+    \item \plaintt{cudaStreamSynchronize(stream)} --- block the host until \emph{this} stream has drained. Other streams keep running.
+    \item \plaintt{cudaDeviceSynchronize()} --- block until \emph{all} streams on the current device have drained. Heavy-handed, but necessary at the very end of a phase or before tearing down resources.
+\end{itemize}
+
+A common mistake is to scatter \plaintt{cudaDeviceSynchronize()} between operations "to be safe": each call effectively serialises the GPU and makes streams pointless. Prefer per-stream synchronisation, and let the runtime keep operations from \emph{different} streams overlapping.
+
+\begin{tipsblock}[Stream callbacks and events]
+For finer-grained synchronisation, CUDA also exposes \plaintt{cudaEvent\_t} (timestamps that can be recorded into a stream and queried/waited on later) and \plaintt{cudaStreamAddCallback} (a host function fired when the stream reaches that point). Events are also the right tool for measuring kernel execution time, as in the \plaintt{matmul\_shared.cu} example.
+\end{tipsblock}
+
+\begin{advancedblock}[Non-blocking streams]
+\plaintt{cudaStreamCreate} creates a stream that synchronises with the default (legacy) stream. The \plaintt{cudaStreamCreateWithFlags(\&s, cudaStreamNonBlocking)} variant decouples it from the default stream, which is preferable when mixing default-stream code (e.g.\ from a library) with explicitly-managed streams. Not covered in detail in this course.
 \end{advancedblock}
 
+\section{Profiling Workflow}
 
+A typical optimisation cycle on the GPU starts from a CPU baseline and proceeds in two passes: first a \emph{system-wide} profile to understand where time is spent (CPU vs.\ GPU, transfer vs.\ compute, idle gaps in the timeline), then a \emph{per-kernel} deep-dive on the worst offender. The two NVIDIA tools that map onto these passes are:
 
+\begin{itemize}
+    \item \textbf{Nsight Systems} (\plaintt{nsys}) --- a low-overhead system-level tracer. It produces a timeline showing kernels, memory transfers, OS-level CPU activity and (optionally) MPI / NVTX ranges. This is what you look at first to confirm that the GPU is busy when it should be and that transfers are overlapping with compute.
+    \item \textbf{Nsight Compute} (\plaintt{ncu}) --- a per-kernel hardware-counter profiler. It reports occupancy, achieved memory bandwidth, instruction mix, warp stall reasons and many other metrics, but at the cost of replaying each kernel several times. Use it after Nsight Systems has identified the kernel that matters.
+\end{itemize}
+
+\subsection{Capturing a profile}
+
+The minimal Nsight Systems invocation traces CUDA and NVTX activity and writes a \plaintt{.nsys-rep} file that the \plaintt{nsys-ui} GUI (or \plaintt{nsys stats}) can open later:
+
+\begin{codeblock}[language=bash]
+nsys profile -t cuda,nvtx --stats=true --force-overwrite=true \
+             -o report ./my_program
+\end{codeblock}
+
+The \plaintt{-t} flag selects which traces to collect (add \plaintt{mpi} or \plaintt{openacc} as needed); \plaintt{--stats=true} prints a summary on the console after the run, which is usually enough for a first triage.
+
+For a full per-kernel report, switch to Nsight Compute:
+
+\begin{codeblock}[language=bash]
+ncu --set full -o report ./my_program
+\end{codeblock}
+
+The \plaintt{--set full} preset enables every metric group; cheaper presets like \plaintt{--set basic} or \plaintt{--set roofline} are available when only a subset is needed. Both tools require write access to GPU performance counters; on Leonardo this is granted automatically inside a \plaintt{boost\_usr\_prod} job.
+
+\subsection{Annotating the timeline with NVTX}
+
+Without help, an Nsight Systems timeline is a sea of unnamed CUDA API calls. The \textbf{NVIDIA Tools Extension} (NVTX) library lets you mark regions of host code so that they appear as named ranges on the timeline, which makes correlating profile features with source code trivial. The pattern is just push/pop:
+
+\begin{codeblock}[language=C]
+#include <nvtx3/nvToolsExt.h>
+
+nvtxRangePushA("H2D Transfer");
+cudaMemcpy(d_A, A, bytes, cudaMemcpyHostToDevice);
+cudaMemcpy(d_B, B, bytes, cudaMemcpyHostToDevice);
+nvtxRangePop();
+
+nvtxRangePushA("MatMul Kernel (Shared Memory)");
+matmul_shared<<<grid, block>>>(d_A, d_B, d_C, M, N, K);
+cudaDeviceSynchronize();
+nvtxRangePop();
+\end{codeblock}
+
+This snippet is condensed from \plaintt{cuda/source/Global\_Shared\_streaming/matmul\_shared.cu}, where every phase (H2D, kernel, D2H, CPU computation) is wrapped in its own NVTX range. The corresponding \plaintt{.nsys-rep} files in that directory show exactly how the labelled bands stack up on the timeline.
+
+\subsection{What to look at first}
+
+\begin{tipsblock}[Profiler triage checklist]
+\begin{enumerate}
+    \item \textbf{Is the GPU busy?} On the Nsight Systems timeline, a wide band of GPU activity is good; large idle gaps between kernels usually mean over-synchronisation on the host or too few streams.
+    \item \textbf{Transfers vs.\ compute.} If the H2D / D2H bands are as wide as the kernel band, the kernel is transfer-bound: pin host memory, use \plaintt{cudaMemcpyAsync} on streams, or move to managed memory with prefetching.
+    \item \textbf{Kernel duration.} Once the timeline looks healthy, sort kernels by total time and pick the heaviest one for an Nsight Compute deep-dive.
+    \item \textbf{Inside Nsight Compute}: check \emph{achieved occupancy} (low values point at register or shared-memory pressure), \emph{memory throughput} as a fraction of peak (low values mean uncoalesced access or insufficient ILP), and the \emph{warp stall reason} histogram (memory dependency, execution dependency, etc.).
+\end{enumerate}
+\end{tipsblock}
+
+\begin{observationblock}[A note on the roofline model]
+A complementary --- and more quantitative --- way to read these metrics is the \textit{roofline model}, which plots achieved performance against arithmetic intensity (FLOPs per byte) and bounds it by the peak compute and peak memory-bandwidth lines. We do not develop it here; the \plaintt{ncu --set roofline} preset already produces the plot for any kernel.
+\end{observationblock}
+
+\section{GPU programming with OpenMP target offload}
+
+CUDA gives the programmer full control over the GPU but also full responsibility for managing devices, memory, kernels and streams; and the resulting code is bound to NVIDIA hardware. \textbf{OpenMP target offload} (introduced in OpenMP 4.0 and consolidated in 4.5/5.x) takes the opposite trade-off: a small set of pragmas asks the compiler to move a region of code and the data it needs to an attached accelerator, while the rest of the program stays in standard C/C++/Fortran. The same source can be retargeted to a different GPU vendor or fall back to the CPU by changing only compiler flags --- at the price of less direct control over the hardware.
+
+This section walks through the constructs that the OpenMP school examples (\plaintt{GPU/OpenMP\_2024/}) exercise, in roughly the same order: \emph{target} first, then \emph{teams/threads}, then data mapping, then asynchrony, then multi-GPU.
+
+\subsection{The target construct}
+
+The basic block is \plaintt{\#pragma omp target}: it marks a structured region whose statements should execute on the device. Scalars and array sections referenced inside the region are mapped to the device automatically (with \plaintt{tofrom} semantics for arrays, more on this below). The course's \plaintt{Simple/simple0.c} uses it just to query the GPU:
+
+\begin{codeblock}[language=C]
+if (omp_get_num_devices() == 0) {
+    printf("No accelerator found\n"); exit(1);
+}
+
+#pragma omp target device(0)
+{
+    int nteams   = omp_get_num_teams();
+    int nthreads = omp_get_max_threads();
+    printf("device 0: %d teams, %d threads/team\n", nteams, nthreads);
+}
+\end{codeblock}
+
+Without further directives the compiler runs the body on a \emph{single} team with a \emph{single} thread --- functionally correct, but only a tiny fraction of the GPU is used. To get parallelism we need to combine \plaintt{target} with the team/thread constructs.
+
+\subsection{Teams, threads and the SIMT mapping}
+
+OpenMP exposes three nested levels of parallelism that map onto the GPU thread hierarchy:
+
+\begin{itemize}
+    \item a \textbf{league} of \textbf{teams} (\plaintt{\#pragma omp teams}) --- each team becomes a CUDA thread block;
+    \item a team's \textbf{threads} executing a worksharing loop (\plaintt{distribute parallel for}) --- each thread becomes a CUDA thread inside the block;
+    \item optionally, \textbf{SIMD lanes} inside a thread (\plaintt{simd}) --- which on the GPU lines up with how a warp executes a SIMT instruction.
+\end{itemize}
+
+The composite construct that one sees most often in practice is
+
+\begin{codeblock}[language=C]
+#pragma omp target teams distribute parallel for simd \
+        map(to: a, n, x[0:n]) map(tofrom: y[0:n])
+for (int i = 0; i < n; ++i)
+    y[i] = a * x[i] + y[i];
+\end{codeblock}
+
+which is the SAXPY kernel from \plaintt{VectorMultiplications/saxpi.gpu.simple.c}. Reading the directives outside-in: the \plaintt{target} sends control to the device; \plaintt{teams} creates a league of thread blocks; \plaintt{distribute} hands successive chunks of loop iterations to successive teams; \plaintt{parallel for} parallelises within each team; and \plaintt{simd} hints at vectorisation inside a thread.
+
+The number of teams and threads can be left to the compiler or controlled with the \plaintt{num\_teams}, \plaintt{thread\_limit}, \plaintt{num\_threads} and \plaintt{dist\_schedule} clauses. The example progression \plaintt{saxpi.gpu.v0.c} $\to$ \plaintt{v2.c} explores this experimentally:
+
+\begin{itemize}
+    \item v0: 1 team, 1 thread --- correct, painfully slow (left as a baseline).
+    \item v1: a single tunable team count; throughput grows roughly with the number of teams up to the SM count.
+    \item v2: full control over both axes via \plaintt{num\_teams(ial)} and \plaintt{num\_threads(itr)} with \plaintt{dist\_schedule(static, itr)}; performance is best when the team count saturates the SMs and the thread count is a multiple of 32 --- the same warp-friendly constraint we saw in CUDA.
+\end{itemize}
+
+\begin{tipsblock}[Rule of thumb]
+Letting the compiler pick \plaintt{num\_teams} and \plaintt{thread\_limit} is usually within $10$--$20\%$ of the hand-tuned configuration. Do not micro-tune these clauses unless the profiler says the kernel is launch-bound or you have a specific layout in mind.
+\end{tipsblock}
+
+\subsection{Data mapping and persistent device data}
+
+By default, every \plaintt{target} region copies the data it touches onto the device on entry and back on exit. This is safe but expensive: in an iterative algorithm the same arrays bounce across PCIe on every iteration. The \plaintt{map} clause makes the intent explicit and lets the runtime optimise:
+
+\begin{itemize}
+    \item \plaintt{map(to: A[0:n])} --- copy host $\to$ device on entry, do not copy back;
+    \item \plaintt{map(from: A[0:n])} --- allocate on device, copy device $\to$ host on exit;
+    \item \plaintt{map(tofrom: A[0:n])} --- both directions (the implicit default for arrays);
+    \item \plaintt{map(alloc: A[0:n])} --- allocate on device, no transfer in either direction.
+\end{itemize}
+
+For arrays that survive across multiple kernels, the right tool is a \plaintt{target data} region (structured) or a pair of \plaintt{target enter data} / \plaintt{target exit data} directives (unstructured), which decouple the data lifetime from any particular kernel. The course's GEMV progression illustrates the pay-off. Version~1 maps the matrix on every call:
+
+\begin{codeblock}[language=C]
+void gemv(float alpha, float* A, float* x, float beta, float* y,
+          size_t rows, size_t cols) {
+    #pragma omp target teams distribute \
+            map(to: A[0:rows*cols], x[0:cols], alpha, beta) \
+            map(from: y[0:rows])
+    for (size_t i = 0; i < rows; ++i) { /* ... */ }
+}
+\end{codeblock}
+
+Version~3 hoists the allocation out of the kernel by attaching it to the array's lifetime:
+
+\begin{codeblock}[language=C]
+float* allocate_and_initialize_array(size_t rows, size_t cols) {
+    float* a = (float*)malloc(rows*cols*sizeof(float));
+    /* ... initialise on the host ... */
+    #pragma omp target enter data map(to: a[:rows*cols])
+    return a;
+}
+
+void deallocate(float* a, size_t n) {
+    #pragma omp target exit data map(delete: a[:n])
+    free(a);
+}
+\end{codeblock}
+
+The kernel itself now runs without per-call mapping, and a final \plaintt{\#pragma omp target update from(y[:rows])} brings the result back. On a $32{,}768 \times 32{,}768$ GEMV this turns a transfer-bound run into a compute-bound one.
+
+\subsection{Asynchronous offload and OpenMP "streams"}
+
+A target region without further annotation is synchronous: the host blocks until the kernel finishes. The \plaintt{nowait} clause turns it into an OpenMP \emph{task} that runs asynchronously, and the host can continue with other work --- including launching more target tasks. \plaintt{taskwait} (or \plaintt{depend} clauses for fine-grained ordering) re-synchronises.
+
+The course example \plaintt{Asyncomputing/multiple.streams.c} simulates CUDA streams entirely with tasks: it splits an array into chunks and fires one asynchronous \plaintt{target} per chunk inside an \plaintt{omp single} region:
+
+\begin{codeblock}[language=C]
+#pragma omp parallel
+{
+    #pragma omp single
+    {
+        for (int s = 0; s < num_streams; ++s) {
+            int start = s * chunk_size;
+            int end   = (s == num_streams - 1) ? N : start + chunk_size;
+            #pragma omp task firstprivate(start, end) nowait
+            gpu_task(data, start, end);   // contains a #pragma omp target
+        }
+    }
+    #pragma omp taskwait
+}
+\end{codeblock}
+
+Each task carries its own target region; the runtime is free to schedule them on different CUDA streams under the hood, giving the same overlap of transfers and kernels as explicit \plaintt{cudaMemcpyAsync} would.
+
+\subsection{Multi-GPU offload}
+
+A node like Leonardo has four A100s; OpenMP exposes them as device IDs $0,\,1,\,\dots,\,N{-}1$. Two ingredients are needed to use more than one:
+\begin{itemize}
+    \item the \plaintt{device(d)} clause on \plaintt{target} / \plaintt{target data} / \plaintt{target enter data}, which selects the GPU that the construct will run on;
+    \item the \plaintt{\#pragma omp declare target} directive, which marks a function (or variable) as callable from device code so that the same routine can be reused across GPUs.
+\end{itemize}
+
+The dual-GPU SAXPY in \plaintt{ModularProgramming/saxpi.dualgpu.simple.c} packages the per-GPU kernel into a \plaintt{declare target} function and dispatches it to a chosen device:
+
+\begin{codeblock}[language=C]
+#pragma omp declare target
+int computeLoop(int n, float a, const float *x, float *y, int dev) {
+    #pragma omp target data device(dev) \
+            map(to: a, n, x[0:n]) map(tofrom: y[0:n])
+    {
+        #pragma omp target teams distribute parallel for simd device(dev)
+        for (int i = 0; i < n; ++i)
+            y[i] = a * x[i] + y[i];
+    }
+    return dev;
+}
+#pragma omp end declare target
+\end{codeblock}
+
+Splitting work across GPUs is then just a matter of partitioning the index range and calling \plaintt{computeLoop} once per device --- typically inside an \plaintt{omp parallel} so the host issues launches on multiple GPUs concurrently.
+
+\subsection{Compilers and Leonardo}
+
+Three compilers support OpenMP target offload to NVIDIA GPUs; the syntax is the same, only the flags change.
+
+\begin{codeblock}[language=bash]
+# NVIDIA HPC SDK
+nvc -mp=gpu -gpu=cc80 -O3 -fast -Minfo=all -o prog prog.c
+
+# Clang
+clang -fopenmp -fopenmp-targets=nvptx64 \
+      -Xopenmp-target -march=sm_80 -o prog prog.c
+
+# GCC offload
+gcc -fopenmp -foffload=nvptx-none \
+    -foffload-options="-march=sm_80" -o prog prog.c
+\end{codeblock}
+
+On Leonardo the recipe documented at \plaintt{GPU/OpenMP\_2024/resources/HOWTO\_compile.md} is
+
+\begin{codeblock}[language=bash]
+module load nvhpc/24.3 openmpi/4.1.6--nvhpc--24.3
+
+OMP_FLAG="-mp=multicore,gpu"      # OpenMP on both CPU and GPU
+GPU_FLAG="-gpu=cc80 -target=gpu -gpu=nomanaged"
+
+nvc -O3 -fast -Minfo=all $GPU_FLAG $OMP_FLAG prog.c -o prog
+\end{codeblock}
+
+A few environment variables are worth knowing about:
+\begin{itemize}
+    \item \plaintt{OMP\_TARGET\_OFFLOAD=MANDATORY} --- abort if offload is not available, instead of silently falling back to the CPU. Use this in benchmarks.
+    \item \plaintt{OMP\_NUM\_TEAMS}, \plaintt{OMP\_TEAM\_LIMIT} --- runtime override for the team count and the maximum threads per team.
+    \item \plaintt{OMP\_DISPLAY\_ENV=true} --- prints the OpenMP runtime configuration on startup; useful when you suspect an environment misconfiguration.
+\end{itemize}
+
+\section{CUDA, OpenMP target, and what comes next}
+
+Looking back at the chapter, the two programming models we have seen sit at opposite ends of the productivity / control trade-off. CUDA exposes the hardware almost directly: the programmer chooses the launch configuration, places data in shared memory, schedules transfers on streams, picks pinned versus managed allocations. The reward is full performance and full responsibility, locked to the NVIDIA stack. OpenMP target offload hides most of those decisions behind a handful of pragmas: the same loop annotated with \plaintt{target teams distribute parallel for} delivers a respectable fraction of the CUDA performance on the same A100, and could in principle be retargeted to a different vendor by changing only compiler flags.
+
+A third directive-based model, \textbf{OpenACC}, occupies roughly the same niche as OpenMP target but with a slightly different vocabulary (\plaintt{parallel}/\plaintt{kernels}, \plaintt{gang}/\plaintt{worker}/\plaintt{vector}, \plaintt{copyin}/\plaintt{copyout}) and a stronger focus on incremental porting of existing scientific codes. OpenACC is the subject of chapter~7, which also includes a side-by-side comparison of the OpenACC and OpenMP directives and clauses, and a Laplace-equation case study that walks the same algorithm through both ecosystems.
