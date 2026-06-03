@@ -1,0 +1,140 @@
+\chapter{CMB radiation}
+
+\dots
+
+CMB radiation comes to us from last scattering surface (LSS). Since recombination is not instantaneous, in general $2.5 \leq z \leq 1090$. Here, the redshift of recombination, is defined as the redshift at which the ionization fraction drops below some value (typically 0.1). Rather, $z = 1080$, where the latter is the redshift of decoupling, defined as the epoch at which the Thomson scattering rate is equal to the Hubble expansion rate
+
+\dots
+
+Temperature power spectrum -> fourier transformation
+
+the poower spectrum is:
+
+$$
+C_\ell = \langle |a_{\ell m}|^2 \rangle
+$$
+
+An important angular scale is set by the comoving Hubble radius at decoupling,
+$$
+r_H(z_{\mathrm{dec}})=\frac{c}{H(z_{\mathrm{dec}})}.
+$$
+Its projected angular size on the last-scattering surface is
+$$
+\theta_H=\frac{r_H}{d_A(z_{\mathrm{dec}})\,(1+z_{\mathrm{dec}})}\simeq 0.87^\circ.
+$$
+
+To connect angular scales to the CMB power spectrum, we use
+$$
+\theta \sim \frac{\pi}{\ell}\ \text{rad} \sim \frac{180^\circ}{\ell},
+$$
+so $\theta_H \simeq 0.87^\circ$ corresponds to a characteristic multipole $\ell_H \sim 200$.
+
+Therefore, temperature anisotropies with $\ell\lesssim 200$ probe super-horizon perturbations at decoupling. On these scales, the dominant contributions to $\Delta T/T$ are:
+\begin{enumerate}
+    \item intrinsic photon-density fluctuations at decoupling,
+    \item gravitational redshift/blueshift from potential fluctuations (photons lose energy when climbing out of potential wells).
+\end{enumerate}
+Their combined contribution is the (ordinary) Sachs--Wolfe effect.
+
+\subsubsection{CMB acoustic peaks}
+
+On sub-horizon scales the rich structure observed in the temperature anisotropy spectrum is mainly a consequence of the acoustic oscillations of the tightly-coupled baryon-photon fluid in the pre-recombination era. Perturbations in the gravitational potential, dominated by the CDM component, drive the oscillations in the plasma, with photon pressure, due to Thomson scattering of photons off free electrons, providing most of the restoring force.
+
+%todo: add pictures
+
+After recombination, photons can travel freely toward us, and the phases of the oscillations is imprinted in the CMB spectrum as a series of harmonic peaks. The last-scattering surface is a snapshot view of oscillation phases of all different modes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/cmb_peaks.png}
+    \caption{CMB acoustic peaks}
+\end{figure}
+
+Since sound speed of photon-baryon fluid is the same for all modes, those with a smaller wavelengths oscillate faster. The \textit{first peak} (yellow) corresponds to the mode that is caught in its first compression by recombination. The \textit{second peak} (green) corresponds to the mode that went through a full cycle of compression and rarefaction by recombination. The even peaks are generally of smaller amplitude because the rebound has to fight against baryon inertia.
+
+\textbf{Damping tail} (blue): On small scales photon diffusion suppresses density fluctuations (Silk damping). Moreover, since the recombination process is not instantaneous, the last scattering surface has a finite thickness. This leads to a smearing of the anisotropies on scales smaller than the width ($\Delta z \simeq 80$) of the recombination process, $\ell > 1000$.
+
+\subsubsection{CMB secondary anisotropies}
+
+At angular scales smaller than few arc-minutes CMB
+temperature fluctuations are no longer dominated by primary
+effects at the surface of last scattering, but rather by the
+so-called secondary anisotropies which arise from the
+interaction of the CMB photons with the matter along the line
+of sight. The secondary anisotropies can be divided in two
+major families depending on the physical process which
+generate them. The first family arises from the interaction of
+the photons with gravitational potential wells, and it includes
+gravitational lensing and the late ISW effect. As for former,
+the gravitational deflection of CMB photons by intertwining
+non-linear structures causes a smoothing of the acoustic
+peaks up to 10\% level at $\ell > 2000$, and generate small-scale
+power that dominates the primary anisotropies for $\ell > 4000$,
+where the diffusion damping is highly effective. Moreover,
+CMB lensing introduces non-Gaussianity in the four-point
+correlation function with a very specific and predictable
+shape, from which it is possible to reconstruct the power
+spectrum of the lensing potential (see later). The second
+family incorporates the effects of scattering of CMB photons
+with free electrons, such as reionization effects and the
+Sunyaev and Zeldovich effect (see previous slides).
+
+\subsubsection{CMB temperature power spectrum}
+
+The observed $TT$ spectrum can be interpreted as the sum of contributions from different physical processes. For non-flat models ($\Omega_k\neq 0$), the pattern is shifted to larger (open) or smaller (closed) angular scales relative to flat $\Lambda$CDM; equivalently, peaks move horizontally in multipole space. Different components also scale differently with cosmological parameters, so changing one parameter modifies specific parts of the spectrum.
+
+A practical decomposition is:
+\begin{itemize}
+    \item \textbf{SW + early ISW} (largest scales): sets the low-$\ell$ plateau and part of the first-peak normalization.
+    \item \textbf{Acoustic oscillations} (intermediate scales): produce the peak--trough sequence.
+    \item \textbf{Late ISW} (very low $\ell$): adds power from late-time potential decay.
+    \item \textbf{Doppler/effective temperature source terms}: contribute around the acoustic region with different phase weighting.
+    \item \textbf{Diffusion damping}: suppresses power at high $\ell$ (Silk damping tail).
+\end{itemize}
+
+The position of the acoustic peaks is set by the physical sound horizon at decoupling and by the angular-diameter distance to the last-scattering surface. Hence peak locations depend on $\Omega_b h^2$, $\Omega_m h^2$, curvature $\Omega_k$, and dark-energy content (through distance-redshift evolution).
+
+The relative heights and valley depths carry complementary information:
+\begin{itemize}
+    \item Increasing $\Omega_b h^2$ raises odd peaks relative to even peaks (baryon loading) and deepens trough structure.
+    \item The overall peak envelope is affected by the primordial scalar amplitude/slope (e.g. $A_s$, $n_s$) and by time evolution of gravitational potentials (early/late ISW driving).
+\end{itemize}
+
+In short, CMB temperature spectra constrain geometry mainly through \emph{peak positions}, and composition/dynamics mainly through \emph{relative peak amplitudes} and the \emph{damping tail}.
+
+\subsection{CMB polarization}
+
+Thomson scattering of a radiation field with a quadrupole anisotropy produces linear polarization. The relevant epoch for the generation of polarization in the CMB is around recombination since at early times scattering is too efficient to allow a significant quadrupole to grow, while after recombination scatterings are very rare (until the universe reionizes).
+
+The CMB polarization signal is expected to have a r.m.s. of $\sim 5$ K,
+peaking at multipoles $\ell = 1000$ (the angle subtended by the photon mean free path at last scattering). The amplitude of the polarization signal is much smaller than the temperature power spectrum.
+
+B-mode polarization can be induced by tensor perturbation, generated by the primordial gravitational waves predicted in the inflationary scenario, or by gravitational lensing due to the intertwining structures along the line of sight. A measurement of the gravitational waves power probes directly the energy scale of inflation.
+
+
+\subsubsection{EE and TE power spectra}
+
+% todo: check if correct, add plots
+
+Besides the $TT$ spectrum, polarization provides two key two-point observables: $C_\ell^{EE}$ and $C_\ell^{TE}$.  
+Their physical origin is tied to the fact that polarization is generated by a \emph{local quadrupole} in the radiation field at Thomson scattering.
+
+A few important features are:
+
+\begin{itemize}
+    \item \textbf{Small-scale dominance and recombination peak:} polarization is most efficiently generated on scales comparable to the photon diffusion length (roughly the distance photons travel between scatterings near decoupling). As a consequence, $EE$ power peaks around $\ell \sim 10^3$. Its amplitude is much smaller than temperature anisotropies, typically at the $\sim 10\%$ level (a few $\mu$K).
+    
+    \item \textbf{Reionization bump at large angular scales:} a second, broad low-$\ell$ feature appears because CMB photons are re-scattered at late times by free electrons produced during reionization. This signal is faint (order $\sim 0.1\,\mu$K), since the probability of a recent scattering is low.
+    
+    \item \textbf{Acoustic oscillations and phase shift:} $EE$ and $TE$ show acoustic peaks, but their phase differs from $TT$. The reason is that polarization mainly traces the \emph{velocity} of the photon--baryon fluid, while temperature anisotropies are more directly related to density/compression extrema. Therefore, when $TT$ is near maxima/minima, the velocity is small and polarization is suppressed; conversely, polarization is strongest near $TT$ zero-crossings.
+\end{itemize}
+
+The cross-spectrum $TE$ is especially informative because it alternates in sign across multipoles, directly encoding the relative phase between density and velocity perturbations and helping break cosmological parameter degeneracies when combined with $TT$ and $EE$.
+
+\subsubsection{Constraints from CMB data}
+
+\dots
+
+\subsubsection{tSZ power spectrum}
+
+\dots

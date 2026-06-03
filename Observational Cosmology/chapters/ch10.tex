@@ -1,0 +1,223 @@
+\chapter{Weak Lensing Cosmology}
+
+\section{Conceptual Overview}
+
+Since light travels along null geodesics, and mass bends spacetime, it deflects light rays.
+
+In 1919 Eddington measured the deflection angle, confirming Einstein's theory of general relativity.
+
+Chwolson and Einstein theorized ring structures as possible outcomes of gravitational lensing.
+
+in 1987 Soucail et al. found strongly distorted "arcs" of background galaxies.
+
+...
+
+In 2012 weak lensing is been used dor cluster cosmology, in 2016 weak lensing led to high precision cosmology.
+
+\subsubsection{Lensing geometry}
+
+being $\beta$ the true position, $x$ the observed position, and $\alpha$ the deflection angle, we have:
+
+$$
+\beta = x - \alpha(x)
+$$
+
+$$
+\alpha(\theta) = \dfrac 1\pi \int_{\mathbb{R}^2} d^2 \theta' \kappa(\theta') dfrac{\theta - \theta'}{|\theta - \theta'|^2}
+$$
+
+where $\kappa(\theta)$ \dots
+
+\subsubsection{Weak lensing}
+
+Lensing conserves surface brightness (no photons get lost or created): $I(\theta) = I[\beta(\theta)]$
+
+Linearize distortion of a surface brightness:
+
+$$
+I(\theta) = = I^{(s)}[\beta...]
+$$
+
+convergence $\kappa$ and shear $\gamma$ are not independent.
+
+\dots
+
+\subsubsection{Galaxy shape}
+
+The sizes and shapes are defined in terms of the second moments of the surface brightness profile
+
+These shapes changes due to lensing:
+
+$$
+\epsilon^{obs} = \dfrac{\epsilon^{orig} + g}{1 + g^* \epsilon^{orig}} \approx \epsilon^{orig} + \gamma
+$$
+
+One common esrimator for grav shear is 
+
+$$
+\langle \epsilon \rangle = g
+$$
+
+\subsubsection{Convergence power spectrum}
+
+the owest order apporx, the 3d cosmological mass distribution can be considered ...
+
+$$
+P_\kappa(\ell) = \int d\chi G^2 (\chi) P_\delta (\kappa = \dfrac \ell \chi)
+$$
+
+$$
+G(\chi) = \dfrac 32 \left( \dfrac {H_0}{c} \right)^2 \dfrac {\Omega_m}{a^2} \dfrac {1}{\chi^2}
+$$
+
+We want to measure the correlation of two shears, however, we measure shears (ellipticities) in real space. We need an ensample of galaxies to measure the correlation.
+
+We can correlate in 4 ways:
+
+\todo{add image}
+
+The shears comes from the derivatives of a potential, therefore the cross terms vanishes.
+
+Measuring non-zero B-terms \dots
+
+\textbf{Galaxy-Galaxy lensing:} correlation of shapes of high-z galaxies with low-z galaxies, getting excess projected mass. 
+
+\textbf{Cluster masses:} We can use weak lensing for cluster masses since it allows to measure the entire mass, including dark matter.
+
+There are many more WL statistics, which can be used to constrain cosmology.
+
+\section{Making the catalogues}
+
+WL is an unsolved method, since observing a single galaxy is not enough. 
+
+Multi-chip cameras are used in many telescopes: with a huge FOV, readout causes problems, increasing noise and taking a lot of time. Therefore, they are broke into multiple chips ($\sim 8$ Mpixels/chip).
+
+Galaxy shape is concolbed with instrument point spread function.
+
+\begin{itemize}
+    \item {On the ground:}
+    \begin{itemize}
+        \item Atmosphere causes syats to twinkle
+        \item Mitigate with high altitude, dry areas, dark nights with no moon
+        \item typcal size 0.6-1 arcsec
+    \end{itemize}
+    \item {In space:}
+    \begin{itemize}
+        \item PSF is smaller and more stable
+        \item typical size 0.1 arcsec
+        \item PSF is very complicate
+    \end{itemize}
+\end{itemize}
+
+
+pixel level processing
+
+An ideal image has equal-sized pixels with linear respnses, each pixel is independent of the others and in the same order of magnitude in each ccd. Moreover, PSF must be independent of object's flux.
+
+Real images have different problems, such as instrumental artifacts, different background levels, different PSF sizes, etc.
+
+CCDs have a cvoltage offset. we can correct it using bias frames (zero-flux images).
+Counts should be proportional to photons for image to be calibrate-able. Calibrate by taking exposures of a uniform screen for an increasing time exposure.
+
+Cross-talk between pixels is another problem.
+
+Brighter fatter effect: we want to measure PSF, but it slightly depends on magnitude
+
+Flat frames: we need to normalize pixels with different responses to the same level. Then we can divide by the "domeflat" to get the true image.
+
+\dots
+
+Sky subtractuion:
+
+Large scale variations across focal plane are removed and produce a background of zero mean.
+We can observe light in the image even where source is not. We can subtract the sky background by taking the median of the image.
+
+\dots
+
+Astrometric calibration:
+
+Astrometry: map from pixels to sky coordinates. A challenge is to keep consistency in position between images and with external data.
+
+Photometric calibration:
+
+$$
+Mag = -2.5 \log(flux) + zero-point
+$$
+
+The photometric calibration consists in setting a relative zero-point across ccds and exposures.
+
+\dots
+
+Stacking (Coaddition)
+
+to stack we need to resample pixels onto a common grid, then combine. Stacking covers chip gaps, increase SNR, removes transitient objects (median stack). On the other end, stacking correlates noise and \dots
+
+\begin{tipsblock}[How often do we need to calibrate the data?]
+    Some corrections are static, other need to ne recalibrated whenever the camera is adjusted on the instrument (starflat). Domeflats are usually taken everyday.
+    ...
+\end{tipsblock}
+
+\subsection{Source Detection and Classification}
+
+To perform detection on deepest image it is often used SExtractor.
+
+PSF modeling: image is convolved with the PSF, which comes from the instrument and atmosphere.
+
+psf affects shear estimation:
+\begin{itemize}
+    \item blurring and rounding shapes
+    \item imprinting coherent shear that depends on psf shape
+\end{itemize}
+
+therefore, we need to look at quality of interpolation (rho statistics) and at psf contribution to shear (psf leakage).
+
+Shaoe measurement:
+\begin{itemize}
+    \item model fitting: generate patrametric models of galaxies and fit them to the data
+    \item moment analysis:
+    \begin{itemize}
+        \item zeroth moment: flux
+        \item first moment: centroid
+        \item second moment: shape
+    \end{itemize}
+    real galaxies have noise, and the moments will diverge unless we add weights
+\end{itemize}
+
+\begin{warningblock}
+    \todo{fix this}
+    We cannot meaningfully compare shapes of single galaxies, we need ensambles statistics.
+\end{warningblock}
+
+\textbf{Measure flux in broadband filters:} Aperture photometry: convolve to worst seeing or psf, measure in apertures.
+
+\textbf{Mosel fitting:} in analogy to shape measuremenrt, but er neto to jointly fit the model across bands to preserve galaxy colors (which correlates to redshift).
+
+\textbf{Shear Calibration:} Galaxy shapes are estimator dependent, we want to find gravitational shear: we want to measure the ensable statistics of a shape estimator to shear:
+$$
+g_i = (1+m_i) g_i^{tr} + c_i
+$$
+
+We have two methods: 
+\begin{itemize}
+\item {Simulation:} we can simulate galaxies with different shapes and shear, and then measure the shape estimator to shear. This is very difficult due to the huge amount of different galaxies and real data.
+\item {Metacalibration:} apply external shear ro rhe imahes directluy and compute response
+\end{itemize}
+
+\textbf{Where does m-bias come from?}
+
+Model bias: the model does not really fit galaxies
+Noise bias: galaxy is pixelated
+blending: galaxies are not point sources, sometimes they overlap
+selection effects: highl elliptical galaxies might not be detected as galaxies
+
+Photo-z Calibration:
+
+Most weak lensing measurement do not care baout individual photo-zs, only on the ensemble N(z). We can use spectroscopic redshifts to calibrate the photo-zs.
+
+\section{Modeling choices}
+
+Intrinsic alignment: close pairs of galaxies might align due to tidal forces from the surrounding structures (clusters, filaments, etc.). 
+We assume $\langle \epsilon \rangle = 0$ for all galaxies.
+
+Universe is more thsn just DM, it contains baryons, neutrinos, etc. Cosmological scale hydrodynamic simulations are difficult and the result depend on the prescription used. Semi-analytical baryionification models parametrixe baryonic effectrs on n-body simulations.
+

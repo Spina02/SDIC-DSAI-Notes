@@ -1,0 +1,201 @@
+\chapter{ICM} % Lecture 11/03/2026
+
+\section{Introduction}
+
+% missing STRUCTURE FORMATION: DARK MATTER HALOS
+
+\subsection{Galaxy Clusters}
+
+Galaxy clusters are composed of galaxies, dark matter, and hot gas. They are the most massive structures in the universe, with a mass $M = 10^{14} - 10^{15} M_\odot$ and a radius $R = 1-5 Mpc$.
+
+Form from the highest density peak of the initial matter density field, Preferentially located at the knots of the Large Scale Structure (LSS).
+
+Galaxy clusters are multi-component systems:
+
+Galaxies and stars (~5\%), ICM (~15\%), DM (~80\%)
+
+Allow to detect clusters at different wavelengths: X-rays, radio, optical, infrared, ultraviolet, gamma-rays.
+
+Perfect astrophysical laboratory to study: galaxy evolution, gas and plasma astrophysics
+
+\subsubsection{Cluster boundary}
+
+The boundary of the cluster is not a well-defined quanrity: clusters are not closed spheres, however it is convenient to define a cluster as the mass within a certain radius, corresponding to a fixed overdensity $\Delta$.
+
+$\Delta$ is defined as the overdensity with respect to the mean or the critical density of the Universe at the cluster redshift.
+
+$$
+M_{\Delta} = \dfrac{4\pi}{3} r^3_{\Delta} \rho_{m/cr} \Delta
+$$
+
+%todo: check if true
+where $\rho_{m/cr}$ is the mean or critical density of the Universe at the cluster redshift.
+
+The edge of the cluster can be defined by the orbital dynamics of the matter within the cluster: the \textbf{Splashback radius} is the radius of the cluster at which the expansion of the universe is equal to the gravitational pull of the cluster.
+
+The splashback radius represents the location of the first orbital "turnaround", i.e. the maximum distance a particle reaches after its first passage through the cluster. At the location of the Splashback radius is expected a rapid decline of the density profile.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{assets/splashback.png}
+    \caption{DM, gas and galaxy density profiles and splashback radius from TNG hydrosim \cite{ONeil2020}.}
+\end{figure}
+
+\section{The intracluster medium}
+
+\begin{itemize}
+    \item Hot (107 - 10° K), optically thin plasma, that permeates the space between galaxies within a GC
+    \item Result of the gas infall into the dark matter halo
+    \item The gas is heated primarily through accretion shocks and adiabatic compression during the hierarchical assembly of the cluster
+    \item AGN feedback and sloshing of the ICM plasma during mergers with subclusters prevent the central ICM from cooling
+    \item Fossil record of the chemical enrichment of the Universe: the deep gravitational potential wells of clusters lock metals produced by member galaxies
+    \item Density: $\sim 10^{-3} - 10^{-1} \text{particle/cm}^3$ 
+    \item Composition: fully ionized plasma; mostly H, He with metallic traces (Fe, O, Ne, Si)
+    \item Weak but pervasive magnetic field: $\sim 0.1 \text{ to } 10 \mu\text{G}$ influencing particle transport. The field varies on scales     from $0.1 \text{ to } 10 \text{ kpc}$.
+    \item Emission primarly via X-ray:
+    \begin{itemize}
+        \item Free-free: Thermal bremsstrahlung radiation $\sim 90\%$ of the luminosity (continuum)
+        \item Free-bound: recombination (continuum)
+        \item Bound-bound: de-excitation radiation (line emission)
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{X-Ray spectrum}
+
+Bremsstrahlung spectrum:
+\begin{itemize}
+    \item Bremsstrahlung X-ray emissivity:
+    $$
+    \epsilon_\nu \equiv \dfrac{\mathrm{d}L}{\mathrm{d}V\mathrm{d}\nu} \propto n_e^2 g(\nu, T) T^{-1/2} \exp(-h\nu / k_B T)
+    $$
+    \item Proportional to the square of the gas density
+    \item The overall normalization scales as $\propto T^{-0.5}$
+    \item Exponential thermal cut-off at the electron's kinetic energy ($k_B T$)
+    \begin{itemize}
+        \item The location of the cut-off provides strong constraints on the ICM temperature
+    \end{itemize}
+\end{itemize}
+
+The observed spectrum is a combination of the bremsstrahlung spectrum and recombination/emission lines:
+
+\begin{itemize}
+    \item Recombination lines: "edges" in the lower temperature spectra (e.g. 1 keV line around 0.5--1 keV)
+    \begin{itemize}
+        \item Above ${\sim}\,6$ keV the cross-section for electron capture drops significantly and the "edges" get smeared out
+    \end{itemize}
+    \item Emission lines:
+    \begin{itemize}
+        \item Strength of the line depends on temperature (e.g. Fe K-$\alpha$ @ $k \sim 6.7$ eV)
+        \item Soft X-ray lines (0.5--2 keV): due to elements like O, Ne, Mg $\rightarrow$ present only if the metals are not fully ionized ($<6$ keV)
+        \item Most prominent signature of the metal enrichment is the Fe K-line complex at 6.7 keV
+        \item Fe-K is the only accessible line at high-$z$ $\rightarrow$ only means to determine cluster redshift from X-ray data
+        \item Iron L-shell Complex (at ${\sim}\,1$ keV): caused by hundreds of overlapping emission lines from partially ionized Fe atoms ($\text{Fe}^{16}$ to $\text{Fe}^{23}$) 
+        \item ``Soft'' elements (0.5--3.0 keV) lines: useful diagnostic for star formation history
+    \end{itemize}
+\end{itemize}
+
+\begin{observationblock}[Spectral fitting]
+    In modern X-ray astronomy (using satellites like \bfit{Chandra} or \bfit{XMM-Newton}), the spectral resolution isn't always high enough to see the individual lines.
+    
+    Observed spectra are fitted to plasma radiation codes which includes all the known emission processes.
+\end{observationblock}
+
+\subsubsection{Temperature profile}
+
+By fitting observed X-ray spectra measured at different radii with tabulated spectral emission convolved with the instrument response, is it possible to derive the ICM temperature profile.
+
+\noindent
+\begin{minipage}[t]{0.65\textwidth}
+\begin{itemize}
+    \item Expected cooling curve for a gas in hydrostatic equilibrium
+    \item At large radii, $R > 0.2\, R_{200}$, the normalized profile looks self-similar
+    \begin{itemize}
+        \item The same gravity-driven physics shape all clusters
+    \end{itemize}
+    \item Some profiles show a significant drop in temperature toward the core (\textbf{Cool Core}) while other profiles are $\sim$flat (\textbf{Non-Cool Core})
+    \item To accommodate the variety of temperature profiles, Vikhlinin et al. 2006 introduced the parametric model:
+    $$
+    T_{3D} = T_0 \dfrac{(r/r_t)^{-a}}{[1 + (r/r_t)^b]^{c/b}} \cdot \dfrac{x + T_{min}/T_0}{x + 1}
+    $$
+\end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.3\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/gc-temp.png}
+    \captionof{figure}{Temperature profile from XMM-Newton observations \cite{Pratt2006}.}
+\end{minipage}
+
+\subsubsection{Metallicity profile}
+
+The metallicity profile shows a sharp rise toward the center ($R/R_{500} < 0.2$), reaching $\sim$solar  value in the inner core. The peak is driven by the metal production of the central galaxy.
+
+At large radii ($R/R_{500} > 0.3$), the profiles flatten out to a constant value $A\sim0.3$. This value is consistent across different clusters and extends so far out in radius that it suggests early enrichment (z = 2-3) of the medium.
+
+The evolution of the Fe abundance with redshift confirm early enrichment of the medium 
+
+%todo: missing last slide about metallicity profile
+
+\subsubsection{Gas Density profile}
+
+The $\beta$-model is a simple and widely used approximation for the gas density profile. Assuming an isothermal sphere, equating the Jeans and HE mass estimates leads to the definition of the $\beta$ parameter:
+
+$$
+M(r) = -\dfrac{\sigma_r^2 r}{G} \left[ \dfrac{d \ln \rho}{d \ln r} \right]
+\qquad
+M(r) = -\dfrac{kT r}{G \mu m_p} \left[ \dfrac{d \ln \rho_g}{d \ln r} \right]
+$$
+
+$$
+\beta = \dfrac{\sigma_r^2 \mu m_p}{kT}
+$$
+
+If the gas distribution follows the matter distribution, and the latter follows an isothermal sphere model we get:
+
+$$
+\dfrac{\rho_g}{\rho_{g0}} = \left( \dfrac{\rho}{\rho_0} \right)^\beta
+\qquad
+\rho = \rho_0 \left( 1 + \left( \dfrac{r}{r_c} \right)^2 \right)^{-3/2}
+\qquad
+\rho_g = \rho_{g0} \left( 1 + \left( \dfrac{r}{r_c} \right)^2 \right)^{-3\beta/2}
+$$
+
+Fit to data finds $\beta \sim 2/3$ , but the $\beta$-model provides a poor fit to distributed systems.
+
+Vikhlinin et al 2006 model:
+
+The $\beta$-model is a poor description of the actual density profile; The shape of cluster density profiles is affected by the individual evolution history of the cluster (e.g. merging, AGN feedbacks)
+
+Vikhlinin introduced in 2006 a parametric model to account for the variegate cluster population:
+
+$$
+n_p n_e = n_0^2 \dfrac{(r/r_c)^{-\alpha}}{(1 + r^2/r_c^2)^{3\beta-\alpha/2}} \dfrac{1}{(1 + r^\gamma/r_s^\gamma)^{\epsilon/\gamma}} + \dfrac{n_{02}^2}{(1 + r^2/r_{c2}^2)^{3\beta_2}}
+$$
+
+The first term accounts for the outskirts, while the second term accounts for the core.
+
+\subsubsection{Surface Brightness Profile}
+
+%todo: missing (slide 21-25)
+
+% missing example: z=1.39 requires a 200ksec observation, a slightly higher redshift z=1.50 requires almost the double exposure time (380 ksec)
+
+\subsection{X-Ray telescopes: Chandra vs XMM-Newton}
+
+%missing (slide 26-29)
+
+\subsubsection{X-ray background}
+
+Astrophysical:
+\begin{itemize}
+    \item X-ray emission from our own galaxy — Local Hot Bubble and hot gas in the galactic halo (e.g. Kuntz \& Snowden 2000) modelled with two thermal emissions
+    \item Unresolved X-ray point sources (mostly AGNs) modelled with an absorbed power law (e.g. Lumb et al. 2002)
+\end{itemize}
+
+Instrumental:
+\begin{itemize}
+    \item Emission from the telescope itself hit by high energetic particles (e.g. Hickox and Markevitch 2006) 
+    \item Particles revealed by the detectors as photons
+\end{itemize}
+
+%missing source detection and fitting density and temperature profiles

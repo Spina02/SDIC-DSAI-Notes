@@ -43,14 +43,14 @@ These spectral classes follow a sequence denoted by the letters O, B, A, F, G, K
         \textbf{Class} & \textbf{Typical Color} & \textbf{$T_{\mathrm{eff}}$ (K)} \\
         \midrule
         O & blue & $> 30{,}000$ \\
-        B & blue-white & $10{,}000$--$30{,}000$ \\
-        A & white & $7{,}500$--$10{,}000$ \\
-        F & yellow-white & $6{,}000$--$7{,}500$ \\
-        G & yellow & $5{,}200$--$6{,}000$ \\
-        K & orange & $3{,}700$--$5{,}200$ \\
-        M & red & $2{,}400$--$3{,}700$ \\
-        L & dark red & $1{,}300$--$2{,}400$ \\
-        T & brown & $550$--$1{,}300$ \\
+        B & blue-white & $10{,}000$-$30{,}000$ \\
+        A & white & $7{,}500$-$10{,}000$ \\
+        F & yellow-white & $6{,}000$-$7{,}500$ \\
+        G & yellow & $5{,}200$-$6{,}000$ \\
+        K & orange & $3{,}700$-$5{,}200$ \\
+        M & red & $2{,}400$-$3{,}700$ \\
+        L & dark red & $1{,}300$-$2{,}400$ \\
+        T & brown & $550$-$1{,}300$ \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -220,33 +220,357 @@ Stellar spectroscopy is a powerful tool that allows us to infer several fundamen
 
 \subsection{Stellar Spectral Types}
 
+\cref{tab:stellar-spectral-types} shows the standard classes used in the Harvard sequence and provide a compact overview of the dominant spectral features, approximate temperatures, and typical colors of stars.
+In practice, each broad class is further divided into finer subclasses, and additional uncommon spectral types exist beyond those shown here.
+    
+\vspace{-0.4em}
+
+\begin{table}[h]
+    \centering
+    \small
+    \begin{tabular}{@{}c l c c@{}}
+        \toprule
+        \textbf{Type} & \textbf{Main spectral features} & \textbf{$T$ (K)} & \textbf{Color} \\
+        \midrule
+        O & He II lines dominate; ionized helium visible & 20{,}000-35{,}000 & Blue \\
+        B & He I lines; few H I lines & 10{,}000-20{,}000 & Blue-white \\
+        A & Strong H I lines & 7{,}500-10{,}000 & White \\
+        F & Weak H I lines; first metallic lines (Ca II) & 6{,}000-7{,}500 & White-yellow \\
+        G & Metallic lines (Ca II), G band & 5{,}200-6{,}000 & Yellow \\
+        K & Metallic lines begin to disappear; molecular lines appear & 3{,}700-5{,}200 & Orange-yellow \\
+        M & Strong molecular bands & 2{,}400-3{,}700 & Red \\
+        \bottomrule
+    \end{tabular}
+    \vspace{-0.2em}
+    \caption{Stellar spectral types, their main features, approximate temperatures, and typical colors.}
+    \label{tab:stellar-spectral-types}
+\end{table}
+
+
+
+
+
+
+
+
+% ================================================================
+% ================================================================
+% ================================================================
+% ================================================================
+% ================================================================
+% ================================================================
+
+
+
+
+\vspace{-1.2em}
+
+\subsection{The Hertzsprung--Russell Diagram}
+
+The \textbf{Hertzsprung--Russell (HR) diagram} is a scatter plot of stars showing the relationship between their luminosity (or absolute magnitude) and their effective temperature (or spectral type/color). It is one of the most important tools in stellar astrophysics.
+
+Stars occupy well-defined regions in the HR diagram:
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.52\textwidth}
+        \begin{itemize}
+            \item The \textbf{main sequence} runs diagonally from the upper-left (hot, luminous O stars) to the lower-right (cool, faint M dwarfs). Most stars, including the Sun, spend the majority of their lives on the main sequence, burning hydrogen in their cores.
+            \item \textbf{Giants} and \textbf{supergiants} occupy the upper-right region (cool but very luminous).
+            \item \textbf{White dwarfs} form a faint sequence in the lower-left (hot but very low luminosity), corresponding to luminosity class $L \sim 10^{-4}\,L_\odot$.
+        \end{itemize}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.46\textwidth}
+        \vspace{-0.2em}
+        \includegraphics[width=\textwidth]{assets/hr_diagram.png}
+
+        \vspace{-0.5em}
+        \captionof{figure}{Hertzsprung-Russell diagram}
+    \end{minipage}
+\end{figure}
+
+\begin{observationblock}[density in the diagram]
+    The densest regions in the diagram are not the ones containing the largest number of stars intrinsically, but those where stars spend most of their lifetimes. E.g., the main sequence is the most populated region because stars spend about 90\% of their lives there, whereas the giant and supergiant regions are sparser because stars pass through those phases more quickly.
+    In catalogues, however, the apparent magnitude is often used. In that case, the most frequent objects are those with higher apparent magnitude only because they are more luminous to us.
+\end{observationblock}
+
+\subsubsection{Age of a Stellar Cluster: the Turn-off Point}
+
+The HR diagram is particularly useful for studying \textbf{stellar clusters}, which are groups of coeval (same-age) stars. Since all stars in a cluster formed at approximately the same time from the same gas cloud, they share a common age but differ in mass.
+
+Stars leave the main sequence at the so-called \textbf{turn-off point}: massive stars evolve faster and leave first (upper end), while less massive stars remain on the main sequence for longer. Given $L \propto M^{3.5}$, the main-sequence lifetime is approximately:
+$$
+t_\mathrm{MS} \lesssim \frac{E_\mathrm{MS}}{L} \approx \frac{Mc^2}{L}
+$$
+A useful empirical relation for the main-sequence lifetime is:
+$$
+t_\mathrm{MS} \approx 8 \times 10^9 \left(\frac{M}{M_\odot}\right)^{-3.5} \,\mathrm{yr}
+$$
+The position of the turn-off point in a cluster's HR diagram therefore directly gives the \textbf{age of the cluster}: the higher the turn-off luminosity, the younger the cluster.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/turning-point.png}
+    \caption{Turn-off point in cluster HR diagrams}
+\end{figure}
+
+\subsection{Variable Stars}
+
+\textbf{Variable stars} are stars whose brightness changes with time. There are two main categories:
+
 \begin{itemize}
-    \item \textbf{O stars}
-    
-    Lines oh He II (ionized), $T \sim (20 000 \to 35 000) K$, Blue
+    \item \textbf{Extrinsic variables}: their brightness variability is not due to intrinsic physical changes. A major subclass is \textbf{binary stars}, where two stars orbit each other and periodically eclipse one another along the line of sight (\textit{eclipsing binaries}).
 
-    \item \textbf{B stars}
-
-    Lines of He I (neutral) few lines of H I, $T \sim 15 000 K$, Blue-White.
-
-    \item \textbf{A stars}
-    
-    strong lines of H I, $T \sim 3 000 K$, White.
-
-    \item \textbf{F stars}
-    
-    weak lines of H I, first metallic lines (Ca II), $T \sim 7000 K$, White-Yellow.
-
-    \item \textbf{G stars}
-    
-    Metallic lines (Ca II), G band, $T \sim 5 500 K$, Yellow.
-
-    \item \textbf{K stars}
-    
-    Start to disappear metallic lines, no molecolar lines, $T \sim 4 000 K$, Orange-Yellow
-
-    \item \textbf{M stars}
-    
-    molecolar bands, $T \sim 3000 K$ Red.
+    \item \textbf{Intrinsically variable stars}: stars that are physically varying (e.g.\ pulsating or erupting). Within this category, \textbf{periodically variable stars} (such as Cepheids and RR~Lyrae stars) occupy an \textit{instability strip} in the HR diagram. These stars pulsate radially, and their light curves show regular, well-defined periods.
 \end{itemize}
-    
+
+\subsubsection{The Period--Luminosity Relation for Cepheids}
+
+\textbf{Cepheid variables} are massive, luminous, pulsating stars (typical type: F--G supergiants). They obey a tight \textbf{period--luminosity relation}: more luminous Cepheids pulsate more slowly.
+
+The period-luminosity relation makes Cepheids excellent \textbf{standard candles}: by measuring the pulsation period, one can infer the absolute magnitude $M$, and then use the distance modulus to determine the distance:
+$$
+m - M = 5 \log\left(\frac{D}{\mathrm{pc}}\right) - 5 + A_V
+$$
+where $A_V$ is the extinction in the $V$ band. Cepheids are used as primary distance indicators out to tens of Mpc, bridging the distance ladder between the local Universe and extragalactic scales.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.52\textwidth]{assets/cepheids.png}
+    \hspace{3em}
+    \includegraphics[width=0.35\textwidth]{assets/cepheids_period.png}
+    \caption{Left: Period-luminosity relationship for pulsating variable stars, (Cepheids Type I and II, and RR Lyrae). Right: Cepheid phase curves over one pulsation cycle.}
+    \label{fig:cepheids}
+\end{figure}
+
+\vspace{-1em}
+
+The underlying physics of the phase curves shown in \cref{fig:cepheids} reflects the thermodynamic cycle of the stellar envelope. According to the Stefan-Boltzmann law, the intrinsic luminosity is proportional to the fourth power of the effective temperature ($L \propto T^4$). Dynamically, a negative radial velocity indicates an expanding envelope, which induces a blueshift in the spectral lines; conversely, a positive radial velocity corresponds to contraction and a subsequent redshift. However, due to the phase lag in the pulsation mechanism, the star reaches its maximum temperature (becoming bluer) near the compression phase, whereas it cools down (becoming redder) during expansion.
+
+\section{The Milky Way Galaxy}
+
+The Milky Way is a \textbf{barred spiral galaxy} containing several hundred billion stars, with a total stellar mass of $M_\star \sim 6 \times 10^{10}\,M_\odot$ and a total extent of roughly $50\,\mathrm{kpc}$ in diameter.
+
+\subsection{Methods of Distance Measurement}
+
+The \textbf{distance ladder} is the set of hierarchical techniques used to measure astronomical distances, each method building on and calibrating the previous one.
+
+\begin{enumerate}
+
+\item \textbf{Day Parallax}
+
+The diurnal parallax uses the diameter of the Earth as a baseline. By observing a nearby object from two different points on the Earth's surface, a small angular shift (the parallax angle) can be measured and converted to a distance. This method is useful for objects within the Solar System.
+
+\item \textbf{Kepler's Third Law}
+
+For objects within the Solar System, Kepler's third law provides an indirect distance scale. It relates the orbital period $T$ and the semi-major axis $a$ of a planet's orbit:
+$$
+T^2 \propto a^3
+$$
+By measuring orbital periods and knowing the Earth--Sun distance (1 AU), all other planetary distances can be derived.
+
+\item \textbf{Annual (Trigonometric) Parallax}
+
+Annual parallax uses the Earth's orbit around the Sun (baseline $= 2\,\mathrm{AU}$) to measure the angular shift of nearby stars against the background of more distant stars over six months. The parallax angle $p$ (in arcseconds) is related to the distance by:
+$$
+d = \frac{1}{p}\,[\mathrm{pc}]
+$$
+This is the most direct method for stellar distances and is limited to stars within $\sim 1\,\mathrm{kpc}$ (ground-based) or $\sim$~a few kpc (Gaia satellite).
+
+\item \textbf{Moving-Cluster Method}
+
+The moving-cluster method exploits the fact that stars in a nearby open cluster all share the same bulk space motion and therefore appear to converge toward (or diverge from) a single point on the sky, known as the \textbf{convergence point}.
+
+For a star in the cluster, the observed radial velocity $V_r$ and transverse velocity $V_t$ (derived from the proper motion $\mu$) are related to the total space velocity $V$ by:
+$$
+V_r = V \cos\psi, \qquad V_t = V \sin\psi
+$$
+where $\psi$ is the angle between the star's direction and the convergence point. Since $V_t = \mu \cdot d$ (in consistent units), we can write:
+$$
+V_t = V_r \tan\psi \quad \Longrightarrow \quad d = \frac{V_r \tan\psi}{\mu}
+$$
+The proper motion $\mu$ satisfies $\mu = V_t / d$, so the distance follows directly.
+
+\item \textbf{Photometric and Spectroscopic Parallax}
+
+Photometric parallax uses the apparent magnitude $m$ and an estimated absolute magnitude $M$ (inferred from the star's spectral type and luminosity class) to derive the distance modulus:
+$$
+m - M = 5 \log\left(\frac{D}{\mathrm{pc}}\right) - 5 + A_V
+$$
+If we have the spectrum of the star, we can determine $M$ (spectroscopic parallax). Taking into account the extinction $A_V \approx 3\,E(B-V)$, where $E(B-V)$ is the color excess, and measuring $(B-V)$ and $(B-V)_0$ from the spectrum, we can correct for reddening and obtain the distance.
+
+\item \textbf{Color-Color Diagram}
+
+When no extinction is present, there is a well-defined relation between color indices (e.g.\ $(U-B)$ and $(B-V)$) for stars of different spectral types, forming the \textbf{standard stellar locus} in the color--color diagram. In the presence of interstellar extinction, the observed colors are shifted from the intrinsic values along a \textbf{reddening vector}, with slope determined by the extinction law. The displacement along this vector in the color--color diagram gives $E(B-V)$, and hence $A_V$.
+
+\item \textbf{Period-Luminosity Relation for Cepheids}
+
+...
+\end{enumerate}
+
+\subsection{Large-Scale Structure}
+
+The Milky Way is surrounded by many \textbf{external spiral galaxies}. Viewed edge-on, a spiral galaxy shows a thin luminous disk and a central bulge. Viewed face-on, it reveals grand spiral arms. The morphology is typically described in terms of four main structural components.
+
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.85\textwidth]{assets/mw-structure.png}
+    \captionof{figure}{Schematic side-view and face-on view of the Milky Way showing the disk, bulge, halo, and spiral arms.}
+\end{figure}
+
+\subsection{The Disk}
+
+The disk of the Milky Way consists of a \textbf{thin disk} and a \textbf{thick disk}.
+
+\subsubsection{Density Profile}
+
+The stellar number density in the disk is modeled as:
+$$
+n(R, z) = n_0 \left( a\,e^{-|z|/h_t} + b\,e^{-|z|/h_T} \right) e^{-R/h_R}
+$$
+where $h_t$, $h_T$, and $h_R$ are the \textbf{scale lengths} (or heights) of the thin disk, thick disk, and radial profile, respectively:
+\begin{itemize}[noitemsep]
+    \item $h_t$ (thin disk): $\approx 300\,\mathrm{pc}$
+    \item $h_T$ (thick disk): $\approx 1\,\mathrm{kpc}$
+    \item $h_R$ (radial scale length): $\approx 3.5\,\mathrm{kpc}$
+\end{itemize}
+The exponential term $e^{-R/h_R}$ is nearly universal for external spiral galaxies as well.
+
+\subsubsection{Kinematics of the Disk}
+
+The disk rotates with a roughly flat rotation curve:
+$$
+V_0 \approx 220\,\mathrm{km\,s^{-1}} \quad (\text{cold motion})
+$$
+Stars also have random \textbf{vertical} and \textbf{radial} motions superimposed on this cold circular rotation, referred to as \textbf{hot motion}. 
+
+\begin{observationblock}
+    Stars form in the thin disk and, through repeated gravitational scattering, gradually acquire a larger vertical velocity dispersion, puffing up the disk (\textit{kinematic heating}). More metal-rich stars tend to remain in the thin disk, while more metal-poor (Population II) stars preferentially populate the thick disk.
+\end{observationblock}
+
+The disk also contains molecular gas (e.g.\ CO) and a diffuse interstellar medium.
+
+\begin{tipsblock}[Disk masses]
+    The total mass of the disk is approximately:
+    $$
+    M_\mathrm{disk} \approx 6 \times 10^{10}\,M_\odot\,(\text{stars}) + 0.5 \times 10^{10}\,M_\odot\,(\text{gas})
+    $$
+    and the mass-to-light ratio is:
+    $$
+    \frac{M}{L} \approx 3\,\frac{M_\odot}{L_\odot}, \quad \text{where } L_0 \approx 2 \times 10^{10}\,L_\odot
+    $$
+\end{tipsblock}
+
+\subsection{Spiral Structure}
+
+The Milky Way has a \textbf{bar} (detected by the Gaia mission, bar length $\sim 4$--$5\,\mathrm{kpc}$) and spiral arms, the most prominent being the \textbf{Sagittarius} and \textbf{Perseus} arms. The Sun lies almost midway between these two arms. The spiral structure most likely arises from \textbf{pressure (density) waves} propagating through the gas disk, triggering star formation along the arms. Spiral arms trace the distribution of \ion{H}{II} regions and blue (young) stars.
+
+\subsection{The Bulge}
+
+The \textbf{bulge} is the central, roughly spheroidal component of the Milky Way. It suffers from heavy extinction along the line of sight ($A_V \sim 28\,\mathrm{mag}$ in the optical toward the Galactic center), making it best studied in the infrared.
+
+\subsubsection{De Vaucouleurs Profile}
+
+If we assume spherical symmetry for the bulge, its surface brightness profile follows the \textbf{de Vaucouleurs} (or $r^{1/4}$) \textbf{law}:
+$$
+\log\left(\frac{I(R)}{I_e}\right) = -3.3307\left[\left(\frac{R}{R_e}\right)^{1/4} - 1\right]
+$$
+where $I_e = I(R_e)$ is the surface brightness at the \textbf{effective radius} $R_e$, defined such that half the total luminosity is enclosed within $R_e$:
+$$
+\int_0^{R_e} I(R)\,R\,\dd{R} = \frac{1}{2}\int_0^{\infty} I(R)\,R\,\dd{R}
+$$
+The total surface luminosity is:
+$$
+L = \int_0^{\infty} I(R)\,2\pi R\,\dd{R} = 7.215\,\pi\,I_e R_e^2
+$$
+The de Vaucouleurs profile applies to the bulges of spiral galaxies and to elliptical galaxies.
+
+The stellar mass in the bulge is $M_{\star,B} \approx 1.6 \times 10^{10}\,M_\odot$, with a mass-to-light ratio:
+$$
+\frac{M}{L} \approx 5\,\frac{M_\odot}{L_\odot}
+$$
+
+\subsection{The Halo}
+
+The \textbf{stellar halo} is a roughly spherical, low-density component extending to $r \lesssim 35\,\mathrm{kpc}$, populated mainly by old, metal-poor \textbf{Population II} stars. It contains about 150 globular clusters distributed spherically around the Galactic center.
+
+If we assume spherical symmetry, the stellar density in the halo falls off as:
+$$
+n(r) \propto r^{-\gamma}, \quad \gamma \approx 3\text{--}3.5
+$$
+
+The gaseous halo contains \textbf{high-velocity clouds} (HVCs) with $V \gtrsim 400\,\mathrm{km\,s^{-1}}$ (e.g.\ the Magellanic Stream). These gas reservoirs are thought to be the raw material from which stars form. The gaseous halo constitutes roughly $10\%$ of the total interstellar medium mass.
+
+\subsection{The Galactic Center}
+
+At the center of the Milky Way lies a \textbf{supermassive black hole}, \textbf{Sagittarius~A*} (Sgr~A*), which is a radio-emitting, compact source first identified as a radio source. It has a mass of $M_\bullet \approx 4 \times 10^6\,M_\odot$. Sgr~A* is also associated with \textbf{AGN} (Active Galactic Nuclei) activity, although it is currently in a quiescent state.
+
+From cosmic ray and dust particle studies, we know that the Milky Way harbors a large-scale \textbf{magnetic field} of roughly $B \approx 4\,\mu\mathrm{G}$.
+
+\section{Population of Stars (and Galaxies)}
+
+\subsection{The Luminosity Function}
+
+The \textbf{luminosity function} $\Phi(M)$ describes the number density of stars (or galaxies) per unit absolute magnitude $M$ per unit volume. Consider a small number of stars $\dd{N}$ in a range of magnitudes $[M, M + \dd{M}]$ and positions in a volume element $\dd^3\vec{x}$ around $\vec{x}$:
+$$
+\dd{N} \equiv \Phi(M,\vec{x})\,\dd{M}\,\dd^3\vec{x}
+$$
+If we assume the magnitude is \textit{independent} of position (i.e.\ we can separate the luminosity function from the spatial distribution):
+$$
+\dd{N} = \Phi(M)\,\dd{M}\cdot\nu(\vec{x})\,\dd^3\vec{x}
+$$
+where $\nu(\vec{x})$ is the \textbf{numerical density} and $\Phi(M)$ is the luminosity function. Qualitatively, $\log\Phi$ grows as $\log\Phi \sim \log\omega$ when stars are born and then $\log\Phi(M)$ settles to a characteristic shape after some evolution time.
+
+\subsection{The Fundamental Equation of Stellar Statistics}
+
+We want to relate the observable \textbf{star counts} $A(m)$ --- the number of stars per unit solid angle brighter than apparent magnitude $m$ --- to the luminosity function and the spatial distribution.
+
+Consider a spherical shell at distance $s$ (in pc) with thickness $\dd{s}$ and solid angle $\omega$. The number of stars in the absolute magnitude range $[M, M+\dd{M}]$ in this shell is:
+$$
+\dd{N} = \Phi(M)\,\dd{M}\cdot\nu(\vec{x})\,\omega\,s^2\,\dd{s}
+$$
+and the total differential star counts:
+$$
+\frac{\dd^2 N}{\dd{m}\,\dd{M}} = \Phi(M)\,\frac{\dd{m}}{\dd{m}}\cdot\left(\frac{\partial s}{\partial m}\right)_M\,\omega\,s^2\,\nu(s)
+$$
+
+Using the relation $m - M = 5\log s - 5$ (ignoring extinction for simplicity), we have:
+$$
+\dd{m} = \frac{5}{\ln 10}\,\frac{\dd{s}}{s} \quad \Longrightarrow \quad \frac{\dd{s}}{\dd{m}} = \frac{s\,\ln 10}{5}
+$$
+so that $\dd{m} = \omega\,s^2\,\nu(s)\,\dd{s}$, and the \textbf{star counts} become:
+$$
+A(m) \equiv \frac{\dd{N}}{\dd{m}} = \int_{-\infty}^{+\infty} \frac{\dd^2 N}{\dd{m}\,\dd{M}}\,\dd{M} = \omega\int_0^{\infty} \Phi(M)\left(\frac{\partial s}{\partial m}\right)_M s^2\,\nu(s)\,\dd{s}
+$$
+
+Since $\dd{m}/\dd{s}\big|_M = -(\partial m/\partial s)_M$ and using $dm = \omega s^2 \nu(s) ds$ (with $V(s)$ denoting the volume factor), the \textbf{Fundamental Equation of Stellar Statistics} is:
+
+\begin{tcolorbox}[colback=definition-color!10, colframe=definition-color!60, arc=3mm, boxrule=0.6pt]
+$$
+A(m) = \omega \int_0^{\infty} \Phi(M)\,s^2\,\nu(s)\,\dd{s}
+$$
+\end{tcolorbox}
+
+\noindent where the absolute magnitude $M = m - 5\log s + 5$ links $m$, $s$, and $M$ at each point along the line of sight.
+
+\subsection{The Malmquist Bias}
+
+Observational surveys are typically \textbf{magnitude-limited}: only stars (or galaxies) brighter than a limiting apparent magnitude $m_\mathrm{lim}$ are detected. This introduces a systematic bias known as the \textbf{Malmquist bias}: at larger distances, only the intrinsically brighter (more massive) objects are included in the sample, skewing inferred properties.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.55\textwidth}
+        \textbf{Qualitative picture}: for an apparent-magnitude-limited survey, the observed distribution of objects is biased toward intrinsically bright objects at large distances. As a result, the mean absolute magnitude of objects in the sample is systematically \textit{brighter} than the true mean of the population: $\langle M_\mathrm{obs} \rangle < \langle M_\mathrm{true} \rangle$.
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.42\textwidth}
+        \vspace{-0.5em}
+        % \includegraphics[width=\textwidth]{assets/malmquist.png}
+        \captionof{figure}{Malmquist bias: a magnitude-limited sample preferentially selects intrinsically bright objects at large distances.}
+    \end{minipage}
+\end{figure}
+
+One can convert a magnitude-limited sample to a \textbf{volume-limited} sample by restricting to the distance at which even the faintest objects of interest would still be detected. The Malmquist bias implies $\langle M_\mathrm{obs} \rangle < M_\mathrm{mean}$, i.e.\ observed objects appear brighter on average than they truly are.
