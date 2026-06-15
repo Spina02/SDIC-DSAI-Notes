@@ -1,2638 +1,661 @@
-\chapter{Raw notes (To be rewritten)}
+\chapter{The Milky Way Galaxy}
 
-\newpage
+\vspace{-0.5em}
 
-\missing{Lecture 21/10/2025}
+In this chapter we'll discuss the structure, main properties, and kinematics of the \textbf{Milky Way}. We'll begin by examining the methods used to measure distances to stars and other astronomical objects.
 
-\chapter{Lecture 23/10/2025}
+\vspace{-0.3em}
 
-\missing{Start of the lecture}
+\section{Methods of Distance Measurement}
 
-% Mass of $E_s$:
+\vspace{-0.3em}
 
-% \begin{enumerate}
-%     \item \textbf{Kinematic of stars}: 
-%     \item \textbf{Hot gas}: $T_x \rarr M$
-% \end{enumerate}
-
-\section{Spiral Galaxies}
-
-\begin{center}
-\begin{tabular}{l|cccc}
-    \toprule
-    & $S_a$ & $S_b$ & $S_c$ & $S_d$ \\
-    \midrule
-    $M_B$ & $-17 - 23$ & $-17 - 23$ & $-16 -22$ & $-15 -20$\\
-    $M/M_{\odot}$ & $10^{9-12}$ & $10^{9-12}$ & $10^{9-12}$ & $10^{8-10}$\\
-    $V_{max}$ & $163 - 367$ & $163 - 367$ & $99 - 304$ & $99 - 304$ \\
-    $L_{bulge}/L_{tot}$ & $0.3$ & $0.13$ & $0.05$ & ?\\
-    $B-V$ & $0.75$ & $0.64$ & $0.52$ & $0.47$\\
-    $M_{gas}/M_{B} $ & $0.04$ & $0.08$ & $0.16$ & $0.25$\\
-    \bottomrule
-\end{tabular}
-\end{center}
-
-
-Another important parameter is the \textbf{Opening angle} $\theta_0$, which is the angle between the major axis of the galaxy and the line of sight.
-
-We can distinguish "grand design" and "flocculent" galaxies.
-
-\begin{tabular}{cccc}
-    \toprule
-    Surface & brightness & profile & M/L\\
-    \midrule
-    Bulge & $2^{1/4}$ & low & $\sim 5 \dfrac{M_d}{L_\odot}$\\
-    Disk & expo & low & $\sim 3\dfrac{M_\odot}{L_\odot}$\\
-    \bottomrule
-\end{tabular}
-
-There exists "Bulges" and "Pseudobulges".
-
-We know very few pseudobulges.
-
-Bulges have law of E
-
-Pseudobulges have exopnential profile -> rotation
-
-Freeman Law:
-
-$\mu_0 \sim const$
-
-$$
-\mu_0 =  21.52 \pm 0.39 \qquad (S_a \rightarrow S_c)
-$$
-
-$$
-\mu_0 =  22.61 \pm 0.39 \qquad (S_d)
-$$
-
-\todo{How evolution can change the spiral}:
-
-\textbf{Stelar Halo}
-
-MW, M31 $\Rightarrow$ $\rho \propto r^{-3}$
-
-If a galaxy is nearby and it is edge-on, we can see a thick disk.
-
-the size of the disk  is $\mu_B \sim 22.5 mag/arcsec^2$
-
-Another important law is the \textbf{Law of Star Formation Rate} (Schmidt-Kennicutt Law):
-
-$$
-\sum_{SFR} \propto \sum_{gas}^N
-$$
-
-$$
-\dfrac{M_\odot}{y kpc^2}
-$$
-
-\subsubsection{Surface photometry bias}
-
-If we observe a portion of a galaxy, and we must "look through" a portion of the galaxy we will see a redder light than observing it from an angle where we don't have to "look through" any portion of the galaxy.
-
-% add plot 2 of my handwritten notes
-
-The same happens for the bulge.
-
-Let's suppose a spiral with no dust: if we observe a "face-on" galaxy, we will see a brighter galaxy than observing the same galaxy "edge-on".
-
-If we consider a very dusty spiral instead, we will notice that the galaxy appears with a similar brightness in both face-on and edge-on views, due to the dust.
-
-% add plot 3 of my handwritten notes
-
-% Disney observed that $L \propto D^2$ -> not true?
-% add plot 4 of my handwritten notes - Disney
-
-\subsubsection{Rotation curves}
-
-The rotation curve is the curve that shows the velocity of the stars in the galaxy as a function of the distance from the center of the galaxy.
-
-\dots
-
-A part of this velocity is related to the baryonic mass.
-
-% add plot 5 of my handwritten notes
-
-We can decompose the velocity:
-
-DM Halo
-disk
-
-% add plot 6 of my handwritten notes
-
-% talk aboutmaximum disk hypothesis
-
-If $\dfrac ML \sim stars$ We do not need to consider Dark Matter in the disk.
-If $\dfrac ML \gg stars$ We need to consider Dark Matter in the disk.
-
-In general, the max velocity is higher if the luminosity is higher.
-If we pick galaxies with the same luminosity, the max velocity is higher for the galaxies with the higher mass. % (or lower?)
-
-% missing something here
-
-arms:
-
-grand design -> density moves (internal)
-$S_c$ flocculent -> tidal interaction (external)
-
-
-\subsection{Virial Theorem}
-
-[karttunen demonstration]
-
-If a system is virialized, the following equation holds:
-
-$$
-2T + U = 0
-$$
-
-where T is the kinetic energy and U is the potential energy.
-
-Suppose we have a system of $n$ point masses $m_i$ with radius vectors $r_i$ and velocities $\dot r_i$. We define a quantity $A$ (the “virial” of the system) as follows:
-
-$$
-A = \sum_{i=1}^n m_i \dot r_i \cdot r_i
-$$
-
-Time derivative:
-
-$$
-\dot A = \sum_{i=1}^n (\underbrace{m_i \dot r_i \cdot \dot r_i}_{2T} + \underbrace{m_i \ddot r_i \cdot r_i}_{F_i})
-$$
-
-$$
-\dot A = 2T + \sum_{i=1}^n n F_i \cdot r_i
-$$
-
-Time average:
-
-$$
-\langle \dot A \rangle = \dfrac 1\tau \int_0^\tau \dot A dt = \langle 2T \rangle + \langle \sum_{i=1}^n F_i \cdot r_i \rangle
-$$
-
-If the system remains bounded—that is, none of the particles escapes—all positions $\vec r_i$ and velocities $\dot{\vec r}_i$ stay finite. In this case, the virial $A$ does not grow without bound, and the integral in the previous equation also remains finite. When we consider an increasingly long timespan ($\tau \to \infty$), the time average $\langle \dot A \rangle$ approaches zero, and we obtain:
-
-$$
-\langle 2T \rangle + \langle \sum_{i=1}^n F_i \cdot r_i \rangle = 0
-$$
-
-where $F_i$ is the garvitational force:
-
-$$
-\vec F_i = -G m_i \sum_{j = 1, j \neq i}^n m_j \dfrac {\vec r_i - \vec r_j}{r_{ij}^3}
-$$
-
-where $r_{ij} = |\vec r_i - \vec r_j|$.
-
-The latter term od the viral theorem becomes:
-
-$$
-\begin{array}{rl}
-\sum_{i=1}^n F_i \cdot r_i 
-& = -G \sum_{i=1}^n \sum_{j = 1, j \neq i}^n m_i m_j \dfrac {r_i - r_j}{r_{ij}^3} \cdot r_i\\
-& = -G \sum_{i=1}^n \sum_{j = i + 1}^n m_i m_j \dfrac {r_i - r_j}{r_{ij}^3} (r_i - r_j)
-\end{array}
-$$
-
-Which is obtained combnining:
-
-$$
-\begin{array}{rl}
-(1) & = -G \sum_{i=1}^n \sum_{j = 1, j \neq i}^n m_i m_j \dfrac {\vec r_i - \vec r_j}{r_{ij}^3} \cdot \vec r_i\\
-(2) & = -G \sum_{j = 1}^n \sum_{i = 1, i \neq j}^n m_i m_j \dfrac {\vec r_j - \vec r_i}{r_{ji}^3} \cdot \vec r_j\\
-(3) & = -G \sum \sum m_i m_j \dfrac {\vec r_i - \vec r_j}{r_{ij}^3} (- \vec r_j)
-\end{array}
-$$
-
-\dots (maybee missing something)
-
-we get:
-
-$$
-\sum_{i=1}^n \vec F_i \vec r_i = -G \sum_{i=1}^n \sum_{j = i + 1}^n \dfrac{m_i m_j}{r_{ij}} = U
-$$
-
-From the virial theorem we want to derive \bfit{observational quantities}.
-
-$$
-\sum_i m_i (v_i - \langle v \rangle)^2 - G \sum_{i > j} \dfrac{m_i m_j}{r_{ij}} = 0
-$$
-
-$$
-\underbrace{\boxed{\dfrac{\sum_i m_i (v_i - \langle v \rangle)^2}{\sum_i m_i}}}_{\text{velocity dispersion}} - G \underbrace{\boxed{\dfrac{\sum_{i > j} \dfrac{m_i m_j}{r_{ij}}}{(\sum_i m_i)(\sum_i m_i)}}}_{\equiv \frac 1{R_v} \text{viral radius}} \sum_i m_i = 0
-$$
-
-\dots
-
-2D position, 1D observations
-
-$$
-\sigma^2_v - G \dfrac{M}{R_v} = 0
-$$
-
-$$
-M = \dfrac{\sigma^2_v R_v}{G}
-$$
-
-If the system is spherical, we can use the projected radius to get the virial radius.
-
-$$
-\sigma^2_v = 3 \sigma^2_{v, los}
-$$
-
-Therefore, we have:
-
-$$
-R_v = \dfrac {\pi}2 R_{v, projected}
-$$
-
-$$
-M = \dfrac{3\pi}2 \dfrac{\sigma^2_{v, los} R_{v, projected}}{G}
-$$
-
-\textbf{Segregation effect:} Some objects behaves differently: not always mass is proportional to luminosity. Therefore we need to use the formula above.
-
-Sometimes we will see "tensorial virial theorem", and "generalized virial theorem".
-
-\begin{observationblock}[Virial Theorem validity]
-The viral theorem is valid if the mass follows the same distribution of light, buth this is not always the case.
-\end{observationblock}
-
-The definition of the \textbf{viral radius} (or better, the \textit{radius of the virial theorem}) is:
-
-$$
-R_v = \dfrac {n^2}{\sum_{i>j} \dfrac{1}{r_{ij}}}
-$$
-
-The \textbf{harmonic radius} is:
-
-$$
-R_H = \dfrac{n(n-1)/2}{\sum_{i>j} \dfrac{1}{r_{ij}}}
-$$
-
-\subsubsection{Scaling relations - Spiral galaxies}
-
-The \textbf{Trully-Fisher relation} allows us to relate the luminosity of a galaxy to its velocity dispersion.
-
-$$
-L \propto V_{max}^\alpha \qquad \alpha \sim 4
-$$
-
-Calibrated TF relation fron nearby galaxies.
-
-For distant galaxies, we can obtain the redshift from the spectrum, and the rotation velocity (and, in particular,  $V_{max}$). Then we can calculate $M$, and then the distance from $m - M$.
-
-\begin{itemize}
-    \item For nearby galaxies we can use cepheids to calculate de distance
-    \item For very far galaxies we can use the Hubble law
-    \item For the ones in the middle we can use the TF relation
-\end{itemize}
-
-
-VT + Spiral structure -> T-F relation
-
-$$
-\mathcal{M} \propto \dfrac{V^2_{max}R}{G} \left( \times \dfrac{L}{\mathcal M} \right)
-$$
-
-so we get:
-
-$$
-L \propto \left( \dfrac{\mathcal{M}}{L} \right)^{-1} \dfrac{V^2_{max}R}{G}
-$$
-
-$$
-L \propto \left( \dfrac{\mathcal{M}}{L} \right)^{-2} \dfrac{R^2}{L G^2} v_{max}^4
-$$
-
-$$
-L^2 \propto \left( \dfrac{\mathcal{M}}{L} \right)^{-2} \dfrac{R^2}{G^2} v_{max}^4
-$$
-
-$$
-L \propto \left( \dfrac{\mathcal{M}}{L} \right)^{-2} \left(\dfrac 1{\langle I \rangle G^2} \right) v_{max}^4
-$$
-
-$$
-\dfrac{\mathcal{M}}{L} \sim const
-$$
-
-\subsubsection{The Faber-Jackson relation}
-
-% not properly working
-
-\subsubsection{The fundamental plane}
-
-$$
-(R_e, \sigma_0, \langle I \rangle_e)
-$$
-
-$$
-R_e \propto \sigma_0^{1.4} \langle I \rangle_e^{-0.85}
-$$
-
-Virial Theorem + Kormendy Relation -> Fundamental Plane
-
-$$
-R_e \propto \langle I \rangle_e^{-0.82} + \dfrac{\mathcal{M}}{L} \propto \mathcal{M}^{0.2}
-$$
-
-\subsubsection{The $D_n - \sigma$ Relation}
-
-Be $D_n$ the diameter of an ellipse within the average surface brightness $I_n$ corresponds to a value of $20.75 mag/arcsec^2$.
-
-We have thet:
-
-$$
-D_n \propto \sigma_0^{1.33}
-$$
-
-Spectrum -> $\sigma_0$ -> $D_n$ -> distance
-
-\subsubsection{Boh}
+The \textbf{distance ladder} is the set of hierarchical techniques used to measure astronomical distances, each method building on and calibrating the previous one.
 
 \begin{enumerate}
-    \item Luminous galaxies $\rightarrow$ Hubble types
-    \item Elliptical $\neq$ Spiral galaxies
-    \begin{itemize}
-        \item morphology
-        \item kinematics
-        \item gas content
-        \item SF (= color)
-    \end{itemize}
-    \item Kinematics
-    \begin{itemize}
-        \item Spiral: ordered $m^+$, $V_{max}$
-        \item Ellipticals: random $m$, $\sigma_v$
-    \end{itemize}
-\end{enumerate}
 
-\newpage
+\item \textbf{Day Parallax}
 
-\section{Lecture 28/10/2025}
+Diurnal parallax uses Earth's diameter as a baseline. Observing the same nearby object from two locations on Earth reveals a small angular shift, which can be converted into distance. It is mainly useful for Solar System objects.
 
-\subsubsection{Galaxies' luminosity function}
+\item \textbf{Kepler's Third Law}
 
-The luminosity function $(\Phi(L))$ is the number of galaxies per unit volume per unit luminosity.
+For objects within the Solar System, Kepler's third law provides an indirect distance scale. It relates the orbital period $T$ and the semi-major axis $a$ of a planet's orbit:
 $$
-v = \int_{-\infty}^{\infty} \Phi(M)dM = \int_0^\infty \Phi(L)dL
+T^2 \propto a^3
 $$
 
-We encounter different problems:
+\vspace{-0.3em}
 
-\begin{itemize}
-    \item what's the distance of a cluster of galaxies?
-    \item large scale structure
-    \item Maluquist bias - limited surveys in $m$
-\end{itemize} 
+By measuring Earth orbital periods, all other planetary distances can be derived.
 
-\todo{reproduce plot in the notebook}
+\item \textbf{Annual (Trigonometric) Parallax}
 
-During the years, multiple attempts to solve the problem have been made:
-
-\begin{itemize}
-    \item Press-Schechter (74) halos -> Mass function
-    \item Schechter (79) -> Luminosity function
-\end{itemize}
-
+Annual parallax uses the Earth's orbit around the Sun (baseline $= 2\,\mathrm{AU}$) to measure the angular shift of nearby stars against the background of more distant stars over six months. The parallax angle $p$ (in arcseconds) is related to the distance by:
 $$
-\Phi(L) = \left( \dfrac{\Phi^*}{L^*} \right) \left( \dfrac{L}{L^*} \right)^{\alpha} e^{-\left( \frac{L}{L^*} \right)}
+d = \frac{1}{p}\,[\mathrm{pc}]
 $$
 
-where $\alpha \sim -1$
+\vspace{-0.3em}
 
-thypical B-band:
+This is the most direct method for stellar distances and is limited to stars within $\sim 1\,\mathrm{kpc}$ (ground-based) or $\sim$~a few kpc (Gaia satellite).
 
-$$
-\Phi^* = 1.6 \cdot 10^{-2} \{ h ^{+3}\}
-$$
+\item \textbf{Moving-Cluster Method}
 
-$$
-M^*_B = -19.7 + 5 \log h \quad \Leftarrow \quad L^*_B = 1.2 \cdot 10^{10} h^{-2} L_{\odot, B}
-$$
+The moving-cluster method exploits the fact that stars in a nearby open cluster all share the same bulk space motion and therefore appear to converge toward (or diverge from) a single point on the sky, known as the \textbf{convergence point}.
 
-Therefore, $\alpha = -1.07$
+% \smallskip
 
-For K-band:
-
-$$
-\Phi^*_K = 1.6 \cdot 10^{-2} Mpc^{-3}
-$$
-
-$$
-M^*_K = -23.1
-$$
-
-therefore, $\alpha = -0.9$
-
-\begin{observationblock}[$h^{+3}$]
-    $h^{+3}$ is used to rescale the luminosity function. At first it was related to $\Omega_m \sim 1$, nowadays it is not so easy to determine, and it depends on $H_0$.
-\end{observationblock}
-
-$$
-L_{tot} = \int_0^\infty dL \Phi(L) L = \Phi^* L^* \Gamma(2 + \alpha)
-$$
-
-which is finite for $\alpha \geq -2$
-
-$$
-N_{tot} = \int_0^\infty \Phi(L) dL
-$$
-
-which is finite for $\alpha > -1$
-
-The 60\% of $L_{tot}$ is contained in the range $0.22 L^* < L < 1.6 L^*$
-
-The 90\% of $L_{tot}$ is contained in the range $0.1 L^* < L < 2.3 L^*$
-
-Typical luminosity of galaxies is $\Phi^* \sim 2 \cdot 10^{-2} Mpc^{-3}$, with an average separation of $4 Mpc$.
-
-In clusters, the density is way higher than in the field (the rest of the universe). In fact, the average distance between galaxies is $\sim 1-2 Mpc$.
-
-\subsubsection{Specific Luminosity Function}
-
-LF for morphological types:
-
-\begin{minipage}{0.49\textwidth}
-    \textbf{Field}
-
-    \todo{put here plot (a) sheet G14 Fig 3.51}
-\end{minipage}
-\begin{minipage}{0.49\textwidth}
-    \textbf{Clusters}
-
-    \todo{put here plot (b) sheet G14 Fig 3.51}
-\end{minipage}
-
-In general it is valid $L_{s\emptyset} > L_{sa}$ - Lenticular galaxies are brighter than spiral galaxies.
-
-Effects due to evolution of galaxies:
-
-A merge of spiral galaxies can result in an elliptical galaxy $\qquad S + S \rightarrow E$
-
-% $In \rightarrow dE$ % what is this?
-
-\begin{minipage}{0.49\textwidth}
-    \textbf{Groups}
-    \begin{itemize}
-        \item $N \lesssim 50$ galaxies
-        \item $M \lesssim 3\cdot 10^{13} M_{\odot}$
-        \item $T_x \sim 1 \rightarrow 3 KeV$
-        \item $\sigma_v \sim 200 \rightarrow 300 km/s$    
-    \end{itemize}
+\begin{minipage}{0.55\textwidth}
+    For a star in the cluster, the observed radial velocity $V_r$ and transverse velocity $V_t$ (derived from the proper motion $\mu$) are related to the total space velocity $V$ by:
+    $$
+    V_r = V \cos\psi, \qquad V_t = V \sin\psi
+    $$
+    where $\psi$ is the angle between the star's direction and the convergence point. 
 \end{minipage}%
-\begin{minipage}{0.40\textwidth}
-    \textbf{Clusters}
-    \begin{itemize}
-        \item $N \gtrsim 50$ galaxies
-        \item $M \gtrsim 3\cdot 10^{14} M_{\odot}$
-        \item $T_x \sim 4 \rightarrow 10 KeV$
-        \item $\sigma_v \sim 400 \rightarrow 1000 km/s$
-    \end{itemize}
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/moving-cluster.png}
 \end{minipage}
 
+Since the total space velocity $V$ is unknown, we eliminate it using $V = V_r/\cos\psi$, then we use the relation $V_t = \mu \cdot d$ (in consistent units):
 $$
-R_{Abell} = 1.5 h_{100}^{-1} Mpc \quad \rightarrow \quad 1.5 \cdot \dfrac{100}{70} h_{70}^{-1} M_r
+V_t = V_r \tan\psi \quad \Longrightarrow \quad d = \frac{V_r \tan\psi}{\mu}
 $$
 
-Both are composed mainly by:
+\vspace{-0.3em}
 
-\begin{itemize}
-    \item Stars $\sim 3-5\%$
-    \item Hot gas ($3\cdot 10^7 K$) $\sim 15-20\%$
-    \item Dark Matter $\sim 80\%$
-\end{itemize}
+The proper motion $\mu$ satisfies $\mu = V_t / d$, so the distance follows directly.
 
+\item \textbf{Photometric and Spectroscopic Parallax}
 
-\subsubsection{Galaxy distribution}
-
-The following figure shows the distribution of galaxies in the universe.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{assets/gal-distribution.jpg}
-\end{figure}
-
-Some structures are "real", such as the \textit{Great Wall}, others are "apparent", such as the \textit{Finger of God}. % explain why
-
-\begin{tipsblock}[Galaxy distribution]
-    In high redshift zones, the galaxies seem to be less dense than in low redshift zones. This is because the farthest galaxies have a lower apparent magnitude than the nearest ones.
-\end{tipsblock}
-
-% plots from slidesGalaxiesNew and slidesGalaxiesBlanton, slidesGalsKinematics, slidesSEDznew
-
-\newpage
-
-\chapter{Lecture 30/10/2025}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{assets/distance-ladder.png}
-    \caption{\centering The distance ladder}
-\end{figure}
-
-\missing{something}
-
-$$
-\Delta R = R_1 - R_0 = p \int_{T_0}^{T_1} v(t) dt
-$$
-
-$$
-m_1 - m_0 = M_1 - M_0 = -5 [\log (R_0 + \Delta R) - \log R_0] = -10 [\log T_1 - \log T_0]
-$$
-
-$$
-R_0 = f(m_0, m_1, \Delta R, T_0, T_1)
-$$
-
-Surface Brightness Fluctuations (SBF):
-
-$$
-z \sim 0 \qquad \rightarrow \qquad SB \sim const
-$$
-
-Galaxy nearby have a small number $N$ of stars, while galaxies far away have a large number $N$ of stars.
-
-The poissonian error goes $\sim \sqrt{N}$
-
-The relative error is $\sim \dfrac{\sqrt{N}}{N}$
-
-Supernovae: you can obtain $\Delta t \sim L_{max}$ from the light curve. $L_{max}$ results in the absolute magnitude of the supernova, summing up the apparent magnitude of the supernova we can find the distance modulus.
-
-Hubble law (1928):
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{assets/hubble-law.png}
-    \caption{\centering Hubble law (1929)}
-\end{figure}
-
-$$
-v = H_0 d
-$$
-
-what is $H_0$?
-
-In 1990:
-
-\begin{itemize}
-    \item \textbf{optical} $H_0 = 50 \; \frac{km}{s}/Mpc$
-    \item \textbf{x-ray} $H_0 = 100 \; \frac{km}{s}/Mpc$
-\end{itemize}
-
-CMB (MW background cosmology): $H_0 \sim 70 \; \frac{km}{s}/Mpc$
-
-$$
-H_0 = h \cdot 100 \; \frac{km}{s}/Mpc
-$$
-
-\missing{something}
-
-\begin{observationblock}[Cluster in Hubble's Law]
-    In the Hubble's Law graph, the "vertical" spread of data points, depicted as clusters known as the "Finger of God", arises from galaxy clusters' peculiar velocities. These formations do not reflect any true spatial structure in the universe.
-\end{observationblock}
-
-\subsubsection{Distant Clusters}
-
-$$
-E(z) = \dfrac{H(z)}{H_0}
-$$
-
-closure of the universe:
-
-$$
-\rho_c = \dfrac{3 H_0^2}{8 \pi G}
-$$
-
-Galaxies in principle are expanding, at some point they are in a region where the average density is higher than the critical density, and they start to collapse.
-
-$$
-\langle \rho \rangle > \rho_c \qquad \Rightarrow \qquad \langle \rho \rangle = 20 \rho_c
-$$
-
-In order to define a size of a cluster, we have to define radius such as $R_{200}$.
-
-\newpage
-
-$\gtrsim 50\%$ of the galaxies stays in groups, not in clusters.
-
-$\sim 5\%$ of the galaxies stays in clusters.
-
-In the local group there are about 35-50 galaxies. $L < L^*$
-
-\begin{center}
-\begin{tabular}{cccc}
- & MW & M31 & M33\\
-$L^*$ & $SB_{bc}$ & $S_b$ & $S_c$\\
-$M_B$ & $-20$ & $-21.2$ & $-18.9$
-\end{tabular}
-\end{center}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{assets/local-group.jpg}
-    \caption{\centering Local group \cite{grebel}}
-\end{figure}
-
-$$
-V \sim - 120 Km/s, \qquad D = 770 Kpc, \qquad \text{collisions in } 6 \cdot 10^9 years
-$$
-
-The mass of the Local Group is:
-
-$$
-M \sim 3 \cdot 10^12 M_\odot
-$$
-
-We can use a two body model to calculate the mass of the Local Group.
-
-$$
-M_{LG} = M_{MW} + M_{M31} \sim 90\% L_{LG} \sim 90\% M_{LG}
-$$
-
-Let's consider at $t = 0$ the two galaxies are very close to each other and they are moving far away from each other.
-
-they will reach a maximum distance $r_max$ at time $t_max$ where $v_max = 0$. Then they start to collapse again.
-
-$$
-\dfrac 12 M v^2 - \dfrac{G M^2}{r} = c
-$$
-
-$$
-C = - \dfrac{G M^2}{r_max}
-$$
-
-$$
-\dfrac 12 \left( \dfrac{dr}{dt} \right)^2 = \dfrac {G M}{r} - \dfrac{G M}{r_max}
-$$
-
-$$
-(dt)^2 = \dfrac{(dr)^2}{2 GM} \left( \dfrac{1}{\dfrac{1}{r} - \dfrac{1}{r_max}} \right)
-$$
-
-$$
-dt = \dfrac{dr}{\sqrt{2 GM}} \dfrac{1}{\sqrt{\dfrac{1}{r} - \dfrac{1}{r_max}}}
-$$
-
-$$
-t_max = \int_0^{t_{max}} dt = \int_0^{r_{max}} \dfrac{dr}{\sqrt{2 GM \sqrt{\dfrac{1}{r} - \dfrac{1}{r_max}}}} = \dfrac {\pi}{2} \dfrac{r_{max}^{3/2}}{\sqrt{2 GM}}
-$$
-
-where the result is obtained using the Wolfram rule:
-$$
-\int_0^a \dfrac 1{\sqrt{\frac 1x - \frac 1a}} dx = \dfrac {\pi}{2} a^{3/2}
-$$
-
-Thus, $r_max$ is obtained by solving the equation:
-
-$$
-r_{max} = \left( \dfrac{2 \sqrt{2 G M}}{\pi} t_{max} \right)^{2/3}
-$$
-
-$$
-\dfrac {v^2}2 = \dfrac {G M}{r} - \dfrac 12 \left( \dfrac{ \pi GM}{t_max} \right)^{2/3}
-$$
-
-$$
-v = f(M, t_{max}) \quad \rightarrow \quad M = f(\nu, t_{max}) = 3 \cdot 10^12 M_{\odot}
-$$
-
-\missing{something}
-
-$$
-t_{max} \sim \dfrac{T_0}{2} + \dfrac {D_{obs}}{2 V_{obs}} \sim 10^10 years
-$$
-
-Sculptor Group has a distance of 1.8 Mpc and it is composed by 6 galaxies
-
-M81 group has a distance of 3.5 Mpc and it is composed by 8 galaxies 
-
-Virgo cluster has a distance of 16 Mpc and it is composed by 250 galaxies, it occupies 10° of space in the sky. Its most important galaxy is M87.
-
-Coma Cluster has a distance of 90Mpc, a redshift of $z \sim 0.03$
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Topics from Schneider - pag 223 and following
-%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\newpage
-
-\subsection{Catalogues of clusters}
-
-optical: Sovradensity of galaxies
-
-An important catalog of galaxy clusters is the \textit{Zwicky catalogue} (1961-68), which contains more clusters, but for which the applied selection criteria are considered less reliable.
-
-The \textit{Abell catalogue} (1958-89) contains $N_{gal} \ge 50$ galaxies.
-
-Those 50 galaxies have a magnitude in the following range:
-$$
-m_3 \le m \le m_3 + 2
-$$
-
-But also a radius such that:
-
-$$
-\theta_A = \dfrac{1.7'}{z}
-$$
-
-Therefore:
-
-$$
-R_{Abel} = 1.5 h^{-1} Mpc
-$$
-
-The \textit{Abell Corwin \& Olowin catalogue} (ACO) contains around 4000 clusters (with a small redshift $z < 0.2$)
-
-\subsubsection{Problems with the catalogues}
-
-The selection of galaxy clusters from an overdensity of galaxies on the sphere is not without problems, in particular if these catalogs are to be used for statistical purposes.
-
-We have two main problems:
-
-We need to define two quantities:
-
-\begin{itemize}
-    \item \textbf{Completeness}: $\dfrac{N_{obs}}{N_{true}} \le 1$
-    \item \textbf{Purity}: $\dfrac{N_{obs} - N_{false}}{N_{obs}} \le 1$
-\end{itemize}
-
-A galaxy cluster is a three-dimensional object, whereas galaxy counts on images are necessarily based on the projection of galaxy positions onto the sky.
-
-Therefore, projection effects are inevitable. Random overdensities on the sphere caused by line-of-sight projection may easily be classified as clusters. These so-called \textit{projection effects} are the most serious problem with the catalogues.
-
-\subsection{Morphological Classification}
-
-The morphological classification of galaxy clusters by Rood and Sastry is defined by several categories:
-
-\begin{itemize}
-    \item \textbf{cD}: Clusters categorized as cDs are characterized by the dominance of a central \textit{cD galaxy}.
-    \item \textbf{B}: Clusters categorized as Bs are distinguished by a \bfit{binary} system of bright galaxies at their center.
-    \item \textbf{L}: Clusters categorized as Ls exhibit a nearly \bfit{linear} alignment of their dominant galaxies.
-    \item \textbf{C}: Clusters categorized as Cs are identified by a \bfit{single core} of galaxies.
-    \item \textbf{F}: Clusters categorized as Fs are described as having a \bfit{flat} galaxy distribution.
-    \item \textbf{I}: Clusters categorized as Is are notable for their \bfit{irregular} distribution.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{assets/morph-class.png}
-    \caption{\centering Morphological classification by Rood and Sastry \cite{schneider}}
-\end{figure}
-
-\missing{a lot of stuff}
-
-Modern Catalogues
-
-Bautz-Morgan: 
-
-sovraddensity of galaxies
-
-Color magnitude diagram
-
-\dots
-
-\begin{itemize}
-    \item sovraddensity of galaxies
-    \item color magnitude diagram
-\end{itemize}
-
-\dots
-
-Max BCG catalog (SDSS survey):
-
-This catalog is 90\% pure and 85\% complete. $M \ge 10^{14} M_{\odot}$
-
-\begin{itemize}
-    \item red sequence
-    \item dominant central galaxy
-    \item radial profile of galaxies distribution
-\end{itemize}
-
-\subsection{Groups}
-
-\begin{itemize}
-\item \textbf{Loose Groups}
-
-They are the most common type of groups, they include almost the 50\% of the galaxies.
-
-\item \textbf{Compact Groups}
-
-They are very rare.
-
-This is the case where we have a high density of galaxies, and they are all close to each other.
-
-$$
-t_{dyn} \sim \dfrac{R}{\sigma_v} \sim 0.02 H_0^{-1}
-$$
-
-\item \textbf{Fossil Groups}
-
-$$
-\Delta m_{12} \ge 2 mag
-$$
-
-\begin{tipsblock}[Fossil Groups]
-The name fossil depends of the fact that a researcher thought it was the first group ever formed in the universe.
-\end{tipsblock}
-
-
-% seen plots in slidespaperICL
-
-\end{itemize}
-
-
-\chapter{Lecture 04/11/2025}
-
-\missing{Start of the lecture}
-
-The Inter Cluster Medium (ICM) is the hot gas that fills the space between the clusters. Between 1920 and 1933 were discovered the first X-ray sources.
-
-Telescopes:
-
-\begin{itemize}
-    \item X-ray (mono source, then extended source)
-    \item UMURU
-    \item Einstein
-    \item Rosat
-    \item Chandra
-    \item XMM
-    \item E-Rosat
-    \item Athena
-\end{itemize}
-
-Athena to study the motion of the gas in some clusters
-
-$$
-L_X \sim 10^{43-45} erg/s
-$$
-
-FF emission: Bremsstrahlung
-
-\begin{itemize}
-    \item Groups $kT \sim 1-3 KeV$
-    \item Clusters $kT \sim 10-12 KeV$ (at least $> 4-5 KeV$)
-\end{itemize}
-
-
-
-$$
-E_\nu \equiv \dfrac {dL}{dV d\nu}
-$$
-
-$$
-e_\nu^{ff} \propto \underbrace{n_e n_i}_{n_e^2} T^{-1/2} e ^{-\frac{h\nu}{kT}}
-$$
-
-\todo{insert plots from paper sheets A2 (right column)}
-
-$$
-E \propto \sqrt{T} n_e^2 \qquad KT \gtrsim 5 KeV
-$$
-
-ff+bf+bb:
-$$
-E \propto T^{-0.6} n_e^2 \qquad KT \le 2 KeV
-$$
-
-\textbf{Rosat} has a sensibility range of $0.1-2.4 KeV$. It is very useful to measure the mass of a cluster.
-
-If the gas is homogeneous, we have: $\langle n_e^2 \rangle = \langle n_e \rangle^2$, but if the mass is not homogeneous, we have: $\langle n_e^2 \rangle \neq \langle n_e \rangle^2$.
-
-From observations we can note that the gas mass is much smaller than the stellar mass: $M_gas \sim 5-10 M_{\star}$. An important indicator is the following ratio:
-
-$$
-\dfrac{M_{gas} \ (\sim 15 - 20\% M_{tot})}{M_{\star} \ (\sim 3-5\% M_{tot})}
-$$
-
-The higher is the total mass $M_{tot}$, the higher is the ratio $\dfrac{M_{gas}}{M_{\star}}$.
-
-A conclusion is that clusters are richer in gas, while groups are richer in stars. Follows that the clusters retain better the gas, and the groups are more efficient in forming stars.
-
-Since $e_x \propto n_e^2$, the x-ray emission comes from the core of the cluster, therefore you can have a better view of where the cluster is in space (for distances $< 1 Mpc$). There is still the problem of the flux limit.
-
-\subsubsection{Clusters morphology}
-
-We can find different morphologies for the clusters:
-
-\begin{itemize}
-    \item \textbf{Unimodal Clusters}: they have a single peak in the x-ray emission.
-    \item \textbf{Bimodal Clusters}: they have two peaks in the x-ray emission.
-\end{itemize}
-
-We can talk further about substructures in the clusters.
-
-\textbf{Unimodal clusters}
-
-$\beta-model$
-
-\begin{itemize}
-    \item 3 dimensional profile:
-
-    $$
-    \rho_{gas}(r) = \rho_{0, gas} \left( 1 + \left( \dfrac{r}{\beta r_{c, gas}} \right)^2 \right)^{-\frac{3}{2} \beta_{fit, gas}}
-    \qquad \Rightarrow \qquad 
-    r^{-2} \beta_{fit, gas} = \dfrac 23
-    $$
-
-    \item 2 dimensional profile:
-    
-    $$
-    \Sigma_{gas}(R) = \Sigma_{0, gas} \left( 1 + \left( \dfrac{r}{\beta R_{c, gas}} \right)^2 \right)^{-\frac{3}{2} \beta_{fit, gas} + \frac 12}
-    \qquad \Rightarrow \qquad 
-    R^{-1}
-    $$
-    
-    \item observed profile:
-    
-    $$
-    S_x = S_{x, 0} \left( 1 + \left( \dfrac{r}{\beta R_{c, gas}} \right)^2 \right)^{-3 \beta_{fit, gas} + \frac 12}
-    \qquad \Rightarrow \qquad 
-    S_x = \int \rho_{gas}^2
-    $$
-\end{itemize}
-
-We have a typical ICM density of:
-$$
-n_e \sim \dfrac{1 \cdot 10^{-3}}{cm^{-3}}
-$$
-
-Cooling Flows (or, in older literature, Cool Cores) are clusters with a high density of gas in the center, characterized by a big emission in the center.
-
-$$
-t_{cool} = \dfrac {\mu}{e_ff} \sim \underline{8.5 \cdot 10^{10} yr} \left( \dfrac{n_e}{10^{-3} cm^{-3}} \right) \left( \dfrac{T_{gas}}{10^8 K} \right)
-$$
-
-Which is bigger than the Hubble time $t_H \sim 13 \cdot 10^{9} yr$, therefore we have no cooling.
-
-$$
-\omega = \dfrac 32 n_e k T
-$$
-
-$$
-E^{ff} \propto n_e^2 T^{1/2}
-$$
-
-The center of some clusters can have high $n_e$ and a lower $t_{cool} < t_H$, therefore we have a cooling core. In these kind of clusters we can observe star formation from the gas.
-
-These kind of clusters have no big Surface Brightness \dots
-
-\missing{something about No Cool Core and Mergers}
-
-\subsubsection{Sunyaev-Zel'dovich Effect}
-
-% page 252 of Schneider's book
-
-The Sunyaev-Zel'dovich Effect is a small distortion of the Cosmic Microwave Background Radiation (CMBR) due to the interaction with the ICM.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.4\textwidth]{assets/s-z-effect.png}
-    \caption{\centering Sunyaev-Zel'dovich Effect \cite{schneider}}
-\end{figure}
-
-In the Rayleigh-Jeans domain of the CMB spectrum, thus at wavelengths larger than about 1 mm, photons are effectively removed by the SZ effect. For the change in specific intensity in the RJ part, one obtains:
-
-$$
-\dfrac {\Delta I_\nu^{RJ}} {I_\nu^{RJ}} = -2 y
-$$
-
-where $y$ is the \bfit{Compton-y parameter}:
-
-$$
-y =\int_0^\infty dl \dfrac{kT_{gas}}{m_e c^2} \sigma_T n_e
-$$
-
-and $\sigma_T$ the Thomson cross-section for electron scattering:
-
-$$
-\sigma_T = \dfrac{8 \pi}{3} \left( \dfrac{e^2}{m_e c^2} \right)^2
-$$
-
-therefore:
-\begin{itemize}
-    \item $y \propto$ optical depth
-    \item $y \propto n_e$ 
-    \item $y \propto T_{gas}$ 
-\end{itemize}
-
-So y can be a proxy for cluster mass.
-
-$$
-\theta = \dfrac R{D_A}, \quad d\theta = \dfrac{dR}{D_A}
-$$
-$$
-sz-eff = \int d^2 \theta y = \dfrac 1{D_A^2} \int d^2 Ry \propto \dfrac 1{D_A^2} \int dV n_e T_{gas}
-$$
-
-$$
-Y_{sz} \equiv M_{gas} \cdot T_{gas}
-$$
-
-\subsubsection{Radio extended emission}
-
-There are galaxies with very large radio halos ($\sim 1 Mpc$ in size).
-
-Radio Relics -> elongated halos, polarized light
-
-synchrotron emission:
-
-We have a (very weak) magnetic field $B$ (\le 1 $\mu G$) and a gamma factor $\gamma \sim 10^4$
-
-
-% primary electron models (?)
-For instance, if $\gamma = 300$, then the electron energy is $E = \gamma m_e c^2 \sim 150 MeV$.
-
-But if we consider a time $T_{life} = 10^9$ its energy will be fewer and fewer.
-% ???
-
-protons instead have a shorter lifetime. 
-% no from astrophysical
-
-Bimodal clusters mergers can result in:
-\begin{itemize}
-    \item \textbf{Shocks}: 
-    \begin{itemize} 
-        \item $v_{rel} \sim 1-2 \cdot 10^3 km/s$
-        \item gravitational energy: $10^64 erg$
-        \item dissipation: $3 \cdot 10^63 erg$
-    \end{itemize}
-
-    \item \textbf{Turbulence}:
-    \begin{itemize}
-        \item ...
-    \end{itemize}
-\end{itemize}
-
-\missing{last few minutes of the lecture}
-
-\chapter{Lecture 06/11/2025}
-
-\subsubsection{Frequencies}
-
-VLA instruments works at a frequency of 1.4 GHz. while LOFAR has a range of 300-800 MHz.
-
-They allow us to study phenomena such as mergers, with ratios 1:1 to 1:10.
-
-They allow us also to study AGN and their radio emission. There are three main models:
-
-\begin{itemize}
-    \item primary electrons models: not good because it (something with the scale)
-    \item primary electron reacceleration models: good because it explains the radio emission of some clusters.
-    \item secondary electron reacceleration models: no evidence of it.
-\end{itemize}
-
-\subsubsection{Galaxies and X-ray emission} % schneider book page 246
-
-Sarazin 1986-88 did a lot of studies and pubblications about the X-ray emission of galaxies.
-
-\textbf{ICM}
-
-We assume that the gas in the cluster is adiabatic (= isotropic)
-
-We remember that for an ideal gas it holds that:
-
-$$
-pV = n_{mol} R T = n_{mol} \mathcal{N} \dfrac R{\mathcal R} T
-$$
-
-so we get:
-
-$$
-pV = N K_B T \qquad \Rightarrow \qquad p = \dfrac{N K_B T}{V}
-$$
-
-
-$$
-\rho_{gas} = \rho = n \langle m \rangle = n \mu m_p
-$$
-
-we can define $\mu$ as the mean atomic mass:
-
-$$
-\mu \equiv \dfrac{\langle m \rangle}{m_p} \sim 0.6
-$$
-
-therefore, we get:
-
-$$
-\boxed{p = \rho \dfrac{K_B T}{\mu m_p}}
-$$
-
-in an isothermal situation, we have:
-
-$$
-p = k \rho
-$$
-
-And in an adiabatic situation, we have:
-
+Photometric parallax uses the apparent magnitude $m$ and an estimated absolute magnitude $M$ (inferred from the star's spectral type and luminosity class) to derive the distance modulus:
 $$
-p = k^i \rho^{\gamma}
+m - M = 5 \log\left(\frac{D}{\mathrm{pc}}\right) - 5 + A_V
 $$
-
-where $\gamma = \dfrac{c_p}{c_v} = \dfrac{5}{3}$ for a monatomic gas.
-
-\textbf{Hydrostatic equilibrium}
-
-We can observe that the cluster is in hydrostatic equilibrium:
-
-$$
-t_{sc} = \dfrac{2 R_A}{c_s},
-\qquad \qquad
-c_s^2 = \left.\dfrac{dp}{d\rho} \right|_{\rho = \rho_0}
-$$
-where $c_s$ is the sound speed:
-
-$$
-c_s \sim \sqrt {\dfrac p \rho} = \sqrt {\dfrac{n K_B T}{\mu m_p}} \sim \sqrt{1000 km/s}
-$$
-
-Therefore we observe a value of $t_sc$ smaller than the Hubble time (time of the universe):
-
-$$
-t_{sc} \sim 7 \cdot 10^8 yr < 13 \cdot 10^9 yr = t_H
-$$
-
----
-
-$$
-\vec \nabla p = - \rho \vec \nabla \phi
-$$
-
-sphere:
-
-$$
-\dfrac {dp}{dr} = - \rho \dfrac {G M(r)}{r^2}
-$$
-
-to convince us:
-
-$$
-p = \dfrac FA \quad \Rightarrow \quad \dfrac px = \dfrac FV
-$$
-
-so 
-
-$$
-\vec \nabla p \cdot V = -m \vec \nabla \phi
-\qquad \Rightarrow \qquad
-\vec \nabla p = - \rho \vec \nabla \phi
-$$
-
-Coming back, we have:
-
-$$
-\dfrac{GM(r)}{r^2} =  - \dfrac 1{\rho} \dfrac{K}{\mu m_p} \left( \rho \dfrac{dT}{dr} + T \dfrac{d\rho}{dr} \right)
-$$
-
-$$
-M(r) = - \dfrac 1{G} \left( \dfrac{KT}{\mu m_p} \right) r \left[ \dfrac{d \ln \rho_{gas}}{d \ln r} + \dfrac{d \ln T}{d \ln r} \right]
-$$
-
-In a 3D situation, we have:
-
-$$
-\rho_{gas}(r) = \rho_{gas, 0} \left( 1 + \left( \dfrac{r}{r_{c, gas}} \right)^2 \right)^{-\frac{3}{2} \underbrace{\beta_{fit, gas}}_{\sim 2/3}}
-$$
-
-where, if $ r \gg r_{c, gas} $, we have $\rho \to r^{-2}$.
-
-For galaxies, we have - Jeans Equation:
-
-$$
-M(r) = - \dfrac 1{G} \sigma_r^2 r \left[ \dfrac{d \ln \rho_{gas}}{d \ln r} + \dfrac{d \ln \sigma_r^2}{d \ln r} + 2 \beta \right]
-$$
-
-Where the factor $\beta$ is called \textit{the velocity anisotropy parameter}.
-
-$$
-\beta(r) = 1 - \dfrac{\sigma_{\tau}^2}{\sigma_r^2}, 
-\qquad \qquad \text{where } \ \ 
-\sigma_{\tau}^2 = \dfrac {\sigma_{\theta}^2 + \sigma_{\phi}^2}2
-$$
-
-for an isotropic orbit, gas is a collisional component, therefore we have:
-
-$$
-\boxed{\beta(r) = 0}
-$$
-
-so the \textit{number density} of a galaxy is:
-
-$$
-\rho_{gal}(r) = \rho_{gal, 0} \left( 1 + \left( \dfrac{r}{r_{c, gal}} \right)^2 \right)^{-\frac{3}{2} \beta_{fit, gal}}
-$$
-
-historically, $\beta_{fit, gal} = 1$ was used.
-
-
-We can derive the Jeans Equation for galaxies:
-
-$$
-\dfrac{-KT}{\mu m_p} \dfrac{d \ln \rho_{gal}}{d r} = - \sigma_r^2 \dfrac{d \ln \rho_{gal}}{d r} - \dfrac{2 \beta \sigma_r^2}{r}
-$$
-
-$$
-\dfrac{\dfrac{d \ln \rho_{gal}}{d r}}{\dfrac{d \ln \rho_{gal}}{d r} + \dfrac{2 \beta}{r}} = - \dfrac{\sigma_r^2}{\dfrac{KT}{\mu m_p}}
-$$
-
-so we get:
-
-$$
-\beta_{spec} = \dfrac{\sigma_{LOS}^2}{\dfrac{KT}{\mu m_p}}
-$$
-
-$$
-\dfrac{d \ln \rho_{gal}}{d r} = \dfrac 1\rho \dfrac{d \rho}{dr} = ... = - 3 \beta_{fit} \left( 1 + \left(\dfrac{r}{r_0} \right)^2 \right)^{-1}r
-$$
-
-where, for $r \gg r_0$, we have $- 3 \beta_{fit} r^{-1}$.
-
-\missing{few calculations of the end of the first beta problem}
-
-\subsubsection{Second beta problem}
-
-The second $\beta$ problem still does not have commonly accepted solutions.
-
-$$
-\beta_{spec} = \dfrac{\sigma_{LOS}^2}{\dfrac{KT}{\mu m_p}} \sim 1
-$$
-
-The energy per unit mass for galaxies and for gas is the same.
-
-equilibrium of energy for unit mass:
-
-$$
-\dfrac 12 m v^2 = \dfrac 32 KT
-$$
-
-in 1D:
-
-$$
-\dfrac 12 3 \sigma_{1D}^2 = \dfrac 32 KT
-$$
-
-Violent relaxation - Lynden-Bell (1967) % schneider book page 235:
-
-They proposed that galaxies and gas forms together clusters, and they are in violent relaxation.
-
-We can observe that the beta fitted is not the same as the beta spec. % plot on red notebook
-
-solutions:
-
-\begin{itemize}
-    \item \textbf{dynamical friction}: more important in groups
-    \item \textbf{Inter-groups medium}: the energy of AGN is smaller than the energy of the ICM, but $T_{AGN} \sim T_{IGM}$ % so AGNs heats the ICM (?)
-    \item \textbf{member selection in groups}
-\end{itemize}
-
-\subsubsection{Galaxies in clusters}
-
-Morphology density relation - Dressler (1980) 
-
-Color-density relation
-
-BCG: Brightest Cluster Galaxy
-
-cD galaxies: E + light envelope (ICL = Inter-Cluster Light)
-
-\dots
-
-$v_{BCG} \sim \bar v$
-
-coevolution of clusters and BCG (which is inside)
+If we have the spectrum of the star, we can determine $M$ (spectroscopic parallax). Taking into account the extinction $A_V \approx 3\,E(B-V)$, where $E(B-V)$ is the color excess, and measuring $(B-V)$ and $(B-V)_0$ from the spectrum, we can correct for reddening and obtain the distance.
 
----
+\item \textbf{Color-Color Diagram}
 
-hypothesis of BCG formation:
+When no extinction is present, there is a well-defined relation between color indices (e.g.\ $(U-B)$ and $(B-V)$) for stars of different spectral types, forming the \textbf{standard stellar locus} in the color--color diagram. In the presence of interstellar extinction, the observed colors are shifted from the intrinsic values along a \textbf{reddening vector}, with slope determined by the extinction law. The displacement along this vector in the color--color diagram gives $E(B-V)$, and hence $A_V$.
 
-\begin{itemize}
-    \item \textbf{merger}: cannibalism dynamics
-    \item \textbf{no-limit tidal radius}: ...
-    \item \textbf{cool core}: ...
-\end{itemize}
+\item \textbf{Period-Luminosity Relation for Cepheids}
 
 ...
+\end{enumerate}
 
-we have two types of segregation:
+\section{The Milky Way}
 
-\begin{itemize}
-    \item \textbf{Luminosity segregation in position}: more evident in clusters with a high density of galaxies
-    \item \textbf{Luminosity segregation in velocity}: even a smaller effect ...
-\end{itemize}
+Understanding the Milky Way morphology is significantly more challenging than for external galaxies, as we are embedded within the disk and obscured by dust, making a direct global view impossible and requiring careful inference from local observations and kinematics.
 
-% plot in the red notebook
+\subsection{Large-Scale Structure}
 
-\missing{Lecture before 13/11/2025}
+The Milky Way is a typical \textbf{barred spiral galaxy} with a bright central \textbf{bulge}, a flattened \textbf{disk} containing gas, dust, and most of the young stars (Population I), and an extended \textbf{halo} populated by old stars (Population II) and globular clusters. The disk hosts the spiral structure, while the Sun lies in the disk at a galactocentric distance of about $8\,\mathrm{kpc}$. The full Galaxy spans roughly $30\text{-}50\,\mathrm{kpc}$ across, much larger than the central bulge region.
 
-\newpage
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/mw.png}
+    \captionof{figure}{Schematic top and side view of the Milky Way}
+\end{figure}
 
-\chapter{Lecture 13/11/2025}
+\subsection{The Disk}
 
-\missing{start of the lecture}
+The disk of the Milky Way consists of a \textbf{thin disk} and a \textbf{thick disk}.
 
-The Butcher-Oemler Effect is a scientific hypothesis suggesting the cores of galaxy clusters at intermediate redshift (z \textasciitilde 0.3) contain a larger fraction of blue galaxies than do the cores of low redshift clusters.
+\subsubsection{Density Profile}
 
-For high redshift it is observed that the fraction of cool cores is lower than in low redshift clusters.
+The stellar number density in the disk is modeled as:
 
-Ths is valid if we have no observational bias.
-
-\section{Protoclusters}
-
-\textbf{Protoclusters} are \bfit{condensation of galaxies} that are not yet clusters. There is a gravitational force that is able to hold the galaxies together, but there is no equilibrium.
-
-color-magnitude methods are not optimal to study protoclusters.
-
-Also $L_x$ id not optimal to study protoclusters.
-
-Radiogalaxies and AGNs reveal the presence of a Protocluster.
-
-\subsubsection{Cluster mass}
-
-\begin{itemize}
-    \item VT (gals)
-    \item hydrostatic equilibrium (ICM)
-    \item SZ effect
-    \item Gravitational lensing (GL)
-\end{itemize}
-
-Gravitational Lensing (GL) is a technique that allows us to study the mass distribution of a cluster by observing the distortion of the images of distant galaxies.
-
-In a situation of strong lensing, when we observe to an image using the GL, we can see a little arc around the galaxy. This arc is due to the bending of the light by the mass of the cluster. 
-
-What we really see is the projection of the mass within the radius $R$ of the cluster, along the line of sight. 
-
-$$
-\Sigma= \dfrac{c^2}{4 \pi G} \dfrac{D}{D_L D_s}
-$$
-
-where $D$ is the distance between the observer and the cluster, $D_L$ is the distance between the observer and the lens, and $D_s$ is the distance between the lens and the source.
-
-This effect is independent from the dynamic of the cluster
-
-\todo{insert image 2.21 schneider book page 65}
-
-If we are in a situation of weak lensing, we can see another effect: \dots
-
-\subsubsection{Inter-Clusters Light (ICL)}
-
-It is supposed that the ICL follows the same distribution of the mass of the cluster. 
-
-------------
-
-In a cluster, glasxies are collisionless components, the gas is collisional and the dark matter, which follows the galaxies, is collisionless.
-
-The bullet cluster is a good example of this. In this cluster, we can see the separation between the gas and the galaxies. The gas is like a shock wave that has passed through the cluster.
-
-\todo{include plot in slides slidesClustersObsMassML - 19}
-
-\chapter{Lecture 20/11/2025}
-
-$$
-W = -4 \pi G \int dr \rho(r) M(r)
-$$
-
-Poisson equation:
-
-$$
-D^2 \phi = 4 \pi G \rho
-$$
-
-$$
-\nabla^2 \phi = \dfrac 1{r^2} \dfrac{d}{dr} \left( r^2 \dfrac{d\phi}{dr} \right) = 4 \pi G \rho
-$$
-
-Let's see some example of this spherical systems:
-
-\begin{exampleblock}[Point mass]
-    $$
-    \phi(r) = - \dfrac{G M}{r}
-    $$
-
-    The circular velocity is: 
-    
-    $$
-    v_c = \sqrt{\dfrac{G M}{r}}
-    $$
-
-    The escape velocity is:
-    
-    $$
-    v_e = \sqrt{\dfrac{2 G M}{r}}
-    $$
-
-    We will have a decreasing circular velocity.
-\end{exampleblock}
-
-\begin{exampleblock}[Homogeneous sphere]
-    $$
-    \rho(r) = \rho_0 \quad \text{for } r < R
-    $$
-    $$
-    \rho(r) = 0 \quad \text{for } r > R
-    $$
-    
-    The circular velocity is:
-    
-    $$
-    v_c^2 = \dfrac{G M}{r} = 
-            \dfrac{G \frac 43 \pi R^3 \rho_0}{r} = 
-            \dfrac{4 \pi G \rho_0}{3} r^2
-    $$
-
-    The caracteristic time: 
-    $$
-    T = \dfrac{2\pi r}{v_c} = \sqrt{\dfrac{3\pi}{G \rho}} = \sqrt{3 \pi} \underbrace{(G \rho)^{-1/2}}_{\footnotesize{\text{dynamical time}}}
-    $$
-
-
-    $$
-    \Phi = \begin{cases}
-        - 2 \pi G \rho (a^2 - \frac 13 r^2) \quad \text{for } r < a\\
-        - \dfrac{4 \pi G \rho a^3}{3r} \quad \text{for } r > a
-    \end{cases}
-    $$
-\end{exampleblock}
-
-\begin{exampleblock}[Plummer model]
-
-    This model is a good approximation for the mass distribution of the globular clusters.
-
-    $$
-    \rho \sim const \quad \text{center of the cluster}
-    $$
-
-    $$
-    \rho \to 0 \quad \text{for } r \to \infty
-    $$
-
-    $$
-    \begin{cases}
-        \Phi \propto r^2 + const \quad \text{for } r < a\\
-        \Phi \propto r^{-1} \quad \text{for } r > a
-    \end{cases}
-    $$
-
-    $$
-    \Phi = - \dfrac{G M}{\sqrt{r^2 + b^2}}
-    $$
-
-    2.44
-
-    Plummer scale
-
-\end{exampleblock}
-
-\begin{exampleblock}[Poisson equation]
-
-    $$
-    \Phi \to \rho
-    $$
-
-    $$
-    \nabla^2 \Phi = \dfrac{3 G M b^2}{(r^2 + b^2)^{5/2}} = 4 \pi \rho
-    $$
-
-    $$
-    \rho \to r^{-5}, \quad \text{for } r \gg b
-    $$
-    
-\end{exampleblock}
-
-\begin{exampleblock}[modification of Hubble model]
-    todo
-\end{exampleblock}
-
-\begin{exampleblock}[Power Law Density]
-
-    $$
-    \rho(r) = \rho_0 \left( \dfrac{r_0}{r} \right)^\alpha
-    $$
-
-    $$
-    M = \int_0^\infty dr' 4 \pi r'^2 \rho(r') = 4 \pi \rho_0^\alpha \left.\dfrac{r'^{3 - \alpha}}{3 - \alpha}\right|_0^\infty
-    $$
-\end{exampleblock}
-
-\begin{exampleblock}[Singular isothermal]
-
-    $\alpha = 2$ is a good approximation for the ICM.
-
-    $$
-    \rho(r) = \rho_o \left(\dfrac{r_o}{r}\right)^2
-    $$
-
-    $$
-    \rho \to r^{-2}, \quad \text{for } r \to 0
-    $$
-
-    $$
-    \rho_{gas}^{ICM}
-    $$
-
-    $$
-    v_c^2 = \dfrac{G M(r)}{r} = \dfrac{4\pi G 1rho_o r_0^\alpha}{3 - \alpha} r^{2-\alpha}
-    $$
-
-    $$
-    v_c \propto r^{\frac{2-\alpha}{2}}
-    $$
-
-    Therefore, for $\alpha = 2$, $v_c$ is constant.
-\end{exampleblock}
-
-\begin{exampleblock}[Two-power law density]
-Instead of consider only a power law density model, we can consider two:
-
-$$
-\rho (r) = \dfrac{\rho_o}{\left(\dfrac{r}{a}\right)^\alpha \left(1 + \dfrac{r}{a}\right)^{\beta - \alpha}}
-$$
-
-\end{exampleblock}
-
-\begin{itemize}
-\item \textbf{Jaffe}
-
-used this model to describe the Milky Way bulge in 1983.
-
-$$
-\begin{cases}
-\alpha = 2 \\
-\beta = 4 
-\end{cases}
-\quad \Rightarrow \beta - \alpha = 2
-$$
-
-$$
-\dfrac{\rho}{\left(\dfrac{r}{a}\right)^2 \left(1 + \dfrac{r}{a}\right)^2}
-\quad \Rightarrow \quad
- \begin{cases}
-    r^{-4} \quad \text{for } r \to \infty \\
-    r^{-2}(r + a)^{-2} \quad \text{for } r \to 0
-\end{cases}
-$$
-
-\item \textbf{Hernquist}
-
-used this model to describe the Milky Way halo in 1990.
-
-$$
-\begin{cases}
-\alpha = 1 \\
-\beta = 4 
-\end{cases}
-\quad \Rightarrow \beta - \alpha = 3
-$$
-
-$$
-\dfrac{\rho_0}{\left(\dfrac{r}{a}\right) \left(1 + \dfrac{r}{a}\right)^3}
-\quad \Rightarrow \quad
- \begin{cases}
-    r^{-4} \quad \text{for } r \to \infty \\
-    r^{-3}(r + a)^{-3} \quad \text{for } r \to 0
-\end{cases}
-$$
-
-\item \textbf{NFW}
-
-model (Navarro, Frenk, White in 1995) to describe the Dark Matter halo.
-
-$$
-\begin{cases}
-\alpha = 1 \\
-\beta = 3 
-\end{cases}
-\quad \Rightarrow \beta - \alpha = 2
-$$
-
-$$
-\dfrac{\rho_0}{\left(\dfrac{r}{a}\right) \left(1 + \dfrac{r}{a}\right)^2}
-\quad \Rightarrow \quad
-\begin{cases}
-    r^{-3} \quad \text{for } r \to \infty \\
-    r^{-1}(r + a)^{-2} \quad \text{for } r \to 0
-\end{cases}
-$$
-
-\end{itemize}
-
-% missing considerations
-
-% Einasto model
-
-\subsubsection{Einasto model}
-
-$$
-\rho(r) = \rho_0 \exp \left( - \left( \dfrac{r}{a} \right) ^{\frac{1}{m}} \right)
-$$
-
-therefore:
-
-$$
-\begin{cases}
-\rho \to finite \quad \text{for } r \to 0 \\
-M \to finite \quad \text{for } r \to \infty
-\end{cases}
-$$
-
-\begin{tipsblock}[In practice]
-    NFW model is easier and more used.
-\end{tipsblock}
-
-\subsubsection{Fluid Mechanics}
-
-We have:
-
-\begin{itemize}
-    \item a density $\rho(\bar x, t)$,
-    \item a pressure $p(\bar x, t)$,
-    \item a velocity field $\bar v(\bar x, t)$.
-    \item a thermodynamic funciton $T(\bar x, t)$ or a specific entropy (entropy per unit mass) $s(\bar x, t)$.
-\end{itemize}
-
-
-continuity equations:
-
-$$
-M(t) = \int_V \rho(\bar x, t) d^3 x
-$$
-
-let's suppose now that the mass changes with time:
-
-$$
-\dfrac{dM(t)}{dt} = \int_V \dfrac{\partial \rho(\bar x, t)}{\partial t} d^3 x = - \int_S \rho \bar v d^2 \bar s
-$$
-
-Now we can write the continuity equation as:
-
-$$
-\int_V \dfrac{\partial \rho}{\partial t} d^3 x + \int_S \rho \bar v d^2 \bar s = 0
-\qquad \Rightarrow \qquad
-\int_V \dfrac{\partial \rho}{\partial t} + \bar \nabla \cdot (\rho \bar v) d^3 \bar x = 0
-$$
-
-$$
-\boxed{
-\dfrac{\partial \rho}{\partial t} + \bar \nabla \cdot (\rho \bar v) = 0
-}
-$$
-
-% appendix 1E - 3
-
-\subsubsection{Perturbation theory}
-
-Suppose that there is a small change in density due to a small movement of the fluid.
-
-Let's consider an initial density $\rho_0$ and a small change at time $t_0 = 0$:
-
-$$
-\rho_0 \to \rho(\bar x) \equiv \rho_0 + \varepsilon \rho(\bar x), \quad \text{where } \varepsilon \ll 1
-$$
-
-$$
-\bar x_0 \to \bar x_1 \equiv \bar x_0 + \varepsilon \xi (\bar x)
-$$
-
-$$
-\int_{t_0 - \delta}^{t_0 + \delta} \left( \dfrac{\partial \rho}{\partial t} + \bar \nabla \cdot (\rho \bar v) \right) dt = 0
-$$
-
-Therefore:
-
-$$
-\rho_1 - \rho_0 + \bar \nabla \left( \int \rho \bar v \right) = 0
-\qquad \Rightarrow \qquad
-\rho_1 - \rho_0 + \bar \nabla \left( \int \rho \dfrac{d\bar x}{dt} \right) = 0
-$$
-
-Euler equation:
-
-in an inviscid fluid, we gravitational force $\vec F_g$, but also the pressure gradient force $\vec F_p$ and they are in equilibrium.
-
-Starting from the fundamental equation:
-
-$$
-M \vec a = \vec F
-$$
-
-The total force is:
-
-$$
-M \dfrac{d\vec v}{dt} = - \underbrace{\int_S p d^2 \bar s}_{\text{pressure force}} - \underbrace{M \vec \nabla \Phi}_{\text{gravity force}}
-$$
-
-The divergence is:
-
-$$
-\int_s p d^2 \bar s = \int_V \nabla p d^3 \bar x
-$$
-
-$$
-\int_V \rho \dfrac{d \bar v}{dt} d^3 \bar x = - \int_V \bar \nabla p d^3 \bar x - \int_V \rho \bar \nabla \Phi d^3 \bar x
-$$
-
-$$
-\rho \dfrac{d \bar v}{dt} = - \bar \nabla p - \rho \bar \nabla \Phi
-$$
-
-$$
-\dfrac{d \bar v}{dt} = \dfrac{\partial \bar v}{\partial t} + \sum_{i = 1}^3 \dfrac {\partial \bar v_i}{\partial x_i} \dfrac{d x_i}{dt} = \dfrac {\partial \bar v}{\partial t} + (\bar v \bar \nabla) \bar v (\nabla \bar v)
-$$
-
-$$
-\dfrac{\partial \bar v}{\partial t} + (\bar v \bar \nabla) \bar v = - \dfrac 1\rho \bar \nabla p - \bar \nabla \Phi
-$$
-
-where compares the rate moomentum exit, and the rate momentum added to the volume.
-
-
-
-In situations where a fluid is in hydrostatic equilibrium, the force due to the gradient of pressure balances exactly the gravitational force. This balance is mathematically expressed by the following equation:
-$$
-\bar \nabla \Phi = - \frac{1}{\rho} \bar \nabla p
-$$
-
---------------
-
-$$
-P = p(\rho, T) \qquad p = p(\rho, s)
-$$
-
-Barotropic fluid:
-
-$$
-p = p(\rho)
-$$
-
-specific entropy is defined as:
-
-$$
-dh = \dfrac{dp}{\rho}, \qquad h(\rho) = \int \dfrac{dp}{\rho'} = \int_0^\rho \dfrac{dp(\rho')}{\rho'} \dfrac{d\rho'}{d\rho} = \int_0^\rho \dfrac{dp(\rho')}{\rho'} \dfrac{d\rho'}{rho'}
-$$
-
-% appendix 1E - 10
-
-$$
-\dfrac{\partial \bar v}{\partial t} + (\bar v \bar \nabla) \bar v = - \bar \nabla (h + \Phi)
-$$
-
-which is the Euler equation for a barotropic fluid.
-
-% appendix 1E - 11
-
----------------
-
-
-
-constant density
-$$
-\rho = const \quad \Rightarrow \quad p = const
-$$
-
-$$
-\bar \nabla \Phi = 0
-$$
-
-small perturbations:
-
-$$
-\rho(\bar x, t) = \rho_0 + \varepsilon \rho_1(\bar x, t)
-$$
-
-\dots
-
-$$
-\dfrac {\partial \rho_1}{\partial t^2} - \left( \dfrac{\partial p}{\partial \rho} \right)_{\rho_0} \nabla^2 \rho_1 = 0
-$$
-
-$$
-v_s \equiv \sqrt{\left.\dfrac{\partial p}{\partial \rho} \right|_{\rho_0}}
-$$
-
----------------------------------
-
-$$
-\dfrac{\partial^2 \rho_1}{\partial t^2} - v_s^2 \nabla^2 \rho_1 = 0
-$$
-
-waves equation:
-
 $$
-\rho_1 = A \cos (k x - \omega t)
+n(R, z) = n_0 \left( a\,e^{-|z|/h_t} + b\,e^{-|z|/h_T} \right) e^{-R/h_R}
 $$
 
 where:
-
-A is the amplitude, $k$ is the wave number, $\omega$ is the angular frequency.
-
-$$
-\dfrac{\partial^2 \rho_1}{\partial t^2} = ... = - A \omega^2 \cos (k x - \omega t)
-\qquad \text{and} \qquad
-\dfrac{\partial^2 \rho_1}{\partial x^2} = ... = - k^2 A\cos (k x - \omega t)
-$$
-
-\begin{itemize}
-\item For an \bfit{ideal gas}:
-
-$$
-pv = n R T
-\qquad \Rightarrow \qquad
-p = \rho \dfrac{K_b T}{m}
-= \rho \dfrac{K_b T}{\mu m_p}
-$$
-
-$$
-p = \rho \bar v_x^2 = \rho \bar v_y^2 = \rho \bar v_z^2
-$$
-
-$$
-\bar v_x^2 = \bar v_y^2 = \bar v_z^2 = \dfrac 13 v^2 = \dfrac{K_B T}{\mu m_p}
-$$
-
-\item for \bfit{adiabatic isoentropic} gas it is valid the polytropic equation of state:
-
-$$
-p = k' \rho^\gamma, \qquad \text{where } \gamma = \dfrac{c_p}{c_v}
-$$
-
-\end{itemize}
-
----------------------------------
-
-\subsubsection{Relaxation time}
-
-$$
-\lambda = \dfrac 1 {n \sigma}
-$$
-
-where $n$ is the number density and $\sigma = \pi (2 R_\odot)^2$ is the cross section, and $R_\odot = 7 \cdot 10^5 km = 2.3 \cdot 10^{-8} pc$ is the radius of the Sun.
-
-$$
-\lambda = 2 \cdot 10^{14} pc
-$$
-
-interval $\dfrac{\lambda}{v} \sim 10^{18} yr$ is the time between two collisions, which is much bigger than the time of the universe ($13 \cdot 10^9 yr$)
-
-The relaxation time is the tima at we have a big change in the velocity $(\dfrac{\Delta v}{v} \sim 1)$
-
------
-
-The gas is different from a stellar system
-
-in gas $v \sim const$ and we have rapid changes due to collisions. In a stellar system we have gravity forces.
-
-$$
-F \propto r^{-2} \qquad m \propto r^2
-$$
-
-
-Field perturbing stars
-
-\todo{copy graph in pen from red notebook}
-
-$$
-\begin{array}{rl}
-\left| \int d \bar v_{\perp} \right| \sim & \int_{-\infty}^{+\infty} \dfrac{G m}{b^2} \left( \cdots \right) ^{-3/2} dt\\
-\sim & \dfrac{G m}{b^2} \dfrac bv \int_{-\infty}^{+\infty} (1+s^2)^{-3/2} ds\\
-\sim & \dfrac{G m}{b^2} \dfrac bv \left| \dfrac s {\sqrt{s^2 + 1}} \right|_{-\infty}^{+\infty} = 
-\dfrac{G m}{b^2} \dfrac bv \cdot 2
-\end{array}
-$$
-
-$$
-\left|\int d \bar v_{\perp} \right| \sim \delta v_{\perp} \sim 2 \underbrace{\dfrac{G m}{b^2}}_{\footnotesize{\text{max acc}}} \overbrace{\dfrac bv}^{\footnotesize{\text{encounter time}}}
-$$
-
-\dots
-
-$$
-\delta n = \dfrac{ N}{\pi R^2} 2 \pi b db = \dfrac {2N}{R^2} b db
-$$
-
-$$
-\delta v_{\perp}^2 \sim \int_{b_{min}}^R \delta v_{\perp}^2 \sim gN \dfrac{G^2 m^2}{v^2 R^2} \int_{b_{min}}^R \dfrac{\cancel{b}}{b^{\cancel{2}}} db = gN \dfrac{G m}{R v} \ln \left( \dfrac{R}{b_{min}} \right) \sim gN \dfrac{G m}{R v} \underbrace{\ln \lambda}_{\footnotesize{\text{coulomb log}}}
-$$
-
-We can use the viral theorem:
-
-$$
-Nm \sim \dfrac{v^2 R}G
-$$
-
-$$
-v^2 \sim \dfrac{GNm}{R}
-$$
-
-Therefore:
-
-$$
-R \sim \dfrac{G N m}{v^2} 
-$$
-
-\dots
-
-$$
-\dfrac{\Delta v_{\perp}^2} {v^2} \sim \dfrac{8 N G^2 m^2}{\dfrac{G^2 N^2 m^2}{...}} \ln \lambda 
-$$
-
-\begin{table}[H]
-\renewcommand{\arraystretch}{1.25}
-\centering
-\begin{tabular}{>{\bfseries}l|c|c|c|c|c|l}
-    % \toprule
-    & $\mathbf{n}$ & $\bm{n_{\mathrm{rel}}}$ & $\bm{R}$ & $\bm{V}$ \textbf{(km/s)} & \textbf{rel. time} & \textbf{notes} \\
-    \hline
-    Galaxies            & $10^{11}$ & $\sim 5 \cdot 10^{8}$ & 10 kpc      & $10^2$    & $5 \cdot 10^{16}$ yr     & no collision \\
-    Globular clusters   & $10^{5}$  & $\sim 10^{3}$         & 10 pc       & $10$      & $10^9$ yr                & collision \\
-    \multirow{2}{*}{Galaxy clusters}
-        & \multirow{2}{*}{$10^3$} & \multirow{2}{*}{$15$} & \multirow{2}{*}{1 Mpc} & \multirow{2}{*}{$10^3$} & \multirow{2}{*}{$1.5 \cdot 10^{10}$ yr} & core: no collision \\
-        &                        &                        &                      &                        &                              & outskirts: collision \\
-    Galaxy groups       & $10$      & $0.5$                  & $\leq 0.5$ Mpc & $10^2$ & $2 \cdot 10^9$ yr         & collision \\
-    % \bottomrule
-\end{tabular}
-\end{table}
-
-\chapter{27/11/2025}
-
-\subsubsection{The Jeans Equations}
-
-\dots
-
-$$
-M = - \dfrac{2 \sigma_r^2}{G} \left( \dfrac{d \ln \nu}{d \ln r} + \dfrac {d \ln \sigma_r^2}{d \ln r} + 2 \beta \right)
-$$
-
-\dots
-
-\missing{start of the lecture}
-
-\dots
-
-Observations:
-
-$$
-\Sigma (R) = 2 \int_0^\infty \nu(r) dz = 2 \int_R^\infty \dfrac {\nu r}{\sqrt{r^2 - R^2}} dz 
-$$
-
-\dots
-
-What we measure from observations is a combination of the projected density with the velocity dispersion:
-
-$$
-\Sigma (R) = \sigma_{LOS}^2(R) = 2 \int_R^\infty \left( 1 - \beta (z) \dfrac {R^2}{z^2} \right) \dfrac {\nu (r) \sigma_r^2(r)}{\sqrt{r^2 - R^2}} dz
-$$
-
-Which are called \textit{Equations of projected $\sigma$-profile}
-
-...
-
-Therefore the mass density $\rho(r)$ is proportional to the number density $\nu(r)$:
-
-$$
-\rho(r) \propto \nu (r)
-\qquad \Rightarrow \quad 
-\text{mass follows light}
-$$
-
-This is valid also dor galaxies in a cluster
-
-...
-
-% add plots in the pictures (phone camera), + page 352 (james)
-
-The problem of the jeans equation is that we need to know a lot of data which is complex to obtain.
-
-\subsubsection{The tensorial Virial Theorem}
-
-$$
-\int \text{Boltz. eq.} \times v_j d^3 \bar v
-$$
-
-...
-
-$$
-\underbrace{
-\int x_k \dfrac {\partial \rho \bar v_j}{\partial t} d^3 \bar x}
-_{A} 
-= 
-\underbrace{
-- \int x_k \dfrac {\partial (\rho v_i \bar v_j)}{\partial x_i} d^3 \bar x}
-_{B \quad \to 2k_{jk}} 
-= 
-\underbrace{
-- \int \rho x_k \dfrac {\partial \Phi}{\partial x_j} d^3 \bar x
-}_{C \quad \text{comp. }W_{jk}} 
-$$
-
-$$
-I_{jk} = \int \rho x_j x_k d^3 \bar x
-$$
-
-$$
-K_{jk} = T_{jk} + \dfrac 12 \Pi_{jk}
-$$
-
-where $T_{jk}$ is the streaming matrix and $\Pi_{jk}$ is the radiatio matrix.
-
-...
-
-$$
-\dfrac 12 \dfrac {d^2 I_{jk}}{dt^2} = 2 T_{jk} + W_{jk} \Pi_{jk} + W_{jk} 
-$$
-
-4.78 -> steady state:
-
-$$
-0 = 2k_{jk} + W_{jk} \qquad trace \qquad 0 = 2k + W
-$$
-
-\dots
-
-\textbf{Pros:}
-
-integral quantities easier to measure
-
-$\beta$ does not compear in the equations
-
-\textbf{Cons:}
-
-test part. give the total mass
-
-\subsubsection{Generalized Virial Theorem}
-
-$$
-n \dfrac {d \Phi}{dt} = n \dfrac {GM(r)}{r^2} = - \dfrac {d(n \sigma^r_2)}{dr} - \dfrac{2n}{r} (\sigma_r^2 - \sigma_{\tau}^2) 
-$$
-
-If we integrate from $0$ to $\infty$ and multiply for $4 \pi r^3 dr$ we get:
-
-$$
-\int_0^\infty n \dfrac {d \Phi}{dt} 4 \pi r^3 dr = \int_0^\infty - \dfrac {d(n \sigma^r_2)}{dr} 4 \pi r^3 dr - \int_0^\infty \dfrac{2n}{r} (\sigma_r^2 - \sigma_{\tau}^2) 4 \pi r^3 dr
-$$
-
-$$
-- |n \sigma^r_2 4 \pi r^3|_{0}^\infty + \int_0^\infty n \sigma^r_2 12 \pi r^2 dr - \int_0^\infty 2 n ( ... ) 4 \pi r^2 dr
-$$
-
-\dots
-
-$$
-\int_0^\infty n \dfrac {d \Phi}{dr} 4 \pi r^2 dr = \int 4 \pi r^2 n (- 2 \sigma_r^2 + 2 \sigma _{\tau}^2 + 3 \sigma_r^2)dr
-$$
-
-$$
-\dfrac{\int_0^\infty n r \dfrac {d \Phi}{dr} 4 \pi r^2 dr}{\int_0^\infty n 4 \pi r^2 dr} = \dfrac {\int_0^\infty \sigma^2 n 4 \pi r^2 dr}{\int_0^\infty n 4 \pi r^2 dr}
-$$
-
-$$
-\langle 2 \dfrac {d \Phi}{dr} \rangle = \langle \sigma^2 \rangle
-$$
-
-$$
-\dfrac{d \Phi}{dr} = \dfrac{GM(r)}{r^2} = - \dfrac {G M_{\infty} F(r)}{r^2}  
-$$
-
-$$
-F(r) = \dfrac{M(r)}{M_{\infty}} \le 1
-$$
-
-$$
-\langle r \dfrac{d \Phi}{dr} \rangle = \langle \sigma^2 \rangle = \langle G \dfrac {M_{\infty} F(r)}{r^2} \rangle
-$$
-
-$$
-G M_{\infty} = \dfrac{\langle \sigma^2 \rangle}{\langle r^{-1} F(r) \rangle}
-$$
-
-
-mass follows light:
-$$
-\dfrac{3 \pi}{2} \langle \sigma^2_{LOS} \rangle R_{VT}
-$$
-
-\dots
-
-Carberg
-
-% plots in the red notebook
-\todo{add plots from the red notebook}
-
-$$
-b = \left(\dfrac{M_{J. eq}^(2)}L(r) \cdot \dfrac{L_{tot}}{M_{VT}}\right)
-$$
-
-$$
-M_j \to M_{150} \to M(< r) = 3 \dfrac{\beta_{fit, gal}}{G}
-$$
-
-$$
-M(r_{max}) = M_{VT} \bigg( 1 - \underbrace{\dfrac{4 \pi r_{max}^3 n(r_{max})}{\int_0^\infty 4 \pi r^2 n(r) dr} \cdot \dfrac{\sigma_{r}^2(r_{max})}{\langle \sigma^2 \rangle}_{r_{max}}}_{20\%} \bigg)
-$$
-
-to make a sense between the observational and the theoretical equations, we must correct the mass for the 20\% of the mass that is not included in the Jeans equation.
-
-typical $\beta \sim 0$
-
-$$
-\dfrac{M(r_{max})}{M_{VT}} \sim 0.8
-$$
-
-\subsubsection{Relating Observational and Theoretical Mass Estimates}
-
-We may approach the problem from two complementary perspectives:
-
-\begin{enumerate}
-    \item \textbf{Jeans equations}: This method is more closely tied to observational data, providing a way to directly infer mass and dynamical properties of a system from measured kinematics and surface brightness.
-    \item \textbf{Modeling the density profile}: Alternatively, we can propose a functional form for the density $\rho(r)$ (or for some underlying function $f$) and integrate or fit this model to the data, allowing for theoretical exploration of different mass distributions.
-\end{enumerate}
-
-
-Let's consider the Jeams Theorems and a spherical system.
-
-integral motion of a given $\Phi$.
-
-$$
-I [\bar x (t_1), \bar v (t_1)] = I [\bar x (t_2), \bar v (t_2)]
-$$
-
-Let's suppose $f$ to be the solution of the Boltzmann equation (steady state). This solution is also the solution of the integral of motion.
-
-$$
-f \iff f = f(I(\bar x, \bar v))
-$$
-
-in a spherical potential, we have $f$ to depend on the energy $E$ and the angular momentum $\vec L$:
-
-$$
-f = f (E, \vec L)
-$$
-
-if the system is spherical in any other quantity, it depends on the module of the angular momentum:
-
-$$
-f = f(E, L)
-$$
-
-\dots
-
-Poisson equation:
-
-$$
-\nabla^2 \Phi = 4 \pi G \rho = 4 \pi G \int_{V} f d^3 \bar v
-$$
-
-spherical symmetry:
-
-$$
-\dfrac 1{r^2} \dfrac{d}{dr} \left( \dfrac {d \Phi}{dr} \right) = 4 \pi G \rho \int f \left( \dfrac 12 v^2 + \Phi, |\bar x \times \bar v| \right)
-$$
-
-relative potential:
-
-$$
-\Psi = - \Phi + \Phi_0
-$$
-
-relative energy:
-
-$$
-\varepsilon =  - E + \Phi_0 = \Psi - \dfrac 12 v^2
-$$
-
-isotropic dispension tensor $\bar \sigma$:
-
-$$
-f = f(\varepsilon)
-$$
-
-\subsubsection{politropes and Plummer models}
-
-We have seen Plummer models for galaxy clusters and polytropes for gas ($p = k p^{\gamma}$).
-
-...
-
-$$
-f(\varepsilon) = \begin{cases}
-    F \varepsilon^{n - \frac 32} & \varepsilon > 0\\
-    0 & \varepsilon \le 0
-\end{cases}
-$$
-
-$$
-\rho = \int f ... = c_n \Psi^n \quad \Psi > 0
-$$
-
-where $n > \dfrac 12$ is a finite number.
-
-So we obtain the equation of stellar politropy:
-
-$$
-\rho = c_n \Psi^n
-$$
-
-Poisson euation:
-
-$$
-\dfrac 1{r^2} \dfrac{d}{dr} \left( r^2 \dfrac{d \Psi}{dr} \right) + 4 \pi G c_n \Psi^n = 0
-$$
-
-$$
-s = \dfrac rb, \qquad \psi = \dfrac {\Psi}{\Psi_0}
-$$
-
-Lane-Emden equation:
-
-% eq 4.108c
-$$
-\dfrac 1{s^2} \dfrac{d}{ds} \left( s^2 \dfrac{d \psi}{ds} \right) =
-\begin{cases}
-    - \psi^n & \text{for } \psi > 0\\
-    0 & \text{for } \psi \le 0
-\end{cases}
-$$
-
-$$
-\psi = \dfrac 1{\sqrt{1 + \frac 13 s^2}}
-$$
-
-we have a special case for $n = 5$ (Globular clusters):
-
-$$
-\rho = c_5 \Psi^5 = \dfrac{ c_5 \Psi_0^5}{\left( 1 + \frac 13 s^2 \right)^{5/2}}
-$$
-
-therefore, for big radius we have the density $rho$ to behave as $r^{-5}$
-
-another important case is $n \to \infty$ 
-
-\dots
-
-Euler equation:
-
-$$
-\cancel{\text{vel. field}}\ \ \underbrace{- \ \dfrac 1{\rho} \dfrac {dp}{dr} - \dfrac {d \Phi}{dr}}_{\text{hydrostatic eq.}} = 0
-$$
-
-$$
-\dfrac {dp}{dr} = - \rho \dfrac {d \Phi}{dr}
-$$
-
-$$
-k \gamma \rho^{\gamma - 1} \dfrac {d \rho}{dr} = - \rho \dfrac {d \Psi}{dr}
-$$
-
-let's multiply for $\rho^{-1}$:
-
-$$
-k \gamma \rho^{\gamma - 2} \dfrac {d \rho}{dr} = - \dfrac {d \Psi}{dr}
-$$
-
-$$
-\int_0^\rho (\rho')^{\gamma - 2} d \rho' = - \dfrac 1{k \gamma} \int_0^\Psi d \Psi'
-$$
-
-We have:
-
-$$
-\dfrac 1{\gamma - 1} = n \qquad \xrightarrow{n \to \infty} \qquad \gamma \to 1
-$$
-
-for $n > \dfrac 12$ we have $\gamma < 3$
-
-\dots
-
-The Poisson equation for a isothermal gas:
-
-% eq 4.115b
-$$
-\dfrac {d}{dr} \left( r^2 \dfrac {d \ln \rho}{dr} \right) = - \dfrac{G m}{k_B T} 4 \pi r^2 \rho
-$$
-
-\dots
-
-\subsubsection{Stellar system}
-
-$$
-f(\varepsilon) = \dfrac {\rho_1}{(2 \pi \sigma^2)^{\frac 32}} \exp \left( \dfrac{\varepsilon}{\sigma^2} \right) 
-\ \ = \ \ 
-\dfrac {\rho_1}{(2 \pi \sigma^2)^{\frac 32}} \exp \left( \dfrac{\Psi - \dfrac 12 v^2}{\sigma^2} \right)
-$$
-
-Therefore:
-
-$$
-\rho = \int f (\varepsilon) d^3 \bar v =  ... = \rho_1 e^{\dfrac{\Psi}{\sigma^2}}
-$$
-
-$$
-\dfrac{d}{dr} \left( r^2 \dfrac{d \ln \rho}{dr} \right) = - \dfrac{4 \pi G}{\sigma^2} \rho
-$$
-
-there is a relation between the temperature and the dispersion velocity:
-
-$$
-\sigma^2 = \dfrac{k_B T}{\mu}
-$$
-
-$$
-\bar v^2 = \dfrac {\int v^2 f d^3 \bar v}{\int f d^3 \bar v} = 3 \sigma^2
-$$
-
-%equation 4.123
-
-$$
-\rho = \dfrac {\sigma^2}{2 \pi G} r^{-2}
-$$
-
-for a singular isothermal sphere:
-
-$$
-\rho \xrightarrow{r \to 0}  \infty
-, \qquad \quad
-M \xrightarrow{r \to \infty}  \infty
-$$
-
-We have a problem:
-
-$$
-\rho \xrightarrow{r \to 0}  \infty
-$$
-
-therefore, we need to normalize the density:
-
-$$
-\tilde \rho \equiv \dfrac{\rho}{\rho_0}
-$$
-
-where $\rho_0 = \rho(r = 0)$
-
-$$
-\tilde r = \dfrac{r}{r_0}, \qquad where \qquad r_0 = \sqrt {\dfrac{9 \sigma^2}{4 \pi G \rho_0}}
-$$
-
-Therefore:
-
-$$
-\Sigma (r_0) = \dfrac 12 \Sigma (R = 0)
-$$
-
-...
-
-
-Another problem is that $M \xrightarrow{r \to \infty}  \infty$:
-
-$$
-f_k (\varepsilon) = \begin{cases}
-    \rho_1 (2 \pi \sigma^2)^{\frac 32} \left( e^{\dfrac{\varepsilon}{\sigma^2}} - 1 \right) & \varepsilon > 0\\
-    0 & \varepsilon \le 0
-\end{cases}
-$$
-
-Which is the king model.
-
-% add picture about king models density profile
-
-\missing{Lecture before 04/12/2025}
-
-
-\chapter{Lecture 04/12/2025}
-
-\dots
-
-$$
-\bar F(\bar x) = G \int \dfrac{\bar x' - \bar x}{|\bar x' - \bar x|^3} \rho(\bar x') d^3 \bar x'
-\qquad \Rightarrow \qquad
-\int \delta \bar F(\bar x) = G \dfrac{(\bar x' - \bar x)} {|\bar x' - \bar x|^3} \rho(\bar x') d^3 \bar x'
-$$
-
-$$
-\bar F(z) = - \dfrac{G M}{z^2} \hat z \qquad \Rightarrow \qquad \int \delta \bar F(z) = \rho(z) G \left( \dfrac{\bar z}{z^3} \right)
-$$
-
-$$
-\left.\dfrac{d\bar V_M}{dt}\right|_{V_m} = \underbrace{4 \pi \ln \lambda G m (M+m) f(\bar V_m)}_{\rho(\bar V_m)} G \dfrac{\bar V_m - \bar V_m}{|\bar V_m - \bar V_m|^3}
-$$
-
-$$
-\int \left.\dfrac{d\bar V_M}{dt}\right|_{V_m} = 16 \pi^2 \ln \lambda G^2 m (M+m) \int_0^{V_M} \dfrac{f(V_m)V_m^2}{V_m^3} dV_m
-$$
-
-% eq 7.14
-which is the Chandal dynamical friction
-
-\begin{enumerate}
-    \item $V_M$ is small:
-    
-    $$
-    \dfrac{d\bar V_M}{dt} \propto \bar V_M
-    $$
-
-    and also the force on M is proportional to $\bar V_M$
-
-    \item $V_M$ is large and $f(V_m)$ is Maxwellian:
-    
-    $$
-    \dfrac{d\bar V_M}{dt} = \dfrac{4 \pi \ln \lambda G^2 (M + m)n_0}{V_M^3} (...) \bar V_M
-    $$
-
-    where $n_0$ is the number density of the stars.
-
-    Therefore, the variational velocity is proportional to:
-
-    $$
-    \dfrac{d\bar V_M}{dt} \propto M,
-    $$
-
-    the force now is proportional to $M^2$:
-
-    $$
-    force \propto M^2
-    $$
-
-    force is proportional to $n_0m$
-
-    $$
-    force \propto n_0m = \rho
-    $$
-
-\end{enumerate}
-
-$$
-\mathcal T_{df} = \langle - \dfrac{1}{V} \dfrac{d V}{dt} \rangle^{-1}
-$$
-
-\begin{advancedblock}[Applications]
-
-\begin{itemize}
-
-    \item decay of globular cluster.
-    
-    Globular cluster slow down because of the dynamical friction.
-
-    $$
-    \mathcal T_{orb-decay} \sim 2 \mathcal T_{df}
-    $$
-    
-    \item Magellanous Clouds
-    
-    \item galactic combination
-
-    sometimes in a cluster, the central dominant galaxy is made of more than one nucleus.
-    
-    ...
-    %missing something about fossil groups
-    
-\end{itemize}
-\end{advancedblock}
-
-\subsubsection{High speed encounters}
-
-enounters 
-between two systems
-
-effect of internal structure
-High speed encounters
-
-One of the most important classes of interaction between stellar systems is high-speed encounters. By “high-speed” we mean that the duration of the encounter (the interval during which the mutual gravitational forces are significant) is short compared to the crossing time within each system.
-
-closest approaches
-$V$ = relative $V_2$ velocity
-$b'$ = distance
-
-$$
-t_{enc} = \dfrac{\max(r_1, r_2, b')}{V}
-$$
-
-impulse approximation:
-
-$$
-t_i \gg t_{enc}
-$$
-
-$$
-V \gg \sigma_i \dfrac{\max(r_1, r_2, b')}{r_i}
-$$
-
-\dots
-
-$\alpha$ star fields a potential $\Phi (\bar r, t)$ 
-
-$$
-\dot \bar V_\alpha = - \bar \nabla \Phi (\bar r, t)
-$$
-
-in the relative system becomes:
-
-$$
-\Delta \bar V_\alpha' = \Delta \bar V_\alpha + \Delta \bar V
-$$
-
-% 7.42
-$$
-\Delta E = \dfrac 12 \sum_{\alpha = 1} m_\alpha |\Delta \bar V_\alpha'|^2
-$$
-
-\subsubsection{The distant-tide approximation}
-
-violent relaxation
-
-\begin{itemize}
-    \item before the encounter: 
-    $$
-    E_0 = T_0 + U_0 = T_0 - 2 T_0 = - T_0
-    $$
-    This $T_0 = - E_0$
-
-    We have $T_0 \to T_0 + \delta T$, thus:
-
-    $$
-    E_1 = e_0 + \delta T
-    $$
-
-    \item relaxation:
-    
-    $$
-    E_1 = - (E_0 + \delta T) = T_0 - \delta T
-    $$
-\end{itemize}
-
-Therefore we have something like:
-
-$$
-T_0 \longleftarrow T_0 + \delta T \longleftarrow T_0 - \delta T
-$$
-
-Tidal stripping of galaxies
-
-very important in galaxy groups
-
-$$
-\sigma_{v_{gal}} \sim 300 km/s \sim \sigma_{v_*}
-$$
-
-tidal approximation:
-
-$$
-\begin{cases}
-r_1 \ll b'
-r_2 \ll b'
-\end{cases}
-\qquad \Rightarrow \qquad
-\Delta E = ... = \dfrac {4 G^2}{3} \dfrac{M_2^2 M_1}{b^4 V^2} \bar r^2
-$$
-
-where $\bar r$ is:
-
-$$
-\bar r^2 = \dfrac{\int \rho(x^2 + y^2 + z^2) d^3 x}{\int \rho(x)}
-$$
-
-therefore, we can notice that:
-
-\begin{itemize}
-    \item $\Delta E \propto M_2^2$
-    \item $\Delta E \propto b^{-4}$
-    \item $\Delta E \propto V^{-2}$
-\end{itemize}
-
-$$
-\Delta E = \dfrac {G^2}3 \dfrac{M_2^2 M_1}{V^2 a^2}
-$$
-
-$$
-\Phi_{Plummer} = - \dfrac{G M}{\sqrt{r^2 + a^2}}
-$$
-
-as a result:
-\begin{itemize}
-    \item $a$ is small
-    \item The globular cluster is not compact
-    \item $\Delta E$ is big
-\end{itemize}
-
-\begin{advancedblock}[Applications]
-
-    The most important applications are:
-
-    \begin{itemize}
-        \item disruption of GCs
-        \item disruption of binary systems
-        \item disk shocking of globular clusters
+\begin{itemize}[noitemsep]
+    \item $n_0$ is the normalization constant (central density)
+    \item $a$ and $b$ are dimensionless amplitude parameters controlling the relative contributions of the thin and thick disk components (with $a + b = 1$)
+    \item $z$ is the vertical distance from the midplane of the disk, and $R$ is the radial distance from the Galactic center in the plane of the disk
+    \item $h_t$, $h_T$, and $h_R$ are the \textbf{scale lengths} (or heights) of the thin disk, thick disk, and radial profile, respectively. More specifically:
+    \begin{itemize}[noitemsep]
+        \item $h_t$ (thin disk): $\approx 300\,\mathrm{pc}$
+        \item $h_T$ (thick disk): $\approx 1\,\mathrm{kpc}$
+        \item $h_R$ (radial scale length): $\approx 3.5\,\mathrm{kpc}$
     \end{itemize}
+\end{itemize}
+The exponential term $e^{-R/h_R}$ is nearly the same for external spiral galaxies as well.
 
-\end{advancedblock}
+\subsubsection{Kinematics of the Disk}
 
-\subsubsection{...}
+The disk exhibits a nearly flat rotation curve, a characteristic often referred to as \textbf{cold motion}:
+$$
+V_\odot \approx 220\,\mathrm{km/s}
+$$
+
+Stars also have random \textbf{vertical} and \textbf{radial} motions superimposed on this cold circular rotation, referred to as \textbf{hot motion}, with typical velocity dispersions of $\approx 15-25\,\mathrm{km/s}$.
+
+There are several hypotheses for the formation of galactic disks:
+
+\begin{itemize}
+    \item One possibility is that stars form in the thin disk and then gradually acquire larger vertical velocity dispersions through repeated gravitational scattering, which thickens the disk (\textit{kinematic heating}). In this picture, more metal-rich stars tend to remain in the thin disk, while more metal-poor (Population II) stars are more often found in the thick disk. The disk also contains molecular gas (e.g.\ CO) and a diffuse interstellar medium.
+    
+    \item Another possibility is that the thick disk formed through the accretion or interaction of a satellite galaxy with a pre-existing thin disk. Such an encounter can heat thin-disk stars and/or deposit stars and gas at larger scale heights, producing a thicker component. In this scenario, the thick disk often rotates more slowly than the thin disk, and in some external galaxies thick components have even been observed to rotate counter to the thin disk.
+\end{itemize}
+
+\subsubsection{Mass and Luminosity of the Disk}
+
+The total mass of the disk is approximately:
 
 $$
-E_J = \dfrac 12 V^2 + \underbrace{\Phi(\bar x) - \dfrac 12 | \bar \Omega \times \bar x|^2}_{\Phi_{eff}}
+M_\mathrm{disk} \approx 6 \times 10^{10}\,M_\odot\,(\text{stars}) + 0.5 \times 10^{10}\,M_\odot\,(\text{gas})
 $$
 
-$E_J$ cannot surpass a region where $\Phi_{eff} > E_J$.
+and the mass-to-light ratio is:
+
+$$
+\frac{M}{L} \approx 3\,\frac{M_\odot}{L_\odot}, \quad \text{where } L_0 \approx 2 \times 10^{10}\,L_\odot
+$$
+
+\subsection{Spiral Structure}
+
+\begin{minipage}{0.55\textwidth}
+The Milky Way has a \textbf{bar} (detected by the Gaia mission, bar length $\sim 4$--$5\,\mathrm{kpc}$) and spiral arms, the most prominent being the \textbf{Sagittarius} and \textbf{Perseus} arms. The Sun lies almost midway between these two arms. The spiral structure most likely arises from \textbf{pressure (density) waves} propagating through the gas disk, triggering star formation along the arms. Spiral arms trace the distribution of $\text{H}_{II}$ regions and blue (young) stars.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \vspace{-1em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/spiral.png}
+\end{minipage}
+
+\subsection{The Bulge}
+
+The \textbf{bulge} is the central, roughly spheroidal component of the Milky Way. It suffers from heavy extinction along the line of sight ($A_V \sim 28\,\mathrm{mag}$ in the optical toward the Galactic center), making it best studied in the infrared.
+
+\subsubsection{De Vaucouleurs Profile}
+
+If we assume spherical symmetry for the bulge, its surface brightness profile follows the \textbf{de Vaucouleurs} (or $r^{1/4}$) \textbf{law}:
+$$
+\log\left(\frac{I(R)}{I_e}\right) = -3.3307\left[\left(\frac{R}{R_e}\right)^{1/4} - 1\right]
+$$
+where $I_e = I(R_e)$, is the surface brightness ($[I] = L_\odot/pc^2$) at the \textbf{effective radius} $R_e$ ($\sim 0.7\,\mathrm{kpc}$), defined such that half the total luminosity is enclosed within $R_e$:
+$$
+\int_0^{R_e} I(R)\,R\,\dd{R} = \frac{1}{2}\int_0^{\infty} I(R)\,R\,\dd{R}
+$$
+The total surface luminosity is:
+$$
+L = \int_0^{\infty} I(R)\,2\pi R\,\dd{R} = 7.215\,\pi\,I_e R_e^2
+$$
+The de Vaucouleurs profile applies to the bulges of spiral galaxies and to elliptical galaxies.
+
+The stellar mass in the bulge is $M_{\star,B} \approx 1.6 \times 10^{10}\,M_\odot$, with a mass-to-light ratio:
+$$
+\frac{M}{L} \approx 5\,\frac{M_\odot}{L_\odot}
+$$
+
+\subsection{The Halo}
+
+The \textbf{stellar halo} is a roughly spherical, low-density component extending to $r \lesssim 35\,\mathrm{kpc}$, populated mainly by old, metal-poor \textbf{Population II} stars. It contains about 150 globular clusters distributed spherically around the Galactic center.
+
+If we assume spherical symmetry, the stellar density in the halo falls off as:
+$$
+n(r) \propto r^{-\gamma}, \quad \gamma \approx 3\text{--}3.5
+$$
+
+The gaseous halo contains \textbf{high-velocity clouds} (HVCs) with $V \gtrsim 400\,\mathrm{km\,s^{-1}}$ (e.g.\ the Magellanic Stream). These gas reservoirs are thought to be the raw material from which stars form. The gaseous halo constitutes roughly $10\%$ of the total interstellar medium mass.
+
+\subsection{The Galactic Center}
+
+At the center of the Milky Way lies a \textbf{supermassive black hole}, \textbf{Sagittarius~A*} (Sgr~A*), which is a radio-emitting, compact source first identified as a radio source. It has a mass of $M_\bullet \approx 4 \times 10^6\,M_\odot$. Sgr~A* is also associated with \textbf{AGN} (Active Galactic Nuclei) activity, although it is currently in a quiescent state.
+From cosmic ray and dust particle studies, we know that the Milky Way harbors a large-scale \textbf{magnetic field} of roughly $B \approx 4\,\mu\mathrm{G}$.
+
+\section{Population of Stars (and Galaxies)}
+
+The observed distribution of stars in apparent magnitude is related to their intrinsic luminosity function and spatial distribution. The same principles apply to galaxies as well, where we relate the observed galaxy counts to the galaxy luminosity function and spatial distribution.
+
+\subsection{The Luminosity Function}
+
+\begin{minipage}{0.62\textwidth}
+    The \textbf{luminosity function} $\Phi(M)$ describes the number density of stars (or galaxies) per unit absolute magnitude $M$ per unit volume. 
+    Consider a small number of stars $\dd{N}$ in a range of magnitudes $[M, M + \dd{M}]$ and positions in a volume element $\dd^3\vec{x}$ around $\vec{x}$:
+    $$
+    \dd{N} \equiv \Phi(M,\vec{x})\,\dd{M}\,\dd^3\vec{x}
+    $$
+    Assuming the magnitude is \textit{independent} of position, we can separate the luminosity function from the spatial distribution:
+    $$
+    \dd{N} = \Phi(M)\,\dd{M}\cdot\nu(\vec{x})\,\dd^3\vec{x}
+    $$
+    where $\nu(\vec{x})$ is the \textbf{numerical density}.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.36\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/luminosity-function.png}
+    \captionof{figure}{Luminosity function $\Phi$ and the initial luminosity function $\Psi$ for main sequence stars in the solar neighbourhood \cite{karttunen}.}
+\end{minipage}
+
+\vspace{-0.5em}
+
+\subsection{The Fundamental Equation of Stellar Statistics}
+
+We want to relate the observable \textbf{star counts} $A(m)$, which is the number of stars per unit solid angle brighter than apparent magnitude $m$, to the luminosity function and the spatial distribution.
+
+Consider a spherical shell at distance $s$ (in pc) with thickness $\dd{s}$ and solid angle $\omega$.
+
+\medskip
+
+\begin{minipage}{0.58\textwidth}
+The number of stars in the absolute magnitude range $[M, M+\dd{M}]$ in this shell is:
+$$
+\dd{N} = \Phi(M)\,\dd{M}\cdot\nu(\vec{x})\,\dd^3\vec{x} = \Phi(M)\,\dd{M}\dd{n}
+$$
+and the total differential star counts:
+$$
+\frac{\dd^2 N}{\dd{m}\,\dd{M}} = \Phi(M)\left.\dfrac{\dd{n}}{\dd{m}}\right|_M
+$$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/star-counts.png}
+    \captionof{figure}{A spherical shell at distance $s$ with thickness $\dd{s}$ and solid angle $\omega$.}
+\end{minipage}
+
+\medskip
+
+Using the relation $m - M = 5\log s - 5$ (ignoring extinction for simplicity), we have:
+
+$$
+\frac{\dd^2 N}{\dd{m}\,\dd{M}} = \Phi(M)\dfrac{\dd{n}}{\dd{s}}\left(\dfrac{\partial s}{\partial m}\right)_M
+$$
+
+Since the number of stars in the shell element is $\dd{n} = \omega\,s^2\,\dd{s}\,\nu(s)$, we get $\frac{\dd{n}}{\dd{s}} = \omega\,s^2\,\nu(s)$.
+The \textbf{star counts} therefore become:
+$$
+A(m) \equiv \frac{\dd{N}}{\dd{m}} = \int_{-\infty}^{+\infty} \frac{\dd^2 N}{\dd{m}\,\dd{M}}\,\dd{M} = \omega\int_{-\infty}^{+\infty} \Phi(M)\left(\frac{\partial s}{\partial m}\right)_M s^2\,\nu(s)\,\dd{M}
+$$
+
+We can express this integral in terms of the distance $s$ instead of $M$. From the distance modulus ($m - M = 5 \log s - 5$), we observe that at a fixed apparent magnitude $m$:
+\begin{itemize}[noitemsep]
+    \item When $M \to -\infty$ (extremely bright stars), we can see them at $s \to +\infty$.
+    \item When $M \to +\infty$ (extremely faint stars), we can see them only at $s \to 0$.
+\end{itemize}
+
+Moreover, differentiating the distance modulus, we find that:
+$$
+\left(\frac{\partial M}{\partial s}\right)_m = -\left(\frac{\partial m}{\partial s}\right)_M \quad \Longrightarrow \quad \dd{M} = -\left(\frac{\partial m}{\partial s}\right)_M \dd{s}
+$$
+Substituting this into the integral and taking into account the integration limits, we get:
+$$
+\left(\frac{\partial s}{\partial m}\right)_M \dd{M} = -\left(\frac{\partial s}{\partial m}\right)_M \left(\frac{\partial m}{\partial s}\right)_M \dd{s} = -\dd{s}
+$$
+
+Evaluating the integral from $s = +\infty$ to $s = 0$ with the minus sign inverts the bounds, yielding the \textbf{Fundamental Equation of Stellar Statistics}:
+
+$$
+\boxed{
+    A(m) = \omega \int_0^{\infty} \Phi(M)\,s^2\,\nu(s)\,\dd{s}
+}
+$$
+
+where the absolute magnitude $M = m - 5\log s + 5$ links $m$, $s$, and $M$ at each point along the LOS.
+
+\subsection{The Malmquist Bias}
+
+Observational surveys are typically \textbf{magnitude-limited}, meaning that they detect only stars or galaxies brighter than a limiting apparent magnitude $m_\mathrm{lim}$. This introduces the \textbf{Malmquist bias}: at larger distances, only the intrinsically brighter, and often more massive, objects are included, biasing the inferred properties.
+The observed distribution is therefore skewed toward intrinsically bright sources at large distances. As a result, the mean absolute magnitude of the sample is systematically \textit{brighter} than the true mean of the population: $\langle M_\mathrm{obs} \rangle < \langle M_\mathrm{true} \rangle$.
+
+\vspace{-0.3em}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/tides.png}
-    \caption{Contours of equal effective potential $\Phi_{\mathrm{eff}}$ for two point masses in a circular orbit, with mass ratio $m/M = 1/9$. The locations L1, \ldots, L5 are the Lagrange points. L4 and L5 form equilateral triangles with the two masses. \cite{binney}}
+    \includegraphics[height=0.2\textheight]{assets/inverse-square-law.png}
+    \hspace{3em}
+    \includegraphics[height=0.2\textheight]{assets/malmquist.png}
+    \vspace{-0.3em}
+\captionof{figure}{Malmquist bias. Left: the inverse-square law causes flux to decrease with distance \cite{malmquist_img}. Right: a magnitude-limited survey preferentially detects intrinsically brighter stars.}
 \end{figure}
+
+\vspace{-0.3em}
+
+One can convert a magnitude-limited sample to a \textbf{volume-limited} sample by restricting to the distance at which even the faintest objects of interest would still be detected.
+
+\textbf{Proof:}
+
+Let $A(m)$ be the total number of stars observed with apparent magnitude $m$. The mean absolute magnitude of a sample of stars with apparent magnitude $m$ is given by the ratio of integrals over the magnitude and distance $s$:
+$$
+\langle M \rangle_m = \frac{\int_{-\infty}^{+\infty} dM \, M \, \frac{d^2 N}{dm\,dM}}{\int_{-\infty}^{+\infty} dM \, \frac{d^2 N}{dm\,dM}} = \frac{\omega \int_0^\infty ds \, M \, \varphi(M) \, s^2 \nu(s)}{\omega \int_0^\infty ds \, \varphi(M) \, s^2 \nu(s)}
+$$
+We know that the derivative of $A(m)$ with respect to $m$ is:
+$$
+\frac{dA}{dm} = \omega \int_0^\infty ds \, \frac{d\varphi}{dm} \, s^2 \nu(s)
+$$
+Since apparent and absolute magnitudes differ only by the distance modulus (which is independent of $m$ and $M$ locally), we have $dm = dM$, which implies $\frac{d\varphi}{dm} = \frac{d\varphi}{dM} \frac{dM}{dm} = \frac{d\varphi}{dM}$. Therefore:
+$$
+\frac{dA}{dm} = \omega \int_0^\infty ds \, \frac{d\varphi}{dM} \, s^2 \nu(s)
+$$
+We can write the expected value of $\frac{1}{\varphi}\frac{d\varphi}{dM}$ at a given $m$ as:
+$$
+\left\langle \frac{1}{\varphi} \frac{d\varphi}{dM} \right\rangle_{\!m} = \frac{\omega \int_0^\infty ds \left[ \frac{1}{\varphi} \frac{d\varphi}{dM} \right] \varphi(M) \, s^2 \nu(s)}{\omega \int_0^\infty ds \, \varphi(M) \, s^2 \nu(s)} = \frac{1}{A(m)} \frac{dA}{dm}
+$$
+\textit{(With a similar computation, one can also show that $\left\langle \frac{1}{\varphi} \frac{d^2\varphi}{dM^2} \right\rangle_m = \frac{1}{A} \frac{d^2 A}{dm^2}$).}
+
+Assuming that the luminosity function $\varphi(M)$ is a Gaussian (which is at least true for a specific stellar class), with true mean $M_0$ and variance $\sigma^2$:
+$$
+\varphi(M) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(M-M_0)^2}{2\sigma^2}} \quad \Longrightarrow \quad \frac{d\varphi}{dM} = \varphi(M) \frac{M_0 - M}{\sigma^2}
+$$
+Substituting this derivative into our expected value equation:
+$$
+\left\langle \frac{1}{\varphi} \frac{d\varphi}{dM} \right\rangle_{\!m} = \frac{\omega \int_0^\infty ds \, \varphi(M) \left( \frac{M_0 - M}{\sigma^2} \right) s^2 \nu(s)}{\omega \int_0^\infty ds \, \varphi(M) \, s^2 \nu(s)} = \left\langle \frac{M_0 - M}{\sigma^2} \right\rangle_{\!m} = \frac{M_0 - \langle M \rangle_m}{\sigma^2}
+$$
+Equating this to $\frac{1}{A}\frac{dA}{dm}$, we get:
+$$
+\frac{M_0 - \langle M \rangle_m}{\sigma^2} = \frac{1}{A} \frac{dA}{dm}
+$$
+Solving for the observed mean absolute magnitude $\langle M \rangle_m$:
+$$
+\langle M \rangle_m = M_0 - \sigma^2 \underbrace{\left( \frac{1}{A} \frac{dA}{dm} \right)}_{> 0}
+$$
+Since the number of observed stars $A(m)$ naturally increases as we look at fainter apparent limits (higher $m$), the derivative $\frac{dA}{dm}$ is strictly positive. Therefore, we rigorously obtain:
+$$
+\langle M \rangle_m < M_0
+$$
+which formally proves the Malmquist bias: the observed mean absolute magnitude $\langle M \rangle_m$ is systematically brighter (numerically smaller) than the true population mean $M_0$.
+
+\textit{Moreover, for the variance: $\langle \sigma^2 \rangle_m = \sigma^2 + \sigma^4 \frac{d^2 \ln A}{dm^2}$. If this derivative is 0, the density is constant (uniform distribution).}
+
+\section{Kinematics of the Milky Way}
+
+Milky way does not behave as a rigid body, but rather exhibits \textbf{differential rotation}, where the orbital velocity of stars depends on their distance from the Galactic center.
+
+Let us suppose the stars are moving in circular orbits about the galactic centre (\cref{fig:mw-kinematics}). This approximation is acceptable for population I stars and gas. The star $S$, seen from the Sun $\odot$ at galactic longitude $l$ at distance $r$, has circular velocity $V$ at a distance $R$ from the centre. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/mw-kinematics.png}
+    \captionof{figure}{The effect of differential rotation on the radial velocities and proper motions of stars \cite{karttunen}. \textbf{(a)} Near the Sun the orbital velocities of stars decrease outwards in the Galaxy. \textbf{(b)} The relative velocity with respect to the Sun is obtained by subtracting the solar velocity from the velocity vectors in (a). \textbf{(c)} The radial components of the velocities with respect to the Sun. This component vanishes for stars on the same orbit as the Sun. \textbf{(d)} The tangential components of the velocities.}
+    \label{fig:mw-kinematics}
+\end{figure}
+
+\subsection{Oort's Constants}
+
+We want to study the velocity of stars in a neighborhood of the Sun.
+\begin{figure}[H]
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/oort.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.55\textwidth}
+    \captionof{figure}{In order to derive Oort's formulas, the velocity vectors of the Sun and the star S are divided into components along the line $\odot S$ and normal to it \cite{karttunen}.}
+    \begin{itemize}
+        \item $r$ is the distance between the Sun and the star of interest.
+        \item $R$ is the distance of the star from the Galactic center.
+        \item $R_0$ is the distance of the Sun from the Galactic center.
+        \item $V$ is the circular velocity of the star at distance $R$.
+        \item $V_0$ is the circular velocity of the Sun.
+        \item $l$ is the galactic longitude of the star.
+        \item $\alpha$ is the angle used to project the velocity components in the geometry.
+    \end{itemize}
+\end{minipage}
+\end{figure}
+
+We have $r \ll R$ and $R \approx R_0$. The relative radial velocity $v_r$ of the star with respect to the Sun is given by:
+$$
+v_r = V \cos \alpha - V_0 \sin l = \omega R \cos \alpha - \omega_0 R_0 \sin l
+$$
+The triangle $\odot C P$ gives us the relation $R \sin \alpha = R_0 \cos l - r$. Substituting this into the expression for $v_r$:
+$$
+v_t = R_0(\omega - \omega_0) \cos l - \omega r
+$$
+Oort noted that in the close neighbourhood of the Sun ($r \ll R_0$), the difference of the angular velocities will be very small. Therefore we can approximate it by keeping only the first term of the Taylor series in the neighbourhood of $R = R_0$:
+$$
+\omega - \omega_0 = \left(\frac{d\omega}{dR}\right)_{R=R_0} (R - R_0) + \ldots
+\qquad \Rightarrow \qquad
+\omega-\omega_0\approx\frac{1}{R_0^2}\left[R_0\left(\frac{dV}{dR}\right)_{R=R_0}-V_0\right](R-R_0)
+$$
+Where we used $\omega=V/R$ and $V(R_0)=V_0$ to obtain the right equation. For $R\approx R_0\gg r$, the difference $R-R_0\approx -r\cos l$ ($\cos l \approx 1$). We can thus approximate the \textbf{radial relative velocity}:
+
+$$
+v_r\approx\left[\frac{V_0}{R_0}-\left(\frac{dV}{dR}\right)_{R=R_0}\right]r\cos l\sin l
+$$
+applying $2\sin\alpha\cos\alpha = \sin2\alpha$ and aggregating the constants, we can write it as:
+$$
+v_r\approx A r\sin 2l
+$$
+where $A$ is a characteristic parameter of the solar neighbourhood, the \textbf{first Oort constant}:
+$$
+A=\tfrac{1}{2}\left[\frac{V_0}{R_0}-\left(\frac{dV}{dR}\right)_{R=R_0}\right]
+$$
+For the \textbf{tangential relative velocity}, one similarly obtains, since $\omega r\approx\omega_0 r = V_0/R_0\; r$:
+
+$$
+v_t\approx\left[\frac{V_0}{R_0}-\left(\frac{dV}{dR}\right)_{R=R_0}\right]r\cos^2 l-\dfrac{V_0}{R_0} r
+$$
+applying $2\cos^2 l=1+\cos 2l$, substituting $A$ and aggregating the other constants, we get:
+$$
+v_t\approx A r\cos 2l + B r
+$$
+The proper motion is given by $\mu = v_t / r$:
+$$
+\mu \approx A \cos 2l + B
+$$
+with $B$ being the \textbf{second Oort constant}:
+$$
+B=-\tfrac{1}{2}\left[\frac{V_0}{R_0}+\left(\frac{dV}{dR}\right)_{R=R_0}\right]
+$$
+
+For the Sun's neighbourhood, the Oort constants are measured to be:
+
+\begin{minipage}[t]{0.52\textwidth}
+    $$
+    A = 14.8 \pm 0.8 \; \frac{\text{km/s}}{\text{kpc}}, \quad B = -12.4 \pm 0.6 \; \frac{\text{km/s}}{\text{kpc}}
+    $$
+
+    \vfill
+
+    \captionof{figure}{The velocity components due to differential rotation according to Oort's formulas as functions of galactic longitude \cite{karttunen}. \textbf{(a)} Radial velocities for objects at a distance of 1 and 2 kpc. The longitude at which the radial velocity vanishes depends on the distance; Oort's formulas are valid only in the close vicinity of the Sun. \textbf{(b)} Proper motions: the amplitude of the curve is A, its mean value is B}
+\end{minipage}%
+% \hfill
+\begin{minipage}[t]{0.45\textwidth}
+    \centering
+    \vspace{-0.5em}
+    \includegraphics[width=\linewidth]{assets/oort-2.png}
+\end{minipage}
+
+The Oort constants satisfy some remarkably elegant relations. First, subtracting $B$ from $A$ yields the angular velocity of the Local Standard of Rest (LSR) around the Galactic centre:
+$$
+A - B = \omega_0 \approx 0.0053'' \text{ yr}^{-1}
+$$
+Conversely, adding the two constants provides the gradient of the circular velocity curve at the Sun's galactocentric distance ($R_0$):
+$$
+A + B = -\left(\frac{dV}{dR}\right)_{R=R_0} \approx -5 \text{ km s}^{-1}
+$$
+
+By observing extragalactic objects as stationary reference points, the circular velocity of the LSR can be independently determined as $V_0 \approx 220 \text{ km s}^{-1}$. Combining this value with the angular velocity $\omega_0$ allows for a direct estimate of our distance to the Galactic centre, positioning $R_0$ at approximately $8.5 \text{ kpc}$.
+Consequently, the Sun's orbital period around the Galaxy can be calculated to be roughly $2.5 \times 10^8$ years. Given the solar age of nearly $5 \times 10^9$ years, it follows that the Sun has completed approximately 20 full revolutions around the Galactic centre since its formation.
+
+
+
+\subsubsection{The Distribution of Interstellar Matter (Tangential Point Method)}
+
+Radio radiation from interstellar gas, in particular the 21\,cm line of \textbf{neutral hydrogen} ($\text{H}_\text{I}$), is not significantly absorbed or scattered by interstellar dust, unlike optical light. 
+
+\begin{minipage}{0.57\textwidth}
+    This makes radio observations an exceptionally powerful tool for mapping the large-scale structure of the Milky Way, allowing us to detect signals even from clouds on the far side of the Galaxy.
+    However, the position of a radio source along the line of sight cannot be read off directly: we can measure the \textit{direction} of a cloud on the sky, but not its distance. An indirect method based on the \textbf{differential rotation} of the Galaxy provides the solution.
+
+    Consider a set of $\text{H}_\text{I}$ clouds $P_1, P_2, \ldots$ lying along a line of sight at Galactic longitude $l$ (with $-90^\circ < l < 90^\circ$). Each cloud moves on a roughly circular orbit around the Galactic center. Since the angular velocity $\omega(R)$ increases inward (differential rotation), different clouds along the same line of sight will have different radial velocities with respect to the Sun.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/HI-dist.png}
+    \captionof{figure}{Clouds $P_1, P_2, \ldots$ seen in the same direction $l$ at various distances along the LOS \cite{karttunen}.}
+\end{minipage}
+
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/v_r.png}
+    \captionof{figure}{The observed radial velocity as a function of distance $r$ along the line of sight \cite{karttunen}.}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+The radial velocity of a cloud at Galactocentric distance $R$ along the line of sight $l$ is $v_r = R(\omega(R) - \omega_0)\sin l$. As we move along the line of sight, $v_r$ increases until we reach the \textbf{tangent point} $P_k$, where the line of sight is tangent to the circular orbit at $R_k = R_0 \sin l$. At this point the radial velocity reaches its maximum $v_{r,\mathrm{max}} = R_k\bigl(\omega(R_k) - \omega_0\bigr)$ and the distance from the Sun to $P_k$ is simply $r_k = R_0 \cos l$. Beyond $P_k$, the radial velocity decreases monotonically back toward zero.
+\end{minipage}
+
+This velocity-distance relation is the key: by measuring the radial velocity of a cloud via the Doppler shift of the 21\,cm line and assuming a known rotation curve $V(R)$, one can solve for the cloud's Galactocentric distance $R$, and hence its position in the Galaxy. 
+
+\begin{minipage}{0.47\textwidth}
+The method is known as \textbf{kinematic distance determination}.
+
+\medskip
+
+In practice, the observed 21\,cm spectral profile along a given line of sight is a superposition of contributions from all $\text{H}_\text{I}$ clouds and spiral arm segments along the beam. Each cloud produces an emission line centered at a Doppler-shifted frequency corresponding to its radial velocity; the strength of each component reflects the cloud's column density.
+
+\medskip
+
+The observed total profile is therefore the sum of these shifted and broadened line profiles. By decomposing the profile into its components and associating each component with a kinematic distance, one can reconstruct a map of $\text{H}_\text{I}$ distribution across the Galactic plane. This technique led to the first large-scale maps of the Milky Way's spiral structure in the 1950s.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/clouds.png}
+    \captionof{figure}{Clouds at different distances produce emission lines with different shifts \cite{karttunen}.}
+\end{minipage}
+
+\begin{observationblock}[Uncertainties in kinematic mapping]
+    Interpreting spiral structure from 21\,cm data is not straightforward. Kinematic distances depend on the rotation curve $V(R)$, but that curve is also estimated from radial velocity measurements, so the method is partly circular. In the inner Galaxy ($|l| < 90^\circ$), the same radial velocity can come from two different distances, creating the \textbf{near/far distance ambiguity}. Also, gas motions that are not perfectly circular, making the distance estimate less accurate.
+\end{observationblock}
+
+\subsubsection{Oort's Limit}
+
+By analyzing the vertical kinematics of stars oscillating perpendicularly to the Galactic plane, we can estimate the total local mass density required to gravitationally bind them. This dynamical estimate is known as the \textbf{Oort limit} (1932). Originally, Oort calculated a \textbf{dynamical mass density} that was roughly twice the density accounted for purely by the \textbf{luminosity of observed stars}.
+
+Historically, this discrepancy between the dynamically inferred mass and the visible stellar mass provided one of the earliest hints of "missing mass" in the Universe. However, Oort's early calculations could not fully account for the Interstellar Medium (ISM), comprising cold gas and dust clouds, nor the abundance of very faint red and brown dwarfs.
+
+Modern observations (e.g., from the \textit{Gaia} mission) have largely resolved this local tension. When the mass of the ISM and faint stellar populations are added to the visible luminous mass, the total local density closely matches the dynamical Oort limit. 
+
+This local agreement is profound: it demonstrates that \textbf{dark matter does not flatten into the Galactic disk}. Instead, as large-scale rotation curves reveal, the missing mass must reside in a vast, diffuse spherical halo encompassing the entire Galaxy.
+
+\subsubsection{The Galactic Rotation Curve and Dark Matter}
+
+By observing the 21\,cm line at different Galactic longitudes and applying the \textbf{tangent-point method}, one can determine the angular velocity $\omega(R)$ and the corresponding circular velocity $V(R) = \omega(R)\,R$ for a range of Galactocentric distances. The result is the \textbf{rotation curve} of the Milky Way:
+
+\medskip
+
+
+\begin{minipage}{0.71\textwidth}
+    \centering
+    \includegraphics[width=0.97\textwidth]{assets/rot-curve.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.26\textwidth}
+\captionof{figure}{Rotation curve of the Milky Way from hydrogen clouds. The dashed line shows the Keplerian decline for mass within 20\,kpc \cite{cosmology}.}
+\end{minipage}
+
+\medskip
+
+Within the luminous disk ($R \lesssim 10\,\mathrm{kpc}$), the curve rises and then flattens. Beyond the end of the \textbf{luminosity disk}, however, one would naively expect the velocity to follow a \textbf{Keplerian decline}:
+
+
+$$
+V(R) = \sqrt{\frac{GM(<R)}{R}} \quad \xrightarrow{M = \text{const}} \quad V \propto R^{-1/2}
+$$
+Instead, observations show that $V(R)$ \textit{remains approximately constant} well beyond the luminous extent of the disk. Since $V = \text{const}$ implies $M(<R) \propto R$, the enclosed mass keeps growing with radius even where there are no visible stars or gas. This is direct evidence for the existence of \textbf{dark matter} in an extended halo surrounding the Galaxy.
+The total estimated mass of the Milky Way (including the dark matter halo) is:
+$$
+M_\mathrm{MW} \sim 10^{12}\,M_\odot
+$$
+which is roughly an order of magnitude larger than the mass in visible stars and gas alone.
+
+\subsection{Applications and Worked Examples}
+
+Oort's constants, kinematic distance determination, and the rotation curve have a wide range of practical applications. Here we present a few key examples.
+
+\subsubsection{1. Distribution of Stars in the Universe.}
+
+Let us suppose that stars are \textbf{uniformly distributed} in space and all have the same absolute magnitude $M$ (a simplifying assumption). The number of stars $N$ brighter than apparent magnitude $m$ is proportional to the volume of space surveyed out to the corresponding distance $s$:
+$$
+m - M = 5\log s - 5 \quad \Longrightarrow \quad s = 10^{0.2(m-M+5)}
+$$
+Since $N \propto s^3 \propto 10^{0.6m}$ (the $M$ and constant terms absorb into the proportionality), we obtain:
+$$
+\log N(m) \propto 0.6\,m
+$$
+In other words, for a uniform, complete survey, the log of the star counts should increase linearly with apparent magnitude with slope $0.6$.
+
+Any deviation from this slope carries physical information. In particular, the \textbf{Wolf diagram} plots $\log N$ versus $m$ along a specific line of sight: a sudden change in slope (a flattening) signals the presence of an interstellar dust cloud that absorbs light, reducing the number of observable sources beyond a certain distance. From the magnitude at which the break occurs, one can estimate the distance of the cloud.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \begin{tikzpicture}[scale=1.2, >=stealth]
+            % Axes (slightly wider than tall for the desired proportions)
+            \draw[->, thick] (-0.2, 0) -- (5.5, 0) node[right] {$m$};
+            \draw[->, thick] (0, -0.2) -- (0, 4.3) node[above] {$\log N$};
+
+            % Theoretical line (uniform distribution)
+            \draw[dashed, thick, gray!80!black] (0, 0) -- (4.8, 4.2);
+
+            % Observed curve (survey incompleteness)
+            \draw[thick, black] (0, 0) -- (2.0, 1.7) 
+                .. controls (3.0, 2.5) and (4.2, 3) .. (5.0, 3.1);
+
+            % Demarcation line at m=22
+            \draw[dashed, thin] (2.5, 2) -- (2.5, 0);
+            \node[below] at (2.5, 0) {$m=22$};
+
+            % Labels and arrows
+            \node (theory_label) at (2.0, 3.5) {Theory};
+            \draw[->] (theory_label) -- (3.3, 2.8);
+
+            \node[align=center] (incomp_label) at (3.8, 1.5) {Incompleteness \\ of the survey};
+            \draw[->, out=90, in=-60] (incomp_label) to (4.3, 3.0);
+        \end{tikzpicture}
+        \captionof{figure}{Expected $\log N(m)$ vs.\ $m$ for a uniform star distribution (straight line with slope 0.6), compared to observations.}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/wolf-diagram.png}
+        \captionof{figure}{Wolf diagram: $\log N$ vs.\ $m$ along a line of sight. A flattening of the slope indicates the presence of an absorbing ISM cloud.}
+    \end{minipage}
+\end{figure}
+
+\subsubsection{2. Cepheid Distance Determination}
+
+Consider a Cepheid with a radial velocity of $80$ km s$^{-1}$, located at a galactic longitude of $145^\circ$. Its period is $3.16$ days, and its apparent visual magnitude is $12.3$. How far away is this star? There are two main approaches to determine its distance:
+
+\begin{itemize}
+    \item \textbf{Kinematic Distance (using Oort's Formula):}
+
+    For stars in the solar neighborhood ($r \ll R_0$), their observed radial velocity $v_r$ at a given Galactic longitude $l$ relates to their distance $r$ from the Sun according to Oort's formula:
+    $$
+    v_r \approx A\,r\,\sin 2l
+    \qquad \Rightarrow \qquad
+    r = \frac{v_r}{A\sin 2l}
+    $$
+    Knowing both the radial velocity and the Galactic longitude, we can estimate the distance:
+    $$
+    r = \frac{80}{14.8 \cdot \sin 90^\circ} \approx 5~\mathrm{kpc}
+    $$
+
+    \item \textbf{Photometric Distance (using the Period-Luminosity Relation):}
+
+    The period-luminosity relation tells us that the Cepheid's absolute magnitude is roughly $M \approx -3$. The distance can then be determined from the distance modulus:
+    $$
+    r = 10^{0.2(m - M + 5)}
+    $$
+    Plugging in the given numbers,
+    $$
+    r = 10^{0.2(12.3 + 3 + 5)} = 10^{0.2 \times 20.3} \approx 10~\mathrm{kpc}
+    $$
+\end{itemize}
+
+The fact that these kinematic and photometric distances differ by nearly a factor of two highlights some important caveats:
+\begin{enumerate}
+    \item Oort's approximation is valid only near the Sun ($r \ll R_0 \approx 8\,\mathrm{kpc}$), and does not include non-circular or streaming motions.
+    \item The photometric distance, based only on the Cepheid's intrinsic brightness, ignores extinction.
+    \item Additional velocity components due to random motion can affect the kinematic calculation.
+\end{enumerate}
