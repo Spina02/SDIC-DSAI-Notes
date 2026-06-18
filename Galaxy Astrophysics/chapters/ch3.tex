@@ -208,7 +208,7 @@ The gaseous halo contains \textbf{high-velocity clouds} (HVCs) with $V \gtrsim 4
 At the center of the Milky Way lies a \textbf{supermassive black hole}, \textbf{Sagittarius~A*} (Sgr~A*), which is a radio-emitting, compact source first identified as a radio source. It has a mass of $M_\bullet \approx 4 \times 10^6\,M_\odot$. Sgr~A* is also associated with \textbf{AGN} (Active Galactic Nuclei) activity, although it is currently in a quiescent state.
 From cosmic ray and dust particle studies, we know that the Milky Way harbors a large-scale \textbf{magnetic field} of roughly $B \approx 4\,\mu\mathrm{G}$.
 
-\section{Population of Stars (and Galaxies)}
+\section{Stellar Statistics: The Population of Stars}
 
 The observed distribution of stars in apparent magnitude is related to their intrinsic luminosity function and spatial distribution. The same principles apply to galaxies as well, where we relate the observed galaxy counts to the galaxy luminosity function and spatial distribution.
 
@@ -350,9 +350,7 @@ $$
 Equating this to $\frac{1}{A}\frac{dA}{dm}$, we get:
 $$
 \frac{M_0 - \langle M \rangle_m}{\sigma^2} = \frac{1}{A} \frac{dA}{dm}
-$$
-Solving for the observed mean absolute magnitude $\langle M \rangle_m$:
-$$
+\qquad\Rightarrow\qquad
 \langle M \rangle_m = M_0 - \sigma^2 \underbrace{\left( \frac{1}{A} \frac{dA}{dm} \right)}_{> 0}
 $$
 Since the number of observed stars $A(m)$ naturally increases as we look at fainter apparent limits (higher $m$), the derivative $\frac{dA}{dm}$ is strictly positive. Therefore, we rigorously obtain:
@@ -371,7 +369,7 @@ Let us suppose the stars are moving in circular orbits about the galactic centre
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{assets/mw-kinematics.png}
+    \includegraphics[width=0.95\textwidth]{assets/mw-kinematics.png}
     \captionof{figure}{The effect of differential rotation on the radial velocities and proper motions of stars \cite{karttunen}. \textbf{(a)} Near the Sun the orbital velocities of stars decrease outwards in the Galaxy. \textbf{(b)} The relative velocity with respect to the Sun is obtained by subtracting the solar velocity from the velocity vectors in (a). \textbf{(c)} The radial components of the velocities with respect to the Sun. This component vanishes for stars on the same orbit as the Sun. \textbf{(d)} The tangential components of the velocities.}
     \label{fig:mw-kinematics}
 \end{figure}
@@ -379,10 +377,13 @@ Let us suppose the stars are moving in circular orbits about the galactic centre
 \subsection{Oort's Constants}
 
 We want to study the velocity of stars in a neighborhood of the Sun.
+
+\vspace{-0.5em}
+
 \begin{figure}[H]
 \begin{minipage}{0.4\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{assets/oort.png}
+    \includegraphics[width=0.98\textwidth]{assets/oort.png}
 \end{minipage}%
 \hfill
 \begin{minipage}{0.55\textwidth}
@@ -403,7 +404,7 @@ We have $r \ll R$ and $R \approx R_0$. The relative radial velocity $v_r$ of the
 $$
 v_r = V \cos \alpha - V_0 \sin l = \omega R \cos \alpha - \omega_0 R_0 \sin l
 $$
-The triangle $\odot C P$ gives us the relation $R \sin \alpha = R_0 \cos l - r$. Substituting this into the expression for $v_r$:
+The triangle $\odot C P$ gives us the relation $R \sin \alpha = R_0 \cos l - r$. Substituting this into the expression:
 $$
 v_t = R_0(\omega - \omega_0) \cos l - \omega r
 $$
@@ -414,7 +415,6 @@ $$
 \omega-\omega_0\approx\frac{1}{R_0^2}\left[R_0\left(\frac{dV}{dR}\right)_{R=R_0}-V_0\right](R-R_0)
 $$
 Where we used $\omega=V/R$ and $V(R_0)=V_0$ to obtain the right equation. For $R\approx R_0\gg r$, the difference $R-R_0\approx -r\cos l$ ($\cos l \approx 1$). We can thus approximate the \textbf{radial relative velocity}:
-
 $$
 v_r\approx\left[\frac{V_0}{R_0}-\left(\frac{dV}{dR}\right)_{R=R_0}\right]r\cos l\sin l
 $$
@@ -427,7 +427,6 @@ $$
 A=\tfrac{1}{2}\left[\frac{V_0}{R_0}-\left(\frac{dV}{dR}\right)_{R=R_0}\right]
 $$
 For the \textbf{tangential relative velocity}, one similarly obtains, since $\omega r\approx\omega_0 r = V_0/R_0\; r$:
-
 $$
 v_t\approx\left[\frac{V_0}{R_0}-\left(\frac{dV}{dR}\right)_{R=R_0}\right]r\cos^2 l-\dfrac{V_0}{R_0} r
 $$
@@ -503,23 +502,26 @@ Radio radiation from interstellar gas, in particular the 21\,cm line of \textbf{
 The radial velocity of a cloud at Galactocentric distance $R$ along the line of sight $l$ is $v_r = R(\omega(R) - \omega_0)\sin l$. As we move along the line of sight, $v_r$ increases until we reach the \textbf{tangent point} $P_k$, where the line of sight is tangent to the circular orbit at $R_k = R_0 \sin l$. At this point the radial velocity reaches its maximum $v_{r,\mathrm{max}} = R_k\bigl(\omega(R_k) - \omega_0\bigr)$ and the distance from the Sun to $P_k$ is simply $r_k = R_0 \cos l$. Beyond $P_k$, the radial velocity decreases monotonically back toward zero.
 \end{minipage}
 
-This velocity-distance relation is the key: by measuring the radial velocity of a cloud via the Doppler shift of the 21\,cm line and assuming a known rotation curve $V(R)$, one can solve for the cloud's Galactocentric distance $R$, and hence its position in the Galaxy. 
+By measuring the radial velocity of a cloud via the Doppler shift of the 21\,cm line, known the rotation curve $V(R)$, we can find cloud's distance $R$ from the center, and its position in the Galaxy. 
 
-\begin{minipage}{0.47\textwidth}
+% \vspace{-1em}
+
+\begin{minipage}{0.5\textwidth}
 The method is known as \textbf{kinematic distance determination}.
 
-\medskip
+\smallskip
 
 In practice, the observed 21\,cm spectral profile along a given line of sight is a superposition of contributions from all $\text{H}_\text{I}$ clouds and spiral arm segments along the beam. Each cloud produces an emission line centered at a Doppler-shifted frequency corresponding to its radial velocity; the strength of each component reflects the cloud's column density.
 
-\medskip
+\smallskip
 
 The observed total profile is therefore the sum of these shifted and broadened line profiles. By decomposing the profile into its components and associating each component with a kinematic distance, one can reconstruct a map of $\text{H}_\text{I}$ distribution across the Galactic plane. This technique led to the first large-scale maps of the Milky Way's spiral structure in the 1950s.
 \end{minipage}%
 \hfill
-\begin{minipage}{0.5\textwidth}
+\begin{minipage}{0.47\textwidth}
     \centering
     \includegraphics[width=0.95\textwidth]{assets/clouds.png}
+    \vspace{-0.3 em}
     \captionof{figure}{Clouds at different distances produce emission lines with different shifts \cite{karttunen}.}
 \end{minipage}
 
@@ -544,7 +546,7 @@ By observing the 21\,cm line at different Galactic longitudes and applying the \
 \medskip
 
 
-\begin{minipage}{0.71\textwidth}
+\begin{minipage}{0.69\textwidth}
     \centering
     \includegraphics[width=0.97\textwidth]{assets/rot-curve.png}
 \end{minipage}%
