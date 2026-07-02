@@ -1,274 +1,156 @@
-\chapter{Cosmological probes}
+\chapter{Galaxy history} % lecture 16/03/2026
+
+To understand a galaxy spectrum, we can consider it as the sum of the ight from all its stars.
+
+We need to know in the Hertzsprung-Russell diagram, how many stars are in each time step of the diagram (isochrones).
+
+We need to know the population of stars and their spectrum, and then we can sum them up to get the spectrum of the galaxy.
+
+\textbf{Simple Stellar Population} (SSP) is a population of stars that are all at the same age and metallicity, it is not a realistic population of stars, but it is the first step we need to understand the spectrum of a galaxy.
+
+Therefore we assume all the stars born at the same time and have the same metallicity:
+
+$$
+f_{SSP}(t, Z) = ...
+$$
+
+The presence of O, B stars (very luminous), tells us that the galaxy is young. After circa 1Gyr we are dominated by A and F stars, and after 10Gyr we are dominated by G stars\dots
+
+Some important features of the spectrum of a galaxy are:
+
+\begin{itemize}
+    \item Balmer break
+        \item 4000 \r{A} break
+        \item Balmer lines
+        \item Metallic lines
+\end{itemize}
+
+from the SSP we have just created, we can convolve it with the chemical evolution model (known if we know the star formation history), to obtain the \textbf{composite stellar population} (CSP).
+
+The galaxy SED has also some "emission lines" which are not modeled by our previous model.
+
+Emission lines comes from gas, not from stars.
+
+To include these emission lines, we need to add a new component to our model: the \textbf{ionized gas}.
+
+Remaining components is dust, it is not uniformally distributed within the galaxy.
+Once we have the dust extintion, 
+different galaxies have different extintion curves, depending on properties, distribution and geometry of the dust vs. stars.
+Thus, for different emission laws we can obtain different spectral shapes.
+
+Regions with hotter gas emit in higher energy bands, while regions with cooler gas emit in lower energy bands.
+
+$$
+f_{CSP}(t) = ...
+$$
+
+\section{Estimate galaxy properties from observed SED}
+
+For the most of the observations, we cannot distringuish indivisual regions in the SED of a galaxy, therefore we are mainly talking about unresolved galaxies. 
+
+Depending on the inclination (Face-on or Edge-on) of the AGN we can observe different SEDs.
+
+we are interested into knowing:
+
+\begin{itemize}
+    \item Stellar mass
+    \item stellar age
+    \item metallicity
+    \item dust mass and temperature
+    \item redshift
+\end{itemize}
+
+There are many approaches, the main principle is:
+
+\subsubsection{Photometric Redshift}
+%todo: complete this paragraph
+
+With a single color is not usually possible to estimate redshift, but there are some exceptions ($3.6 - 4.5 \mu \text{m}$ colors).
+
+Using two colors we can estimate redshift with better accuracy.
+
+For many yeasr we have used the color-color diagram to estimate redshift, but now we have more accurate methods.
 
 \dots
 
-\section{Cluster number counts}
+%todo: something about Mass and Light weighted ages
 
-\subsection{Structure formation}
+\subsubsection{Parametric star formation history}
 
-\subsubsection{Spherical collapse model}
+we have differnt kinds of sfh: constant, declining, rising and delayed.
 
-\subsection{Galaxy clusters}
+We want to fit our star formation history to the theoretical models:
 
-The abundance and spatial distribution of galaxy clusters are sensitive to the growth rate of cosmic structures and expansion history of the Universe.
+%todo: add plot
 
-$$
-S_8 = \sigma_8( \Omega_m / 0.3)^{0.5}
-$$
-
-where $\sigma_8$ is the amplitude of the matter power spectrum and $\Omega_m$ is the present-day matter density.
-
-\subsection{The halo mass function}
-
-The cluster abundance can be expressed as:
-$$
-\frac{dN}{dz d\Omega} = \frac{dV}{dz d\Omega} n(M, z)
-$$
-where the first term represents the geometry (comoving volume element) and the second term $n(M,z)$ represents the growth of structure.
-
-The halo mass function is given by:
-$$
-n(z, M) = \frac{\rho_m}{M} f(\sigma) \frac{d \ln \sigma^{-1}}{dM}
-$$
-
-The variance of the density field is:
-$$
-\sigma(z, R) = \frac{1}{2\pi^2} \int_0^{\infty} dk \, k^2 P_m(z, k) |W(kR)|^2
-$$
-where $P_m(z,k)$ is the matter power spectrum.
-
-The halo mass function depends on cosmological parameters: increasing $\Omega_m$ or $\sigma_8$ shifts the mass function to higher abundances. Cluster counts as a function of redshift show sensitivity to these parameters, with different combinations of $\Omega_m$ and $\sigma_8$ producing distinct predictions for the number of clusters observed at different redshifts.
-
-\subsubsection{Massive neutrinos}
-
-\textbf{Massive neutrinos} are produced in the early Universe and kept in thermal equilibrium by weak interactions.
-
-Decoupling occurs at $T_{dec} \approx 2-4$ MeV, when $T_{dec} \gg m_\nu$, meaning neutrinos are ultra-relativistic at decoupling.
-
-The free-streaming length is given by:
-$$
-\lambda_H \sim \frac{c}{H} = R_H \sim ct
-$$
-
-At this stage, neutrinos contribute to the \textbf{radiation} energy content.
-
-The redshift of the \textbf{non-relativistic transition} is:
-$$
-(1 + z_{nr}) = \frac{1}{a_{nr}} \approx 2 \times 10^3 \left( \frac{m_\nu}{1 \text{ eV}} \right)
-$$
-
-The free-streaming wavenumber is:
-$$
-k_{nr} = 2\pi \frac{a_{nr}}{\lambda_h} = 0.018 \Omega_m^{1/2} \left( \frac{m_\nu}{1 \text{ eV}} \right) h \text{ Mpc}^{-1}
-$$
-
-After the non-relativistic transition, neutrinos contribute to the \textbf{matter} energy content.
-
-The evolution of the free-streaming wavenumber $k_s = 2\pi \frac{a}{\lambda_s}$ shows three distinct regimes:
-\begin{itemize}
-    \item Free streaming regime (small scales, high $k$)
-    \item Growth regime (intermediate scales)
-    \item Super horizon regime (large scales, low $k$)
-\end{itemize}
-
-
-Neutrinos are diffused becouse of the free streaming wavelegth, so they are not clustered. They:
-
-\begin{itemize}
-    \item Delay the epoch of matter-raadiation equality
-    \item Suppresses the growth of density fluctuation on scale smaller than the free streaming length
-\end{itemize}
-
-The higher the neutrino mass, the more they suppress the growth of density fluctuations, and the less massive objects are formed.
-
-\subsubsection{Modified gravity}
-
-There are many classes og mg models, e.g. $f(R)$:
-
-$$
-S = \dfrac 1{16 \pi G} \int \sqrt{-g} \lfloor R + f(R) \rfloor d^4 x
-$$
-
-Give rise to accelerated expansion and enhance gravity, therefore the growth rate of structures is increased.
-
-Introduce screening mechanism that restores GR in high density environments: for object with mass above a given threshold, we restore the ... model.
-
-% todo: add picture of Relative effect on the Halo Mass Function compared to ACDM
-
-The halo mass function $n(z, M) = \frac{\rho_m}{M} f(\sigma) \frac{d \ln \sigma^{-1}}{dM}$ contains the factor $f(\sigma)$, which is a "universal" function:
-\begin{itemize}
-    \item Press \& Schechter (1974): approximated from spherical collapse of Gaussian density field
-    \item Improved modeling using ellipsoidal collapse, e.g. Sheth \& Tormen (1999)
-    \item Nowadays calibrated against N-body simulations
-\end{itemize}
-
-The calibration of $f(\sigma)$ depends on different factors:
-\begin{itemize}
-    \item Specifics of the simulation (e.g. box size, number of particles, softening length)
-    \item Halo finder (e.g. linking length, FoF, SO)
-    \item Mass definition (e.g. $M_{200,m}$, $M_{500,c}$)
-    \item Redshift dependence
-    \item Cosmological model (e.g. $\Lambda$CDM, wCDM, massive neutrinos)
-\end{itemize}
-
-\subsubsection{Baryonic effects}
-
-Baryonic feedback (radiative cooling, star formation, AGN feedback) redistribute and expel mass from galaxy clusters.
-
-baryonic feedback is most effective in the inner the regions of the halo and in low mass systems: the potential well is shallower, so the gas can escape more easily.
-
-\section{From theory to observation}
-
-Masses are not directly observable. Galaxy clusters are selected according to different observables (e.g. Richness, X-ray luminosity / photon counts, SZ signal), in general relarted to the observational techniqye, which correate with the mass.
-
-Individual mass measurements are expensive and not feasible for cluster survey. We need to rely on mass proxies which are tightly correlated with the halo mass. We introduce an "Observable-mass relation".
-
-Cosmological and scaling relation parameters are in general highly degenerate, and follow-up data are necessary to constrain simultaneously cosmology and the observable-mass relation. We need to combine cluster abundance and cluster mass estimates data to simultaneously constrain cosmology and the observable-mass relation(s).
-
-\subsection{Cluster detection}
-
-\subsubsection{Photometric survey}
-
-Detection methods:
-\begin{itemize}
-    \item Overdensity of (red-sequence) galaxies
-    \item Lensing effect
-\end{itemize}
-
-Observable/Mass proxy:
-\begin{itemize}
-    \item Richness (\# member galaxies)
-    \item Luminosity
-    \item Lensing signal
-    \item Velocity dispersion (with spectra)
-\end{itemize}
-
-% todo: add z-$\lambda$ distribution of redMaPPer clusters in DES Y1
-
-\subsubsection{X-ray survey}
-
-Detection methods:
-\begin{itemize}
-    \item Extended X-ray sources
-\end{itemize}
-
-Observable/Mass proxy:
-\begin{itemize}
-    \item $L_X$ (X-ray luminosity)
-    \item $T_X$ (temperature)
-    \item Flux
-    \item $Y_X = M_{gas} T_X$ (gas thermal energy)
-\end{itemize}
-
-X-ray emissivity from bremsstrahlung radiation of the ICM:
-$$
-\epsilon_\nu = \frac{dL}{dVd\nu} \propto n_e^2 g(\nu, T) T^{-1/2} \exp(-h\nu / k_B T)
-$$
-
-X-ray surveys are flux limited samples and not very sensitive to projections.
-
-% todo: add X-ray images of clusters from eROSITA
-% todo: add $L_X$-z distribution of X-ray selected catalogs
-
-\subsubsection{SZ survey}
-
-Detection methods:
-\begin{itemize}
-    \item Thermal Sunyaev-Zel'dovich effect (mm-wavelength)
-\end{itemize}
-
-Observable/Mass proxy:
-\begin{itemize}
-    \item SZ signal
-\end{itemize}
-
-The Compton-y parameter:
-$$
-y = \int d\ell \frac{k_B T_e}{m_e c^2} n_e \sigma_T
-$$
-
-The SZ signal is redshift independent, making it particularly useful for detecting clusters at high redshift.
-
-% todo: add SZ spectral distortion plot
-% todo: add mass and redshift distribution of SZ-selected cluster catalogs
-
-\subsection{Cluster catalogs at different $\lambda$s}
-
-% todo: listen the lecture, then enhance this section
-
-ICM-selected (X-ray, SZ):
-\begin{itemize}
-    \item Mass limit $M \sim 2 \cdot 10^{14} M_\odot$
-    \item Clean selection function (SZ signal independent of redshift!)
-    \item Need optical follow-up for confirmation, redshift and WL data
-\end{itemize}
-
-Optically-selected:
-\begin{itemize}
-    \item Lower mass limit $M \sim 5 \cdot 10^{13}$
-    \item $M_\star$ ($\times 10$ sample size)
-    \item Selection function harder to model
-    \item WL and photo-z data readily available
-\end{itemize}
-
-% todo: add $M_{500}$ vs redshift comparison plot for different surveys (eRASS1, Planck SZ, SPT-SZ, SPT-3G, SDSS, DES Y1, Euclid)
-
-\subsubsection{Mass measurements from X-ray data}
 \dots
 
-\subsubsection{Mass measurements from spectroscopic data}
+\section{Stellar Mass}
 
-Assumimg spherical symmetry and dynamical equilibrium, we can dynamically estimate the mass using the Jeans equation:
-$$
-M(<r) = -\frac{r \sigma_r^2}{G} \left( \frac{d \ln \sigma_r^2}{d \ln r} + \frac{d \ln n_{\text{gal}}}{d \ln r} + 2\beta \right)
-$$
-where $\sigma_r$ is the radial velocity dispersion, $n_{\text{gal}}$ is the galaxy number density, and $\beta$ is the velocity anisotropy parameter.
+Mass to light ratio (M/L) cottelates with galaxy color: we can get stellar mass estimate even from one (well chosen) color (and one magnitude) only.
 
-% todo: add plot "Dynamical mass measurements in Euclid"
+%todo: add plot
 
-\subsubsection{Mass measurements from imaging}
+if we want to be sensitive to stellar mass -> NIR
 
-The gold standard to perform mass validation on clusters is using the lensing signal.
+if we are interested in ages of stars -> UV/optical
 
-The deflection does not depend on the dynamical state of the cluster.
+Our reconstract will be sensitive to different models (dust/no dust, history model, ...)
 
-we deal with two different regimes:
-\begin{itemize}
-    \item \textbf{Strong lensing}: Strong lensing regime in cluster's core ($\sim$ few hundred kpc). Deflection of the light is large enough to create multiple images of the same source and arcs $\rightarrow$ Precise measurements of the projected mass in scales enclosed by arcs. The mass reconstruction rely on assumptions on lens geometry and mass model $\rightarrow$ introduce systematic uncertainties of $\sim 10-20\%$.
-    
-    \item \textbf{Weak lensing}: At larger radii ($R > 300$ kpc), the tidal gravitational field causes subtle distortion of the shape of background galaxies -- weak lensing regime -- resulting in a coherent alignment of the sources. We can reconstruct the projected density profile by measuring the mean tangential shear profile at different radii around the cluster:
-    $$
-    \gamma_t(r_\perp), \Sigma(R) \Rightarrow \bar{\Sigma}(R) = \int d^2x \Delta\rho\left(\sqrt{R^2 + x^2}\right)
-    $$
-    To infer the mass profile one need to assume a parametric form for the halo density profile (e.g. NFW, Einasto profiles; Navarro+97, Einasto 1965) and correlated structures (2-halo term). In wide-field surveys, the weak lensing signal of clusters is usually stacked to increase the signal-to-noise and reduce the effect of shape noise and projection systematics, enabling calibration of the mass--observable scaling relation across large cluster samples.
-\end{itemize}
+One of the most impactful parameter is the Initial Mass Function (IMF)
 
-% todo: add plot for mass measurement from imaging using different methods with high quality data 
+Intrinsic colors of a stellar population correlate with age / sSFR (specific star formation rate)
 
-\subsubsection{CMB cluster lensing}
+Red does not necessarily mean old or quiescent, it can also mean that the galaxy is dusty.
 
-The CMB provides a unique source of lensing signal at very high redshift ($z \approx 1100$), offering a powerful tool for cluster mass calibration that is independent of optical weak lensing systematics.
+The combination of NIR and UV/optical may give us a better estimate of the stellar mass.
 
-The CMB has intrinsic temperature anisotropies from the last scattering surface. When CMB photons pass through a galaxy cluster, they are deflected by the gravitational potential of the cluster. This deflection causes the CMB temperature gradient to appear shifted, creating a \textbf{dipole-like distortion} pattern aligned with the local CMB gradient direction. The amplitude of this dipole is proportional to the cluster mass and the magnitude of the background CMB gradient.
+\subsection{Star Formation Rate}
 
-The distortion is quite small ($\sim 10$ µK for a $10^{15} M_\odot$ halo), but can be detected through stacking analysis of many clusters. By stacking the CMB signal around large samples of clusters (e.g., thousands of optically-selected clusters from surveys like redMaPPer), the signal-to-noise can be significantly enhanced, enabling robust mass calibration.
+The estimate of the rate at wich stats are being formed relies on \dots
 
-CMB lensing signal can also be detected in polarization data:
-\begin{itemize}
-    \item CMB Polarization (E-modes) provides a "cleaner" signal than temperature $\rightarrow$ Less contaminated by astrophysical foregrounds (e.g., tSZ effect, point sources)
-    \item Recent results show $4.8\sigma$ detection of lensing signal from SPT-Pol data alone (Raghunathan+19)
-\end{itemize}
+proxies fot star formation rate are emission lines, UV luminosity, H$\alpha$, PAH, IR gas emission, partial / full SED modelling.
 
-% todo: add plot showing stacked 2D CMB lensing signal and azimuthally averaged convergence profile from CMB data around clusters (e.g., Baxter+19)
-% todo: add figure showing example lensing dipole signal from simulated Q/U stacks and rotated background-subtracted Q and U stacks from SPT-Pol data
+indices are affected by both age and metallicity: there is no spectral index with is pure mteallicity or pure age. If we combine them we can couple indices to get a more accurate estimate.
 
-\subsubsection{Scaling relations}
+with sufficient spectral coverage and resolution we can attempt to reconstruct the SFH.
 
-Different detection techniques imply different mass proxies, mass calibration and systematics.  
-The calibration of the observable-mass relation(s) requires:
-\begin{itemize}
-    \item Well defined selection function(s)
-    \item A model to describe the parent distribution as a function of mass (halo mass function)
-    \item A model to describe the PDF of the multivariate observable space: $P(\mathcal{X},\mathcal{O}|\mathcal{M})$
-\end{itemize}
+%todo: add plot about synthetic SED reconstruction
+
+\subsubsection{Dust}
+
+dust extintion can be estimated from $L_{IR} / L_{UV}$ ratio, UV slope or Balmer decrement.
+
+...
+
+\subsubsection{AGNs}
+
+2-color selection at NIR/mid-IR wavelenghts has also been used for AGN selection.
+
+...
+
+\begin{advancedblock}[COSMOS Web Tool]
+    The \href{https://cosmos2025.iap.fr/fitsmap}{COSMOS2025 FitsMap viewer} provides an interactive interface for exploring multi-wavelength imaging data from the COSMOS field. This tool allows users to visualize galaxy properties, photometric redshifts, and derived physical parameters such as stellar masses and star formation rates across one of the most extensively studied extragalactic survey fields.
+\end{advancedblock}
+
+\subsubsection{Stellar mass density in SF and Q galaxies}
+
+At low redshift quiescent galaxies' star formation rate is faster than other galaxies, but we can observe that at high redshift it is slower.
+
+
+\section{Cosmic star formation history}
+
+\dots
+
+\subsection{Main sequence of star-forming galaxies}
+
+the main sequence of star-forming galaxies: the star formation rate of galaxies depends on stellar mass.
+
+%todo: add main sequence sf galaxies plot
+
+galaxies with same stellar masses but at higher redshift forms stars faster.
+
+\subsubsection{Age/SFH vs stellar mass}
+
+At high redshift, galaxies with same stellar masses but at higher redshift forms stars earlier and faster.
 

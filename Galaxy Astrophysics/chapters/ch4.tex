@@ -804,7 +804,7 @@ This opposite behavior cannot be captured by a single universal scaling law, and
 \end{minipage}
 
  
-\subsubsection{Elliptical profile: The Kormendy Relation}
+\subsubsection{Elliptical Profile: The Kormendy Relation} \label{subsec:kormendy-rel}
  
 For elliptical galaxies, the effective radius and the mean surface brightness within it are tightly correlated through the \textbf{Kormendy relation}:
 $$
@@ -1092,9 +1092,37 @@ The total mass of elliptical galaxies is typically determined through two key ap
 
 \section{Spiral Galaxies}
 
-\textit{(Reference: see table 3.2, "Extragalactic Astronomy and Cosmology", page 98)}
-
 Spiral galaxies exhibit diverse morphological structures, ranging from highly structured \textbf{Grand Design} spirals to patchy, less defined \textbf{Flocculent} spirals. 
+
+\medskip
+
+\begin{minipage}{0.76\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/spirals.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.21\textwidth}
+    \captionof{figure}{Types of spiral galaxies: Top left: M94 (Sab). Top middle: M51 (Sbc). Top right: M101 (Sc). Lower left: M83 (SBa). Lower middle: NGC 1365 (SBb). Lower right: M58 (SBc).}
+\end{minipage}
+
+\smallskip
+
+\begin{center}
+    \begin{tabular}{l|>{\centering\arraybackslash}p{3cm}>{\centering\arraybackslash}p{3cm}>{\centering\arraybackslash}p{3cm}>{\centering\arraybackslash}p{3cm}}
+        & $S_a$ & $S_b$ & $S_c$ & $S_d$ \\
+        \midrule
+        $M_B$ & $-17\ \text{--}\ -23$ & $-17\ \text{--}\ -23$ & $-16\ \text{--}\ -22$ & $-15\ \text{--}\ -20$ \\
+        $M/M_{\odot}$ & $10^{9-12}$ & $10^{9-12}$ & $10^{9-12}$ & $10^{8-10}$ \\
+        $V_{max}$ & $163\ \text{--}\ 367$ & $163\ \text{--}\ 367$ & $99\ \text{--}\ 304$ & $99\ \text{--}\ 304$ \\
+        $L_{bulge}/L_{tot}$ & $0.3$ & $0.13$ & $0.05$ & -- \\
+        $B-V$ & $0.75$ & $0.64$ & $0.52$ & $0.47$ \\
+        $M_{gas}/M_{B} $ & $0.04$ & $0.08$ & $0.16$ & $0.25$ \\
+        $\theta_0$ & $\sim 6^\circ$ & $\sim 12^\circ$ & $\sim 18^\circ$ & -- \\
+    \end{tabular}
+    \captionof{table}{Key properties of spiral galaxies Sa, Sb, Sc, and Sd \cite{schneider}.}
+\end{center}
+
+\vspace{-0.7em}
 
 \subsection{Trends in the Sequence of Spirals}
 
@@ -1106,7 +1134,7 @@ As we move along the sequence of spiral galaxies (from early-type Sa to late-typ
     \frac{L_b}{L_d} \sim 0.3 \text{ (Sa)}, \quad \frac{L_b}{L_d} \sim 0.05 \text{ (Sc)}
     $$
     
-    \item An \textbf{increasing opening angle} of the spiral arms, widening from $\sim 6^\circ$ in Sa galaxies to $\sim 18^\circ$ in Sc galaxies.
+    \item An \textbf{increasing opening angle} of the spiral arms, widening from $\sim 6^\circ$ in Sa to $\sim 18^\circ$ in Sc.
     
     \item An \textbf{increasing brightness structure} along the spiral arms:
     \begin{itemize}
@@ -1120,19 +1148,640 @@ $$
 -16 \gtrsim M_B \gtrsim -23 \quad \text{and} \quad 10^9 M_\odot \lesssim M \lesssim 10^{12} M_\odot
 $$
 
+About $70\%$ of disk galaxies exhibit a large-scale \textbf{stellar bar}. Such bars break the axial symmetry of the gravitational potential, redistributing angular momentum among stars, gas, and dark matter, and can drive gas toward the center, potentially triggering nuclear activity.
+
+\subsubsection{Brightness Profile}
+
+The light profile of the bulge of spirals is described by a de Vaucouleurs profile to a good approximation, while the disk follows an exponential brightness profile, as is the case for our Milky Way. Expressing these distributions of the surface brightness in $\mu \propto -2.5\log(I)$, measured in $\mathrm{mag/arcsec^2}$, we obtain:
+$$
+\mu_\mathrm{bulge}(R) = \mu_e + 8.3268\left[\left(\frac{R}{R_e}\right)^{1/4} - 1\right]
+\qquad \qquad
+\mu_\mathrm{disk}(R) = \mu_0 + 1.09\left(\frac{R}{h_R}\right)
+$$
+
+Here, $\mu_e$ is the surface brightness at the effective radius $R_e$, which encloses half the total luminosity. The disk's central surface brightness and scale length are $\mu_0$ and $h_R$, respectively.
+
+Note that $\mu_0$ refers to the disk component only, and is not the true central surface brightness of the whole galaxy, nor is it directly observed.
+
+\medskip
+
+\begin{center}
+    \begin{tabular}{cccc}
+        \toprule
+        Surface & brightness profile & M/L\\
+        \midrule
+        Bulge & $r^{1/4}$ law & $\sim 5\ M_\odot/L_\odot$\\
+        Disk & exponential law & $\sim 3\ M_\odot/L_\odot$\\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\subsubsection{Bulge-Disk Decomposition}
+
+Since the observed light of a spiral galaxy is the sum of a bulge and a disk component, the total surface brightness profile can be decomposed into these two contributions by fitting the de Vaucouleurs law in the inner regions and the exponential law in the outer regions. Plotted against $R$, the bulge component appears as the characteristic concave de Vaucouleurs curve, while the disk component appears as a straight line; the observed profile traces the brighter (i.e.\ numerically smaller $\mu$) of the two at each radius, smoothly transitioning from bulge-dominated to disk-dominated light.
+
+\medskip
+
+\begin{minipage}{0.62\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1, every node/.style={scale=0.9}]
+        % Axes
+        \draw[<->, thick] (0,4) node[left] {$\mu$} -- (0,0) -- (6,0) node[right] {$R$};
+        
+        % Disk line
+        \draw[dashed, thick, blue] (0,3.5) -- (5,0.5) node[midway, above right] {disk};
+        
+        % Bulge curve
+        \draw[dashed, thick, red] (0.5,4) .. controls (1.2,2.5) and (2,1) .. (3.5,0.5) node[midway, below left] {bulge};
+        
+        % Bulge label and arrow
+        \node at (3.2, 3.5) {central part bulge};
+        \draw[->, shorten >= 2pt] (1.6, 3.6) -- (0.9, 3.9);
+        
+        % total line
+        \draw[thick] (0.7,4) .. controls (1.5,3) and (2.5,1.7) .. (5,0.6);
+        
+        % Circle at the top intersection
+        \draw (0.6,3.8) ellipse (0.25 and 0.4);
+    \end{tikzpicture}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \captionof{figure}{Schematic bulge-disk decomposition. The bulge ($R^{1/4}$ law, red) dominates the light at small radii, while the disk (exponential law, blue) dominates at large radii. The observed total profile (black) is the upper envelope of the two, i.e.\ the brighter component at each $R$.}
+\end{minipage}
+
+\subsubsection{Bulges and Pseudobulges}
+
+Not all bulges are alike. A distinction is made between classical \textbf{bulges} and \textbf{pseudobulges}:
+
+\begin{itemize}
+    \item \textbf{Classical bulges} are structurally and kinematically similar to elliptical galaxies: they are pressure-supported, dynamically hot systems whose light follows a de Vaucouleurs ($r^{1/4}$) profile.
+    \item \textbf{Pseudobulges} are instead rotationally supported, disk-like structures, presumably built through secular evolution of the disk itself (e.g.\ via bar-driven gas inflow) rather than through mergers. Their light follows an exponential profile, much like the surrounding disk.
+\end{itemize}
+
+\medskip
+
+Pseudobulges are comparatively rare and more difficult to identify than classical bulges, since distinguishing the two requires a careful joint analysis of the surface brightness profile and the kinematics (rotation vs.\ velocity dispersion support) of the central component.
+
+\subsubsection{Freeman's Law}
+
+An intriguing empirical result, known as \textbf{Freeman's Law}, is that the central surface brightness of the disk component, $\mu_0$, is approximately constant across spiral galaxies of very different luminosities and sizes:
+$$
+\mu_0 = 21.52 \pm 0.39 \ \mathrm{mag/arcsec^2} \qquad (S_a \rightarrow S_c)
+$$
+$$
+\mu_0 = 22.61 \pm 0.39 \ \mathrm{mag/arcsec^2} \qquad (S_d)
+$$
+
+In other words, the disks of essentially all spiral galaxies, regardless of the host's total luminosity, appear to share nearly the same central surface brightness. Since $\mu_0$ and $h_R$ are otherwise independent fit parameters, this constancy is a striking dynamical coincidence and not a mathematical necessity of the exponential profile itself.
+
+\begin{tipsblock}[Selection biases and the use of Freeman's Law]
+Freeman's Law is partly an effect of selection bias: galaxies with $\mu_0$ much fainter than $\sim 21$-$22\ \mathrm{mag/arcsec^2}$ are simply harder to detect above the sky background, so historical samples were biased toward "Freeman disks". Modern deep surveys have revealed a population of genuine low surface brightness (LSB) disk galaxies that violate the law. Despite this caveat, Freeman's Law remains useful in practice: combined with the Tully--Fisher relation, it can help estimate the luminosity, and therefore the distance, of an observed spiral.
+\end{tipsblock}
+
+\subsubsection{Complex Tracers of Evolution}
+
+\begin{center}
+    \begin{minipage}{0.45\textwidth}
+    In addition to their bulge and disk components, spiral galaxies display a rich variety of structural and kinematic features that reflect the processes involved in their formation and evolution.
+        
+        \medskip
+    \textbf{Tidal interactions.} Close encounters and interactions with companion galaxies can perturb the stellar and gaseous disk, producing tidal tails, warps, and asymmetric spiral structure (e.g.\ \textbf{wraps}) that persist long after the encounter itself.
+
+    \medskip
+
+    \textbf{Stellar halo.} Both the Milky Way and M31 possess an extended, diffuse \textbf{stellar halo}, with a density profile that falls off as $\rho \propto r^{-3}$. If a spiral galaxy is sufficiently nearby and oriented edge-on, an additional \textbf{thick disk} component can also be detected, observed as a stellar population located beyond the scale height of the thin disk and above/below the plane of the disk.
+    \end{minipage}%
+    \hfill
+\begin{minipage}{0.52\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/tidal-wrap.png}
+    \captionof{figure}{Hubble Space Telescope image of Arp 248, showing two interacting spiral galaxies linked by a tidal bridge, a feature caused by gravitational interactions \cite{ESA_Hubble_Arp248}.}
+\end{minipage}%
+\end{center}
+
+\medskip
+
+The thick disk of more distant spirals can only be studied if they happen to be oriented close to edge-on. For radii $R \lesssim 20\ \mathrm{kpc}$, the surface density profile of the stellar halo follows the extrapolation of the bulge's brightness profile; at larger radii, however, it exceeds this extrapolation, following instead a power-law profile $\rho \propto r^{-3}$. This indicates that stellar halos constitute a generic property of spiral galaxies, distinct from the bulge component itself.
+
+\subsubsection{The Schmidt-Kennicutt Law}
+
+The \textbf{Schmidt--Kennicutt Law} describes how the rate at which a galaxy forms stars depends on the amount of gas present in its disk. The surface density of star formation, $\Sigma_{\mathrm{SFR}}$ (measured in $\frac{M_\odot}{\mathrm{yr}\;\mathrm{kpc}^2}$), increases as a power of the surface density of gas, $\Sigma_{\mathrm{gas}}$ (measured in $\frac{M_\odot}{\mathrm{pc}^2}$):
+
+\large
+$$
+\Sigma_{\mathrm{SFR}} \propto \Sigma_{\mathrm{gas}}^{\,N}
+$$
+\normalsize
+where $N \approx 1.4$.
+
+\subsubsection{Surface Photometry Bias}
+
+The observed surface brightness $\mu$ of a spiral galaxy can be strongly affected by the orientation and the distribution of dust in its disk, introducing important observational biases.
+
+Consider first an idealized spiral galaxy with negligible dust. In this case, the total luminosity remains the same whether the galaxy is viewed edge-on or face-on. However, when seen edge-on, the emitted light is concentrated into a smaller apparent area on the sky (due to the thin vertical extent of the disk), so the surface brightness $\mu$ appears fainter compared to the face-on view.
+
+Now, introduce significant dust into the spiral disk. For a dusty galaxy viewed edge-on, much of the starlight is absorbed or scattered out of the line of sight, reducing both the observed luminosity and the surface brightness. Intriguingly, the increase in extinction can offset the geometric effect: the surface brightness measured in edge-on and face-on configurations becomes nearly equal, despite the differing path lengths through the disk.
+
+\medskip
+
+\begin{minipage}{0.61\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/spiral-sb.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+    \captionof{figure}{How the observed color and brightness of light from a spiral galaxy depend on the line of sight. Light emerging perpendicular to the disk can appear white or blue, while light that passes through the disk appears redder due to dust extinction and scattering.}
+\end{minipage}
+
+\vspace{-0.5em}
+\subsubsection{The Disney Bias}
+
+A selection effect occurs when comparing a galaxy's luminosity $L$ and its observed diameter $D$.
+
+\begin{minipage}{0.47\textwidth}
+    Disney originally noted an empirical relation:
+    $$
+    L \propto D^2,
+    $$
+    and argued that this relation could not be physical, but is instead an artifact of how galaxy samples are selected: surveys preferentially detect galaxies above some threshold surface brightness, since at fixed luminosity, a galaxy with a larger diameter $D$ has a correspondingly lower surface brightness $\mu \propto -2.5\log(L/D^2)$, eventually falling below the detectability threshold of the survey.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \begin{tikzpicture}[scale=1, every node/.style={scale=0.9}]
+        
+        % Axes
+        \draw[<->, thick] (0,3.5) node[left] {$L$} -- (0,0) -- (6,0) node[right] {$D$};
+        
+        % L propto D^2 Line
+        \draw[thick] (1,1) -- (3.5, 3);
+        
+        % Data point and vector
+        \filldraw (2.5, 1.45) circle (1.5pt);
+        \draw[->, thick] (2.6, 1.45) -- (3.5, 1.5) node[right]{very low SB};
+    \end{tikzpicture}
+    \vspace{-0.3em}
+
+    \captionof{figure}{At fixed diameter $D$, a hypothetical galaxy lying below the $L \propto D^2$ relation has low surface brightness and tends to fall below survey detection thresholds.}
+\end{minipage}
+
+\smallskip
+
+As a result, low surface brightness galaxies of a given luminosity are systematically under-represented at the corresponding (large) values of $D$, biasing the observed relation toward $L \propto D^2$.
+
+\subsubsection{Rotation Curves}
+
+Like our own Milky Way, other spiral galaxies are observed to rotate considerably faster in their outer regions than one would expect from Kepler's law applied to the distribution of visible matter alone. Such measurements are typically obtained via the Doppler effect, where the inclination of the disk with respect to the line of sight must be properly accounted for in order to recover the true rotational velocity.
+
+\medskip
+
+\begin{center}
+\begin{minipage}{0.58\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/rot-curve-spiral.png}
+\end{minipage}%
+\hspace{1em}
+\begin{minipage}{0.35\textwidth}
+    \captionof{figure}{Example of a typical rotation curve of a spiral galaxy: the observed rotational velocity remains approximately constant at large radii, contrary to the decline predicted from visible matter alone. This behavior is a fundamental line of evidence for the existence of dark matter halos surrounding galaxies \cite{karttunen}}
+\end{minipage}
+\end{center}
+
+\medskip
+
+From the distribution of visible matter alone, one would predict a circular velocity
+$$
+V_{\mathrm{lum}}^2(R) = \frac{G M_{\mathrm{lum}}(R)}{R},
+$$
+which should decline as $V_{\mathrm{lum}} \propto R^{-1/2}$ beyond the radius enclosing most of the luminous mass (the Keplerian regime). Instead, observed rotation curves remain approximately flat, $V_{\mathrm{rot}} \sim \mathrm{const}$, out to radii $R \gg h_R$, well beyond the visible disk, suggesting that spiral galaxies are surrounded by an extended halo of dark matter.
+
+The discrepancy between the observed rotation curve $V^2$ and the luminous contribution $V_{\mathrm{lum}}^2$ yields the distribution of dark matter:
+$$
+V_{\mathrm{DM}}^2 = V^2 - V_{\mathrm{lum}}^2 = \frac{G M_{\mathrm{DM}}}{R}
+\qquad \text{or equivalently} \qquad
+M_{\mathrm{DM}}(R) = \frac{R}{G}\left[V^2(R) - V_{\mathrm{lum}}^2(R)\right].
+$$
+
+The rotation curves of spiral galaxies cannot, therefore, be explained by visible matter alone; this is the classical starting point for the dark matter halo decomposition of a galaxy's mass budget.
+
+\begin{center}
+    \begin{minipage}{0.58\textwidth}
+        \centering
+        \includegraphics[width=0.95\textwidth]{assets/ngc-3198.png}
+    \end{minipage}%
+    \hspace{1em}
+    \begin{minipage}{0.35\textwidth}
+        \captionof{figure}{Rotation curve decomposition for the spiral galaxy NGC 3198. The observed velocity can be interpreted as the sum of contributions from the stellar disk and an extended dark matter halo. The latter dominates at large radii, where the rotation curve remains approximately flat \cite{karttunen}.}
+    \end{minipage}
+\end{center}
+
+\medskip
+
+A common approach to interpret rotation curves is the so called \textbf{maximum disk hypothesis}. In this framework, the stellar disk is assumed to contribute maximally to the observed rotation curve, within the constraints imposed by the data. This corresponds to adopting a mass to light ratio $M/L$ consistent with stellar populations.
+
+If the inferred $M/L$ is compatible with that expected from stars, the observed kinematics can be largely explained without invoking a significant dark matter contribution in the inner regions. On the contrary, if a much larger $M/L$ is required, this indicates the presence of an additional, non luminous mass component even within the disk.
+
+Empirically, one finds that the maximum rotational velocity increases with the total luminosity of the galaxy. At fixed luminosity, however, variations in the rotation curve reflect differences in the total mass distribution, in particular in the relative contribution of dark matter.
+
+The presence and structure of spiral arms are also closely related to the dynamics of the disk. Two main classes of spiral patterns are observed. 
+
+\begin{itemize}
+\item \textbf{Grand design spirals} exhibit well defined, symmetric arms that can be interpreted as long lived density waves propagating within the disk. 
+
+\item \textbf{Flocculent spirals}, on the other hand, show fragmented and irregular arm structures, which are often associated with local instabilities or tidal interactions with nearby galaxies.
+\end{itemize}
+
+\subsection{Virial Theorem}
+
+The virial theorem provides a fundamental relation between the kinetic and potential energy of a gravitationally bound system in dynamical equilibrium.
+
+\begin{definitionblock}[Virial Theorem]
+
+A \textbf{virialized system} is a gravitationally bound system that has reached \bfit{equilibrium}, so its overall properties (like the distribution of energies) are stable over time.
+
+For such a system:
+$$
+2T + U = 0,
+$$
+where $T$ is the total kinetic energy and $U$ is the total gravitational potential energy.
+
+\end{definitionblock}
+
+\subsection{Proof}
+Consider a system of $n$ point masses $m_i$, with position vectors $\vec r_i$ and velocities $\dot{\vec r}_i$. We define the virial quantity:
+$$
+A = \sum_{i=1}^n m_i \, \dot{\vec r}_i \cdot \vec r_i.
+$$
+
+Taking the time derivative:
+$$
+\dot A = \sum_{i=1}^n (\underbrace{m_i \dot r_i \cdot \dot r_i}_{2T} + \underbrace{m_i \ddot r_i}_{F_i} \cdot r_i)
+= 2T + \sum_{i=1}^n \vec F_i \cdot \vec r_i
+$$
+
+Taking the time average over a sufficiently long interval $\tau$:
+$$
+\langle \dot A \rangle = \dfrac 1\tau \int_0^\tau \dot A dt =\langle 2T \rangle + \left\langle \sum_{i=1}^n \vec F_i \cdot \vec r_i \right\rangle.
+$$
+
+For a bound system, $A$ remains finite (no particle escapes), and therefore $\langle \dot A \rangle \to 0$ as $\tau \to \infty$. 
+
+This yields the \textit{generalized form of the Virial theorem}:
+$$
+\langle 2T \rangle + \left\langle \sum_{i=1}^n \vec F_i \cdot \vec r_i \right\rangle = 0.
+$$
+
+For gravitational forces:
+$$
+F_i = -G m_i \sum_{j=1, j\neq i}^n m_j \frac{\vec{r}_i - \vec{r}_j}{r_{ij}^3} \qquad \text{where} \quad r_{ij} = |\vec{r}_i - \vec{r}_j|
+$$
+
+The latter term of the viral theorem becomes:
+$$
+\begin{array}{rl}
+\sum_{i=1}^n F_i \cdot r_i 
+& \displaystyle = -G \sum_{i=1}^n \sum_{j = 1, j \neq i}^n m_i m_j \dfrac {r_i - r_j}{r_{ij}^3} \cdot r_i\\
+& \displaystyle = -G \sum_{i=1}^n \sum_{j = i + 1}^n m_i m_j \dfrac {r_i - r_j}{r_{ij}^3} (r_i - r_j)
+\end{array}
+$$
+
+where the latter form is obtained by rearranging the double sum, combining the terms:
+
+$$
+\begin{array}{rl}
+(1) & \displaystyle m_i m_j \frac{\vec{r}_i - \vec{r}_j}{r_{ij}^3} \cdot \vec{r}_i\\
+(2) & \displaystyle m_i m_j \frac{\vec{r}_j - \vec{r}_i}{r_{ij}^3} \cdot \vec{r}_j = m_i m_j \frac{\vec{r}_i - \vec{r}_j}{r_{ij}^3} \cdot (-\vec{r}_j)\\
+\end{array}
+$$
+since: $(\vec{r}_i - \vec{r}_j) \cdot (\vec{r}_i - \vec{r}_j) = r_{ij}^2$
+$$
+\Rightarrow -G \sum_{i=1}^n \sum_{j=i+1}^n \frac{m_i m_j}{r_{ij}} = U
+$$
+
+where U is the potential energy of the system. Thus, the virial theorem becomes simply:
+$$
+\langle T \rangle = -\frac{1}{2} \langle U \rangle
+$$
+
+\subsubsection{Relation to Observables}
+
+From the virial theorem, we can derive crucial \bfit{observational quantities}. By expressing the kinetic and potential energies in terms of individual particle masses $m_i$, velocities $v_i$, and spatial separations $r_{ij}$, the equilibrium condition becomes:
+$$
+\sum_i m_i (v_i - \langle v \rangle)^2 - G \sum_{i > j} \frac{m_i m_j}{r_{ij}} = 0
+$$
+
+To express this in terms of macroscopic observables, we can isolate the velocity dispersion and define a characteristic scale for the system. By factoring out the total mass $\sum m_i$, we obtain:
+$$
+\underbrace{\frac{\sum_i m_i (v_i - \langle v \rangle)^2}{\sum_i m_i}}_{\text{velocity dispersion}} - G \underbrace{\frac{\sum_{i > j} \frac{m_i m_j}{r_{ij}}}{(\sum_i m_i)(\sum_i m_i)}}_{\equiv \frac{1}{R_v}} \sum_i m_i = 0
+$$
+
+The first term represents the mass weighted velocity dispersion $\sigma_v^2$ of the system. The denominator of the second fraction defines the \bfit{virial radius} $R_v$. 
+
+This definition allows us to rewrite the virial theorem as a direct relation between the total mass $M$, the three dimensional velocity dispersion, and the virial radius:
+$$
+\sigma_v^2 - G \frac{M}{R_v} = 0 \quad \Rightarrow \quad M = \frac{\sigma_v^2 R_v}{G}
+$$
+
+Observationally, we cannot measure the full three dimensional velocity vectors or the true spatial separations of the components. Instead, we are restricted to projected quantities on the celestial sphere, specifically the two dimensional positions and the one dimensional radial velocities. Assuming the system is spherically symmetric and its velocity distribution is isotropic, the true velocity dispersion is exactly three times the observed line of sight variance:
+$$
+\sigma_v^2 = 3 \sigma_{v,\mathrm{los}}^2
+$$
+
+Similarly, the true spatial virial radius can be geometrically related to the projected virial radius $R_{v,\mathrm{proj}}$ by a constant factor:
+$$
+R_v = \frac{\pi}{2} R_{v,\mathrm{proj}}
+$$
+
+Substituting these projected quantities back into the mass equation yields a practical formula for estimating the dynamical mass of a spherical system:
+$$
+M = \frac{3\pi}{2} \frac{\sigma_{v,\mathrm{los}}^2 \, R_{v,\mathrm{proj}}}{G}
+$$
+
+A significant practical challenge arises because the individual masses $m_i$ of the tracers are generally unknown. Astronomers often substitute mass weighting with luminosity weighting under the assumption that mass is strictly proportional to luminosity. However, this assumption is not always valid due to observational selection effects and the segregation of masses within the system. When luminosity weighting is unreliable, an unweighted approach is preferred, calculating simple averages of the observed velocities and projected radii.
+
+\begin{observationblock}[Mass Distributions and Advanced Theorems]
+The standard virial mass estimator implicitly assumes that the underlying mass distribution perfectly follows the spatial distribution of the observed luminous tracers. In systems like galaxy clusters, where the dominant dark matter component may be distributed differently than the visible galaxies, this assumption breaks down. To address these complex mass distributions and handle systems lacking spherical symmetry, astronomers must rely on more advanced frameworks such as the \bfit{tensorial virial theorem} or the \bfit{generalized virial theorem}.
+\end{observationblock}
+
+Finally, when analyzing discrete systems, it is often useful to define the \bfit{harmonic radius} $R_H$. Assuming equal mass particles for simplicity, the definitions of the virial radius and the harmonic radius are:
+$$
+R_v = \frac{n^2}{\sum_{i>j} \frac{1}{r_{ij}}} \qquad \text{and} \qquad R_H = \frac{\frac{1}{2}n(n-1)}{\sum_{i>j} \frac{1}{r_{ij}}}
+$$
+
+For a system with a large number of particles $n$, the virial radius is approximately twice the harmonic radius, meaning $R_v \approx 2 R_H$. Applying this substitution provides an alternative expression for the total dynamical mass using the harmonic radius:
+$$
+M = \frac{3\pi}{2} \frac{\sigma_{v,\mathrm{los}}^2 R_v}{G} = 3\pi \frac{\sigma_{v,\mathrm{los}}^2 R_H}{G}
+$$
+
+\section{Scaling Relations}
+
+Scaling relations are empirical correlations between the global observable properties of galaxies. They are essential tools in astrophysics because they provide deep insights into galaxy formation and serve as crucial secondary distance indicators.
+
+\subsection{The Tully Fisher Relation}
+
+The \textbf{Tully Fisher relation} provides a powerful tool to relate the intrinsic luminosity of a spiral galaxy to its kinematic properties, specifically its maximum rotational velocity $V_{max}$:
+$$
+L \propto V_{max}^\alpha \qquad \text{where} \quad \alpha \approx 4
+$$
+
+This relation is calibrated with nearby galaxies whose distances are measured using primary indicators like Cepheids. For intermediate distance galaxies where stars aren't individually resolved, the Tully Fisher relation bridges the gap. By observing a galaxy's spectrum, we measure its redshift and rotation curve (to get $V_{max}$). The relation then provides the absolute luminosity $L$ (or magnitude $\mathcal{M}$), which, with the apparent magnitude $m$, yields the distance.
+
+The physical basis of the Tully Fisher relation comes from combining the virial theorem with the properties of spiral disks. In virial equilibrium, the dynamical mass $M$ is proportional to the rotational velocity squared times the characteristic radius $R$:
+$$
+M \propto \frac{V_{max}^2 R}{G}
+$$
+
+We can introduce the luminosity $L$ by multiplying and dividing by the mass to light ratio:
+$$
+L = M \left( \frac{M}{L} \right)^{-1} \propto \frac{V_{max}^2 R}{G} \left( \frac{M}{L} \right)^{-1}
+$$
+
+Squaring both sides gives:
+$$
+L^2 \propto \left( \frac{M}{L} \right)^{-2} \frac{R^2}{G^2} V_{max}^4
+$$
+
+For a disk galaxy, the total luminosity is related to the average surface brightness $\langle I \rangle$ and the square of the radius, meaning $R^2 \propto L / \langle I \rangle$. Substituting this into our squared expression yields:
+$$
+L^2 \propto \left( \frac{M}{L} \right)^{-2} \frac{L}{\langle I \rangle G^2} V_{max}^4
+$$
+
+Dividing both sides by $L$ leaves the final theoretical expectation:
+$$
+L \propto \left( \frac{M}{L} \right)^{-2} \left(\frac{1}{\langle I \rangle G^2} \right) V_{max}^4
+$$
+
+If we assume the mass-to-light ratio $M/L$ and the mean surface brightness $\langle I \rangle$ do not vary significantly between galaxies (as approximated by the Freeman law, $M/L \sim \mathrm{const}$), then the relation simplifies to:
+$$
+L \propto V_{max}^4
+$$
+
+It is important to note, however, that in real observations the exponent $\alpha$ is not exactly 4, and its precise value depends somewhat on the photometric band used (e.g., B-band, K-band).
+
+\begin{minipage}{0.55\textwidth}
+    \includegraphics[width=0.95\textwidth]{assets/tf.png}
+    \captionof{figure}{Tully-Fisher relation: stellar mass as a function of maximum rotation velocity $V_{max}$ for spiral galaxies. The line shows $\alpha = 4$ \cite{schneider}.}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    The Tully-Fisher relation in its simplest form assumes that both the mass-to-light ratio ($M/L$) and the average surface brightness ($\langle I \rangle$) are similar for all spiral galaxies, a condition supported by Freeman's law. 
+    
+    The symmetry observed in most rotation curves also suggests that the proportion of luminous matter to dark matter is relatively consistent across spirals. 
+    
+    Additionally, because the $M/L$ ratio of a stellar population does not change much with age, this approximate constancy of $M/L$ would still hold even when including dark matter.
+\end{minipage}
+
+\subsection{The Faber Jackson Relation} \label{subsec:fj-rel}
+
+While spiral galaxies follow the Tully Fisher relation, elliptical galaxies exhibit a similar kinematic scaling known as the \textbf{Faber Jackson relation}. For ellipticals, the relevant kinematic parameter is the central velocity dispersion $\sigma_0$, which represents the random thermalized motion of the stars.
+
+\begin{minipage}{0.5\textwidth}
+The empirical \textbf{Faber-Jackson relation} connects the total luminosity in the visual band $L_V$ to the central velocity dispersion $\sigma_0$:
+$$
+L_V \propto \sigma_0^\gamma \qquad \text{where} \quad \gamma \approx 4
+$$
+
+A commonly used empirical form relates $\sigma_0$ to the absolute magnitude $M_B$ in the $B$-band:
+$$
+\log(\sigma_0) = -0.1 M_B + \text{const}
+$$
+
+\smallskip
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \centering
+\begin{tikzpicture}[scale=1.1]
+    % Axes
+    \draw[->] (0,0) -- (0,3.2) node[left,yshift=2pt] {$\log \sigma_{v,0}$};
+    \draw[->] (0,0) -- (4.2,0) node[below,xshift=2pt] {$M_B$};
+    % Linear relationship
+    \draw[thick] (0.5,0.4) -- (3.5,2.6);
+
+    % Original black scatter points
+    \fill[black] (0.8,0.7) circle (1.3pt);
+    \fill[black] (1.1,0.8) circle (1.3pt);
+    \fill[black] (1.3,1.5) circle (1.3pt);
+    \fill[black] (1.6,1.2) circle (1.3pt);
+    \fill[black] (1.75,2.1) circle (1.3pt);
+    \fill[black] (2.0,1.8) circle (1.3pt);
+    \fill[black] (2.1,1.5) circle (1.3pt);
+    \fill[black] (2.3,2.3) circle (1.3pt);
+    \fill[black] (2.4,1.9) circle (1.3pt);
+    \fill[black] (2.6,2.5) circle (1.3pt);
+    \fill[black] (2.6,1.9) circle (1.3pt);
+    \fill[black] (2.8,2.0) circle (1.3pt);
+    \fill[black] (2.95,2.45) circle (1.3pt);
+    \fill[black] (2.9,2) circle (1.3pt);
+    \fill[black] (3.1,2.25) circle (1.3pt);
+    \fill[black] (3.15,2) circle (1.3pt);
+    \fill[black] (3.3,2.2) circle (1.3pt);
+    \fill[black] (3.3,2.3) circle (1.3pt);
+    \fill[black] (1.2,1.2) circle (1.3pt);
+    \fill[black] (1.8,2.35) circle (1.3pt);
+    \fill[black] (2.0,1.93) circle (1.3pt);
+    \fill[black] (2.1,2.6) circle (1.3pt);
+    \fill[black] (2.3,1.62) circle (1.3pt);
+    \fill[black] (2.5,1.48) circle (1.3pt);
+    \fill[black] (2.55,2.05) circle (1.3pt);
+    \fill[black] (2.65,2.7) circle (1.3pt);
+    \fill[black] (2.8,1.58) circle (1.3pt);
+    \fill[black] (3.0,1.75) circle (1.3pt);
+    \fill[black] (3.15,2.6) circle (1.3pt);
+    \fill[black] (3.3,2.6) circle (1.3pt);
+    \fill[black] (3.4,1.82) circle (1.3pt);
+    \fill[black] (3.2,2.45) circle (1.3pt);
+\end{tikzpicture}
+\end{minipage}%
+
+\smallskip
+
+Because the observed data points have a large intrinsic scatter (dispersion) about the mean relation, the uncertainty in estimating $M_B$ from $\sigma_0$ (and thus the distance) is significant. This limits the reliability of the Faber-Jackson relation as a precise distance indicator.
+
+\subsection{The Fundamental Plane}
+
+The \href{subsec:fj-rel}{Faber Jackson Relation} and the \href{subsec:kormendy-rel}{Kormendy Relation} are actually just two dimensional projections of a three dimensional parameter space, which is defined by three quantities: the effective radius $R_e$, the central velocity dispersion $\sigma_0$, and the average surface brightness within the effective radius $\langle I \rangle_e$. When plotted in a three dimensional logarithmic space, elliptical galaxies do not scatter randomly but populate a tightly constrained surface known as the \textbf{Fundamental Plane}.
+
+Observationally, the fundamental plane is described by the empirical relation:
+$$
+R_e \propto \sigma_0^{1.4} \langle I \rangle_e^{-0.85}
+$$
+
+We can understand the origin of this plane returning to the virial theorem and kormendy relation, which dictate respectively:
+$$
+M \propto \frac{\sigma_0^2 R_e}{G}, \qquad \qquad R_e \propto \langle I \rangle_e^{-0.83}
+$$
+
+Combining this with the definition of total luminosity, where $L \propto \langle I \rangle_e R_e^2$, we can express the effective radius in terms of the other variables and the mass to light ratio:
+$$
+R_e \propto \sigma_0^2 \, \langle I \rangle_e^{-1} \left( \frac{M}{L} \right)^{-1}
+$$
+
+By comparing this theoretical virial expectation with the empirical fundamental plane, we notice a discrepancy known as the \textit{tilt of the fundamental plane}. The theoretical exponents are $2$ and $-1$, whereas the observed ones are $1.4$ and $-0.85$. This implies that the mass to light ratio is not strictly constant for all ellipticals, but rather scales weakly with the total mass, approximately following:
+$$
+\frac{M}{L} \propto M^{0.2}
+$$
 
 
+\subsection{The $\mathbf{D_n}$-$\sigma$ Relation}
 
+To bypass the complexities of precise surface brightness measurements required by the fundamental plane, astronomers introduced the \textbf{$\mathbf{D_n}$-$\boldsymbol{\sigma}$ relation} as an optimized and robust distance indicator for early type galaxies. Here, the parameter $D_n$ is defined as the physical diameter of the galaxy within which the average integrated surface brightness corresponds to exactly $20.75 \, \mathrm{mag/arcsec^2}$.
 
+This new parameter correlates tightly with the central velocity dispersion according to the relation:
+$$
+D_n \propto \sigma_0^{1.33}
+$$
 
+This single relation elegantly combines the structural variables of the fundamental plane. First, one measures the central velocity dispersion $\sigma_0$ from the galactic spectrum, which immediately yields $D_n$. Next, photometric imaging is used to find the apparent angular diameter $\theta_n$ on the sky where the surface brightness threshold is met. Finally, the physical distance to the galaxy is simply determined from the ratio of the physical diameter to the observed angular diameter.
 
+\section{Luminosity Function of Galaxies}
 
+The luminosity function $\Phi(L)$ (or $\Phi(M)$), specifies the statistical distribution of a given class of celestial objects with respect to their intrinsic luminosity or absolute magnitude. More precisely, the luminosity function defines the number density of galaxies at a specific luminosity.
 
+The total number density of galaxies in a given volume can be obtained by integrating the luminosity function over all possible luminosities or magnitudes:
+$$
+\nu = \int_{-\infty}^{\infty} \Phi(M) \, dM = \int_0^\infty \Phi(L) \, dL
+$$
 
+Deriving an accurate luminosity function observationally involves several significant challenges:
+\begin{itemize}
+    \item \textbf{Distance Estimates:} essential to convert apparent magnitudes into absolute luminosities. This is easier for galaxies within a cluster, as they all share approximately the same distance. For isolated galaxies, however, it requires measuring redshifts and assuming a cosmological model.
+    \item \textbf{Large Scale Structure:} The Universe is not perfectly homogeneous on small scales. To obtain a statistically representative sample of the galaxy population, the survey must encompass a sufficiently large volume to average out local cosmic voids and superclusters.
+    \item \textbf{Malmquist Bias:} In any flux limited survey, highly luminous galaxies will always be systematically overrepresented. Because they are intrinsically brighter, they can be observed out to much larger distances and thus sampled over a much larger volume than faint dwarf galaxies.
+\end{itemize} 
 
+\subsection{The Schechter Luminosity Function (General Luminosity Function)}
 
+Over the decades, astronomers have developed analytical formulas to fit the observed distributions of mass and light. In 1974, Press and Schechter developed a theoretical mass function for dark matter halos. Later, in 1976, Schechter proposed a highly successful empirical formula for the luminosity function of galaxies. 
 
+The \textbf{Schechter Luminosity Function} describes a power law distribution at faint luminosities combined with a rapid exponential cutoff at high luminosities:
+$$
+\Phi(L) \, dL = \left( \frac{\Phi^*}{L^*}\right) \left( \frac{L}{L^*} \right)^{\alpha} e^{-\left( \frac{L}{L^*} \right)} \frac{dL}{L^*}
+$$
+This function relies on three fundamental parameters:
 
+\begin{minipage}{0.55\textwidth}
+\begin{itemize}
+    \item \textbf{$\Phi^*$:} The normalization constant. It dictates the overall number density of galaxies.
+    \item \textbf{$L^*$ (or $M^*$):} The characteristic luminosity. It represents the "knee" of the function, separating the low luminosity power law behavior from the high luminosity exponential drop off.
+    \item \textbf{$\alpha$:} The faint end slope parameter. It is typically negative ($\alpha \sim -1$), indicating that the number density continues to rise as luminosity decreases.
+\end{itemize}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.42\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{assets/schechter.png}
+    \end{minipage}
 
+\vspace{-0.5em}
 
+\begin{exampleblock}[Empirical Fits in K and B Bands]
+The parameters of the Schechter function vary depending on the observed wavelength band.
 
+\begin{itemize}
+\item For the optical \textbf{B band} (where $h$ is the dimensionless Hubble parameter):
+
+\vspace{-0.5em}
+
+$$
+\Phi^*_B = 1.6 \times 10^{-2} \, h^3 \, \mathrm{Mpc}^{-3}
+$$
+
+\vspace{-0.8em}
+
+$$
+M^*_B = -19.7 + 5 \log_{10} h \quad \Rightarrow \quad L^*_B = 1.2 \times 10^{10} \, h^{-2} \, L_{\odot, B}
+$$
+The faint end slope in the B band is typically found to be $\alpha_B \approx -1.07$.
+
+\item For the near infrared \textbf{K band}:
+
+\vspace{-0.5em}
+
+$$
+\Phi^*_K = 1.6 \times 10^{-2} \, h^3 \, \mathrm{Mpc}^{-3}
+$$
+
+\vspace{-0.8em}
+
+$$
+M^*_K = -23.1 + 5 \log_{10} h
+$$
+The faint end slope here is slightly shallower, around $\alpha_K \approx -0.9$.
+\end{itemize}
+\end{exampleblock}
+
+Using the Schechter function, we can calculate total integrated quantities for a given volume. The total luminosity density (the sum of all light emitted by all galaxies) is given by:
+$$
+L_{\mathrm{tot}} = \int_0^\infty L \, \Phi(L) \, dL = \Phi^* L^* \, \Gamma(2 + \alpha), \qquad \text{where } \Gamma = \int_0^\infty dy y^{x-1}e^{-y}
+$$
+For the total luminosity to be finite and physically meaningful, the integral requires $\alpha > -2$. Interestingly, the majority of the light in the Universe is produced by galaxies with luminosities near $L^*$. Specifically, $60\%$ of the total luminosity is emitted by galaxies in the range $0.22 L^* < L < 1.6 L^*$, and $90\%$ is contained within the bounds $0.1 L^* < L < 2.3 L^*$.
+
+Similarly, we can calculate the total number density of galaxies:
+$$
+N_{\mathrm{tot}} = \int_0^\infty \Phi(L) \, dL = \Phi^* \, \Gamma(1 + \alpha)
+$$
+This integral diverges (becomes infinite) if $\alpha \leq -1$. Since observational fits often yield $\alpha \approx -1$, the implication is that the Universe contains an enormous number of extremely faint dwarf galaxies.
+
+\medskip
+
+The typical number density normalization for field galaxies is $\Phi^* \sim 2 \times 10^{-2} \mathrm{Mpc}^{-3}$, which corresponds to an average separation between galaxies of $\sim4 \mathrm{Mpc}$. However, in dense region the density is much higher than in the isolated field, reducing theis distance to roughly $1$ to $2 \mathrm{Mpc}$.
+
+\subsection{Luminosity Functions by Morphological Type}
+
+The global Schechter function is actually a composite; it arises from summing the individual luminosity distributions of different morphological galaxy classes, each of which deviates slightly from the pure Schechter form.
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/specific-L.png}
+    \vspace{-0.5em}
+    \caption{Luminosity function for different Hubble types of field galaxies (left) and Virgo Cluster galaxies (right). The total Schechter luminosity function arises from summing the contribute of distinct galaxy types. In clusters, dwarf ellipticals (dEs) dominate at faint magnitudes, while giant ellipticals and S0s make a much stronger contribution at the bright end than in the field.}
+    \label{fig:specific-LF}
+\end{figure}
+
+\vspace{-1em}
+
+The distribution of morphological types is strongly dependent on environment. As illustrated in \cref{fig:specific-LF}, the bright end of the luminosity function shows that, in the local field, moderate to high luminosities are dominated by normal spiral galaxies (Sa, Sb, Sc), with only a small contribution from ellipticals (E) and lenticulars (S0). In contrast, in the Virgo cluster, massive ellipticals and S0 galaxies clearly dominate at the bright end, with spirals playing a much more subdominant role. At the faint end, both environments are rich in irregular (Irr) and dwarf elliptical (dE) galaxies. However, the number of dwarf ellipticals in clusters is dramatically enhanced compared to the field.

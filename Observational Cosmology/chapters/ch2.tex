@@ -1,61 +1,249 @@
-\chapter{ISM} % ... + Lecture 09/03/2026
+\chapter{Active Galactic Nuclei} \label{ch:agn}
 
-% missing previous lecture 
+\section{AGN Basics} \label{sec:agn_basics}
 
-\section{ISM: Hot Ionized Medium}
+\subsection{Historical Overview} \label{sec:agn_history}
 
-The HIM is primarily created and energized by SN and the intense radiation from High-mass stars.
+The recognition of active galactic nuclei (AGN) as a distinct astrophysical phenomenon came well before the development of a theoretical framework to explain them. In 1908, Fath detected strong emission lines of H, O, and Ne in the nucleus of NGC\textasciitilde{}1068, years before general relativity and before nebulae were recognized as extragalactic. Slipher (1917) observed unusually broad lines, and Curtis (1918) noted a “curious straight ray” from M87's nucleus: an early observation of a relativistic jet. Following Hubble's confirmation (1924-1929) that these nebulae are distant galaxies, Seyfert's 1943 study identified galaxies with bright nuclei and broad emission lines, introducing the class now called \textbf{Seyfert galaxies}. The later discovery of luminous radio sources with high-redshift, point-like optical counterparts, culminating with Schmidt's 1963 measurement of $z=0.158$ for 3C\textasciitilde{}273, showed that some nuclei (\textbf{quasars}) can outshine their host galaxy. By the mid-1960s, Salpeter and Zel'dovich \& Novikov proposed accretion onto a compact massive object as the energy source, and Lynden-Bell (1968) suggested many galactic nuclei may harbor dormant quasars. Thereafter, AGN became a major and rapidly growing field in extragalactic astrophysics.
 
-Hottest phase of the interstellar cycle, following the "Stardust injection” from stellar deaths.
+\medskip
 
-HIM properties:
+Nuclear activity is not a rare curiosity restricted to a handful of exotic objects: it is a phase, or a level of activity, that a large fraction of massive galaxies experience. In the local Universe, only about $10^{-6}$ of massive galaxies host a luminous quasar, but roughly $5\%$ display the moderate luminosities characteristic of Seyfert galaxies, and as many as $30\%$ show some sign of low-level nuclear activity. This distribution already hints at a central theme of the subject: AGN activity spans an enormous dynamic range, from barely-detectable accretion (such as that seen in the Milky Way's own supermassive black hole, Sgr\textasciitilde{}A*) up to quasars that outshine their entire host galaxy.
 
-\begin{itemize}
-    \item density: $\sim 10^{-3}$ cm$^{-3}$
-    \item temperature: $\sim 10^6$ K — almost completely ionized gas
-    \item thermal velocities: 100 km/s
-    \item complex kinematics
-    \item gas tracer: X-rays, high-ionization absorption lines: OVI, CIV, NV etc. (far UV)
-    \item Occupies $\sim$50\% of the volume of the ISM
-    \item The vertical scale height of this gas is $\sim$3 kpc, so it is sometimes referred to in the literature as the hot "corona" of the galaxy
-    \item This hot gas is often buoyant and appears as bubbles, with characteristic dimensions of $\sim$20 pc, and fountains high above and below the disk.
-    \item The gas is collisionally ionized and cools — primarily through adiabatic expansion and X-ray emission — on $\sim$Myr timescales
-\end{itemize}
+\subsection{Seyfert Galaxies} \label{subsec:seyfert}
 
-\section{ISM: Warm Ionized Medium}
 
-Warm ionized medium (WIM) or Diffuse ionized gas (DIG) properties:
+\begin{minipage}{0.58\textwidth}
+Seyfert galaxies are peculiar spiral galaxies characterised by a bright, compact nucleus and strong, broad permitted emission lines. The presence of these lines signals an ionisation level of the gas well in excess of what is produced in ordinary star-forming HII regions, indicating that the gas is photoionised by a harder, more luminous radiation field than that of young stars. Crucially, the lines can reach FWHM in excess of $1000\,\text{km/s}$, far broader than the typical stellar velocities in a galaxy (a few hundred km/s); by Doppler broadening, this implies gas moving at high velocity in close proximity to a compact, massive central object. Many Seyferts additionally display a strong UV continuum with a characteristic UV excess, known as the \bfit{big blue bump}, superposed on the underlying stellar continuum of the host galaxy.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/seyfert_vs_normal.png}
+    \captionof{figure}{Comparison of a Seyfert nucleus spectrum against the bulge of a normal galaxy.}
+    \label{fig:seyfert_spectrum}
+\end{minipage}
 
-\begin{itemize}
-    \item density: $\sim 0.2$ cm$^{-3}$
-    \item temperature: $\sim 10^4$ K
-    \item Ionized by photons escaping from HII regions
-    \item Constitutes $\sim$90\% of all ionized hydrogen mass in the Galaxy ($\sim 10^9$ M$_\odot$)
-    \item Fills $\sim$20\% of the ISM volume
-    \item Transition Phase: It sits between the high-energy HIM and the cooler Diffuse Clouds
-    \item Produces a faint, pervasive H$\alpha$ emission — red visible light that occurs when electrons recombine with hydrogen nuclei in "warm" gas — seen in every direction across the sky
-    \item In other galaxies, observed as discrete loops filaments, and shell not directly associated with HII regions
-    \item The DIG accounts for 30-50\% of the total H$\alpha$ emission of each galaxy 
-    \item The H$\alpha$ intensity is measured across different frequency channels to understand the range of velocities caused by the Doppler effect.
-\end{itemize}
+\medskip
 
-\section{How do we observe the ISM}
+Not every Seyfert nucleus is directly visible, however. In NGC\textasciitilde{}1068, the nucleus itself is completely hidden behind dense clouds of gas and dust, yet a cone-shaped region of highly ionised gas extends outward from the nuclear region, carved out and illuminated by radiation escaping preferentially along directions unobstructed by the surrounding material. This kind of \textbf{obscuration} anticipates one of the central themes developed later in this chapter: much of the diversity observed among AGN classes can be understood as an orientation effect, in which the same underlying object appears different depending on the viewing angle relative to an obscuring structure.
 
-The main idea is to decompose the observed emission into different wavelength bands.
+\section{Observational Properties of AGN} \label{sec:agn_obs_properties}
 
-\begin{itemize}
-    \item \textbf{Radio continuum}: Synchrotron radiation from relativistic electrons (accelerated by SN shocks and pulsars) spiraling in the ~pG galactic magnetic field
-    \item \textbf{Atomic hydrogen (21cm)}: HI neutral atomic hydrogen, hyperfine transition
-    \item \textbf{Radio continuum (2.5 GHz)}: Synchrotron + bremsstrahlung (free-free) from supernova remanants and hot gas
-    \item \textbf{Molecular hydrogen (CO)}: Traces molecular gas in the Galactic plane
-    \item \textbf{Far Infrared}: Thermal emission from dust — heated by old stars (diffuse "cirrus") or by young
-    massive stars in molecular clouds
-    \item \textbf{Mid Infrared}: PAH emission lines from polycyclic aromatic hydrocarbons in the diffuse dust
-    \item \textbf{Near Infrared}: Emission from old stars (main sequence + giants) with little dust absorption
-    \item \textbf{Optical}: Emission from stars with dust absorption
-    \item \textbf{X-ray}: X-ray binaries + diffuse hot gas; some absorption by neutral hydrogen
-    \item \textbf{Gamma-ray}: Compact sources + gamma-ray photons from cosmic ray collisions with
-    diffuse gas
-\end{itemize}    
+Despite their diversity, AGN share a set of defining observational characteristics: an extremely broad range of luminosities, strong and broad emission lines, emission spanning the full electromagnetic spectrum, pronounced variability, and, in a subset of sources, powerful collimated particle jets. Together these properties constrain the physical picture developed in the rest of this chapter.
 
-%todo: last slide
+\subsubsection{Luminosity Range} \label{subsec:agn_luminosity}
+
+AGN luminosities span more than nine orders of magnitude, from the intermittent, very low-level activity seen in Sgr\textasciitilde{}A*, up to the most luminous quasars known, which can outshine their host galaxy by factors of $100$-$1000$ and remain detectable out to high redshift. There is no strict lower limit to AGN luminosity: at the faint end, the distinction between an "active" and a "normal" galactic nucleus becomes largely semantic, since the observed properties do not separate into two cleanly distinct populations but instead form a continuous sequence. At the bright end, in contrast, there does appear to be a genuine maximum observed luminosity, suggesting that the most luminous quasars observed are close to representative of the most extreme objects that exist.
+
+
+\medskip
+
+\begin{minipage}{0.57\textwidth}
+    \subsubsection{Emission Lines} \label{subsec:agn_lines}
+
+The strong, broad optical and UV emission lines seen in AGN spectra indicate the presence of ionised nebular gas photoionised by the bright central source. Because the observed line widths substantially exceed the thermal broadening expected at the gas temperatures involved, the excess width must be attributed to Doppler broadening from bulk gas motions, with velocities reaching as high as ${\sim}\,25\,000\;\text{km/s}$ in the most extreme cases.
+
+Stacked AGN spectra reveal two distinct line populations, pointing to a stratified structure of ionised gas within the nuclear region. \bfit{Broad lines} (BLs), such as the Balmer series, He\,I, and He\,II, but notably \emph{not} the forbidden lines, originate in dense, compact regions close to the central source, since forbidden transitions are collisionally suppressed at high densities. \bfit{Narrow lines} (NLs), such as [OIII] and [NII], instead arise in a more extended, lower-density region farther from the nucleus, where forbidden-line emission is not quenched.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.41\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/agn_stacked_spectrum.png}
+    \captionof{figure}{\textbf{Top:} Stacked AGN spectra from SDSS \cite{Vanden_Berk_2001}, showing broad and narrow emission lines. \textbf{Bottom:} Zoom-in on the optical region, detailing strong permitted and forbidden lines.}
+    \label{fig:agn_stacked_spectrum}
+\end{minipage}
+
+\medskip
+
+Measured gas-phase abundances in the line-emitting regions are typically close to solar, or mildly super-solar, though such measurements remain observationally challenging. In some AGN, the spectrum additionally shows blue-shifted \textbf{absorption} lines, sometimes very broad (velocities of order $10^3$--$10^4\,\text{km/s}$), which reveal the presence of outflowing, absorbing gas along the line of sight.
+
+
+\begin{minipage}{0.58\textwidth}
+\subsubsection{Broad-Band Continuum Emission} \label{subsec:agn_broadband}
+
+Unlike normal galaxies, whose spectral energy distribution peaks in the optical, tracing the blackbody emission of their stellar populations, AGN emit across more than ten orders of magnitude in frequency, from the radio to gamma rays, with a spectrum that is typically much flatter than a stellar continuum.
+
+\smallskip
+
+Roughly $10\%$ of AGN are \bfit{radio loud}, displaying strong radio emission, while the remaining ${\sim}\,90\%$ are \bfit{radio quiet}; this radio loud/radio quiet dichotomy is closely tied to the presence or not of a powerful particle jet.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/broad_band.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Broad-band spectral energy distribution of a Seyfert galaxy compared to a normal galaxy.}
+    \label{fig:agn_sed}
+\end{minipage}
+
+\vspace{-0.5em}
+
+\subsubsection{Variability} \label{subsec:agn_variability}
+
+\vspace{-0.5em}
+
+\begin{minipage}{0.56\textwidth}
+AGN continua vary on essentially all timescales, and the variability is generally chaotic, without a well-defined period, as illustrated by a century of photometric monitoring of 3C\textasciitilde{}273. The variability is coherent across wavelengths, but its amplitude and characteristic timescale both increase toward higher frequencies: in the X-ray band, flux variations are observed on timescales as short as minutes.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.41\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/agn_variability.png}
+    \captionof{figure}{100-year light curve of 3C 273}
+    \label{fig:agn_variability}
+\end{minipage}
+
+\begin{observationblock}[Variability and source size]
+A characteristic time variable $\tau$ places an upper limit on the physical size of the emitting region, since no causal signal can traverse a region faster than the light-crossing time:
+$$
+R \lesssim c\,\tau .
+$$
+X-ray variability on timescales of minutes therefore implies an emitting region only light-hours across (or smaller), remarkably compact given the enormous luminosities involved, and among the strongest lines of evidence that AGN power output originates from accretion onto a compact object rather than from any distributed stellar process.
+\end{observationblock}
+
+\begin{minipage}{0.55\textwidth}
+Not only the continuum, but also the broad emission lines vary, generally tracking the continuum variations but with a measurable time lag. Because the broad-line region and the continuum-emitting region are physically distinct, this lag has a purely geometric origin: it reflects the light-travel time between the two regions. 
+
+This is the basis of the \bfit{reverberation mapping} technique, in which the observed lag between continuum and emission-line light curves is used to infer the size of the broad-line region, and, combined with the line width (via the virial theorem), the mass of the central black hole.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/agn_lag.png}
+    \vspace{-0.5em}
+
+    \captionof{figure}{H$\beta$ emission-line and optical continuum in Mrk 335 vs.\ time, showing a 15.6-day lag of line behind continuum.}
+    \label{fig:agn_lag}
+\end{minipage}
+
+\subsubsection{Particle Jets} \label{subsec:agn_jets}
+
+Roughly $10\%$ of AGN, the radio-loud population introduced in \cref{subsec:agn_broadband}, launch powerful, collimated particle jets that extend from parsec up to megaparsec scales. These jets produce strong, linearly polarised radio emission through synchrotron radiation, and are also detected in the optical, in X-rays (via inverse Compton scattering of ambient photons off the relativistic jet electrons), and, in sources where the jet points close to the line of sight (\textbf{blazars}), in gamma rays.
+
+\smallskip
+
+\begin{center}
+    \centering
+        \includegraphics[width=0.5\textwidth]{assets/agn_jet.png}
+    \hfill
+        \includegraphics[width=0.48\textwidth]{assets/agn_feedback.png}
+    \captionof{figure}{
+        \textbf{Left:} Multi-wavelength view of a jetted AGN, showing the jet and lobe structure in visible, X-ray, infrared, and radio light.
+        \textbf{Right:} Illustration of AGN feedback: jets and outflows influencing the surrounding gas in a host galaxy cluster.
+    }
+    \label{fig:agn_jet_feedback}
+\end{center}
+
+\smallskip
+
+Beyond their role as a signpost of nuclear activity, jets are cosmologically significant: they inject enormous amounts of energy, of order $10^{58}$--$10^{61}\,\text{erg}$, into the interstellar and intracluster medium via their radio lobes, regulating star formation in the host galaxy (\textbf{AGN feedback}) and shaping the broader evolution of the galaxy and its environment. Interaction with the surrounding medium can imprint characteristic morphological patterns on the jet, as seen in "radio trail" sources such as NGC\textasciitilde{}1265 in the Perseus cluster; the long-term stability of the jet direction in such systems implies the presence of a stable central "gyroscope" (naturally identified with the spin axis of the central black hole) that keeps the jet pointing fixed over very long timescales.
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=0.25\textheight]{assets/agn_jet_ism.png}
+    \hspace{0.5em}
+    \includegraphics[height=0.25\textheight]{assets/cosmic_skywriting.png}
+
+    \caption{
+        \textbf{Left:} Radio image of a jet from an AGN, showing clear interaction between the jet and the surrounding interstellar medium.
+        \textbf{Right:} Radio image showing \emph{``cosmic skywriting''}, where features within the AGN jet trace out apparent curved or helical paths in high-resolution VLBI images, revealing jet dynamics and interactions with the environment.
+    }
+    \label{fig:cosmic_skywriting}
+\end{figure}
+
+
+\subsubsection{Apparent superluminal motion}
+
+High-resolution VLBI monitoring of jetted AGN, such as the jet in M87, frequently reveals individual emission knots that appear to move across the sky at apparent transverse speeds \emph{exceeding} the speed of light. This is not a violation of special relativity, but a geometric projection effect that arises whenever emitting material moves at relativistic speed nearly along the line of sight.
+
+Consider a blob of plasma moving with speed $v$ at an inclination angle $\theta$ to the line of sight. In an observer time interval $t$ (measured in the source's rest frame, i.e.\ neglecting cosmological redshift), the blob travels a physical distance $v t$, with a component
+$$
+\Delta x = v\,t\,\sin\theta
+$$
+projected on the plane of the sky, and a component $vt\cos\theta$ directed toward the observer. Because the blob approaches the observer as it moves, the light emitted at the end of the interval has less distance to travel than the light emitted at the start; the interval between the two arrival times is correspondingly compressed to:
+
+\medskip
+
+\begin{minipage}{0.54\textwidth}
+    $$
+    \Delta t_{\text{obs}} = t \left(1 - \frac{v}{c}\cos\theta \right) .
+    $$
+    \vspace{0pt}
+    The \bfit{apparent transverse velocity} inferred by the observer, who does not know the true light-travel-time correction, is then
+    $$
+    v_{\text{app}} = \frac{\Delta x}{\Delta t_{\text{obs}}} = \frac{v \sin\theta}{1 - (v/c)\cos\theta} .
+    $$
+    This expression can exceed $c$ for suitable combinations of $v$ and $\theta$: for a fixed speed $v$, $v_{\text{app}}$ is maximised at $\cos\theta \approx v/c$, where it reaches $v_{\text{app}}^{\max} \approx \gamma v$, with $\gamma$ the bulk Lorentz factor of the flow. The effect therefore grows both with the true jet speed and with increasing alignment between the jet and the line of sight.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.44\textwidth}
+    \centering
+    \vspace{-1em}
+    \includegraphics[width=\textwidth]{assets/agn_v-app.png}
+
+    \vspace{-0.5em}
+    \captionof{figure}{ Apparent transverse velocity $v_{\text{app}}$ versus viewing angle $\theta$ for several values of the intrinsic jet speed $v$. $v_{\text{app}}$ may exceed $c$ for small $\theta$ and relativistic speeds.
+    }
+    \label{fig:agn_v_app}
+\end{minipage}
+\medskip
+
+For the M87 jet, VLBI observations show a knot with viewing angle $\theta \approx 14^\circ$, angular displacement $\varphi = 30.6$\,mas over an observed time interval $\delta t' = 2$\,yr. 
+
+Converting the angular displacement into a projected physical distance at the distance of M87 ($D_L \approx 54\times10^6$\,ly) gives $D' \approx 8.01$\,ly, so that the naively inferred transverse speed is:
+\medskip
+
+\begin{minipage}{0.49\textwidth}
+$$
+v'_{\text{app}} = \frac{D'}{\delta t'} \approx 4\,c .
+$$
+Inverting the superluminal-motion relation for the true speed,
+$$
+v = \frac{v'_{\text{app}}}{\sin\theta + (v'_{\text{app}}/c)\cos\theta} \approx 0.97\,c ,
+$$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.49\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/superluminal.png}
+\end{minipage}
+\medskip
+
+recovers a physically sensible, sub-luminal jet speed once the light-travel-time geometry is correctly accounted for; the true light-crossing time for this ejection event, correspondingly, is $\delta t \approx 66.7$\,yr, much longer than the apparent $2$\,yr inferred at face value.
+
+\section{Radiation Mechanism} \label{sec:agn_radiative_mechanism}
+
+The origin of the extraordinary luminosity of AGN lies in a unique radiative mechanism, which is revealed by a set of distinct observational signatures. The extreme compactness of the emitting regions, inferred from rapid variability on timescales as short as days or even hours, indicates that the source is no larger than a few light-days or light-hours across. Furthermore, the presence of strongly collimated, relativistic jets in some AGN demonstrates that plasma is being launched at nearly the speed of light, often extending up to kiloparsec scales. 
+
+Spectroscopic observations reveal that emission lines and dynamical tracers originate from gas bound within tens of astronomical units from the nucleus, pointing again to an extremely compact and energetic central region. The sheer radiative power observed in AGN, which can easily surpass $10^{47}\,\mathrm{erg/s}$, cannot be explained by stellar processes or nuclear fusion alone. Instead, such high luminosities require the accretion of matter onto a massive, compact object with immense gravitational potential---specifically, a supermassive black hole. In fact, the efficiency with which gravitational accretion can convert matter into energy ($\epsilon \sim 0.1$ for typical scenarios, and up to even larger values for rapidly spinning Kerr black holes) is far greater than that of nuclear fusion, making this process vastly more effective at powering the observed emission.
+
+Other observational clues include the detection of broad and strong emission lines from highly ionised gas very close to the compact source, and the remarkable breadth of the spectral energy distribution, which typically spans the entire electromagnetic spectrum from radio up to gamma rays. Finally, AGN emission is notably variable and unstable across all wavelengths, a hallmark of the dynamic, and often chaotic, physical processes at play in the accreting material.
+
+\subsection{Black Hole + Accretion Disk Model} \label{subsec:agn_bh_disk}
+
+The prevailing physical model for AGN envisions a supermassive black hole surrounded by an accretion disk. As gas spirals inward within the disk, viscous processes convert gravitational potential energy into heat, fueling intense electromagnetic emission. This process is fundamentally distinct from stellar energy generation, as the gravitational binding energy per unit mass released as material accretes onto a black hole dramatically exceeds what is achievable by conventional nuclear burning.
+
+For a non-rotating (Schwarzschild) black hole, there exists a theoretical maximum to the luminosity that can be sustained before radiation pressure halts further accretion. This threshold, known as the Eddington limit, is given by
+\begin{equation}
+    L_\mathrm{Edd} = \frac{4\pi G M m_p c}{\sigma_\mathrm{T}} \approx 1.3 \times 10^{38} \left( \frac{M}{M_\odot} \right)\, \mathrm{erg\,s}^{-1}
+\end{equation}
+where $\sigma_\mathrm{T}$ is the Thomson cross-section, $M$ is the black hole mass, and $M_\odot$ is the solar mass. At this luminosity, the outward radiation pressure on ionised hydrogen balances gravity, establishing a maximum steady-state accretion luminosity.
+
+The corresponding critical accretion rate required to reach $L_\mathrm{Edd}$ is
+\begin{equation}
+    \dot{M}_\mathrm{Edd} = \frac{L_\mathrm{Edd}}{\epsilon c^2}
+\end{equation}
+where $\epsilon$ is the radiative efficiency, which depends on the black hole spin and typically ranges from about $0.06$ for non-rotating black holes up to $0.42$ for maximally spinning ones.
+
+The bulk of the AGN’s radiative output emerges from the accretion disk itself, predominantly in the ultraviolet or soft X-ray bands, with the precise peak frequency set by the disk temperature and the mass of the black hole. Broad and narrow emission lines arise from gas clouds surrounding the disk, ionised by this intense radiation field. In many systems, part of the accreting material is not swallowed by the black hole, but instead is launched in powerful, relativistic jets that transport energy away from the nucleus and profoundly affect the host galaxy and its environment.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.55\textwidth]{assets/accretion.png}
+    \caption{Accretion disk model}
+\end{figure}
