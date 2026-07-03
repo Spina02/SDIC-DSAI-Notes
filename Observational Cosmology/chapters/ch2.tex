@@ -167,9 +167,9 @@ $$
 $$
 projected on the plane of the sky, and a component $vt\cos\theta$ directed toward the observer. Because the blob approaches the observer as it moves, the light emitted at the end of the interval has less distance to travel than the light emitted at the start; the interval between the two arrival times is correspondingly compressed to:
 
-\medskip
+\bigskip
 
-\begin{minipage}{0.54\textwidth}
+\begin{minipage}{0.48\textwidth}
     $$
     \Delta t_{\text{obs}} = t \left(1 - \frac{v}{c}\cos\theta \right) .
     $$
@@ -181,9 +181,8 @@ projected on the plane of the sky, and a component $vt\cos\theta$ directed towar
     This expression can exceed $c$ for suitable combinations of $v$ and $\theta$: for a fixed speed $v$, $v_{\text{app}}$ is maximised at $\cos\theta \approx v/c$, where it reaches $v_{\text{app}}^{\max} \approx \gamma v$, with $\gamma$ the bulk Lorentz factor of the flow. The effect therefore grows both with the true jet speed and with increasing alignment between the jet and the line of sight.
 \end{minipage}%
 \hfill
-\begin{minipage}{0.44\textwidth}
+\begin{minipage}{0.48\textwidth}
     \centering
-    \vspace{-1em}
     \includegraphics[width=\textwidth]{assets/agn_v-app.png}
 
     \vspace{-0.5em}
@@ -191,8 +190,10 @@ projected on the plane of the sky, and a component $vt\cos\theta$ directed towar
     }
     \label{fig:agn_v_app}
 \end{minipage}
-\medskip
 
+\bigskip
+
+\begin{exampleblock}[M87 apparent superluminal motion]
 For the M87 jet, VLBI observations show a knot with viewing angle $\theta \approx 14^\circ$, angular displacement $\varphi = 30.6$\,mas over an observed time interval $\delta t' = 2$\,yr. 
 
 Converting the angular displacement into a projected physical distance at the distance of M87 ($D_L \approx 54\times10^6$\,ly) gives $D' \approx 8.01$\,ly, so that the naively inferred transverse speed is:
@@ -215,35 +216,286 @@ $$
 \medskip
 
 recovers a physically sensible, sub-luminal jet speed once the light-travel-time geometry is correctly accounted for; the true light-crossing time for this ejection event, correspondingly, is $\delta t \approx 66.7$\,yr, much longer than the apparent $2$\,yr inferred at face value.
+\end{exampleblock}
 
-\section{Radiation Mechanism} \label{sec:agn_radiative_mechanism}
+\section{Black Hole + Accretion Disk Model} \label{sec:agn_bh_disk}
 
-The origin of the extraordinary luminosity of AGN lies in a unique radiative mechanism, which is revealed by a set of distinct observational signatures. The extreme compactness of the emitting regions, inferred from rapid variability on timescales as short as days or even hours, indicates that the source is no larger than a few light-days or light-hours across. Furthermore, the presence of strongly collimated, relativistic jets in some AGN demonstrates that plasma is being launched at nearly the speed of light, often extending up to kiloparsec scales. 
+As we have seen, the \textbf{radiative mechanism} powering AGN must explain a \textit{broad luminosity range} (up to $L \sim 10^{13}L_\odot$), the presence of \textit{collimated relativistic jets} on Mpc scales, and a remarkably \textit{stable central engine} (acting as a gyroscope over $\sim 10^7$\,yr). It must also account for the production of \textit{huge energy reservoirs} ($\Delta E \sim 10^{61}$\,erg) with \textit{high efficiency} ($\epsilon \sim 10\%$, much more than stellar fusion), \textit{strong and broad optical/UV emission lines}, \textit{emission across a wide spectral range}, and marked \textit{variability}. Taken together, these observations point to a \textbf{supermassive black hole surrounded by an accretion disk} as the most compelling explanation.
 
-Spectroscopic observations reveal that emission lines and dynamical tracers originate from gas bound within tens of astronomical units from the nucleus, pointing again to an extremely compact and energetic central region. The sheer radiative power observed in AGN, which can easily surpass $10^{47}\,\mathrm{erg/s}$, cannot be explained by stellar processes or nuclear fusion alone. Instead, such high luminosities require the accretion of matter onto a massive, compact object with immense gravitational potential---specifically, a supermassive black hole. In fact, the efficiency with which gravitational accretion can convert matter into energy ($\epsilon \sim 0.1$ for typical scenarios, and up to even larger values for rapidly spinning Kerr black holes) is far greater than that of nuclear fusion, making this process vastly more effective at powering the observed emission.
+\subsection{Eddington limit} \label{subsec:eddington_limit}
 
-Other observational clues include the detection of broad and strong emission lines from highly ionised gas very close to the compact source, and the remarkable breadth of the spectral energy distribution, which typically spans the entire electromagnetic spectrum from radio up to gamma rays. Finally, AGN emission is notably variable and unstable across all wavelengths, a hallmark of the dynamic, and often chaotic, physical processes at play in the accreting material.
+As gas in the disk gradually spirals inward toward the black hole, it emits radiation. If this radiation becomes intense enough, it generates outward pressure that can oppose and even limit the inflow of new material onto the black hole.
 
-\subsection{Black Hole + Accretion Disk Model} \label{subsec:agn_bh_disk}
-
-The prevailing physical model for AGN envisions a supermassive black hole surrounded by an accretion disk. As gas spirals inward within the disk, viscous processes convert gravitational potential energy into heat, fueling intense electromagnetic emission. This process is fundamentally distinct from stellar energy generation, as the gravitational binding energy per unit mass released as material accretes onto a black hole dramatically exceeds what is achievable by conventional nuclear burning.
-
-For a non-rotating (Schwarzschild) black hole, there exists a theoretical maximum to the luminosity that can be sustained before radiation pressure halts further accretion. This threshold, known as the Eddington limit, is given by
-\begin{equation}
-    L_\mathrm{Edd} = \frac{4\pi G M m_p c}{\sigma_\mathrm{T}} \approx 1.3 \times 10^{38} \left( \frac{M}{M_\odot} \right)\, \mathrm{erg\,s}^{-1}
-\end{equation}
-where $\sigma_\mathrm{T}$ is the Thomson cross-section, $M$ is the black hole mass, and $M_\odot$ is the solar mass. At this luminosity, the outward radiation pressure on ionised hydrogen balances gravity, establishing a maximum steady-state accretion luminosity.
-
-The corresponding critical accretion rate required to reach $L_\mathrm{Edd}$ is
-\begin{equation}
-    \dot{M}_\mathrm{Edd} = \frac{L_\mathrm{Edd}}{\epsilon c^2}
-\end{equation}
-where $\epsilon$ is the radiative efficiency, which depends on the black hole spin and typically ranges from about $0.06$ for non-rotating black holes up to $0.42$ for maximally spinning ones.
-
-The bulk of the AGN’s radiative output emerges from the accretion disk itself, predominantly in the ultraviolet or soft X-ray bands, with the precise peak frequency set by the disk temperature and the mass of the black hole. Broad and narrow emission lines arise from gas clouds surrounding the disk, ionised by this intense radiation field. In many systems, part of the accreting material is not swallowed by the black hole, but instead is launched in powerful, relativistic jets that transport energy away from the nucleus and profoundly affect the host galaxy and its environment.
-
-\begin{figure}[h]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.55\textwidth]{assets/accretion.png}
+    \includegraphics[width=0.75\textwidth]{assets/accretion.png}
     \caption{Accretion disk model}
 \end{figure}
+
+For a non-rotating (Schwarzschild) black hole, there is a natural upper 
+limit to its luminosity before radiation pressure pushes material away and 
+shuts off further accretion. This threshold is known as the \textbf{Eddington limit}. It arises when the outward force from radiation (which primarily acts on electrons, mass $m_e$) exactly balances the inward gravitational pull (which acts mainly on protons, mass $m_p$), since the two charges remain coupled via the Coulomb force and $m_p \gg m_e$:
+
+$$
+    F_{\text{rad}} = \frac{L \sigma_T}{4 \pi r^2 c} \qquad \text{and} \qquad F_{\text{grav}} = \frac{G M (m_p + m_e)}{r^2} \approx \frac{G M m_p}{r^2}
+$$
+
+Setting these forces equal gives the classic Eddington luminosity:ù
+
+$$
+    L_\mathrm{Edd} = \frac{4\pi G M m_p c}{\sigma_\mathrm{T}}
+$$
+
+where $M$ is the black hole mass, $\sigma_\mathrm{T}$ is the Thomson cross-section, and $c$ is the speed of light.
+
+\begin{tipsblock}[Eddington limit and BH mass]
+Crucially, the Eddington limit depends only on the black hole's mass: no matter how much infalling gas is available, a black hole cannot shine any brighter than this without radiation pressure stopping further accretion.
+\end{tipsblock}
+
+\subsection{Measuring Black Hole Masses} \label{subsec:agn_bh_mass}
+
+The accretion picture makes a sharp prediction: the compact object at the centre of an AGN should be a massive black hole, and this can be tested directly wherever the gravitational influence of the central mass can be resolved dynamically. The cleanest such case is our own Galactic nucleus, Sgr\textasciitilde{}A*, where individual stars can be tracked as they orbit the central dark mass.
+
+\begin{exampleblock}[The mass of Sgr A* from a stellar orbit]
+Over two decades, astronomers have tracked the orbits of stars very close to the center of the Milky Way. In particular, observations of the star S2 revealed it performs a close orbit around what we now know to be Sgr\textasciitilde{}A*, with measured orbital parameters: period $P \approx 15.8$\,yr, eccentricity $e \approx 0.87$, semi-major axis $a \approx 1025$\,AU, and a closest approach of about $125$\,AU.
+
+\smallskip
+
+Applying Kepler's third law to these measurements allows us to estimate the mass enclosed within S2's orbit:
+$$
+M = M_\odot \left(\frac{a}{1\,\text{AU}}\right)^3 \left(\frac{P}{1\,\text{yr}}\right)^{-2}.
+$$
+Using the observed values, this yields
+$$
+M = 4.3\times10^6\,M_\odot.
+$$
+This shows that several million solar masses are concentrated within a tiny region, providing strong evidence for a supermassive black hole at the center of the Galaxy.
+\end{exampleblock}
+
+\medskip
+
+Sgr\textasciitilde{}A* is a special case, since individual stellar orbits can only be resolved for the nearest supermassive black hole. For more distant AGN, several independent techniques are used instead, each probing a different physical scale and each subject to its own systematic uncertainties: 
+
+\begin{table}[h!]
+    \centering
+    \footnotesize
+    \begin{tabular}{p{4cm} c c c c}
+        \toprule
+        \textbf{Method \& Telescope} & 
+        \makecell{\textbf{Scale} \\ $(R_S)$} & 
+        \makecell{\textbf{No.\ of SBH} \\ \textbf{Detections}} & 
+        \makecell{$\mathbf{M}$ \textbf{Range} \\ $(M_\odot)$} & 
+        \makecell{\textbf{Typical Densities} \\ $(M_\odot\,\mathrm{pc}^{-3})$} \\
+        \midrule
+        
+        Fe K$\alpha$ line \newline (XEUS, ConX) 
+            & 3--10 
+            & 0 
+            & N/A 
+            & N/A \\
+        \addlinespace
+        Reverberation mapping \newline (Ground based optical) 
+            & 600 
+            & 36 
+            & $10^6 - 4 \times 10^8$ 
+            & $\gtrsim 10^{10}$ \\
+        \addlinespace
+        Stellar proper motion \newline (Keck, NTT, VLT) 
+            & 1000 
+            & 1 
+            & $4 \times 10^6$ 
+            & $4 \times 10^{16}$ \\
+        \addlinespace
+        H$_2$O megamasers \newline (VLBI) 
+            & $10^4$ 
+            & 1 
+            & $4 \times 10^7$ 
+            & $4 \times 10^9$ \\
+        \addlinespace
+        Gas dynamics (optical) \newline (Mostly \emph{HST}) 
+            & $10^6$ 
+            & 11 
+            & $7 \times 10^7 - 4 \times 10^9$ 
+            & $\sim 10^5$ \\
+        \addlinespace
+        Stellar dynamics \newline (Mostly \emph{HST}) 
+            & $10^6 - 10^7$ 
+            & 17 
+            & $10^7 - 3 \times 10^9$ 
+            & $\sim 10^5$ \\
+            
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of principal techniques for measuring supermassive black hole masses in galaxy nuclei. $R_S$ denotes the Schwarzschild radius \cite{Ferrarese}. Where the number of SBH detections is 1, this indicates that the method can currently be applied only to the supermassive black hole in our own Galaxy.}
+    \label{tab:bh_mass_methods}
+\end{table}
+
+\subsection{Spectral Energy Distribution of an AGN}
+
+The spectral energy distribution (SED) of an active galactic nucleus (AGN) spans the entire electromagnetic spectrum, with distinct components dominating different bands.
+
+\smallskip
+
+\begin{minipage}{0.52\textwidth}
+\begin{itemize}
+    \item \textbf{Accretion Disk:} Thermal optical/UV emission from hot gas near the BH ("big blue bump").
+    \item \textbf{Hot Corona:} Tenuous plasma above the disk, up-scatters photons to X-rays.
+    \item \textbf{Soft X-ray Excess:} Extra soft X-rays, likely from disk reflection or a cooler corona.
+    \item \textbf{Reflection:} X-rays reflected off disk or torus yield a broad Fe K$\alpha$ line and a hard X-ray hump.
+    \item \textbf{Dusty Torus:} Circumnuclear dust absorbs high-energy light and re-emits in the IR.
+    \item \textbf{Non-thermal Radio:} Jets produce synchrotron radio/mm emission (strong in radio-loud AGN).
+    \item \textbf{Gamma Rays:} In blazars, jets aligned with us give a gamma-ray peak via inverse Compton.
+\end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/AGN_SED.png}
+    
+    \vspace{-0.5em}
+
+    \captionof{figure}{Schematic SED of an AGN, highlighting the main emission components}
+\end{minipage}
+
+\smallskip
+
+Together, these components create the characteristic multi-peaked SED, with the relative prominence of each feature varying between radio-loud and radio-quiet AGN.
+
+\subsubsection{The X-ray Corona} \label{subsec:agn_corona}
+
+A geometrically thin, optically thick accretion disk of the kind discussed above has a maximum temperature of only $T_{\max}\sim10^5$\,K, and therefore cannot by itself account for the strong X-ray emission observed in essentially all AGN. Producing X-rays instead requires a separate, much hotter component: a \bfit{corona} of tenuous, magnetised plasma with a temperature of order $100$-$150$\,keV that surrounds the inner disk. Soft UV/optical seed photons from the disk are repeatedly Compton up-scattered by the hot corona electrons, generating a hard power-law continuum extending into the X-ray band.
+
+\begin{minipage}{0.5\textwidth}
+    The precise geometry of the corona (whether it sandwiches the disk, forms a compact "lamppost" above the black hole, or is instead associated with the base of a jet) remains an open question, and its properties cannot yet be predicted from first principles.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \vspace{-0.5em}
+
+    \includegraphics[width=\textwidth]{assets/agn_corona.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Illustration of AGN corona.}
+\end{minipage}
+
+AGN X-ray light curves rarely show periodic or quasi-periodic behaviour; instead, their variability is best characterised statistically through the \textbf{power spectral density} (PSD) of the light curve, which describes how variability power is distributed across timescales. The PSD is well described by a broken power law, with a characteristic break timescale of order $0.1$-$100$\,days that reflects a genuine physical timescale within the accretion flow. Because this break frequency scales systematically with black hole mass, it provides an independent, purely timing-based proxy for $M_{\text{BH}}$.
+
+\subsection{Obscuration and Radiation Reprocessing} \label{subsec:agn_obscuration_reprocessing}
+
+Much of the accretion disk and corona emission (optical, UV, and soft X-ray) is intercepted before it can escape freely, by circumnuclear gas and dust often envisioned as a geometrically thick \bfit{torus}. This absorbed radiation is not lost: it heats the dust grains, which re-radiate the energy thermally as "waste heat" in the infrared, so that the torus dominates the mid-infrared portion of the AGN spectral energy distribution. \todo{Insert figure: schematic AGN SED decomposed into accretion disk, hot corona, reflection, soft excess, dusty torus, and non-thermal radio components (radio-loud vs.\ radio-quiet), from the lecture slides.}
+
+\subsection{Particle Jets from the Accretion Flow} \label{subsec:agn_jets_disk}
+
+The same accreting, spinning supermassive black hole that powers the disk and corona is also a natural engine for launching the relativistic jets described in \cref{subsec:agn_jets}. Black hole accretion supplies the necessary ingredients: an enormous energy reservoir that can be tapped with high efficiency, relativistic bulk motions, strong magnetic fields threading the orbiting plasma (the same fields invoked to heat the corona), and a rotating compact object that acts as a stable "gyroscope," fixing the jet direction over very long timescales. Magnetohydrodynamic (MHD) processes are generally invoked to divert part of the inflowing plasma outward and collimate it into a jet, but exactly how the black hole spin, the magnetic field configuration, and the properties of the surrounding environment combine to determine whether a strong jet is launched at all remains poorly understood, and is an active area of numerical and theoretical research.
+
+\section{Finding AGN Across the Electromagnetic Spectrum} \label{sec:agn_finding}
+
+Since the different components of the unified picture developed above (disk, corona, torus, jet) each dominate a different part of the spectrum, AGN can be selected using observational signatures in essentially any waveband. No single method is complete, however, and each carries its own selection effects and biases; the most reliable AGN census is therefore obtained by combining several independent techniques and cross-checking the results.
+
+\medskip
+
+In the \textbf{optical and UV}, quasars can be identified up to $z\sim2.5$ as point sources with a distinctive \bfit{UV excess} relative to the colours of normal stars, since the accretion disk contributes a hard blue continuum absent in stellar photospheres; this is the basis of large surveys such as the SDSS quasar catalogue (SDSS-IV/eBOSS DR16), which contains around $750\,000$ spectroscopically confirmed quasars spanning $z\approx0.1$ to $z\approx6$. Beyond $z\sim2$-$2.5$, however, absorption by the intergalactic medium reddens the observed spectrum, and this method becomes increasingly biased toward unobscured sources; at low AGN luminosity, contaminating light from the host galaxy poses a further difficulty. A complementary optical diagnostic uses line ratios of strong narrow lines (the Baldwin, Phillips \& Terlevich, or \bfit{BPT}, diagram of $[\text{O\,\textsc{iii}}]/\text{H}\beta$ against $[\text{N\,\textsc{ii}}]/\text{H}\alpha$) to separate galaxies photoionised by young stars from those ionised by an accreting black hole.
+
+\medskip
+
+Because almost all AGN are strong \textbf{X-ray} emitters, X-ray selection largely avoids dust obscuration and maximises the contrast between the nuclear source and the host-galaxy starlight, making it effective at finding both obscured and intrinsically low-luminosity AGN that would be missed in optical/UV surveys; the ROSAT and Chandra deep surveys, and more recently eROSITA (which detected close to a million X-ray sources in its first all-sky pass, resolving roughly $20\%$ of the cosmic X-ray background), all confirm that AGN dominate the extragalactic X-ray sky. In the $\gamma$-ray band, only AGN whose relativistic jets point close to the line of sight (blazars) are typically bright enough to be detected; correspondingly, blazars make up the majority (${\sim}\,57\%$) of the identified sources in the Fermi-LAT catalogue.
+
+\medskip
+
+\textbf{Infrared} selection relies on the fact that accretion-disk radiation absorbed by the torus is thermally re-emitted as warm dust continuum, producing a characteristic power-law excess in the mid-infrared colours of AGN (as exploited, for instance, in \textit{WISE} and \textit{Spitzer}/IRAC colour-colour diagrams). This method is relatively insensitive to obscuration and can recover AGN missed even in X-ray surveys, though at low AGN luminosities it suffers substantial contamination from star-forming galaxies, whose dust is heated by young stars rather than by the AGN. Finally, \textbf{radio} selection exploits the non-thermal synchrotron emission from relativistic jets, which is physically distinct from any thermal process in normal galaxies and essentially free of stellar contamination or dust extinction; only about $10\%$ of AGN are radio-loud in this sense, however, so radio catalogues, while extremely reliable, are necessarily incomplete unless very deep, sensitive surveys are used to recover the radio-quiet majority.
+
+\section{The AGN Zoo} \label{sec:agn_zoo}
+
+The historical discovery of AGN through many independent observational channels, summarised in the preceding sections, has left behind a proliferation of overlapping classification schemes and names. A given object can, at least in part, be independently classified according to its \textbf{radio loudness} (radio-loud versus radio-quiet), its \textbf{optical/UV emission-line properties} (Type 1 versus Type 2, or Seyfert versus quasar), and its \textbf{variability and absorption-line properties}; luminosity is also frequently invoked, largely for historical reasons, although it is not a particularly fundamental axis of classification (Seyfert galaxies, for instance, are essentially just low-luminosity quasars).
+
+\medskip
+
+Among the \textbf{Seyfert galaxies} introduced in \cref{subsec:seyfert}, finer sub-classes are defined by the relative strength of the broad and narrow components of the Balmer lines: Sy1.2 sources show a strong broad component with only a weak narrow "cusp," Sy1.5 sources have comparable broad and narrow line strengths, and Sy1.8 sources show only a very weak (but still detectable) broad component. \bfit{Narrow-line Seyfert 1} (NLS1) galaxies are a distinct sub-population with unusually narrow permitted lines ($1000\,\text{km/s} \lesssim \text{FWHM} \lesssim 2000\,\text{km/s}$), often interpreted as systems accreting at a high fraction of the Eddington limit onto a relatively low-mass black hole. \bfit{LINERs} (Low-Ionisation Nuclear Emission-line Regions) are the low-ionisation analogue of Sy2 galaxies, characterised by unusually strong low-ionisation forbidden lines and generally representing the low-luminosity end of the AGN population.
+
+\medskip
+
+\textbf{Quasars} were first identified in 1960 as radio sources of stellar appearance (hence "quasi-stellar radio source"), and represent the highest-luminosity end of the AGN population, with $L_{\text{bol}}$ reaching $10^{44}$-$10^{48}\,\text{erg/s}$, often close to the Eddington limit; their luminosity typically outshines that of the host galaxy entirely, so that they appear as essentially point-like sources. As with Seyferts, quasars separate into Type 1 (unobscured, with strong broad lines and a UV/optical-bright appearance) and Type 2 (obscured by the torus, lacking broad lines, and correspondingly faint in the optical but bright in the infrared and X-ray).
+
+\medskip
+
+Extended, radio-loud AGN are further classified morphologically according to the \bfit{Fanaroff-Riley} (FR) scheme. \textbf{FR\,I} sources are brightest near the nucleus, with jets that fade and diffuse lobes at large distance, typically found in massive elliptical galaxies or cluster environments, and have radio power $L_{1.4\,\text{GHz}} < 10^{24.5}\,\text{W/Hz}$; \textbf{FR\,II} sources instead show highly collimated jets terminating in bright hotspots and well-defined lobes, are typically associated with powerful quasars, and exceed the same radio-power threshold. Notably, this dichotomy appears to reflect a combination of intrinsic jet power and the density of the surrounding external medium rather than a fundamentally different central engine.
+
+\medskip
+
+Finally, \bfit{blazars} are radio-loud AGN whose relativistic jet points close to the observer's line of sight, and are correspondingly characterised by extreme variability (hours to days), high polarisation, a flat radio spectrum, apparent superluminal motion (\cref{subsec:agn_lines}), and, in the most powerful sources, detectable $\gamma$-ray emission. \textbf{BL\,Lac objects} are a blazar sub-class with weak or entirely absent emission lines, while \textbf{Flat Spectrum Radio Quasars} (FSRQs) are blazars that retain strong, broad emission lines; the two are thought to correspond respectively to the low-power (FR\,I-like) and high-power (FR\,II-like) ends of the aligned radio-loud population.
+
+\section{The Unified Model} \label{sec:agn_unified}
+
+The bewildering variety of AGN classes catalogued above can be substantially reduced by recognising a single organising principle: much of the observed diversity of AGN phenomenology reflects \textbf{orientation} relative to a common, axisymmetric central engine, rather than genuinely distinct physical objects. \todo{Insert figure: Urry \& Padovani (1995)-style schematic of the unified model, showing the central engine (SMBH, accretion disk, BLR, dusty torus, NLR, jet) and the various AGN classes as a function of viewing angle and radio loudness.}
+
+\medskip
+
+On parsec scales, the central engine common to all AGN classes consists of the supermassive black hole itself, an accretion disk producing the thermal UV/optical continuum, a compact \textbf{Broad Line Region} (BLR) of high-velocity, Doppler-broadened gas, a geometrically and optically thick dusty \textbf{torus}, and a much more extended, lower-density \textbf{Narrow Line Region} (NLR); radio-loud systems additionally launch a pair of relativistic jets along the system's symmetry axis. An observer's view of this structure, and hence the observed classification of the source, then depends principally on the inclination of the line of sight relative to the torus and jet axis.
+
+\subsection{The Broad Line Region} \label{subsec:agn_blr_detail}
+
+The relative strengths of the broad emission lines indicate gas in photoionisation equilibrium at a temperature of order $10^4$\,K, with roughly solar (or mildly super-solar) abundances. The Doppler widths of the broad component, $1000$-$25\,000\,\text{km/s}$, reflect supersonic bulk motion, while the presence (or suppression) of particular density-sensitive lines such as $[\text{O\,\textsc{iii}}]$ and $\text{C\,\textsc{iii}}]$ constrains the gas density to $n_e \sim 10^9$-$10^{11}\,\text{cm}^{-3}$; smooth, rather than clumpy, line profiles in high-resolution spectra further suggest a continuous flow of material rather than discrete clouds.
+
+\medskip
+
+The broad lines vary in response to continuum changes, but with a measurable time lag reflecting the light-travel time across the BLR (\cref{subsec:agn_variability}); applying reverberation mapping across large samples reveals a tight relation between the BLR size and the AGN luminosity, $R_{\text{BLR}} \propto L^{0.5-0.7}$, consistent with different AGN sharing similar ionisation parameters and densities. Reverberation lags measured simultaneously for several transitions within a single object further reveal \textbf{ionisation stratification}: the highest-ionisation lines respond most rapidly to continuum changes and therefore originate closest to the ionising source, followed at progressively larger radii by lower-ionisation species.
+
+\begin{exampleblock}[Virial black hole masses from reverberation mapping]
+If the BLR gas is gravitationally bound to the central black hole, its characteristic velocity and radius should satisfy the virial relation,
+$$
+\frac{1}{2}mv^2 = \frac{1}{2}\frac{GMm}{R}
+\qquad \Longrightarrow \qquad
+v \propto \frac{1}{\sqrt{R}} \propto \frac{1}{\sqrt{c\,\tau}} ,
+$$
+since the reverberation lag $\tau$ measures $R$ directly via $R \sim c\tau$. This scaling, $v \sim \tau^{-1/2}$, is indeed observed (for example in NGC\,5548), confirming that the BLR gas is virialised. The black hole mass then follows from the virial theorem,
+$$
+M_{\text{BH}} = \frac{f\,c\,\tau\,\Delta V^2}{G} ,
+$$
+where $f$ is a dimensionless factor of order unity that absorbs the (generally unknown) BLR geometry and inclination. Reverberation-based masses using H$\beta$ are typically accurate to within a factor of $\sim3$; combining the $R_{\text{BLR}}$-$L$ relation with the virial theorem additionally allows single-epoch mass estimates for large AGN samples, at the cost of a somewhat larger uncertainty (a factor of several), dominated by the difficulty of reliably characterising the line width.
+\end{exampleblock}
+
+\medskip
+
+Growing evidence suggests that the BLR itself has a composite origin: a moderate-ionisation, high-optical-depth component (plausibly the outer accretion disk atmosphere itself) is largely responsible for the Balmer lines and Mg\,\textsc{ii}, while a separate high-ionisation, moderate-optical-depth component (plausibly a disk wind) produces the high-ionisation lines and can account for the blueshifts and blueward asymmetries observed in lines such as C\,\textsc{iv}. In this picture, gas is lifted from the disk surface by radiation pressure on dust grains or by magnetic fields; any dust is rapidly destroyed once exposed to the AGN's ionising radiation, permitting efficient line emission from the lifted material.
+
+\subsection{Outflowing Winds and Feedback} \label{subsec:agn_winds}
+
+Blueshifted UV absorption features, known as \bfit{Broad Absorption Lines} (BALs), are seen directly in $10$-$15\%$ of quasar spectra (and are thought to affect a larger fraction, $20$-$30\%$, once selection effects are accounted for), and are interpreted as outflowing winds with velocities of order $100$-$30\,000\,\text{km/s}$, most plausibly driven by radiation pressure on the ionised gas in the equatorial accretion disk or torus. BAL incidence correlates with luminosity, with more luminous quasars driving faster winds, and anti-correlates with radio power, for reasons that remain unclear (possibly reflecting a wind-jet connection, or simply orientation).
+
+\medskip
+
+Such winds are cosmologically important: they can remove angular momentum from the accretion flow, helping to sustain accretion, and can evacuate gas from the host galaxy altogether, thereby directly linking black hole growth to the evolution of the surrounding galaxy. This connection is supported observationally by a tight correlation between black hole mass and host-galaxy bulge properties, suggesting genuine co-evolution. The efficiency of this feedback depends on how the wind's kinetic power,
+$$
+L_k = \frac{1}{2}\dot{M}v^2 ,
+$$
+couples to the interstellar medium: in dense environments, radiative losses are significant and the outflow is \bfit{momentum-driven}, whereas in low-density environments, radiative losses are negligible and the shocked wind retains most of its energy, producing an \bfit{energy-driven} outflow that can sweep up and expel much larger masses of gas.
+
+\subsection{The Narrow Line Region} \label{subsec:agn_nlr_detail}
+
+The NLR is more extended and lower-density than the BLR ($n_e \sim 10^2$-$10^6\,\text{cm}^{-3}$), so that forbidden transitions are not collisionally suppressed and dominate its spectrum; Doppler widths are correspondingly narrow ($200$-$900\,\text{km/s}$), and the lines do not vary on short timescales. A wide range of ionisation states is observed, from low-ionisation species such as $[\text{O\,\textsc{i}}]$ to high-ionisation species such as $[\text{O\,\textsc{iii}}]$ and, occasionally, highly ionised iron coronal lines, again pointing to radial stratification.
+
+\medskip
+
+Because the NLR extends to scales of order $100$\,pc or more in nearby Seyferts (larger still in quasars), it can be spatially resolved: in NGC\,1068, for instance, imaging reveals a clumpy, roughly axisymmetric ionisation "cone" extending from the nucleus, whose axis generally coincides with the radio jet axis where one is detected, and which occasionally shows enhanced line emission where the jet collides with and shocks the surrounding interstellar medium. The NLR plays several important diagnostic roles: its line peaks provide reliable systemic redshifts, its total luminosity offers a rough bolometric proxy for the AGN power that (being emitted well outside any nuclear obscuration) remains usable even in obscured sources, its line widths correlate with the host-galaxy bulge potential, and the sharp edges of its ionisation cones trace the collimating geometry (very plausibly the shadow cast by the torus) of the escaping ionising radiation.
+
+\subsection{The Dusty Torus} \label{subsec:agn_torus_detail}
+
+The Type\,1/Type\,2 dichotomy introduced for Seyfert galaxies and quasars generalises across the AGN population: \bfit{Type 1} sources show broad permitted lines clearly wider than the forbidden lines, together with moderate-equivalent-width forbidden lines, whereas \bfit{Type 2} sources show only narrow permitted lines, comparable in width to the forbidden lines, with correspondingly higher equivalent widths. This dichotomy is understood as an orientation effect: at least some Type\,2 sources are intrinsically Type\,1 objects whose BLR and continuum are simply hidden from direct view by the torus.
+
+\medskip
+
+Compelling confirmation of this picture came from \textbf{spectropolarimetry}: in NGC\,1068, a canonical Type\,2 Seyfert, the polarised flux spectrum reveals a full, broad-lined Type\,1 spectrum invisible in total intensity, with the position angle of the polarisation oriented perpendicular to the system's symmetry axis, exactly as expected if photons from a hidden BLR are being scattered into our line of sight (by free electrons or dust) around the edge of an obscuring torus.
+
+\medskip
+
+The torus itself is a thick, axisymmetric structure of mixed dusty atomic and molecular gas lying between the BLR and NLR, with clump densities of order $10^5$-$10^7\,\text{cm}^{-3}$ and Keplerian velocities of order $1000\,\text{km/s}$; its total mass is only a small fraction of the central black hole mass. Its size can be measured directly through dust reverberation mapping (tracking the lag between optical and near-infrared light curves) or through near- and mid-infrared interferometry, and is found to scale with luminosity as $R\propto L^{0.5}$, consistent with a roughly constant ionisation (or, more precisely, dust sublimation) parameter across the population; the inferred inner edge of the torus lies at approximately three times the reverberation-mapped H$\beta$ BLR radius. High-resolution imaging (ALMA molecular-line observations and mid-infrared interferometry) further reveals the torus to be a genuinely multi-component structure, plausibly a combination of a clumpy rotating disk and a clumpy polar wind, spanning sub-parsec to tens-of-parsec scales, with substantial source-to-source variation in its detailed geometry.
+
+\subsection{Jets in the Unified Picture} \label{subsec:agn_jets_unified}
+
+Only about $10\%$ of optically luminous AGN host a relativistic particle jet, identifiable through its strong, primarily synchrotron radio emission; such sources are termed \bfit{radio loud}. Because the apparent properties of a jet (superluminal motion, variability, relative prominence of the core versus the extended lobes) depend strongly on its orientation to the line of sight, radio-loud AGN with a dominant, beamed radio core generally show a "flat" radio spectrum ($L_\nu \propto \nu^{-\alpha}$ with $\alpha < 0.5$), while those seen with the jet closer to the plane of the sky show extended, lobe-dominated emission with a "steeper" spectrum ($\alpha > 0.5$); much of this difference in spectral index is therefore itself an orientation effect rather than an intrinsic property of the source.
+
+\medskip
+
+Beyond powering the AGN phenomenology discussed throughout this chapter, jets have a genuine cosmological impact: in galaxy clusters, jets inflate buoyant cavities in the hot intracluster medium, visible directly in X-ray imaging, and can inject enough energy to offset radiative cooling of the cluster gas, regulating both star formation in the central galaxy and the thermodynamic state of the cluster as a whole (AGN feedback). How jets are actually launched remains an open theoretical problem: a spinning, accreting black hole naturally supplies the necessary ingredients (a relativistically deep potential well, a stable rotation axis acting as a gyroscope, a large energy reservoir, and strong magnetic fields threading the orbiting plasma), and magnetohydrodynamic simulations show that such fields can indeed divert and collimate part of the inflowing plasma into an outflowing jet; however, precisely what combination of black hole spin, magnetic field configuration, and accretion-flow environment determines whether a given system launches a powerful jet at all is still not well understood.
