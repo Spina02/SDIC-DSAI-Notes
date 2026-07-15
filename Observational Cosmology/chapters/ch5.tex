@@ -1,284 +1,106 @@
-% \chapter{ICM} % Lecture 11/03/2026
+% 11/03/2026
 
-% \section{Introduction}
-
-% % missing STRUCTURE FORMATION: DARK MATTER HALOS
-
-% \subsection{Galaxy Clusters}
-
-% Galaxy clusters are composed of galaxies, dark matter, and hot gas. They are the most massive structures in the universe, with a mass $M = 10^{14} - 10^{15} M_\odot$ and a radius $R = 1-5 Mpc$.
-
-% Form from the highest density peak of the initial matter density field, Preferentially located at the knots of the Large Scale Structure (LSS).
-
-% Galaxy clusters are multi-component systems:
-
-% Galaxies and stars (~5\%), ICM (~15\%), DM (~80\%)
-
-% Allow to detect clusters at different wavelengths: X-rays, radio, optical, infrared, ultraviolet, gamma-rays.
-
-% Perfect astrophysical laboratory to study: galaxy evolution, gas and plasma astrophysics
-
-% \subsubsection{Cluster boundary}
-
-% The boundary of the cluster is not a well-defined quanrity: clusters are not closed spheres, however it is convenient to define a cluster as the mass within a certain radius, corresponding to a fixed overdensity $\Delta$.
-
-% $\Delta$ is defined as the overdensity with respect to the mean or the critical density of the Universe at the cluster redshift.
-
-% $$
-% M_{\Delta} = \dfrac{4\pi}{3} r^3_{\Delta} \rho_{m/cr} \Delta
-% $$
-
-% %todo: check if true
-% where $\rho_{m/cr}$ is the mean or critical density of the Universe at the cluster redshift.
-
-% The edge of the cluster can be defined by the orbital dynamics of the matter within the cluster: the \textbf{Splashback radius} is the radius of the cluster at which the expansion of the universe is equal to the gravitational pull of the cluster.
-
-% The splashback radius represents the location of the first orbital "turnaround", i.e. the maximum distance a particle reaches after its first passage through the cluster. At the location of the Splashback radius is expected a rapid decline of the density profile.
-
-% \begin{figure}[H]
-%     \centering
-%     \includegraphics[width=0.6\textwidth]{assets/splashback.png}
-%     \caption{DM, gas and galaxy density profiles and splashback radius from TNG hydrosim \cite{ONeil2020}.}
-% \end{figure}
-
-% \section{The intracluster medium}
-
-% \begin{itemize}
-%     \item Hot (107 - 10° K), optically thin plasma, that permeates the space between galaxies within a GC
-%     \item Result of the gas infall into the dark matter halo
-%     \item The gas is heated primarily through accretion shocks and adiabatic compression during the hierarchical assembly of the cluster
-%     \item AGN feedback and sloshing of the ICM plasma during mergers with subclusters prevent the central ICM from cooling
-%     \item Fossil record of the chemical enrichment of the Universe: the deep gravitational potential wells of clusters lock metals produced by member galaxies
-%     \item Density: $\sim 10^{-3} - 10^{-1} \text{particle/cm}^3$ 
-%     \item Composition: fully ionized plasma; mostly H, He with metallic traces (Fe, O, Ne, Si)
-%     \item Weak but pervasive magnetic field: $\sim 0.1 \text{ to } 10 \mu\text{G}$ influencing particle transport. The field varies on scales     from $0.1 \text{ to } 10 \text{ kpc}$.
-%     \item Emission primarly via X-ray:
-%     \begin{itemize}
-%         \item Free-free: Thermal bremsstrahlung radiation $\sim 90\%$ of the luminosity (continuum)
-%         \item Free-bound: recombination (continuum)
-%         \item Bound-bound: de-excitation radiation (line emission)
-%     \end{itemize}
-% \end{itemize}
-
-% \subsubsection{X-Ray spectrum}
-
-% Bremsstrahlung spectrum:
-% \begin{itemize}
-%     \item Bremsstrahlung X-ray emissivity:
-%     $$
-%     \epsilon_\nu \equiv \dfrac{\mathrm{d}L}{\mathrm{d}V\mathrm{d}\nu} \propto n_e^2 g(\nu, T) T^{-1/2} \exp(-h\nu / k_B T)
-%     $$
-%     \item Proportional to the square of the gas density
-%     \item The overall normalization scales as $\propto T^{-0.5}$
-%     \item Exponential thermal cut-off at the electron's kinetic energy ($k_B T$)
-%     \begin{itemize}
-%         \item The location of the cut-off provides strong constraints on the ICM temperature
-%     \end{itemize}
-% \end{itemize}
-
-% The observed spectrum is a combination of the bremsstrahlung spectrum and recombination/emission lines:
-
-% \begin{itemize}
-%     \item Recombination lines: "edges" in the lower temperature spectra (e.g. 1 keV line around 0.5--1 keV)
-%     \begin{itemize}
-%         \item Above ${\sim}\,6$ keV the cross-section for electron capture drops significantly and the "edges" get smeared out
-%     \end{itemize}
-%     \item Emission lines:
-%     \begin{itemize}
-%         \item Strength of the line depends on temperature (e.g. Fe K-$\alpha$ @ $k \sim 6.7$ eV)
-%         \item Soft X-ray lines (0.5--2 keV): due to elements like O, Ne, Mg $\rightarrow$ present only if the metals are not fully ionized ($<6$ keV)
-%         \item Most prominent signature of the metal enrichment is the Fe K-line complex at 6.7 keV
-%         \item Fe-K is the only accessible line at high-$z$ $\rightarrow$ only means to determine cluster redshift from X-ray data
-%         \item Iron L-shell Complex (at ${\sim}\,1$ keV): caused by hundreds of overlapping emission lines from partially ionized Fe atoms ($\text{Fe}^{16}$ to $\text{Fe}^{23}$) 
-%         \item ``Soft'' elements (0.5--3.0 keV) lines: useful diagnostic for star formation history
-%     \end{itemize}
-% \end{itemize}
-
-% \begin{observationblock}[Spectral fitting]
-%     In modern X-ray astronomy (using satellites like \bfit{Chandra} or \bfit{XMM-Newton}), the spectral resolution isn't always high enough to see the individual lines.
-    
-%     Observed spectra are fitted to plasma radiation codes which includes all the known emission processes.
-% \end{observationblock}
-
-% \subsubsection{Temperature profile}
-
-% By fitting observed X-ray spectra measured at different radii with tabulated spectral emission convolved with the instrument response, is it possible to derive the ICM temperature profile.
-
-% \noindent
-% \begin{minipage}[t]{0.65\textwidth}
-% \begin{itemize}
-%     \item Expected cooling curve for a gas in hydrostatic equilibrium
-%     \item At large radii, $R > 0.2\, R_{200}$, the normalized profile looks self-similar
-%     \begin{itemize}
-%         \item The same gravity-driven physics shape all clusters
-%     \end{itemize}
-%     \item Some profiles show a significant drop in temperature toward the core (\textbf{Cool Core}) while other profiles are $\sim$flat (\textbf{Non-Cool Core})
-%     \item To accommodate the variety of temperature profiles, Vikhlinin et al. 2006 introduced the parametric model:
-%     $$
-%     T_{3D} = T_0 \dfrac{(r/r_t)^{-a}}{[1 + (r/r_t)^b]^{c/b}} \cdot \dfrac{x + T_{min}/T_0}{x + 1}
-%     $$
-% \end{itemize}
-% \end{minipage}%
-% \hfill
-% \begin{minipage}[t]{0.3\textwidth}
-%     \centering
-%     \includegraphics[width=\textwidth]{assets/gc-temp.png}
-%     \captionof{figure}{Temperature profile from XMM-Newton observations \cite{Pratt2006}.}
-% \end{minipage}
-
-% \subsubsection{Metallicity profile}
-
-% The metallicity profile shows a sharp rise toward the center ($R/R_{500} < 0.2$), reaching $\sim$solar  value in the inner core. The peak is driven by the metal production of the central galaxy.
-
-% At large radii ($R/R_{500} > 0.3$), the profiles flatten out to a constant value $A\sim0.3$. This value is consistent across different clusters and extends so far out in radius that it suggests early enrichment (z = 2-3) of the medium.
-
-% The evolution of the Fe abundance with redshift confirm early enrichment of the medium 
-
-% %todo: missing last slide about metallicity profile
-
-% \subsubsection{Gas Density profile}
-
-% The $\beta$-model is a simple and widely used approximation for the gas density profile. Assuming an isothermal sphere, equating the Jeans and HE mass estimates leads to the definition of the $\beta$ parameter:
-
-% $$
-% M(r) = -\dfrac{\sigma_r^2 r}{G} \left[ \dfrac{d \ln \rho}{d \ln r} \right]
-% \qquad
-% M(r) = -\dfrac{kT r}{G \mu m_p} \left[ \dfrac{d \ln \rho_g}{d \ln r} \right]
-% $$
-
-% $$
-% \beta = \dfrac{\sigma_r^2 \mu m_p}{kT}
-% $$
-
-% If the gas distribution follows the matter distribution, and the latter follows an isothermal sphere model we get:
-
-% $$
-% \dfrac{\rho_g}{\rho_{g0}} = \left( \dfrac{\rho}{\rho_0} \right)^\beta
-% \qquad
-% \rho = \rho_0 \left( 1 + \left( \dfrac{r}{r_c} \right)^2 \right)^{-3/2}
-% \qquad
-% \rho_g = \rho_{g0} \left( 1 + \left( \dfrac{r}{r_c} \right)^2 \right)^{-3\beta/2}
-% $$
-
-% Fit to data finds $\beta \sim 2/3$ , but the $\beta$-model provides a poor fit to distributed systems.
-
-% Vikhlinin et al 2006 model:
-
-% The $\beta$-model is a poor description of the actual density profile; The shape of cluster density profiles is affected by the individual evolution history of the cluster (e.g. merging, AGN feedbacks)
-
-% Vikhlinin introduced in 2006 a parametric model to account for the variegate cluster population:
-
-% $$
-% n_p n_e = n_0^2 \dfrac{(r/r_c)^{-\alpha}}{(1 + r^2/r_c^2)^{3\beta-\alpha/2}} \dfrac{1}{(1 + r^\gamma/r_s^\gamma)^{\epsilon/\gamma}} + \dfrac{n_{02}^2}{(1 + r^2/r_{c2}^2)^{3\beta_2}}
-% $$
-
-% The first term accounts for the outskirts, while the second term accounts for the core.
-
-% \subsubsection{Surface Brightness Profile}
-
-% %todo: missing (slide 21-25)
-
-% % missing example: z=1.39 requires a 200ksec observation, a slightly higher redshift z=1.50 requires almost the double exposure time (380 ksec)
-
-% \subsection{X-Ray telescopes: Chandra vs XMM-Newton}
-
-% %missing (slide 26-29)
-
-% \subsubsection{X-ray background}
-
-% Astrophysical:
-% \begin{itemize}
-%     \item X-ray emission from our own galaxy — Local Hot Bubble and hot gas in the galactic halo (e.g. Kuntz \& Snowden 2000) modelled with two thermal emissions
-%     \item Unresolved X-ray point sources (mostly AGNs) modelled with an absorbed power law (e.g. Lumb et al. 2002)
-% \end{itemize}
-
-% Instrumental:
-% \begin{itemize}
-%     \item Emission from the telescope itself hit by high energetic particles (e.g. Hickox and Markevitch 2006) 
-%     \item Particles revealed by the detectors as photons
-% \end{itemize}
-
-% %missing source detection and fitting density and temperature profiles
-
-\chapter{Galaxy Clusters and the Intracluster Medium} \label{ch:icm}
+\chapter{Galaxy Clusters and the ICM} \label{ch:icm}
 
 \section{Galaxy Clusters as Cosmological Structures} \label{sec:gc_intro}
 
-\subsection{Structure Formation and Dark Matter Halos} \label{subsec:structure_formation}
+\subsubsection{Structure Formation and Dark Matter Halos} \label{subsec:structure_formation}
 
-In the $\Lambda$CDM scenario, cosmic structures grow \bfit{hierarchically}: small density perturbations are the first able to overcome the cosmological expansion and collapse, and the resulting dark matter \bfit{halos} subsequently merge together into progressively larger halos. This bottom-up assembly process, in which small structures form first and later coalesce into massive ones, provides the gravitational scaffolding within which galaxies and, ultimately, galaxy clusters form.
-
-\medskip
 
 \begin{minipage}{0.48\textwidth}
-    \centering
-    \todo{Halo merger tree, illustrating hierarchical assembly from small progenitor halos (top) merging into a single massive halo (bottom), analogous to Hirschmann+2014.}
-\end{minipage}%
-\hfill
-\begin{minipage}{0.48\textwidth}
-    \centering
-    \todo{Merger history of a massive dark matter halo as a function of lookback time, from a cosmological N-body simulation, showing progenitor masses growing via successive mergers.}
-\end{minipage}
-
-\subsection{Galaxy Clusters} \label{subsec:galaxy_clusters}
-
-\bfit{Galaxy clusters} are the most massive gravitationally bound structures in the Universe, with total masses $M \sim 10^{14}$-$10^{15}\,M_\odot$ and radii $R \sim 1$-$5\,\text{Mpc}$. They form at the highest peaks of the initial matter density field and are consequently found preferentially at the knots of the cosmic web, the \bfit{Large-Scale Structure} (LSS).
-
-\smallskip
-
-\begin{minipage}{0.55\textwidth}
-    Clusters were first identified as large concentrations of passive galaxies exhibiting anomalously large velocity dispersions. Field galaxies, galaxy groups, and massive clusters can be broadly distinguished by their characteristic velocity dispersions, which increase from $\sigma_v \sim 100$-$300\,\text{km/s}$ for isolated field galaxies, through $\sigma_v \sim 300$-$500\,\text{km/s}$ for groups, up to $\sigma_v \sim 800$-$1500\,\text{km/s}$ for the richest clusters, which can host anywhere from $100$ to $1000$ member galaxies.
-\end{minipage}%
-\hfill
-\begin{minipage}{0.4\textwidth}
-    \centering
-    \todo{Magneticum simulation panel: large-scale dark-matter distribution (500 Mpc box) zooming into a single cluster-scale halo (25 Mpc), from Hirschmann+2014.}
-\end{minipage}
-
-\medskip
-
-Clusters are \textbf{multi-component systems}: galaxies and stars contribute only $\sim 5\%$ of the total mass, the hot diffuse gas filling the space between galaxies, the \bfit{intracluster medium} (ICM), accounts for $\sim 15\%$, while the remaining $\sim 80\%$ is dark matter. This layered composition makes clusters detectable across the electromagnetic spectrum: in the optical, through galaxy richness and gravitational lensing effects on background sources; in X-rays, through the luminous, extended thermal emission of the hot ICM; and in the microwave, through the spectral distortion of the CMB known as the Sunyaev-Zel'dovich effect (\cref{ch:cmb}). Because they contain representative samples of galaxies, hot plasma, and dark matter within a single virialised system, clusters constitute a natural astrophysical laboratory for studying galaxy evolution, and gas and plasma astrophysics under extreme conditions.
-
-\begin{center}
-    \todo{Three-panel comparison of a galaxy cluster observed in optical (richness and lensing), X-ray (extended thermal emission), and microwave (Sunyaev-Zel'dovich decrement) light, alongside simulated dark matter and baryon distribution maps.}
-\end{center}
-
-\subsection{Defining the Cluster Boundary} \label{subsec:cluster_boundary}
-
-Unlike an isolated star or galaxy, a cluster has no sharply defined edge: it is not a closed, isolated sphere, but a structure continuously accreting matter from its surrounding cosmic web. It is nonetheless convenient to adopt an \textbf{operational definition}, identifying the cluster with the mass enclosed within a radius $r_\Delta$ corresponding to a fixed \bfit{overdensity} $\Delta$ with respect to the mean or critical density of the Universe at the cluster's redshift:
-$$
-M_\Delta = \frac{4\pi}{3}\,r_\Delta^3\,\rho_{m/cr}\,\Delta .
-$$
-Common choices are $\Delta = 200$ or $\Delta = 500$, yielding the characteristic radii $r_{200}$ and $r_{500}$ widely used throughout the cluster literature.
-
-\medskip
-
-\begin{minipage}{0.45\textwidth}
-    \centering
-    \todo{Schematic of nested overdensity spheres $M_{\Delta 1} \supset M_{\Delta 2} \supset M_{\Delta 3}$ around a cluster centre, illustrating the operational overdensity definition.}
+    In the $\Lambda$CDM scenario, cosmic structures grow \bfit{hierarchically}: small density perturbations are the first to overcome the cosmological expansion and collapse, and the resulting \textbf{dark matter halos} subsequently merge together into progressively larger halos. This bottom-up assembly process, in which small structures form first and later coalesce into massive ones, provides the gravitational scaffolding within which galaxies and, ultimately, galaxy clusters form.
 \end{minipage}%
 \hfill
 \begin{minipage}{0.5\textwidth}
-    A physically motivated alternative is provided by the orbital dynamics of the infalling matter itself. The \bfit{splashback radius} marks the location of the first orbital \textbf{turnaround}: the maximum distance reached by a particle after its first infall and pericentric passage through the cluster. Because particles pile up near this turning point before falling back in, the splashback radius is expected to coincide with a sharp, rapid decline in the density profile, distinguishing the multiply-orbiting, virialised interior from the smoothly infalling material at larger radii.
+    \vspace{-0.3em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/dm-hierarchy.jpg}
+    \captionof{figure}{Growth of a massive dark matter halo via mergers over time from an N-body simulation.}
 \end{minipage}
+
+\vspace{-0.4em}
+
+\subsection{Galaxy Clusters} \label{subsec:galaxy_clusters}
+
+
+\begin{minipage}{0.47\textwidth}
+    \textbf{Galaxy clusters} are the most massive gravitationally bound structures in the Universe, with total masses $M \sim 10^{14}$-$10^{15}\,M_\odot$ and radii $R \sim 1$-$5\,\text{Mpc}$. They form at the highest peaks of the initial matter density field and are consequently found preferentially at the knots of the cosmic web, the \bfit{Large-Scale Structure} (LSS).
+    
+    \smallskip
+
+    Clusters were first identified as large concentrations of passive galaxies exhibiting anomalously large velocity dispersions. Field galaxies, galaxy groups, and massive clusters can be broadly distinguished by their characteristic velocity dispersions, which increase from $\sigma_v \sim 100$-$300\,\text{km/s}$ for isolated field galaxies, through $\sigma_v \sim 300$-$500\,\text{km/s}$ for groups, up to $\sigma_v \sim 800$-$1500\,\text{km/s}$ for the richest clusters, which can host anywhere from $100$ to $1000$ member galaxies.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.5\textwidth}
+    \vspace{-1em}
+    \centering
+    \includegraphics[width=0.98\textwidth]{assets/clusters.jpg}
+    \captionof{figure}{Simulation: dark-matter distribution ($100 h^{-1} \mathrm{Mpc}$) zooming in on a cluster halo \cite{Boylan}.}
+\end{minipage}
+
+\medskip
+
+Clusters are \textbf{multi-component systems}: galaxies and stars contribute only $\sim 5\%$ of the total mass, the hot diffuse gas filling the space between galaxies, the \textbf{intracluster medium} (ICM), accounts for $\sim 15\%$, while the remaining $\sim 80\%$ is \textbf{dark matter}.  This layered composition makes clusters detectable across the electromagnetic spectrum: in the optical, through galaxy richness and gravitational lensing effects on background sources; in X-rays, through the luminous, extended thermal emission of the hot ICM; and in the microwave, through the spectral distortion of the CMB known as the Sunyaev-Zel'dovich effect. 
+
+
+\begin{minipage}{0.33\textwidth}
+    Because they contain representative samples of galaxies, hot plasma, and dark matter within a single virialised system, clusters constitute a natural astrophysical laboratory for studying galaxy evolution, and gas and plasma astrophysics under extreme conditions.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.62\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/cluster-emissions.png}
+    \captionof{figure}{Galaxy clusters are detectable via multiple probes.}
+\end{minipage}
+
+\subsubsection{Defining the Cluster Boundary} \label{subsec:cluster_boundary}
+
+Unlike an isolated star or galaxy, a cluster has no sharply defined edge: it is not a closed, isolated sphere, but a structure continuously accreting matter from its surrounding cosmic web. 
+
+\smallskip
+
+\begin{minipage}{0.7\textwidth}
+    It is nonetheless convenient to adopt an \textbf{operational definition}, identifying the cluster with the mass enclosed within a radius $r_\Delta$ corresponding to a fixed \bfit{overdensity} $\Delta$ with respect to the mean or critical density of the Universe at the cluster's redshift:
+    $$
+    M_\Delta = \frac{4\pi}{3}\,r_\Delta^3\,\rho_{m/cr}\,\Delta
+    $$
+    Common choices are $\Delta = 200$ or $\Delta = 500$, yielding the characteristic radii $r_{200}$ and $r_{500}$ widely used throughout the cluster literature.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.28\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/cluster-borders.png}
+\end{minipage}
+
+\bigskip
+
+A physically motivated alternative for defining the cluster edge is provided by the orbital dynamics of the matter within the cluster. The \textbf{splashback radius} represents the location of the first orbital "turnaround", which is the maximum distance a particle reaches after its first passage through the cluster. In a phase space diagram mapping radial velocity as a function of radius, this boundary creates a clear kinematic separation between the multi-stream region of orbiting particles and the single-stream region of newly infalling particles. Because particles pile up near this turning point before falling back in, at the location of the splashback radius a rapid decline of the density profile is expected.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{assets/splashback.png}
-    \caption{DM, gas and galaxy density profiles and splashback radius from TNG hydrosimulations \cite{ONeil2020}.}
+    \includegraphics[height=0.32\textwidth]{assets/splashback.png}
+    \hfill
+    \includegraphics[height=0.32\textwidth]{assets/cluster-turnaround.png}
+    \caption{\textbf{Left}: DM, gas, and galaxy density profiles and the corresponding splashback radius derived from TNG hydrosimulations \cite{ONeil2020}. \textbf{Right}: Phase space diagram showing the velocity of dark matter particles as a function of radius in a halo, illustrating the boundary between orbiting and infalling particles.}
 \end{figure}
 
 \section{The Intracluster Medium} \label{sec:icm}
 
 \subsection{General Properties} \label{subsec:icm_general}
 
-\begin{minipage}{0.56\textwidth}
-The \bfit{intracluster medium} (ICM) is a hot ($T \sim 10^7$-$10^8\,\text{K}$), optically thin plasma that permeates the space between galaxies within a cluster. It is the product of gas infall into the deep gravitational potential well of the cluster's dark matter halo, heated primarily by accretion shocks and adiabatic compression during the hierarchical assembly of the structure. Once heated, the ICM is prevented from cooling efficiently at the cluster centre by two competing processes: feedback from the central AGN, and the sloshing of the plasma induced by mergers with infalling subclusters (a competition examined further in \cref{sec:cool_core}).
+\begin{minipage}{0.52\textwidth}
+
+The \textbf{intracluster medium} (ICM) is a hot ($T \sim 10^7$-$10^8\,\text{K}$), optically thin plasma that permeates the space between galaxies within a cluster. It is the product of gas infall into the deep gravitational potential well of the cluster's dark matter halo, heated primarily by accretion shocks and adiabatic compression during the hierarchical assembly of the structure. 
+
+\medskip
+
+Although the ICM radiates copiously in X-rays, which should, in principle, cause the cluster core to cool rapidly, this cooling is offset by two competing processes: energetic feedback from the central AGN, and sloshing motions of the plasma driven by mergers with infalling subclusters (as discussed further in \cref{sec:cool_core}).
 \end{minipage}%
 \hfill
-\begin{minipage}{0.4\textwidth}
+\begin{minipage}{0.45\textwidth}
     \centering
-    \todo{Composite optical/millimetre image of the intracluster medium surrounding the Spiderweb Galaxy, hot gas detected with ALMA overlaid on an HST optical image (ESO/Di Mascolo et al.; HST: H. Ford).}
+    \includegraphics[width=\textwidth]{assets/icm.jpg}
+    \captionof{figure}{Optical/millimiter view of the Spiderweb Galaxy's ICM hot gas \cite{mascolo}.}
 \end{minipage}
 
 \medskip
@@ -303,174 +125,281 @@ where $g(\nu,T)$ is a slowly varying Gaunt factor. Three features of this expres
 
 \medskip
 
-\begin{minipage}{0.58\textwidth}
-The observed ICM spectrum is not a pure bremsstrahlung continuum, but a superposition of the continuum with recombination and line features. At lower temperatures, recombination produces characteristic "edges" in the spectrum (for instance, a feature near $0.5$-$1\,\text{keV}$); above ${\sim}\,6\,\text{keV}$ the electron-capture cross-section drops sharply and these edges are smeared out. Superposed emission lines carry the signature of metal enrichment: soft X-ray lines ($0.5$-$2\,\text{keV}$) from elements such as O, Ne, and Mg appear only when these metals are not yet fully ionised (below ${\sim}\,6\,\text{keV}$), while the \bfit{Iron L-shell complex} near $1\,\text{keV}$ arises from hundreds of overlapping transitions in partially ionised iron ions (Fe$^{16+}$ to Fe$^{23+}$). The single most prominent tracer of metal enrichment, however, is the \bfit{Fe K-$\alpha$ complex} at $6.7\,\text{keV}$: since it remains the only accessible line at high redshift, it provides the sole means of determining a cluster's redshift directly from its X-ray spectrum.
+\begin{minipage}{0.53\textwidth}
+The observed ICM spectrum is not a pure bremsstrahlung continuum, but a superposition of the continuum with recombination and line features:
+
+\begin{itemize}
+    \item \textbf{Recombination lines:} At lower temperatures, recombination processes imprint characteristic "edges" on the spectrum (e.g. around $0.5$-$1\,\text{keV}$). At $T \gtrsim 6\,\text{keV}$, electron capture becomes inefficient and these edges are increasingly suppressed.
+    \item \textbf{Emission lines:} The spectrum is further enriched by superposed emission lines, which reflect the presence of metals in the plasma. Soft X-ray lines in the range $0.5$-$2\,\text{keV}$, from elements like O, Ne, and Mg, are present when these atoms are not yet fully ionised, typically below $\sim 6\,\text{keV}$. The \bfit{Iron L-shell complex} near $1\,\text{keV}$ consists of hundreds of overlapping transitions from partially ionised iron (Fe$^{16+}$ to Fe$^{23+}$). Most notably, the \bfit{Fe K-$\alpha$ complex} at $6.7\,\text{keV}$ stands out as the dominant marker of metal enrichment: it is often the only strong line visible at high redshift, making it an essential tool for directly determining a cluster's redshift from its X-ray spectrum.
+\end{itemize}
 \end{minipage}%
 \hfill
-\begin{minipage}{0.38\textwidth}
+\begin{minipage}{0.45\textwidth}
     \centering
-    \todo{Bremsstrahlung X-ray spectra for hot gas at temperatures from 1 to 10 keV, showing the exponential cut-off shifting to higher energy with increasing temperature.}
+    \includegraphics[width=\textwidth]{assets/cluster-emissions-plot.png}
+    \captionof{figure}{X-ray spectra of hot gas at 1-10 keV. \textbf{Top:} bremsstrahlung continuum. \textbf{Bottom:} with recombination and line features.}
 \end{minipage}
 
 \begin{observationblock}[Spectral fitting]
+\begin{minipage}{0.63\textwidth}
 In modern X-ray astronomy, using satellites such as \textbf{Chandra} or \textbf{XMM-Newton}, the spectral resolution is not always sufficient to resolve individual emission lines. Instead, observed spectra are fitted against tabulated plasma radiation codes, which incorporate all the known emission processes (bremsstrahlung, recombination, and line emission) as a function of temperature and metallicity, allowing these physical parameters to be recovered even when individual features remain blended.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.34\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/syntetic-spectra.png}
+    \captionof{figure}{Syntetic spectrum.}
+\end{minipage}
+
 \end{observationblock}
 
 \subsection{Radial Profiles of the ICM} \label{subsec:icm_profiles}
 
 Because clusters are extended, resolved X-ray sources, it is possible to map how the physical properties of the ICM, its temperature, metallicity, and density, vary as a function of cluster-centric radius. These radial profiles both test the underlying physics of cluster formation and reveal the diversity introduced by each cluster's individual merger history.
 
+\vspace{-0.3em}
+
 \subsubsection{Temperature Profile} \label{subsubsec:icm_temperature}
 
-\begin{minipage}[t]{0.62\textwidth}
-Fitting the X-ray spectra measured in concentric radial annuli, after convolving the tabulated plasma emission models with the instrument response, yields the three-dimensional temperature profile of the ICM. At large radii, $R \gtrsim 0.2\,R_{200}$, the normalised temperature profile is found to be remarkably \bfit{self-similar} across the cluster population, a signature that the same gravity-driven physics of accretion and shock heating shapes the outskirts of all clusters in a common way.
+Fitting the X-ray spectra measured in concentric radial annuli, after convolving instrument response, yields the three-dimensional temperature profile of the ICM. The resulting profile shows the characteristic decline in temperature with radius that is expected for gas in hydrostatic equilibrium. At large radii, $R \gtrsim 0.2\,R_{200}$, the \textit{normalised} temperature profile is found to be remarkably \bfit{self-similar} across the cluster population, a signature that the same gravity-driven physics of accretion and shock heating shapes the outskirts of all clusters in a common way.
 
-\smallskip
+\begin{minipage}{0.6\textwidth}
 
-Closer to the centre, however, clusters diverge into two distinct behaviours: some show a pronounced drop in temperature toward the core, the signature of \bfit{Cool-Core} (CC) clusters, while others exhibit an approximately flat central profile, characteristic of \bfit{Non-Cool-Core} (NCC) systems (a distinction explored further in \cref{sec:cool_core}). To accommodate this diversity within a single parametric description, Vikhlinin et al. (2006) introduced the model
+Closer to the centre, however, clusters diverge into two distinct behaviours: some show a pronounced drop in temperature toward the core, the signature of \bfit{Cool-Core} (CC) clusters, while others exhibit an approximately flat central profile, characteristic of \bfit{Non-Cool-Core} (NCC) systems (a distinction explored further in \cref{sec:cool_core}). To accommodate this diversity within a single parametric description, Vikhlinin et al. (2006) introduced the model:
+\medskip
 $$
 T_{3D}(r) = T_0\,\frac{(r/r_t)^{-a}}{\left[1+(r/r_t)^b\right]^{c/b}}\,\frac{x + T_{\min}/T_0}{x+1} ,
 $$
-whose flexible functional form can reproduce both the declining cores of CC clusters and the flatter profiles of NCC systems.
+whose flexible functional form can reproduce both the profiles of CC and NCC  clusters.
 \end{minipage}%
 \hfill
-\begin{minipage}[t]{0.33\textwidth}
+\begin{minipage}{0.37\textwidth}
     \centering
     \includegraphics[width=\textwidth]{assets/gc-temp.png}
-    \captionof{figure}{Temperature profile from XMM-Newton observations \cite{Pratt2006}.}
+    \captionof{figure}{T-profile from XMM-Newton observations \cite{Pratt2006}.}
 \end{minipage}
 
 \subsubsection{Metallicity Profile} \label{subsubsec:icm_metallicity}
 
-The radial metallicity profile of the ICM shows a sharp rise toward the cluster centre ($R/R_{500} \lesssim 0.2$), reaching approximately solar abundance in the innermost core; this central peak is driven by the ongoing metal production and enrichment from the central galaxy. At larger radii ($R/R_{500} \gtrsim 0.3$), the profile flattens to a remarkably constant value, $A \sim 0.3\,\text{solar}$. The consistency of this floor value across different clusters, together with the very large radii over which it extends, points to an early, widespread enrichment of the ICM, thought to have occurred around $z \sim 2$-$3$, well before the bulk of the cluster's present-day mass assembled. Measurements of the Fe abundance as a function of redshift independently corroborate this picture of early enrichment.
+The radial metallicity profile of the ICM shows a sharp rise toward the cluster centre ($R/R_{500} \lesssim 0.2$), reaching approximately solar abundance in the innermost core; this central peak is driven by the ongoing metal production and enrichment from the central galaxy. At larger radii ($R/R_{500} \gtrsim 0.3$), the profile flattens to a remarkably constant value, $A \sim 0.3\,\text{solar}$. 
 
 \smallskip
 
-\begin{minipage}{0.55\textwidth}
-The scatter observed in the metallicity profile at fixed radius is not random, but is closely tied to a cluster's dynamical state: \textbf{relaxed} systems display, on average, a higher central metallicity than \textbf{disturbed} ones, whose central abundance, while still enhanced relative to the outskirts, remains systematically lower. This pattern is consistent with a picture in which cluster mergers stir and mix the metal distribution through large-scale gas motions, diluting the sharp central enrichment that can otherwise build up undisturbed over a relaxed cluster's lifetime.
-\end{minipage}%
-\hfill
-\begin{minipage}{0.4\textwidth}
+The consistency of this floor value across different clusters, together with the very large radii over which it extends, points to an \bfit{early, widespread enrichment} of the ICM, thought to have occurred around $z \sim 2$-$3$, well before the bulk of the cluster's present-day mass assembled. Measurements of the Fe abundance as a function of redshift independently corroborate this picture of early enrichment.
+
+\begin{figure}[H]
     \centering
-    \todo{Mean metallicity profile from a sample of ${\sim}200$ nearby galaxy groups and clusters observed with XMM-Newton, split into relaxed and disturbed subsamples, from Lovisari \& Reiprich (2019).}
-\end{minipage}
+    \includegraphics[height=0.2\textheight]{assets/clusters-metallicity.png}
+\hfill
+    \includegraphics[height=0.2\textheight]{assets/cluster-met-evo.png}
+\captionof{figure}{\textbf{Left}: Mean metallicity profile from ${\sim}200$ nearby galaxy groups and clusters splitted in relxed (blue) and disturbed (red) systems (XMM-Newton) \cite{Lovisari}. \textbf{Right}: Redshift evolution of the Fe abundance within different radial bins in cool-core clusters \cite{Mernier}.}
+\end{figure}
+
+The scatter observed in the metallicity profile at fixed radius is not random, but is closely tied to a cluster's dynamical state: \textbf{relaxed} systems display, on average, a higher central metallicity than \textbf{disturbed} ones, whose central abundance, while still enhanced relative to the outskirts, remains systematically lower. This pattern is consistent with a picture in which cluster mergers stir and mix the metal distribution through large-scale gas motions, diluting the sharp central enrichment that can otherwise build up undisturbed over a relaxed cluster's lifetime.
+
 
 \subsubsection{Gas Density Profile} \label{subsubsec:icm_density}
 
-The simplest and most widely used description of the ICM density profile is the \bfit{$\beta$-model}. Assuming the gas is an isothermal sphere in hydrostatic equilibrium, the mass profile can be estimated in two equivalent ways: from the velocity dispersion of a collisionless tracer via the Jeans equation, or from the gas pressure and density directly,
+The bremsstrahlung X-ray emission enables us to reconstruct the radial gas density profile of galaxy clusters. The most common and straightforward model for describing the ICM density is the \bfit{$\beta$-model}. This approach assumes (approximately) that the intracluster gas forms an isothermal sphere in hydrostatic equilibrium. Under this assumption, the cluster's mass profile can be derived in two mathematically equivalent ways: one, by applying the Jeans equation to the velocity dispersion of a collisionless tracer population; and two, by relating the gas density and thermal pressure gradient directly (a topic discussed further in \cref{subsec:hse}):
+\medskip
 $$
 M(r) = -\frac{\sigma_r^2\,r}{G}\left[\frac{d\ln\rho}{d\ln r}\right]
 \qquad\text{and}\qquad
 M(r) = -\frac{kT\,r}{G\,\mu m_p}\left[\frac{d\ln\rho_g}{d\ln r}\right] .
 $$
+
 Equating these two mass estimates, under the assumption that the gas density profile traces the total (dark-matter-dominated) mass profile, motivates the definition of the dimensionless parameter
 $$
 \beta \equiv \frac{\sigma_r^2\,\mu m_p}{kT} ,
 $$
-which relates the specific kinetic energy of the collisionless matter to the thermal energy of the gas. If both the total matter distribution and the gas distribution follow the profile of a singular isothermal sphere truncated at a core radius $r_c$,
+which relates the kinetic energy of collisionless matter (galaxies) to the thermal (kinetic) energy of gas. If both the total matter and gas distribution follow the profile of a singular isothermal sphere truncated at a core radius $r_c$, we can get a first estimate of the density profile of the gas:
+\medskip
 $$
-\rho(r) = \rho_0\left(1+\left(\frac{r}{r_c}\right)^2\right)^{-3/2} ,
-$$
-then the gas density obeys the analogous relation
-$$
-\rho_g(r) = \rho_{g0}\left(1+\left(\frac{r}{r_c}\right)^2\right)^{-3\beta/2} .
+\frac{\rho_g}{\rho_{g0}} = \left(\frac{\rho}{\rho_0}\right)^\beta
+\quad \Rightarrow \quad
+\rho(r) = \rho_0\left(1+\left(\frac{r}{r_c}\right)^2\right)^{-3/2}
+\quad \Rightarrow \quad
+\rho_g(r) = \rho_{g0}\left(1+\left(\frac{r}{r_c}\right)^2\right)^{-3\beta/2}
 $$
 Fits to observed clusters typically recover $\beta \sim 2/3$, and the model provides an adequate description of relaxed systems (such as the Coma cluster) out to large radii; however, it performs poorly for dynamically disturbed clusters, whose density profiles are shaped by their individual merger and feedback history rather than by a single self-similar form.
 
-\medskip
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/beta-model.png}
+    \caption{$\beta$-model fits to gas density profiles of relaxed and disturbed clusters \cite{Bartalucci2019}.}
+\end{figure}
 
-To accommodate this diversity, Vikhlinin et al. (2006) introduced a more flexible parametric model for the emission-measure profile ($n_p n_e \propto n_e^2$),
+\vspace{-0.5em}
+
+To accommodate this diversity, Vikhlinin et al. (2006) introduced a more flexible parametric model for the emission-measure profile ($n_p n_e \propto n_e^2$):
+\medskip
 $$
 n_p n_e = n_0^2\,\frac{(r/r_c)^{-\alpha}}{\left(1+r^2/r_c^2\right)^{3\beta - \alpha/2}}\,\frac{1}{\left(1+r^\gamma/r_s^\gamma\right)^{\epsilon/\gamma}} \;+\; \frac{n_{02}^2}{\left(1+r^2/r_{c2}^2\right)^{3\beta_2}} ,
 $$
-in which the first term describes the cluster outskirts and the second, independent term accounts for the central core, allowing the model to capture both the self-similar behaviour at large radii and the wide variety of central morphologies (cool cores, cavities, and disturbed cores) seen across the cluster population.
+in which the first term describes the cluster outskirts and the second, independent term accounts for the central core, allowing to model both the self-similar behaviour at large radii and the wide variety of central morphologies (cool cores, disturbed cores, ...) seen across the cluster population.
 
 \subsubsection{Surface Brightness Profile} \label{subsubsec:icm_sb}
 
-\begin{minipage}{0.56\textwidth}
-Because the ICM is optically thin, the observed X-ray \textbf{surface brightness} at projected radius $R$ is simply the line-of-sight integral of the gas emissivity,
+The intracluster medium (ICM) is optically thin, so the observed X-ray \textbf{surface brightness} at a given projected radius $R$ is obtained by integrating the gas emissivity $\varepsilon$ along the line of sight:
+\medskip
 $$
-S_x(R) = \frac{2}{4\pi}\int_R^\infty n_e^2\,\widetilde\Lambda(T)\,dz ,
+\varepsilon = n_e^2\,\widetilde\Lambda(T)
+\qquad \implies \qquad
+S_x(R) = \frac{1}{2\pi} \int_R^\infty n_e^2\,\widetilde\Lambda(T)\,dz
 $$
-where $\widetilde\Lambda(T)$ is the temperature-dependent cooling function. Adopting a $\beta$-model for the underlying gas density profile, this integral can be evaluated analytically,
+where $n_e$ is the electron density and $\widetilde\Lambda(T)$ is a function which accounts for all the dependencies on the gas temperature $T$ and $R$ is the distance from the center of the cluster. If we assume that the gas density follows a $\beta$-model, this line-of-sight integral has a closed-form solution:
+\medskip
 $$
-S_x(R) = \frac{n_{e0}^2\,\widetilde\Lambda(T)\,r_c}{4\pi}\,\frac{\Gamma(0.5)\,\Gamma(3\beta - 0.5)}{\Gamma(3\beta)}\left(1+\left(\frac{R}{r_c}\right)^2\right)^{-3\beta+1/2}(1+z)^{-4} .
+S_x(R) = \frac{n_{e0}^2\,\widetilde\Lambda(T)\,r_c}{4\pi} \frac{\Gamma(0.5)\,\Gamma(3\beta - 0.5)}{\Gamma(3\beta)} \left[1+\left(\frac{R}{r_c}\right)^2\right]^{-3\beta + 1/2} (1+z)^{-4}
 $$
-Two features of this result have important observational consequences. Because $S_x \propto n_e^2$, the surface brightness falls steeply with radius, making the low-density cluster outskirts intrinsically difficult to observe. Because $S_x \propto (1+z)^{-4}$, the same cosmological surface-brightness dimming that dims extended sources at any wavelength makes it correspondingly difficult to obtain high signal-to-noise X-ray observations of clusters at high redshift: reaching a cluster at $z \simeq 1.4$ can require an exposure roughly twice as long as reaching one at $z \simeq 1.3$, and this cost grows rapidly with redshift.
-\end{minipage}%
-\hfill
-\begin{minipage}{0.4\textwidth}
+where $n_{e0}$ is the central electron density and $r_c$ the core radius.
+
+\medskip
+
+Two features of this result have important observational consequences:
+
+\begin{itemize}
+\item Because $S_x \propto n_e^2$, the surface \bfit{brightness falls steeply with radius}, making the low-density cluster outskirts intrinsically difficult to observe. 
+\item Because $S_x \propto (1+z)^{-4}$, the same cosmological surface-brightness dimming that dims extended sources at any wavelength makes it correspondingly \bfit{difficult to get good X-ray data at high redshift} in terms of high signal-to-noise: reaching a cluster at $z \simeq 1.4$ can require an exposure roughly twice as long as reaching one at $z \simeq 1.3$, and this cost grows rapidly with redshift.
+\end{itemize}
+
+\begin{figure}[H]
     \centering
-    \todo{Chandra images of two clusters at similar mass but different redshift (z~0.26 and z~1), illustrating the dramatic surface-brightness dimming of the higher-redshift system.}
-\end{minipage}
+    \includegraphics[height=0.18\textheight]{assets/cluster-center-outer.png}
+    \hfill
+    \includegraphics[height=0.18\textheight]{assets/chandra-obs.png}
+    \caption{\textbf{Left}: Brighter core, fainter outskirts. \textbf{Right}: Chandra images at different $z$ show strong surface-brightness dimming.}
+\end{figure}
+
+\vspace{-2em}
 
 \section{X-ray Observations of Galaxy Clusters} \label{sec:icm_xray_obs}
 
 \subsection{X-ray Telescopes: Chandra and XMM-Newton} \label{subsec:icm_telescopes}
 
-The bulk of our knowledge of cluster X-ray emission derives from two flagship observatories, whose complementary designs (introduced in \cref{subsec:xray_optics,subsec:xray_detectors}) make them suited to different aspects of cluster science.
+Most knowledge of cluster X-ray emission comes from two flagship observatories with complementary designs (\cref{subsec:xray_optics,subsec:xray_detectors}), each suited to different aspects of cluster science.
 
-\smallskip
 
-\subsubsection{Chandra}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}lcc@{}}
+        \toprule
+        & \textbf{Chandra} & \textbf{XMM-Newton} \\
+        \midrule
+        Angular resolution & $\sim 0.5''$ & $\sim 6''$ \\
+        Energy range      & 0.5--9~keV & 0.3--10~keV \\
+        Field of view     & $\sim 16\,\text{arcmin}$ & $\sim 30\,\text{arcmin}$ \\
+        Key objective
+            & \makecell{Higher resolution \\ $\rightarrow$ Detection of substructures}
+            & \makecell{Higher sensitivity \\ $\rightarrow$ Cluster outskirts} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison of key instrumental properties for \textbf{Chandra} and \textbf{XMM-Newton}.}
+\end{table}
 
-\textbf{Chandra} (NASA), operating from 0.5 to 9\,keV over a field of view of ${\sim}\,16\,\text{arcmin}$, delivers an exceptional angular resolution of ${\sim}\,0.5''$, achieved through its Advanced CCD Imaging Spectrometer (ACIS), an array of CCD chips arranged into an imaging (ACIS-I) and a spectroscopic (ACIS-S) configuration. This superb resolution makes Chandra the instrument of choice for resolving fine substructure within a cluster, such as cold fronts, shock edges, and filamentary features associated with mergers and AGN-driven cavities.
 
-\subsubsection{XMM-Newton}
 
-\textbf{XMM-Newton} (ESA), covering 0.3 to 10\,keV over a wider field of view of ${\sim}\,30\,\text{arcmin}$, trades some angular resolution (${\sim}\,6''$) for substantially higher collecting area and throughput. Its European Photon Imaging Camera (EPIC) combines two types of CCD detector: the Metal-Oxide-Semiconductor (MOS) cameras, each comprising 7 CCDs, and the PN-CCD camera, comprising 12 CCDs. The resulting higher sensitivity makes XMM-Newton particularly well suited to mapping the faint, diffuse emission of cluster outskirts, complementing Chandra's strength in resolving compact central structure.
+\begin{minipage}{0.6\textwidth}
+Chandra and XMM-Newton are complementary and often used together for cluster studies, revealing both detailed core structure and extended diffuse emission. Key features:
+\begin{itemize}
+    \item \textbf{Chandra:} Exceptional angular resolution ($\sim0.5''$), uniquely capable of resolving fine substructures such as filaments, sharp edges, cool fronts, and distinguishing closely spaced point sources from diffuse cluster emission. Ideal for detailed mapping of cluster cores and the study of dynamical processes.
+    \item \textbf{XMM-Newton:} Much larger collecting area and broader field of view, providing greater sensitivity to faint and extended X-ray emission. Used to detect and map the diffuse, low-surface-brightness outskirts of clusters, and for efficient spectral measurements over large areas.
+\end{itemize}
+By leveraging both Chandra's high-resolution imaging and XMM-Newton's sensitivity to extended structures, researchers can construct a comprehensive picture of galaxy clusters at both small and large scales.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/chandra-vs-newton.png}
+    \captionof{figure}{\small MACS J0717.5+3745 ($z=0.55$), Cl0016+16 ($z=0.55$). Chandra resolves substructure and sharp features, XMM-Newton captures diffuse emission in the outskirts.}
+\end{minipage}
 
-\begin{observationblock}[Chandra versus XMM-Newton]
-The two observatories are frequently used in tandem for the same targets, since their strengths are complementary rather than redundant: Chandra's superior angular resolution reveals substructures such as filaments and sharp edges that XMM-Newton's coarser point-spread function smooths over, while XMM-Newton's larger effective area and field of view make it markedly more sensitive to the low surface brightness emission of cluster outskirts, which Chandra's smaller collecting area struggles to detect at comparable exposure times.
-\end{observationblock}
+\begin{tipsblock}[Future Facilities - Athena]
+    \textbf{Athena} (ESA) is a next-generation X-ray observatory that will unite a large effective area and wide field of view with the exceptional spectral resolution of its X-ray Integral Field Unit (X-IFU), a micro-calorimeter similar to that on XRISM. Athena will detect more sources over larger areas than Chandra in much shorter exposures, dramatically increasing survey efficiency for high-redshift clusters.
+    
+    \smallskip
+
+    By precisely resolving metal emission lines in the ICM, Athena/X-IFU will enable detailed measurements of cluster metallicity and temperature profiles out to higher redshifts and lower masses, providing key insights into the history of chemical enrichment in galaxy clusters.
+\end{tipsblock}
 
 \subsection{Event Files, Background, and Source Detection} \label{subsec:icm_background}
 
-X-ray observations are delivered not as conventional images but as \bfit{event files}: a list of individually detected photons, each tagged with its arrival time, detector position, and pulse-height (energy) channel. Because each incoming X-ray photon liberates many electron-hole pairs in the CCD (in contrast to the single electron produced by an optical photon), these detectors function simultaneously as imagers and as photon-counting spectrometers, recording both where and at what energy each photon arrived.
+X-ray observations are delivered not as conventional images but as \textbf{event files}: a list of individually detected photons, each tagged with its arrival time, detector position, and pulse-height (energy) channel. Because each incoming X-ray photon liberates many electron-hole pairs in the CCD (in contrast to the single electron produced by an optical photon), these detectors function simultaneously as imagers and as photon-counting spectrometers, recording both where and at what energy each photon arrived.
 
 \medskip
 
-Any X-ray observation is contaminated by a \textbf{background} with both astrophysical and instrumental origins. The astrophysical component comprises diffuse emission from the Milky Way itself, principally the Local Hot Bubble and the hot gas of the Galactic halo, typically modelled as a combination of two thermal components, together with the cumulative emission of unresolved extragalactic point sources (predominantly background AGN), modelled as an absorbed power law. The instrumental component arises from the telescope structure itself being struck by high-energy charged particles, whose interactions with the detector are registered indistinguishably from genuine X-ray photons.
+Any X-ray observation is contaminated by a \textbf{background} caused by:
+\begin{itemize}
+    \item \textbf{Astrophysical background:}
+    \begin{itemize}[label=$\circ$]
+        \item Diffuse emission from the Milky Way, primarily the Local Hot Bubble and the hot gas of the Galactic halo, typically modeled as two thermal components.
+        \item Cumulative emission of unresolved point sources (mainly background AGN), usually modeled as an absorbed power law.
+    \end{itemize}
+    \item \textbf{Instrumental background:}
+    \begin{itemize}[label=$\circ$]
+        \item Emission from the telescope itself when struck by high-energy particles
+        \item Particle events registered by the detectors as X-ray photons
+    \end{itemize}
+\end{itemize}
 
-\medskip
+\begin{center}
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/x-bg-rem.png}
 
-\begin{minipage}{0.6\textwidth}
-Extracting a clean measurement of the cluster's own emission from this combination of source and background requires a multi-step \bfit{source detection} procedure. First, all individually resolved point sources in the field, chiefly foreground stars and background AGN unrelated to the cluster, are identified and masked. The astrophysical and instrumental background components are then characterised and subtracted from the remaining, diffuse emission. Only after this cleaning step does the smooth, extended emission of the cluster itself emerge clearly, ready for the radial profile analysis described in \cref{subsec:icm_profiles}.
+    \vspace{-0.5em}
+
+    \captionof{figure}{Four-panel sequence: raw Chandra field, detected point sources circled and masked, background-subtracted image, and final cleaned cluster detection.}
+\end{center}
+
+\smallskip
+
+Extracting a clean measurement of the cluster's own emission from this combination of source and background requires a multi-step source detection procedure. First, all individually resolved point sources in the field, chiefly foreground stars and background AGN unrelated to the cluster, are identified and masked. The astrophysical and instrumental background components are then characterised and subtracted from the remaining, diffuse emission. Only after this cleaning step does the smooth, extended emission of the cluster itself emerge clearly.
+
+\smallskip
+
+In practice, deriving the density and temperature profiles proceeds by measuring the mean surface brightness and the mean spectrum within a series of concentric radial annuli or bins, and then fitting each of these binned measurements independently: the surface brightness profile is fit to recover the gas density profile, while the spectrum extracted in each bin is fit to recover the local temperature.
+
+\smallskip
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/x-obs-pipeline.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Extraction of gas density and temperature profiles from X-ray data using radial bins.}
+\end{center}
+
+\section{Cluster Masses from X-ray Observations} \label{sec:icm_masses}
+
+\subsubsection{Hydrostatic Mass Estimates} \label{subsec:hse}
+
+\begin{minipage}{0.67\textwidth}
+For a system in \textbf{hydrostatic equilibrium}, the inward pull of gravity is everywhere balanced by the outward gradient of the gas pressure:
+\smallskip
+$$
+\nabla P_{\text{gas}} = -\rho_{\text{gas}}\,\nabla\Phi .
+$$
+Assuming spherical symmetry, this reduces to:
+\smallskip
+$$
+\frac{dP}{dr} = -\rho_{\text{gas}}\,\frac{d\Phi}{dr} = -\rho_{\text{gas}}\,\frac{GM(r)}{r^2} .
+$$
 \end{minipage}%
 \hfill
-\begin{minipage}{0.35\textwidth}
+\begin{minipage}{0.3\textwidth}
     \centering
-    \todo{Four-panel sequence: raw Chandra field, detected point sources circled and masked, background-subtracted image, and final cleaned cluster detection.}
+    \includegraphics[width=0.8\textwidth]{assets/m-p.png}
+    \captionof{figure}{Hydrostatic equilibrium}
 \end{minipage}
 
 \medskip
 
-In practice, deriving the density and temperature profiles of \cref{subsec:icm_profiles} proceeds by measuring the mean surface brightness and the mean spectrum within a series of concentric radial annuli or bins, and then fitting each of these binned measurements independently: the surface brightness profile is fit to recover the gas density profile (\cref{subsubsec:icm_density,subsubsec:icm_sb}), while the spectrum extracted in each bin is fit to recover the local temperature (\cref{subsubsec:icm_temperature}).
-
-\section{Cluster Masses from X-ray Observations} \label{sec:icm_masses}
-
-\subsection{Hydrostatic Mass Estimates} \label{subsec:hse}
-
-\begin{minipage}{0.58\textwidth}
-For a system in \bfit{hydrostatic equilibrium}, the inward pull of gravity is everywhere balanced by the outward gradient of the gas pressure,
-$$
-\nabla P_{\text{gas}} = -\rho_{\text{gas}}\,\nabla\Phi .
-$$
-Assuming spherical symmetry, this reduces to
-$$
-\frac{dP}{dr} = -\rho_{\text{gas}}\,\frac{d\Phi}{dr} = -\rho_{\text{gas}}\,\frac{GM(r)}{r^2} .
-$$
 Combining this with the ideal gas equation of state, $P = n k_B T$, allows the total gravitating mass enclosed within radius $r$, dark matter included, to be estimated directly from the observed gas density and temperature profiles:
 $$
 M(r) = -\frac{r^2}{\rho_{\text{gas}}}\frac{dP}{dr} = -\frac{r}{G}\frac{kT}{\mu m_p}\left[\frac{d\ln\rho_{\text{gas}}}{d\ln r} + \frac{d\ln T}{d\ln r}\right] .
 $$
 This \bfit{hydrostatic mass} estimate is one of the principal routes by which X-ray observations constrain cluster masses, and, by extension, cosmological parameters sensitive to the cluster mass function.
-\end{minipage}%
-\hfill
-\begin{minipage}{0.38\textwidth}
-    \centering
-    \todo{Schematic of a spherical gas cloud in hydrostatic equilibrium, with inward gravity arrows balanced by outward gas-pressure arrows.}
-\end{minipage}
 
 \medskip
 
@@ -478,54 +407,382 @@ The derivation rests on two simplifying assumptions: hydrostatic equilibrium its
 $$
 \frac{\partial \mathbf{v}}{\partial t} + (\mathbf{v}\cdot\nabla)\mathbf{v} = -\frac{1}{\rho_{\text{gas}}}\nabla P_{\text{gas}} - \nabla\phi ,
 $$
-which is entirely neglected by the simple hydrostatic mass formula above. Recent high-resolution spectroscopy (e.g.\ with XRISM) has begun to measure this non-thermal pressure fraction directly, finding it to increase from a few percent in the core to several percent near $R_{2500}$ in relaxed systems such as Abell 2029.
+which is entirely neglected by the simple hydrostatic mass formula above. Recent high-resolution spectroscopy has begun to measure this non-thermal pressure fraction directly, finding it to increase from a few percent in the core to several percent near $R_{2500}$ in relaxed systems.
 
-\subsection{The Hydrostatic Mass Bias} \label{subsec:hse_bias}
+\begin{observationblock}[Hydrostatic Mass Bias]
+The standard hydrostatic mass estimate systematically \textbf{underestimates} the true cluster mass whenever non-thermal pressure support is present, a systematic known as the \textbf{hydrostatic mass bias}. Typical biases are of order $10$-$20\%$, being larger for dynamically disturbed clusters than for relaxed ones. An additional, smaller uncertainty can also arise from the specific choice of cluster centre.
+\end{observationblock}
+
+\section{Cool-Core and Non-Cool-Core Clusters} \label{sec:cool_core}
+
+Building on the temperature profile diversity introduced in \cref{subsubsec:icm_temperature}, \bfit{Cool-Core} (CC) and \bfit{Non-Cool-Core} (NCC) clusters exhibit distinct, physically linked signatures across their density, temperature, and metallicity profiles:
+
+\begin{itemize}
+    \item \textbf{Cool-core clusters} show an elevated central gas density, which drives efficient radiative cooling; a temperature that drops sharply toward the centre, indicating that the gas is losing energy faster than it can be replenished; and a strong central enhancement in metallicity, reflecting the undisturbed accumulation of metals produced by the central galaxy over a long, quiescent period. 
+    \item \textbf{Non-cool-core clusters} lack all three signatures, instead showing a flatter, hotter, and more chemically uniform central distribution.
+\end{itemize}
+
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/cc-ncc.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Radial profiles of gas density, temperature, and metallicity in CC and NCC clusters.}
+\end{figure}
+
+\vspace{-1em}
 
 \begin{minipage}{0.55\textwidth}
-Because the simple hydrostatic mass estimate neglects any non-thermal pressure support, it systematically \textbf{underestimates} the true cluster mass whenever such support is present, an effect known as the \bfit{hydrostatic mass bias}. Comparisons between hydrostatic mass estimates and the true mass in cosmological simulations, where the true mass is known exactly, indicate a typical bias of order $10$-$20\%$, with the effect being markedly stronger for dynamically disturbed clusters than for relaxed ones: mock observations of clusters spanning a range of dynamical states consistently recover mass profiles for disturbed systems that lie below those of relaxed systems at the same true mass.
+    These two classes map directly onto the dynamical history of the cluster. Cool cores are found in \textbf{relaxed} systems that have not experienced a major merger for several billion years, allowing their dense central gas to cool and their metal content to accumulate undisturbed. Non-cool cores, conversely, characterise \textbf{disturbed} systems that have recently undergone a major merger: the immense kinetic energy of the collision drives shocks and turbulence that stir the gas, injecting heat and erasing any pre-existing cool core, in the same way that mergers dilute the central metallicity peak discussed in \cref{subsubsec:icm_metallicity}.
 \end{minipage}%
 \hfill
 \begin{minipage}{0.42\textwidth}
     \centering
-    \todo{Scaled hydrostatic mass profiles for 75 simulated massive clusters, showing disturbed systems (red) lying systematically below relaxed systems (blue) at fixed radius; adapted from Bartalucci et al. 2019.}
+    \includegraphics[width=\textwidth]{assets/cc-ncc-emission.png}
+    \captionof{figure}{Comparison of X-ray surface brightness profiles in cool-core (CC) and non-cool-core (NCC) clusters.}
 \end{minipage}
 
-\medskip
+\subsection{The cooling flow problem and selection effects} \label{subsec:cooling-flow-selection}
 
-A further, more subtle source of uncertainty in the derived radial profiles comes from the choice of \textbf{cluster centre}. Two common definitions, the X-ray surface-brightness peak and the X-ray centroid, generally agree closely for relaxed, symmetric clusters, but can diverge substantially in disturbed systems whose X-ray morphology is elongated or multiply peaked, introducing an additional, dynamical-state-dependent systematic into the mass estimate.
+\subsubsection{The cooling flow problem}
 
-\section{Cool-Core and Non-Cool-Core Clusters} \label{sec:cool_core}
-
-Building on the temperature profile diversity introduced in \cref{subsubsec:icm_temperature}, \bfit{Cool-Core} (CC) and \bfit{Non-Cool-Core} (NCC) clusters exhibit distinct, physically linked signatures across their density, temperature, and metallicity profiles. Cool-core clusters show an elevated central gas density, which drives efficient radiative cooling; a temperature that drops sharply toward the centre, indicating that the gas is losing energy faster than it can be replenished; and a strong central enhancement in metallicity, reflecting the undisturbed accumulation of metals produced by the central galaxy over a long, quiescent period. Non-cool-core clusters lack all three signatures, instead showing a flatter, hotter, and more chemically uniform central distribution.
-
-\smallskip
-
-These two classes map directly onto the dynamical history of the cluster. Cool cores are found in \textbf{relaxed} systems that have not experienced a major merger for several billion years, allowing their dense central gas to cool and their metal content to accumulate undisturbed. Non-cool cores, conversely, characterise \textbf{disturbed} systems that have recently undergone a major merger: the immense kinetic energy of the collision drives shocks and turbulence that stir the gas, injecting heat and erasing any pre-existing cool core, in the same way that mergers dilute the central metallicity peak discussed in \cref{subsubsec:icm_metallicity}.
-
-\begin{tipsblock}[The cooling flow problem]
-Based purely on X-ray observations of its density and temperature, the dense central gas of a cool-core cluster should radiate away its energy efficiently and cool rapidly to very low temperatures ($T < 10^4\,\text{K}$), producing a massive \bfit{cooling flow} of gas onto the central galaxy at rates of order $100$-$1000\,M_\odot\,\text{yr}^{-1}$. In practice, however, X-ray spectroscopy shows that while the gas does cool toward the centre, it never drops below a characteristic floor temperature of order $T \sim 10^7\,\text{K}$: the large reservoirs of cold gas and correspondingly high star formation rates predicted by simple cooling-flow models are largely absent, with the observed cooling rate falling roughly a factor of five below the naive prediction.
+Based purely on X-ray observations of its density and temperature, the dense central gas of a cool-core cluster should radiate away its energy efficiently and cool rapidly to very low temperatures ($T < 10^4\,\text{K}$), producing a massive \textbf{cooling flow} of gas onto the central galaxy at rates of order $100$-$1000\,M_\odot\,\text{yr}^{-1}$. In practice, however, X-ray spectroscopy shows that while the gas does cool toward the centre, it never drops below a characteristic floor temperature of order $T \sim 10^7\,\text{K}$: the large reservoirs of cold gas and correspondingly high star formation rates predicted by simple cooling-flow models are largely absent, with the observed cooling rate falling roughly a factor of five below the naive prediction.
 
 \smallskip
 
 The leading resolution to this "cooling flow problem" is that the gas is continuously reheated, most plausibly by feedback from the central supermassive black hole's active nucleus (\cref{ch:agn}): jets and outflows from the AGN inject just enough mechanical energy back into the surrounding gas to balance radiative losses, holding the cool core in a state of rough thermal equilibrium rather than allowing it to collapse.
-\end{tipsblock}
 
-\smallskip
+\subsubsection{Selection Effect}
 
-Finally, because the X-ray surface brightness scales as $n_e^2$ (\cref{subsubsec:icm_sb}), the denser cores of cool-core clusters render them systematically easier to detect in flux-limited X-ray surveys than their non-cool-core counterparts. This \textbf{selection effect} must be carefully modelled in any cosmological analysis that relies on X-ray-selected cluster catalogues, since an uncorrected excess of cool cores in a survey would otherwise bias the inferred cluster mass function and the cosmological parameters derived from it.
+\begin{minipage}{0.57\textwidth}
 
-\section{Future Facilities: Athena} \label{sec:athena}
+    A key observational bias arises because X-ray surface brightness depends on the square of the electron density, $n_e^2$ (\cref{subsubsec:icm_sb}). The dense, bright cores of cool-core clusters boost their detectability in flux-limited X-ray surveys, making them stand out even when compared to non-cool-core clusters of similar overall mass and size.
 
-\begin{minipage}{0.55\textwidth}
-The \textbf{Advanced Telescope for High-Energy Astrophysics} (Athena, ESA) is a next-generation X-ray observatory designed to combine a substantially larger effective area and field of view with the high spectral resolution of a micro-calorimeter instrument (the X-ray Integral Field Unit, X-IFU), analogous in principle to the instrument flown on Astro-H/XRISM (\cref{subsubsec:cmb_history}). Simulated observations of deep survey fields indicate that Athena will detect a comparable or greater number of sources than Chandra over a much wider field of view, using only a small fraction of the exposure time, dramatically improving the efficiency of wide-area, high-redshift cluster surveys.
+    \smallskip
+
+    This \textbf{selection effect} causes X-ray-selected cluster samples to be disproportionately populated by cool-core systems. As a result, statistical or cosmological studies that rely on these samples risk drawing conclusions from a skewed population, unless this bias is properly accounted for. To obtain accurate measurements of the true cluster population, analyses must model and correct for this over-representation of cool-core clusters.
 \end{minipage}%
 \hfill
 \begin{minipage}{0.4\textwidth}
     \centering
-    \todo{Simulated Athena X-IFU spectrum of a cluster compared to XMM-Newton/pn, XRISM/SXS, and Chandra/ACIS-I, showing individually resolved metal lines (O, Ne, Mg, Si, S, Fe) at far higher signal-to-noise than current instruments.}
+    \includegraphics[width=\textwidth]{assets/selection-effect.png}
+    \captionof{figure}{SZ vs. X-ray selection: X-ray samples over-represent cool-core clusters \cite{White}.}
+\end{minipage}
+
+\section{The ICM in the Millimetre: The Sunyaev-Zel'dovich Effect} \label{sec:icm_mm}
+ 
+Beyond X-rays, the hot ICM leaves a second, entirely independent observational signature: a small, characteristic distortion imprinted on the CMB spectrum itself as its photons pass through the cluster. This \textbf{Sunyaev-Zel'dovich} (SZ) effect, predicted by Sunyaev and Zel'dovich in 1970 and first tentatively detected toward the Coma cluster shortly thereafter, has since grown into one of the primary tools for finding and characterising clusters, particularly at high redshift, complementing the X-ray view of the ICM developed in the preceding sections.
+ 
+\subsection{The Thermal SZ Effect} \label{subsec:tsz}
+ 
+\begin{minipage}{0.56\textwidth}
+The \textbf{thermal SZ} (tSZ) effect arises from the inverse Compton scattering of low-energy CMB photons off the hot, energetic free electrons of the ICM. Each individual scattering event changes the photon's frequency by a fractional amount of order
+\medskip
+$$
+\frac{\Delta\nu}{\nu} \sim \frac{k_B T_e}{m_e c^2} \sim 10^{-2} ,
+$$
+and, because the electrons are far more energetic than the photons, up-scattering (which transfers energy from the electron to the photon) is systematically more likely than down-scattering. The cumulative effect of many such scattering events along the line of sight through the cluster is therefore not merely to redistribute photons at fixed energy, but to pump low-frequency CMB photons preferentially toward higher frequencies.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/tsz-dist.png}
+    \captionof{figure}{Spectral distortion of the CMB due to the tSZ effect in clusters, shown for different electron temperatures ($k_B T_e$) from 0 to 20~keV. The effect produces a decrement at low frequencies and an increment at high frequencies, with the null near 217~GHz.}
+\end{minipage}
+
+\medskip
+ 
+The net result is a small but characteristic \textbf{spectral distortion} of the CMB blackbody along any line of sight that intersects a massive cluster: a deficit of photons at low frequencies and a corresponding excess at high frequencies, relative to the pure $2.725\,\text{K}$ blackbody described in \cref{subsec:cmb_monopole}. In the non-relativistic limit, this distortion is:
+$$
+\delta I_\nu \approx \frac{2(k_B T_{\rm CMB})^3}{(hc)^2}\,\frac{x^4 e^x}{(e^x-1)^2}\left[x\,\frac{e^x+1}{e^x-1} - 4\right] y
+$$
+or, expressed as an equivalent CMB temperature shift:
+$$
+\delta T \approx T_{\rm CMB}\left[x\,\frac{e^x+1}{e^x-1} - 4\right] y ,
+$$
+where $x$ is the \bfit{dimensionless} (or \bfit{reduced}) \bfit{frequency}:
+$$
+x = \frac{h\nu}{k_B T_{\rm CMB}}
+$$
+The amplitude of the distortion is set by the \bfit{Compton-$y$ parameter}, the line-of-sight integral of the electron pressure,
+$$
+y = \frac{\sigma_T}{m_e c^2}\int n_e\, T_e\, dl ,
+$$
+which depends only on the thermodynamic properties of the ICM along the line of sight, not on the frequency of observation.
+The spectral term in square brackets, by contrast, encodes the characteristic \bfit{spectral signature} of the effect: negative at low frequencies, positive at high frequencies, with a null crossing at $x \simeq 3.83$, corresponding to $\nu \simeq 217\,\text{GHz}$.
+ 
+\begin{observationblock}[Redshift independence of the tSZ signal]
+The reduced frequency $x = h\nu/(k_B T_{\rm CMB}(z))$ depends on redshift only through the CMB temperature at the cluster, $T_{\rm CMB}(z)$. Under the standard assumption of adiabatic cosmic expansion, $T_{\rm CMB}(z) = T_0(1+z)$, while a photon observed today at frequency $\nu_0$ was emitted (and scattered) at the cluster at the correspondingly redshifted frequency $\nu = \nu_0(1+z)$. The factor of $(1+z)$ therefore cancels exactly between numerator and denominator,
+$$
+x = \frac{h\,\nu_0(1+z)}{k_B\,T_0(1+z)} = \frac{h\,\nu_0}{k_B\,T_0}
+$$
+leaving the tSZ spectral distortion, at fixed observing frequency, independent of the cluster's redshift. Unlike the X-ray surface brightness, which dims steeply as $(1+z)^{-4}$, the SZ signal of a cluster of fixed mass is thus, to first order, equally detectable regardless of its distance.
+\end{observationblock}
+ 
+\medskip
+ 
+This same redshift independence provides a direct observational test of the assumed adiabatic expansion. If the CMB temperature instead evolved as $T_{\rm CMB}(z) = T_0(1+z)^{1+\beta}$ for some small deviation $\beta$, the cancellation above would be incomplete, and the tSZ null frequency and spectral shape would acquire a residual, measurable redshift dependence. Combining SZ observations of clusters spanning a wide range of independently known redshifts (from X-ray or optical follow-up) with this technique yields tight constraints on $\beta$, consistent with zero and hence with the standard adiabatic thermal history of the Universe.
+ 
+\subsection{CMB Secondary Anisotropies and the tSZ Power Spectrum} \label{subsec:tsz_secondary}
+ 
+At small angular scales where the primary CMB anisotropies (\cref{sec:cmb_anisotropies}) are damped away, high-resolution experiments like ACT and SPT reveal \textbf{secondary anisotropies} imprinted along the line of sight after recombination. These arise from compact point sources, radio-loud AGN, dusty star-forming galaxies, and the extended tSZ "shadows" of foreground galaxy clusters.
+
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.44\textwidth]{assets/cmb-sec-any.png}
+    \hspace{0.8em}
+    \includegraphics[width=0.49\textwidth]{assets/cmb-any.png}
+    
+    \vspace{-0.5em}
+
+    \captionof{figure}{\textbf{Left}: Sky map at 150~GHz from the SPT, showing secondary CMB anisotropies. \textbf{Right}: CMB temperature power spectrum, showing secondary anisotropies at high multipoles.}
+\end{center}
+
+\medskip
+
+At high multipoles, the CMB signal is dominated by secondary anisotropies, such as those arising from galaxy clusters and foreground sources. Consequently, astrophysical foregrounds become increasingly important and must be accurately modeled to interpret the observed spectrum:
+
+\smallskip
+
+\begin{itemize}
+    \item At 220 GHz, the thermal Sunyaev-Zel'dovich (tSZ) effect is nulled, but emissions from the cosmic infrared background (CIB) and radio point sources remain significant. 
+    \item At 150 GHz, the tSZ effect produces a strong decrement, while dust emission is much fainter than at 220 GHz.
+\end{itemize}
+
+The observed temperature map at frequency $\nu$ can be modeled as the sum of several distinct components:
+$$
+\Delta T_i(\nu) = f(\nu)\,y_i + \mathrm{CMB}_i + \mathrm{Dust}_i + \mathrm{Noise}_i(\nu)
+$$
+Here, $f(\nu)\,y_i$ describes the thermal Sunyaev-Zel'dovich (tSZ) effect previously defined, where $y_i$ is the Compton-$y$ parameter for pixel $i$, quantifying the distortion amplitude. The other terms represent the primary CMB anisotropies, Galactic and extragalactic dust emission, and instrumental (and possibly astrophysical) noise. This linear decomposition enables separation of the tSZ signal from other foregrounds and backgrounds in multi-frequency observations.
+
+\smallskip
+ 
+\begin{minipage}{0.43\textwidth}
+Isolating the tSZ signal from these other components, requires exploiting its distinctive spectral signature across multiple frequency channels. Linear combinations of the multi-frequency maps (such as the Modified Internal Linear Combination Algorithm, MILCA, or the Needlet Internal Linear Combination, NILC) are constructed to null the CMB blackbody term while preserving the tSZ spectral law, producing a full-sky \textbf{Compton-$y$ map} in which clusters appear as compact, positive-$y$ features.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.54\textwidth}
+    \vspace{-0.5em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/y-map.png}
+    
+    \vspace{-0.5em}
+
+    \captionof{figure}{Combined Planck and SPT-3G minimum-variance Compton-$y$ map, showing galaxy clusters as reddish tSZ features \cite{Maniyar}.}
+\end{minipage}
+
+\smallskip
+ 
+The $y$-map can then be analysed statistically in the same way as the CMB TT power spectrum of \cref{subsubsec:cmb_powerspectrum}, by expanding it in spherical harmonics and computing an angular power spectrum:
+\medskip
+$$
+y(\hat n) = \sum_{\ell m} y_{\ell m}\, Y_{\ell m}(\hat n) ,
+\qquad
+C_\ell^{\rm tSZ} = \frac{1}{2\ell+1}\sum_m y_{\ell m}\, y_{\ell m}^* .
+$$
+
+\vspace{-0.5em}
+
+\begin{minipage}{0.55\textwidth}
+Even after advanced component separation, the recovered tSZ spectrum remains \bfit{contaminated by residual foregrounds}: primarily the cosmic infrared background (CIB), along with radio (RS) and infrared (IR) point sources. These residual components must be modeled and subtracted simultaneously with the tSZ signal to obtain an unbiased measurement:
+\medskip
+$$
+C_\ell^{\mathrm{total}} = C_\ell^{\mathrm{tSZ}} + C_\ell^{\mathrm{CIB}} + C_\ell^{\mathrm{RS}} + C_\ell^{\mathrm{IR}}
+$$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/y-map-decomposed.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{$y$-map decomposition \cite{Planck2015_tSZ}.}
+\end{minipage}
+
+\vspace{-0.7em}
+
+\subsubsection{Relativistic Corrections} \label{subsubsec:tsz_relativistic}
+ 
+\begin{minipage}{0.6\textwidth}
+At the higher electron temperatures found in the most massive clusters ($k_B T_e$ of several keV), the simple non-relativistic treatment requires correction for the mildly relativistic motions of the scattering electrons:
+$$
+\Delta I_\nu = y\, I_0\left[g(x) + \delta_{\rm rel}(x, T_e)\right] .
+$$
+These \bfit{relativistic corrections} shift the null frequency of the distortion to higher values with increasing electron temperature, approximately as $\nu_0(T_e) \simeq 217.4 + T_e/2\,\text{GHz}$ (with $T_e$ in keV), and they increase the tSZ intensity ratio to higher frequencies.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/rel-tsz.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Relativistic tSZ spectral corrections as a function of $T_e$.}
+\end{minipage}
+
+Because the correction size depends explicitly on $T_e$, multi-frequency SZ photometry offers an electron temperature estimate that is independent of, and complementary to, the X-ray spectroscopic temperature $T_X$; stacked analyses of Planck data confirm good agreement between the two.
+ 
+\subsection{The Kinetic SZ Effect} \label{subsec:ksz}
+ 
+A second, physically distinct secondary anisotropy arises whenever the scattering electrons in the ICM possess a coherent bulk motion relative to the CMB rest frame. This \textbf{kinetic SZ} (kSZ) effect is a Doppler shift, not a spectral distortion: photons Thomson-scattering off electrons with line-of-sight peculiar velocity $v_{\rm pec}$ are shifted uniformly in frequency, producing a temperature fluctuation:
+$$
+\Delta T_{\rm kSZ} = -T_{\rm CMB}\int n_e\,\sigma_T\,\frac{\vec v\cdot\hat n}{c}\,dl = -T_{\rm CMB}\left(\frac{v_{\rm pec}}{c}\right)\tau_e ,
+$$
+where $\tau_e$ is the optical depth along the line of sight. Since it is a uniform temperature shift rather than a change in spectral shape, the kSZ effect is, to first order, \textbf{frequency-independent}, unlike the tSZ effect, which makes it considerably harder to separate from the primary CMB using multi-frequency data alone. It is also intrinsically much fainter, typically by an order of magnitude ($\Delta T/T \sim 10^{-6}$), since cluster peculiar velocities of a few hundred km/s are a small fraction of the speed of light.
+ 
+\smallskip
+
+\begin{minipage}{0.54\textwidth}
+    Despite its faintness, the kSZ effect offers a uniquely direct observational route to cluster peculiar velocities and, through them, to the large-scale velocity field of the cosmic web, complementary to the density-field information carried by galaxy clustering. Because the signal from any single cluster is too noisy to detect in isolation, kSZ measurements rely on stacking many systems together. In the \textbf{pairwise kSZ} technique, pairs of clusters at small comoving separations are stacked to measure their average relative motion.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.43\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/pairwise-clusters.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Pairwise kSZ amplitude \cite{Soergel}.}
+\end{minipage}
+
+\smallskip
+
+On average, such pairs are infalling toward each other, producing a detectable coherent infall signal. This effect has been robustly detected at $4.2\sigma$ significance by cross-correlating ${\sim}\,6700$ clusters from the DES redMaPPer catalogue with SPT-SZ temperature maps.
+ 
+\smallskip
+
+A more recent variant, the \textbf{rotational kSZ} effect, targets the coherent Doppler signal produced by the bulk rotation of gas within group- and cluster-scale halos, as opposed to their translational infall. By estimating each system's projected angular momentum axis from the redshift dipole of its satellite galaxies, and stacking the CMB temperature maps aligned along these axes, researchers have achieved a $2.3\sigma$ detection of coherent rotational kSZ signal within the virial radii of SDSS groups of typical mass $10^{14}\,h^{-1}\,M_\odot$. This technique opens a new observational window onto the angular momentum content of gas in collapsed halos.
+
+\smallskip
+
+\begin{center}
+    \centering
+    \includegraphics[width=\textwidth]{assets/rot-ksz.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Rotational kSZ effect \cite{rotation}.}
+\end{center}
+ 
+\subsection{SZ Cluster Catalogs} \label{subsec:sz_catalogs}
+
+
+
+\subsubsection{SZ view of clusters}
+
+The angular resolution of SZ instruments fundamentally determines the type of science we can do with cluster observations. Different observatories offer complementary capabilities that bridge the gap between full-sky detection and fine structural mapping:
+
+\smallskip
+
+\begin{itemize}
+\item \textbf{\textit{Planck}} (Space-based): While providing all-sky coverage, it has limited resolution, sufficient to detect only the most massive systems, but unable to resolve the internal structure of any individual cluster.
+\item \textbf{South Pole Telescope (SPT)} (Ground-based): Achieves better resolution and can distinguish between nearby clusters and the background, yet still cannot resolve substructures within most clusters.
+\item \textbf{MUSTANG} (High-resolution): Mounted on large single-dish telescopes, it allows us to probe the internal structure, such as shocks or pressure substructures, within low-redshift clusters.
+\end{itemize}
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.5\textwidth]{assets/mm-res.png}
+    \hfill
+    \includegraphics[width=0.45\textwidth]{assets/plank-bullet.png}
+    \captionof{figure}{\textbf{Left:} SZ instrument resolutions at various angular scales. \textbf{Right:} The Bullet Cluster as seen by Planck and Chandra+HST; low SZ resolution fails to reveal key substructures that are apparent at higher resolution.}
+\end{center}
+
+\medskip
+
+However, even with MUSTANG's capabilities, resolving such detail becomes impossible at high redshift (e.g.\ $z \sim 2$), though it remains sensitive enough to identify prominent features like shock fronts. Thus, the specific questions we can address about the intracluster medium, ranging from cluster detection to mapping detailed thermodynamic features, depend crucially on the angular resolution and sensitivity of our SZ observations.
+
+\medskip
+
+\begin{center}
+\includegraphics[width=0.88\textwidth]{assets/spt-mustang.png}
+
+\vspace{-0.5em}
+
+\captionof{figure}{Examples of SPT and MUSTANG imaging: SPT delivers arcminute-scale SZ maps for many clusters, while MUSTANG achieves much finer resolution, revealing substructure in nearby systems.}
+
+\end{center}
+
+\subsubsection{Matched filtering}
+ 
+Because the tSZ signal from any single cluster is faint and buried within a complex mixture of primary CMB fluctuations, astrophysical foregrounds, and instrumental noise, cluster detection in SZ survey data relies on \textbf{matched filtering}. 
+
+\smallskip
+
+The \textbf{optimal matched filter} technique models the signal in each frequency map as:
+$$
+\Delta T_i(\vec\theta) = y_0\, S(\vec\theta)\cdot f(\nu_i) + \text{Noise}_i(\vec\theta) , \qquad \quad \ S(\vec\theta) = \Delta T_0\left(1+|\vec\theta|^2/\theta_c^2\right)^{-1}
+$$
+where $y_0$ is the \bfit{signal strength}, $f(\nu)$ the \bfit{spectral dependence} (tSZ frequency law), $S(\vec\theta)$ an assumed \bfit{spatial profile} depending on the angular parameter, and $\theta_c$ the angular cluster size. 
+
+\smallskip
+
+A \textbf{filter} $\psi(\vec k)$ is constructed in Fourier space to maximise the S/N ratio at the cluster location:
+$$
+\psi(\vec k) = \frac{B(\vec k)\,S(|\vec k|)}{B(\vec k)^2\,N_{\rm astro}(|\vec k|) + N_{\rm noise}(\vec k)}
+$$
+where $B(\vec k)$ is the instrument beam. Since a given cluster's true angular size is not known in advance, the filter is applied repeatedly across a grid of trial core radii, and the scale that maximises the recovered signal-to-noise is retained as the cluster's best-fit extent.
+
+\begin{center}
+\begin{minipage}{0.45\textwidth}
+    \includegraphics[width=\textwidth]{assets/filter.png}
+\end{minipage}%
+\hspace{1em}
+\begin{minipage}{0.5\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/matched-filter.png}
+\end{minipage}
+\end{center}
+\captionof{figure}{\textbf{Left}: filter at different frequencies \textbf{Right}: matched-filter pipeline, multi-frequency inputs processed by the matched filter into a single output map optimizing S/N ratio.}
+ 
+\medskip
+ 
+Applying such filters across a full survey and flagging peaks above a chosen significance threshold enables the \bfit{blind} detection of clusters, that is, without any prior knowledge of their existence or location; this approach produced the first blind SZ-selected cluster sample, using data from the SPT. Because the tSZ amplitude is essentially independent of redshift, SZ surveys detect massive clusters out to very high redshift with a selection function set primarily by mass rather than distance, in sharp contrast to the steeply redshift-dimmed X-ray selection. This complementarity is directly visible across cluster samples spanning from $z\sim 1$ to $z\sim 1.9$, where the SZ decrement remains comparably detectable despite the very different cosmic epochs probed, and it is precisely this same $n_e^2$-versus-$n_e$ scaling that underlies the X-ray/SZ selection contrast already noted in \cref{subsec:cooling-flow-selection}.
+ 
+\medskip
+ 
+This same redshift independence, however, means that an SZ detection alone conveys no information about the cluster's distance. Confirming a candidate and assigning it a redshift therefore requires dedicated multi-wavelength follow-up: optical and near-infrared imaging to identify the overdensity of red-sequence galaxies associated with the cluster, or spectroscopy of individual member galaxies, is combined with the SZ-based mass estimate to build a complete, redshift-calibrated cluster catalogue.
+ 
+\subsubsection{The catalogue}
+
+\begin{minipage}{0.55\textwidth}
+    The halo mass shown in cluster catalogues is not a directly observable quantity; rather, it is inferred from observables like the SZ signal from y-maps, and calibrated against independent mass estimates. The distribution of clusters in the mass-redshift plane in \cref{fig:cat}, illustrates several important features of SZ-selected cluster surveys. 
+
+    \smallskip
+
+    Matched filtering in SZ surveys imposes a \textbf{mass selection}: we only detect clusters above a certain mass threshold, set by the filter. Critically, this threshold is nearly \textbf{independent of redshift}: all clusters plotted are above this mass limit.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.43\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/sz-cat.png}
+    \captionof{figure}{Halo mass versus redshift for clusters detected in major SZ surveys.}
+    \label{fig:cat}
 \end{minipage}
 
 \medskip
 
-By resolving individual metal emission lines with high statistical precision across large cluster samples, Athena's X-IFU is expected to transform measurements of the ICM's metallicity and temperature structure described in \cref{subsec:icm_profiles}, extending detailed profile studies to higher redshift and lower mass than is currently feasible, and providing a far more direct probe of the chemical enrichment history encoded in the ICM.                        
+At high redshift (above $z \sim 2$), it is not simply that clusters become undetectable, rather, the most massive clusters have not yet formed at these early epochs, so their absence at high redshift is a genuine reflection of hierarchical structure formation rather than an observational limitation.
+
+\subsubsection{Protoclusters} \label{subsubsec:protoclusters}
+ 
+\begin{minipage}{0.5\textwidth}
+At sufficiently high redshift ($z \gtrsim 1.5$-$2$), the progenitors of today's massive clusters have not yet virialised into the single, thermalised dark matter halo characteristic of a mature cluster. Instead, they appear as \bfit{protoclusters}: extended, still-collapsing overdensities of individually forming galaxy groups, embedded within a shared but not yet fully assembled gravitational potential. Unlike mature clusters, protoclusters are characterised by ongoing, vigorous star formation and energetic AGN feedback within their still-merging member galaxies.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.47\textwidth}
+    \vspace{-0.7em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/protocluster.png}
+    \captionof{figure}{Examples of star-forming and simulated protoclusters at high redshift.}
+\end{minipage}
+ 
+\medskip
+ 
+The Spiderweb protocluster at $z \approx 2$, illustrates both the promise and the observational challenge of this regime. Deep, ${\sim}\,700\,\text{ks}$ Chandra observations struggle to detect significant diffuse, thermalised ICM emission around the system, a direct consequence of the $(1+z)^{-4}$ X-ray surface-brightness dimming. Millimetre observations, by contrast, are far more efficient at this epoch: only a few hours of ALMA integration reveal an extended reservoir of enriched proto-ICM gas surrounding the still-assembling central galaxy and its radio jets, tracing the material that will eventually thermalise into the hot, X-ray-luminous ICM of a mature cluster.
