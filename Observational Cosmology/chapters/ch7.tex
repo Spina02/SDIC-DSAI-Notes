@@ -1,357 +1,1169 @@
-\chapter{Cosmological probes}
+\chapter{Cosmological Probes} \label{ch:cosmo_probes}
 
-\dots
+\section{The $\Lambda$CDM Framework} \label{sec:lcdm}
 
-\section{Cluster number counts}
+\subsection{Assumptions and Observational Pillars} \label{subsec:lcdm_assumptions}
 
-\subsection{Structure formation}
+Modern cosmology is founded on the \bfit{$\Lambda$CDM model}, a framework that explains the Universe's evolution from the Big Bang to today using just a few free parameters. Its key assumptions are: gravity follows General Relativity (GR); particle physics is described by quantum field theory (QFT); the Universe obeys the \textbf{cosmological principle} (isotropy and homogeneity); the early Universe had a rapid expansion phase (\textbf{inflation}); most matter is cold and collisionless (\textbf{dark matter}); and today's accelerated expansion is driven by a component with negative pressure, labeled $\Lambda$. Each of these assumptions is backed by observations. General Relativity is supported by Solar System tests (e.g., Mercury's perihelion, light deflection, gravitational redshift), timing of binary pulsars (Hulse-Taylor), and, recently, by direct detection of gravitational waves from compact-object mergers, confirming GR even in the strong-field regime.
 
-\subsubsection{Spherical collapse model}
+\subsubsection{The Cosmological Principle} \label{subsubsec:cosmo_principle}
 
-\subsection{Galaxy clusters}
+The \textbf{cosmological principle} states that the Universe is \textbf{isotropic and homogeneous} on sufficiently large scales, of order $100\,h^{-1}\,\text{Mpc}$. Isotropy, the absence of a preferred direction, is directly established by observation: the CMB temperature field is uniform to a few parts in $10^5$ once the dipole is removed, and galaxy surveys reveal no preferred axis on sufficiently large volumes. Homogeneity cannot be verified directly from a single vantage point and is instead adopted as an extension of the \textbf{Copernican principle}: since there is no reason to suppose that our location in the Universe is special, an isotropic Universe as seen from every point must also be homogeneous.
 
-The abundance and spatial distribution of galaxy clusters are sensitive to the growth rate of cosmic structures and expansion history of the Universe.
+\subsubsection{Cosmic Inflation} \label{subsubsec:inflation}
 
+\textbf{Inflation} is a brief phase of exponential expansion (about 60 e-folds) at $t \sim 10^{-37}$-$10^{-35}\,$s after the Big Bang, proposed to solve three key puzzles of standard cosmology.
+
+\smallskip
+
+\begin{minipage}{0.5\textwidth}
+The \textbf{horizon problem} concerns the near-perfect uniformity of the CMB temperature across the sky. In a Universe without inflation, causally disconnected regions at recombination subtend an angular scale of only $R_H(z_{\text{rec}}) \sim 1^\circ$ on the sky today, since light could not have travelled far enough since the Big Bang to connect them; yet regions separated by tens of degrees are observed to share the same temperature to within $10^{-5}$. Inflation resolves this by pushing the effective onset of the causal, particle horizon far earlier in conformal time, so that regions now widely separated on the sky were in causal contact before inflation began.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.47\textwidth}
+    % \vspace{-0.7em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/horizon-problem.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{The horizon problem: regions separated at recombination are linked by a prior inflationary epoch.}
+    \label{fig:horizon_problem}
+\end{minipage}
+
+\medskip
+
+\begin{minipage}{0.55\textwidth}
+The \textbf{flatness problem} asks why the Universe appears so close to spatially flat today ($\Omega_k \simeq 0$). In a decelerating Universe, flatness ($\Omega_{\text{tot}} = 1$) is \emph{unstable}: any tiny deviation from flatness in the early Universe would quickly grow, so observing near-exact flatness now would require extreme initial fine-tuning.
+Inflation solves this: rapid exponential expansion stretches space so much that any curvature is flattened away, driving $\Omega_{\text{tot}} \to 1$ no matter its starting value, like zooming in on a balloon's surface, which looks flatter as its radius increases.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.43\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/flatness.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Evolution of $\Omega_{\text{tot}}(z)$ for two initial values, both approach 1 at high $z$.}
+    \label{fig:flatness_problem_minipage}
+\end{minipage}
+
+\smallskip
+
+Finally, the \textbf{magnetic monopole problem}: many grand unified theories predict large numbers of stable, superheavy magnetic monopoles in the early Universe, yet none have been observed. Inflation solves this by exponentially diluting any relics present before it begins, reducing their number density by $e^{3N}$ (with $N \sim 60$), so that any primordial monopoles are undetectable today.
+
+\subsubsection{Dark Matter} \label{subsubsec:dark_matter_evidence}
+
+\bfit{Dark matter} is a hypothesized massive particle that interacts with ordinary matter and radiation primarily through gravity. Although it has never been directly detected, strong evidence for its existence comes from many independent observations on different scales.
+
+\medskip
+
+The first hint came from Zwicky's 1933 study of the Coma cluster: the observed galaxy velocities implied much more total mass than could be explained by the visible galaxies. Later, Vera Rubin measured \textbf{galaxy rotation curves} (\cref{sec:ism_hi}). Instead of declining at large radii as expected, galaxy rotation speeds remain nearly flat, implying an extended, invisible ("dark") mass component.
+
+\medskip
+
+\begin{minipage}{0.58\textwidth}
+Further evidence comes from gravitational lensing and the growth of structure. In merging clusters like the Bullet Cluster, gravitational lensing shows the total mass is offset from the X-ray-emitting gas (which marks most of the baryonic mass), directly indicating that most of the mass is dark and collisionless. Additionally, structure formation (going from tiny CMB fluctuations to the dense cosmic web today) can only be explained if most collisionless matter decouples early from the photon-baryon fluid; if the Universe were made of only baryons, there would not have been enough time for such structures to grow.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.40\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/CDM-growth.png}
+    \captionof{figure}{Growth of CDM, baryon, and photon density perturbations.}
+    \label{fig:dm_lensing_growth}
+\end{minipage}
+
+\subsubsection{Accelerated Expansion and Dark Energy} \label{subsec:dark_energy_discovery}
+
+The final critical pillar of the $\Lambda$CDM model is the discovery that the Universe's expansion is not just continuing, but actually accelerating—meaning galaxies are receding from each other faster and faster over time. This remarkable fact was firmly established in 1998-1999 by two independent teams, the High-Z Supernova Search Team and the Supernova Cosmology Project (2011 Nobel Prize). They found that distant Type Ia supernovae (\cref{sec:standard_candles}) appeared systematically fainter than they would in a Universe containing only matter. The simplest explanation for this dimming is that the expansion of the Universe has sped up over time, requiring the existence of an unknown component with strong negative pressure. This mysterious phenomenon is known as \textbf{dark energy}, and in the simplest scenario it is described mathematically by a cosmological constant $\Lambda$.
+
+\subsection{Current Status and Open Tensions} \label{subsec:lcdm_status}
+
+Today, multiple precise and independent cosmological probes—ranging from the CMB angular power spectrum at $z \simeq 1100$ to the baryon acoustic oscillation (BAO) pattern in large galaxy surveys at low redshift—consistently support a spatially flat $\Lambda$CDM Universe. Under the flatness condition,
 $$
-S_8 = \sigma_8( \Omega_m / 0.3)^{0.5}
+\Omega_k = 1 - \sum_i \Omega_i = 0
+$$
+the standard $\Lambda$CDM cosmology is fully characterised by six fundamental parameters (with a seventh included for massive neutrinos):
+$$
+\boxed{
+    \Lambda\mathrm{CDM}+\nu \text{parameters:}
+    \textcolor{orange}{\Omega_m, \Omega_b,~\Omega_\nu},
+    \textcolor{OliveGreen}{H_0},
+    \textcolor{MidnightBlue}{\sigma_8},
+    \textcolor{violet}{\tau},
+    \textcolor{ForestGreen}{n_s}
+}
 $$
 
-where $\sigma_8$ is the amplitude of the matter power spectrum and $\Omega_m$ is the present-day matter density.
-
-\subsection{The halo mass function}
-
-The cluster abundance can be expressed as:
-$$
-\frac{dN}{dz d\Omega} = \frac{dV}{dz d\Omega} n(M, z)
-$$
-where the first term represents the geometry (comoving volume element) and the second term $n(M,z)$ represents the growth of structure.
-
-The halo mass function is given by:
-$$
-n(z, M) = \frac{\rho_m}{M} f(\sigma) \frac{d \ln \sigma^{-1}}{dM}
-$$
-
-The variance of the density field is:
-$$
-\sigma(z, R) = \frac{1}{2\pi^2} \int_0^{\infty} dk \, k^2 P_m(z, k) |W(kR)|^2
-$$
-where $P_m(z,k)$ is the matter power spectrum.
-
-The halo mass function depends on cosmological parameters: increasing $\Omega_m$ or $\sigma_8$ shifts the mass function to higher abundances. Cluster counts as a function of redshift show sensitivity to these parameters, with different combinations of $\Omega_m$ and $\sigma_8$ producing distinct predictions for the number of clusters observed at different redshifts.
-
-\subsubsection{Massive neutrinos}
-
-\textbf{Massive neutrinos} are produced in the early Universe and kept in thermal equilibrium by weak interactions.
-
-Decoupling occurs at $T_{dec} \approx 2-4$ MeV, when $T_{dec} \gg m_\nu$, meaning neutrinos are ultra-relativistic at decoupling.
-
-The free-streaming length is given by:
-$$
-\lambda_H \sim \frac{c}{H} = R_H \sim ct
-$$
-
-At this stage, neutrinos contribute to the \textbf{radiation} energy content.
-
-The redshift of the \textbf{non-relativistic transition} is:
-$$
-(1 + z_{nr}) = \frac{1}{a_{nr}} \approx 2 \times 10^3 \left( \frac{m_\nu}{1 \text{ eV}} \right)
-$$
-
-The free-streaming wavenumber is:
-$$
-k_{nr} = 2\pi \frac{a_{nr}}{\lambda_h} = 0.018 \Omega_m^{1/2} \left( \frac{m_\nu}{1 \text{ eV}} \right) h \text{ Mpc}^{-1}
-$$
-
-After the non-relativistic transition, neutrinos contribute to the \textbf{matter} energy content.
-
-The evolution of the free-streaming wavenumber $k_s = 2\pi \frac{a}{\lambda_s}$ shows three distinct regimes:
 \begin{itemize}
-    \item Free streaming regime (small scales, high $k$)
-    \item Growth regime (intermediate scales)
-    \item Super horizon regime (large scales, low $k$)
+    \item \textcolor{orange}{$\Omega_m$, $\Omega_b$, $\Omega_\nu$}: energy density parameters (total, baryons, neutrinos) relative to the critical density;
+    \item \textcolor{OliveGreen}{$H_0$}: the Hubble constant, setting the current expansion rate of the Universe;
+    \item \textcolor{MidnightBlue}{$\sigma_8$}: the amplitude of matter fluctuations on $8\,h^{-1}\,\text{Mpc}$ scales;
+    \item \textcolor{violet}{$\tau$}: the optical depth to reionisation;
+    \item \textcolor{ForestGreen}{$n_s$}: the spectral index of the primordial fluctuation spectrum.
 \end{itemize}
 
+The present-day energy budget of the Universe, as measured by these probes, is dominated by dark energy ($\sim 69\%$) and cold dark matter (CDM, $\sim 26\%$), with only about $5\%$ in ordinary (baryonic) matter and roughly $1\%$ in neutrinos.
 
-Neutrinos are diffused becouse of the free streaming wavelegth, so they are not clustered. They:
+\medskip
 
-\begin{itemize}
-    \item Delay the epoch of matter-raadiation equality
-    \item Suppresses the growth of density fluctuation on scale smaller than the free streaming length
-\end{itemize}
+Despite this concordance, the two main components (dark matter and dark energy) remain deeply mysterious. We do not know the particle nature of dark matter, nor whether cosmic acceleration is driven by a true dark energy component, a modification of gravity, or something else. Fundamentally, it is also unknown if dark energy is a true constant (as in $\Lambda$CDM) or evolves with time (as in $w$CDM). If dark energy is vacuum energy, its observed value is inexplicably tiny compared to predictions from quantum field theory: $\frac{\rho_{\Lambda,\,\text{QFT}}}{\rho_{\Lambda,\,\text{observed}}} \approx 10^{120}$. The physical origin of inflation is also unknown.
 
-The higher the neutrino mass, the more they suppress the growth of density fluctuations, and the less massive objects are formed.
+\smallskip
 
-\subsubsection{Modified gravity}
+Compounding these open theoretical questions, precision measurements over the past decade have revealed statistically significant tensions between parameters inferred from early-Universe probes (the CMB) and those inferred from late-time, low-redshift probes (supernovae, cosmic shear, galaxy clustering, and cluster counts). The most discussed of these is the \bfit{Hubble tension}: local, late-Universe determinations of $H_0$ from the distance ladder (e.g. $H_0 \simeq 74 \pm\,\text{km\,s}^{-1}\,\text{Mpc}^{-1}$) sit some $4$-$6\sigma$ above the value inferred from the Planck CMB under $\Lambda$CDM ($H_0 \simeq 67\,\text{km\,s}^{-1}\,\text{Mpc}^{-1}$). A related, if somewhat milder, tension exists in the amplitude of matter clustering, commonly parametrised as $S_8 \equiv \sigma_8\sqrt{\Omega_m/0.3}$: weak-lensing and cluster-based measurements of $S_8$ tend to fall systematically below the value predicted by the Planck CMB best-fit model.
 
-There are many classes og mg models, e.g. $f(R)$:
+\smallskip
 
+\begin{center}
+    \includegraphics[width=\textwidth]{assets/CDM-tension.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{The Hubble tension (left) and the $S_8$ tension (right): discrepancies between early- and late-Universe determinations of key $\Lambda$CDM parameters.}
+    \label{fig:h0_s8_tension}
+\end{center}
+
+Most recently, results from the DESI spectroscopic survey, combining BAO measurements with the CMB and with independent SN Ia compilations, have provided tentative evidence that the equation of state of dark energy may not be exactly constant, hinting at a preference for a time-evolving dark energy component (parametrised as $w_0 w_a\text{CDM}$) over the simplest cosmological-constant scenario. Whether this preference reflects genuinely new physics, an unaccounted-for systematic, or a statistical fluctuation remains an open and actively debated question.
+
+\begin{tipsblock}[A strategy for stress-testing $\Lambda$CDM]
+A robust test of the $\Lambda$CDM model combines early-Universe probes (such as the CMB) with diverse late-time measurements across a wide redshift range. Expansion history and structure growth respond differently to cosmological parameters, particularly dark energy. By comparing multiple independent observables spanning broad redshifts, we can reveal discrepancies between models that may otherwise appear identical at a single epoch.
+\end{tipsblock}
+
+\subsection{Growth and Expansion: What Cosmological Probes Measure} \label{sec:probes_overview}
+
+Broadly speaking, cosmological probes constrain the $\Lambda$CDM model (and possible extensions to it) through two complementary observables: the \textbf{expansion history} of the Universe, encoded in the Hubble parameter $H(z)$, and the \textbf{growth history} of density perturbations, encoded in the linear growth factor $\delta(z)/\delta(\text{today})$. Both quantities depend on the matter density $\Omega_m$ and on the dark energy equation of state $w$, but with different sensitivities, so that a joint measurement of both breaks degeneracies that would otherwise persist if either were measured in isolation.
+
+\smallskip
+
+A wide range of independent techniques probe the Universe's expansion and growth history, each using different tracers and spanning various redshifts and systematics. These include primordial light-element abundances from Big Bang nucleosynthesis, CMB temperature and polarization anisotropies, the Lyman-$\alpha$ forest in quasar spectra, 21\,cm intensity mapping, the abundance and clustering of galaxy clusters, large-scale galaxy distribution, weak gravitational lensing, and standard candles like Type Ia supernovae. Major survey facilities such as Euclid, Rubin, SKAO, SPT, and eROSITA are all designed to exploit one or more of these probes, often covering multiple redshifts and wavelengths to maximize constraints on dark energy and test General Relativity.
+
+\vspace{-0.5em}
+
+\section{Standard Candles} \label{sec:standard_candles}
+
+A \bfit{standard candle} is an astronomical object whose absolute magnitude (equivalently, intrinsic luminosity) is known, either because it is genuinely constant across the population or because it can be calibrated against some other observable property of the source. Classic examples include Cepheid and RR Lyrae variable stars and Type Ia supernovae. By measuring the apparent magnitude of a standard candle and comparing it to its known absolute magnitude, one obtains its distance; combining distance measurements across a range of redshifts (the \bfit{Hubble diagram}) then allows the expansion history, and hence the underlying cosmological parameters, to be inferred directly.
+
+\vspace{-0.5em}
+
+\subsubsection{The Luminosity Distance} \label{subsec:luminosity_distance}
+
+In an expanding Universe, objects of known luminosity appear dimmer than they would in Euclidean space, due to both redshifting and the spreading of photons over a larger area. This leads to the definition of the \textbf{luminosity distance} $D_L$ as
 $$
-S = \dfrac 1{16 \pi G} \int \sqrt{-g} \lfloor R + f(R) \rfloor d^4 x
+f = \frac{L}{4\pi D_L^2} ,
 $$
+where $L$ is the bolometric luminosity of the source and $f$ its observed bolometric flux. 
 
-Give rise to accelerated expansion and enhance gravity, therefore the growth rate of structures is increased.
+To obtain an explicit expression for the luminosity distance $D_L$, we must consider three key effects in addition to the standard geometric dilution:
 
-Introduce screening mechanism that restores GR in high density environments: for object with mass above a given threshold, we restore the ... model.
+\begin{enumerate}
+    \item \textbf{Non-Euclidean Geometry:} The Universe may have spatial curvature, so the flux from a source is distributed over an area determined by the comoving transverse distance $D_M$, rather than by a simple Euclidean separation.
+    \item \textbf{Photon Redshifting:} As photons travel from source to observer, their energy is reduced by a factor of $1/(1+z)$ due to cosmological redshift. This directly decreases the observed flux.
+    \item \textbf{Time Dilation:} The arrival rate of photons is further reduced by a factor of $1/(1+z)$, because the observer's clocks run faster than those in the rest frame of the emitting source.
+\end{enumerate}
 
-% todo: add picture of Relative effect on the Halo Mass Function compared to ACDM
-
-The halo mass function $n(z, M) = \frac{\rho_m}{M} f(\sigma) \frac{d \ln \sigma^{-1}}{dM}$ contains the factor $f(\sigma)$, which is a "universal" function:
-\begin{itemize}
-    \item Press \& Schechter (1974): approximated from spherical collapse of Gaussian density field
-    \item Improved modeling using ellipsoidal collapse, e.g. Sheth \& Tormen (1999)
-    \item Nowadays calibrated against N-body simulations
-\end{itemize}
-
-The calibration of $f(\sigma)$ depends on different factors:
-\begin{itemize}
-    \item Specifics of the simulation (e.g. box size, number of particles, softening length)
-    \item Halo finder (e.g. linking length, FoF, SO)
-    \item Mass definition (e.g. $M_{200,m}$, $M_{500,c}$)
-    \item Redshift dependence
-    \item Cosmological model (e.g. $\Lambda$CDM, wCDM, massive neutrinos)
-\end{itemize}
-
-\subsubsection{Baryonic effects}
-
-Baryonic feedback (radiative cooling, star formation, AGN feedback) redistribute and expel mass from galaxy clusters.
-
-baryonic feedback is most effective in the inner the regions of the halo and in low mass systems: the potential well is shallower, so the gas can escape more easily.
-
-\section{From theory to observation}
-
-Masses are not directly observable. Galaxy clusters are selected according to different observables (e.g. Richness, X-ray luminosity / photon counts, SZ signal), in general relarted to the observational techniqye, which correate with the mass.
-
-Individual mass measurements are expensive and not feasible for cluster survey. We need to rely on mass proxies which are tightly correlated with the halo mass. We introduce an "Observable-mass relation".
-
-Cosmological and scaling relation parameters are in general highly degenerate, and follow-up data are necessary to constrain simultaneously cosmology and the observable-mass relation. We need to combine cluster abundance and cluster mass estimates data to simultaneously constrain cosmology and the observable-mass relation(s).
-
-\subsection{Cluster detection}
-
-\subsubsection{Photometric survey}
-
-Detection methods:
-\begin{itemize}
-    \item Overdensity of (red-sequence) galaxies
-    \item Lensing effect
-\end{itemize}
-
-Observable/Mass proxy:
-\begin{itemize}
-    \item Richness (\# member galaxies)
-    \item Luminosity
-    \item Lensing signal
-    \item Velocity dispersion (with spectra)
-\end{itemize}
-
-% todo: add z-$\lambda$ distribution of redMaPPer clusters in DES Y1
-
-\subsubsection{X-ray survey}
-
-Detection methods:
-\begin{itemize}
-    \item Extended X-ray sources
-\end{itemize}
-
-Observable/Mass proxy:
-\begin{itemize}
-    \item $L_X$ (X-ray luminosity)
-    \item $T_X$ (temperature)
-    \item Flux
-    \item $Y_X = M_{gas} T_X$ (gas thermal energy)
-\end{itemize}
-
-X-ray emissivity from bremsstrahlung radiation of the ICM:
+Taking all these factors into account, the observed flux becomes:
 $$
-\epsilon_\nu = \frac{dL}{dVd\nu} \propto n_e^2 g(\nu, T) T^{-1/2} \exp(-h\nu / k_B T)
+f = \frac{L}{4\pi (1+z)^2 D_M^2} ,
 $$
+Comparing this result with the definition of $D_L$ shows that the general relation is $D_L = (1+z) D_M$.
 
-X-ray surveys are flux limited samples and not very sensitive to projections.
+\smallskip
 
-% todo: add X-ray images of clusters from eROSITA
-% todo: add $L_X$-z distribution of X-ray selected catalogs
-
-\subsubsection{SZ survey}
-
-Detection methods:
-\begin{itemize}
-    \item Thermal Sunyaev-Zel'dovich effect (mm-wavelength)
-\end{itemize}
-
-Observable/Mass proxy:
-\begin{itemize}
-    \item SZ signal
-\end{itemize}
-
-The Compton-y parameter:
-$$
-y = \int d\ell \frac{k_B T_e}{m_e c^2} n_e \sigma_T
-$$
-
-The SZ signal is redshift independent, making it particularly useful for detecting clusters at high redshift.
-
-% todo: add SZ spectral distortion plot
-% todo: add mass and redshift distribution of SZ-selected cluster catalogs
-
-\subsection{Cluster catalogs at different $\lambda$s}
-
-% todo: listen the lecture, then enhance this section
-
-ICM-selected (X-ray, SZ):
-\begin{itemize}
-    \item Mass limit $M \sim 2 \cdot 10^{14} M_\odot$
-    \item Clean selection function (SZ signal independent of redshift!)
-    \item Need optical follow-up for confirmation, redshift and WL data
-\end{itemize}
-
-Optically-selected:
-\begin{itemize}
-    \item Lower mass limit $M \sim 5 \cdot 10^{13}$
-    \item $M_\star$ ($\times 10$ sample size)
-    \item Selection function harder to model
-    \item WL and photo-z data readily available
-\end{itemize}
-
-% todo: add $M_{500}$ vs redshift comparison plot for different surveys (eRASS1, Planck SZ, SPT-SZ, SPT-3G, SDSS, DES Y1, Euclid)
-
-\subsubsection{Mass measurements from X-ray data}
-\dots
-
-\subsubsection{Mass measurements from spectroscopic data}
-
-Assumimg spherical symmetry and dynamical equilibrium, we can dynamically estimate the mass using the Jeans equation:
-$$
-M(<r) = -\frac{r \sigma_r^2}{G} \left( \frac{d \ln \sigma_r^2}{d \ln r} + \frac{d \ln n_{\text{gal}}}{d \ln r} + 2\beta \right)
-$$
-where $\sigma_r$ is the radial velocity dispersion, $n_{\text{gal}}$ is the galaxy number density, and $\beta$ is the velocity anisotropy parameter.
-
-% todo: add plot "Dynamical mass measurements in Euclid"
-
-\subsubsection{Mass measurements from imaging}
-
-The gold standard to perform mass validation on clusters is using the lensing signal.
-
-The deflection does not depend on the dynamical state of the cluster.
-
-we deal with two different regimes:
-\begin{itemize}
-    \item \textbf{Strong lensing}: Strong lensing regime in cluster's core ($\sim$ few hundred kpc). Deflection of the light is large enough to create multiple images of the same source and arcs $\rightarrow$ Precise measurements of the projected mass in scales enclosed by arcs. The mass reconstruction rely on assumptions on lens geometry and mass model $\rightarrow$ introduce systematic uncertainties of $\sim 10-20\%$.
-    
-    \item \textbf{Weak lensing}: At larger radii ($R > 300$ kpc), the tidal gravitational field causes subtle distortion of the shape of background galaxies -- weak lensing regime -- resulting in a coherent alignment of the sources. We can reconstruct the projected density profile by measuring the mean tangential shear profile at different radii around the cluster:
+\begin{minipage}{0.62\textwidth}
+    For a spatially flat $\Lambda$CDM Universe, at redshifts well below matter-radiation equality ($z \ll z_{\text{eq}}$), the comoving distance reduces to a simple line-of-sight integral:
     $$
-    \gamma_t(r_\perp), \Sigma(R) \Rightarrow \bar{\Sigma}(R) = \int d^2x \Delta\rho\left(\sqrt{R^2 + x^2}\right)
+    D_L(z) = (1+z)\,D_M(z) = (1+z)\,\frac{c}{H_0}\int_0^z \frac{dz'}{E(z')}
     $$
-    To infer the mass profile one need to assume a parametric form for the halo density profile (e.g. NFW, Einasto profiles; Navarro+97, Einasto 1965) and correlated structures (2-halo term). In wide-field surveys, the weak lensing signal of clusters is usually stacked to increase the signal-to-noise and reduce the effect of shape noise and projection systematics, enabling calibration of the mass--observable scaling relation across large cluster samples.
-\end{itemize}
 
-% todo: add plot for mass measurement from imaging using different methods with high quality data 
+    \vspace{-0.5em}
 
-\subsubsection{CMB cluster lensing}
-
-The CMB provides a unique source of lensing signal at very high redshift ($z \approx 1100$), offering a powerful tool for cluster mass calibration that is independent of optical weak lensing systematics.
-
-The CMB has intrinsic temperature anisotropies from the last scattering surface. When CMB photons pass through a galaxy cluster, they are deflected by the gravitational potential of the cluster. This deflection causes the CMB temperature gradient to appear shifted, creating a \textbf{dipole-like distortion} pattern aligned with the local CMB gradient direction. The amplitude of this dipole is proportional to the cluster mass and the magnitude of the background CMB gradient.
-
-The distortion is quite small ($\sim 10$ µK for a $10^{15} M_\odot$ halo), but can be detected through stacking analysis of many clusters. By stacking the CMB signal around large samples of clusters (e.g., thousands of optically-selected clusters from surveys like redMaPPer), the signal-to-noise can be significantly enhanced, enabling robust mass calibration.
-
-CMB lensing signal can also be detected in polarization data:
-\begin{itemize}
-    \item CMB Polarization (E-modes) provides a "cleaner" signal than temperature $\rightarrow$ Less contaminated by astrophysical foregrounds (e.g., tSZ effect, point sources)
-    \item Recent results show $4.8\sigma$ detection of lensing signal from SPT-Pol data alone (Raghunathan+19)
-\end{itemize}
-
-% todo: add plot showing stacked 2D CMB lensing signal and azimuthally averaged convergence profile from CMB data around clusters (e.g., Baxter+19)
-% todo: add figure showing example lensing dipole signal from simulated Q/U stacks and rotated background-subtracted Q and U stacks from SPT-Pol data
-
-\subsubsection{Scaling relations}
-
-Different detection techniques imply different mass proxies, mass calibration and systematics.  
-The calibration of the observable-mass relation(s) requires:
-\begin{itemize}
-    \item Well defined selection function(s)
-    \item A model to describe the parent distribution as a function of mass (halo mass function)
-    \item A model to describe the PDF of the multivariate observable space: $P(\mathcal{X},\mathcal{O}|\mathcal{M})$
-\end{itemize}
-
-
-\chapter{Lecture 30/03/2026}
-
-% \dots
-
-% c-M primary dependence: mass and redshift -> the concentration decreases with mass and redshift.
-
-% \dots
-
-Cores and Self-Interacting Dark Matter (SIDM):
-
-\begin{itemize}
-    \item A finite self-interaction cross-section leads to heat transfer between DM particles, transporting energy from the hotter outer regions inward and reducing the central dark matter density — transforming a cusp into a core.
+    where:
+    $$
+    E(z) \equiv \frac{H(z)}{H_0} = \sqrt{\Omega_m (1+z)^3 + \Omega_\Lambda}
+    $$
+    Because $E(z)$ depends on $\Omega_m$, $\Omega_\Lambda$, and $H(z)$, measuring the luminosity distance to standard candles at known redshifts is a powerful way to constrain these cosmological parameters.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/lum-dist.png}
     
-    \item "small" Cross-sections of order $\sigma/m \sim 1$ cm$^2$/g are sufficient to produce kpc-sized cores, consistent with observations of low-surface-brightness galaxies and dwarf galaxies.
+    \captionof{figure}{Luminosity distance}
+    \label{fig:luminosity_distance_models}
+\end{minipage}
+
+\smallskip
+
+
+Each choice of parameters predicts a distinct $D_L(z)$ curve; these differences become especially pronounced for $z \gtrsim 1$, where the luminosity distances in matter-dominated and dark-energy-dominated models separate significantly.
+
+\vspace{-0.5em}
+
+
+\subsubsection{The Distance Modulus} \label{subsec:distance_modulus}
+
+Observationally, source brightness is conventionally expressed in magnitudes rather than in flux directly. The \textbf{apparent magnitude} is defined as
+$$
+m = -2.5\log_{10}(f) + \text{const.} ,
+$$
+and the \textbf{absolute magnitude} $M$ is defined as the apparent magnitude the source would have if placed at a fiducial distance of $10\,\text{pc}$. 
+
+\begin{minipage}{0.6\textwidth}
+    The difference between the two, the \textbf{distance modulus}, then encodes the luminosity distance directly:
+    \medskip
+    $$
+    \mu \equiv m - M = 5\log_{10}\!\left(\frac{D_L}{10\,\text{pc}}\right)
+    $$
+    Since $D_L(z)$ depends on the cosmological parameters as derived above, the distance modulus of a population of standard candles observed across a range of redshifts (the Hubble diagram $\mu(z)$) is one of the most direct empirical routes to constraining $\Omega_m$ and $\Omega_\Lambda$.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+    \vspace{-1em}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/distance-modulus.png}
+    \captionof{figure}{Distance modulus}
+    \label{fig:distance_modulus}
+\end{minipage}
+
+\subsection{Cepheid Variables} \label{subsec:cepheids}
+
+\begin{minipage}{0.56\textwidth}
+\textbf{Cepheid variables} are pulsating stars whose pulsation period is tightly correlated with their intrinsic luminosity, the \bfit{period-luminosity relation} (or \textbf{Leavitt Law}, 1908). Because this relation allows the absolute magnitude of an individual Cepheid to be inferred directly from an easily measured observable, its pulsation period, Cepheids constitute the first standard candle used in astronomy, and remain a crucial rung of the local \bfit{cosmic distance ladder}: they are used to calibrate the absolute magnitude of Type Ia supernovae in nearby host galaxies, anchoring the entire SN Ia Hubble diagram to a physically calibrated distance scale.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/chepheids.png}
+    \captionof{figure}{The Cepheid period-luminosity (Leavitt) relation.}
+    \label{fig:cepheid_pl}
+\end{minipage}
+
+\subsection{Type Ia Supernovae} \label{subsec:sn1a}
+
+The progenitor of a \textbf{Type Ia supernova} (SN Ia) is generally understood to be a white dwarf in a close binary system, accreting matter from its companion until it approaches the Chandrasekhar limit, $M_{\text{Ch}} \sim 1.4\,M_\odot$. Upon reaching this critical mass, the star is disrupted by an explosive thermonuclear burning event that synthesises iron-peak elements. Because essentially all SNe Ia explode at very nearly the same mass, the resulting population shows comparatively small intrinsic scatter in peak luminosity, making them attractive as standard candles.
+
+\smallskip
+
+SN Ia explosions are intrinsically rare, occurring at a rate of only ${\sim}\,10^{-4}\,[\text{yr\,Mpc}^3]^{-1}$ (roughly once per century in a galaxy like the Milky Way), but their peak luminosity is extraordinary, $M_V \simeq -19.3$, some $5\times10^9$ times brighter than the Sun and typically comparable to the integrated brightness of their entire host galaxy. This combination of rarity and extreme luminosity is precisely what makes them valuable cosmological probes: their brightness allows them to be detected out to $z > 1$, while their rarity is offset by monitoring very large volumes with dedicated time-domain surveys.
+
+\subsubsection{Standardisation} \label{subsubsec:sn1a_standardization}
+
+\begin{minipage}{0.56\textwidth}
+Although SNe Ia show the highest photometric homogeneity of any supernova type, they are not, strictly speaking, standard candles: their peak absolute magnitudes show an intrinsic scatter of order $40\%$. The key empirical insight that rescues their use as precision distance indicators is that this scatter is not random, but correlates tightly with two independently measurable observables: the shape of the light curve (dimmer SNe decline more rapidly after maximum light, brighter SNe decline more slowly) and the SN colour at peak (redder events tend to be intrinsically fainter, largely due to dust extinction in the host galaxy).
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/sup-Ia.png}
+    \captionof{figure}{SN Ia V-band light curves before (left) and after (right) stretch standardization.}
+    \label{fig:sn1a_stretch}
+\end{minipage}
+
+\smallskip
+
+This motivates the \textbf{standardised distance modulus},
+$$
+\mu = m - M - \alpha\, x - \beta\, c ,
+$$
+where $x$ is the light-curve stretch parameter, $c$ is a measure of the SN colour, and $\alpha$, $\beta$ are empirically fitted nuisance parameters common to the entire SN sample. Once corrected in this way, the residual scatter in peak luminosity is reduced to the few-percent level, sufficient for precision cosmology.
+
+
+\begin{minipage}{0.52\textwidth}
+    \subsubsection{The Hubble Diagram} \label{subsubsec:sn1a_hubble_diagram}
     
-    \item If SIDM is universal, cores should exist in all dark matter halos, from dwarf galaxies to galaxy clusters — providing a testable prediction across a wide range of scales.
+Studying the evolution of the standardised distance modulus with redshift, the \textbf{Hubble diagram of SNe Ia}, provides a direct measurement of both $H_0$ (from the low-redshift slope) and the full expansion history $H(z)$ (from the shape of the curve at higher redshift, where the transition from decelerated to accelerated expansion becomes visible). The most recent, large SN Ia compilations (e.g.\ the DES-SN5YR sample of over 1\,600 supernovae) confirm this transition directly: residuals relative to a matter-only ($\Lambda = 0$) cosmology diverge systematically from zero at $z \lesssim 0.5$, exactly as expected once dark energy comes to dominate the energy budget.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.44\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/sIa-hubble.png}
+    \captionof{figure}{SNe Ia Hubble diagram.}
+    \label{fig:sn1a_hubble_diagram}
+\end{minipage}
+
+\subsection{$H_0$ and Low-Redshift Anchors}
+
+Calibrating SN Ia distances at low redshift relies on independent geometric distance anchors, most commonly Cepheids in SN Ia host galaxies, themselves tied to precise parallax or maser measurements. This full calibration chain yields $H_0 = 73.2 \pm 1.3\,\text{km\,s}^{-1}\,\text{Mpc}^{-1}$ (\textbf{SH0ES}, Riess et al.\ 2021), a value in notable ($\sim4\sigma$) tension with that inferred from the CMB assuming $\Lambda$CDM.
+
+\medskip
+
+Recent \textbf{JWST} observations of Cepheid hosts previously observed with \textbf{HST} find tight ($\sim 1\sigma$) agreement, and alternative distance indicators like the tip of the red giant branch (TRGB) and J-region asymptotic giant branch (JAGB) also concur within uncertainty. This consistency across methods argues against a significant instrumental or Cepheid-specific systematic as the source of the discrepancy.
+
+\medskip
+
+
+\begin{center}
+    \includegraphics[width=0.52\textwidth]{assets/anchor.png}
+    \includegraphics[width=0.47\textwidth]{assets/H0.png}
+    \captionof{figure}{\textbf{Left:} Calibration of $H_0$ via the distance ladder, showing results for Cepheids (HST, JWST), TRGB, and JAGB anchors. \textbf{Right:} Comparison of $H_0$ measurements from different methods \cite{Riess}.}
+    \label{fig:sn1a_hubble_diagram}
+\end{center}
+
+\begin{exampleblock}[Fitting cosmological models to the SN Ia Hubble diagram]
+Other cosmological models predict distinct forms for $E(z)$, and distinct Hubble diagrams:
+\smallskip
+\begin{center}
+    \footnotesize
+\begin{tabular}{ll}
+\toprule
+\textbf{Model} & $E(z) = H(z)/H_0$ \\
+\midrule
+Flat $\Lambda$CDM & $\left[\Omega_M(1+z)^3 + (1-\Omega_M)\right]^{1/2}$ \\
+$\Lambda$CDM & $\left[\Omega_M(1+z)^3 + \Omega_\Lambda + (1-\Omega_M-\Omega_\Lambda)(1+z)^2\right]^{1/2}$ \\
+Flat $w$CDM & $\left[\Omega_M(1+z)^3 + (1-\Omega_M)(1+z)^{3(1+w)}\right]^{1/2}$ \\
+Flat $w_0w_a$CDM & $\left[\Omega_M(1+z)^3 + (1-\Omega_M)(1+z)^{3(1+w_0+w_a)}\,e^{-3w_a z/(1+z)}\right]^{1/2}$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+\smallskip
+
+Fitting the observed distance moduli $\mu(z)$ against these functional forms yields the corresponding best-fit parameters $\Omega_M$, $\Omega_\Lambda$, $w$, or $(w_0,w_a)$.
+\end{exampleblock}
+
+\section{Standard Clocks and Chronometers} \label{sec:cosmic_chronometers}
+
+A complementary route to constraining the expansion history exploits the relation between cosmic time and redshift directly, rather than relying on a distance indicator. Since the age of the Universe at redshift $z$ is
+$$
+t(z) = \frac{1}{H_0}\int_0^z \frac{dz'}{E(z')(1+z')} ,
+$$
+finding the oldest objects at each redshift and using their inferred formation ages provides one route to constraining $H_0$ and the expansion history: such objects act as \textbf{standard clocks}, sources whose absolute age is independently known.
+
+\smallskip
+
+A more powerful variant of this idea avoids the need for absolute ages entirely. Rearranging the definition of the Hubble parameter,
+$$
+H(z) = -\frac{1}{1+z}\frac{dz}{dt} ,
+$$
+shows that a direct, model-independent measurement of $H(z)$ requires only the \textit{differential} age of the Universe between two nearby redshifts, that is, $dt$ for a given $dz$, rather than any absolute age. This motivates the search not for standard clocks, but for \textbf{standard chronometers}: a homogeneous population of objects with a synchronised formation epoch, whose internal clocks all began ``ticking'' at the same cosmic time, and which therefore trace the differential age evolution of the Universe in a consistent way regardless of the (unknown) absolute zero-point of that clock.
+
+\subsection{The Cosmic Chronometers Method} \label{subsec:cc_method}
+
+The \textbf{cosmic chronometers} (CC) method rests on two pillars: the selection of an optimal population of chronometers, and a sufficiently precise measurement of the differential age between redshift bins. Spectroscopic redshift surveys make the second requirement remarkably achievable, since a spectroscopic redshift typically constrains $\delta z/(1+z) \lesssim 10^{-3}$. The first requirement is met by \textbf{massive, passively evolving galaxies}: systems that formed the bulk (${>}\,90\%$) of their stellar mass in a single, rapid episode of star formation at high redshift ($z \gtrsim 2$-$3$), and subsequently exhausted their gas reservoir, evolving thereafter without further significant star formation. Because their star-formation histories are effectively synchronised and simple, the differential ageing of their stellar populations tracks the differential ageing of the Universe itself, with minimal dependence on the detailed astrophysics of any individual galaxy.
+
+\subsection{The 4000 \AA\ Break} \label{subsec:d4000}
+
+In practice, deriving an age from a galaxy spectrum requires adopting a model for stellar population synthesis, introducing a source of systematic uncertainty. This dependence can be minimised by working instead with a direct, empirically robust spectral feature: the \textbf{4000 \AA\ break} ($D_n4000$), a discontinuity in a galaxy's continuum flux around rest-frame $4000\,\text{\AA}$ produced by the accumulation of metal absorption lines in the atmospheres of older, cooler stars. 
+
+
+\noindent
+\begin{minipage}{0.55\textwidth}
+Because the strength of this break grows monotonically with the age of a passively evolving stellar population (for a given star-formation history and metallicity), it provides an approximately linear proxy for stellar age:
+$$
+D_n4000 = A(\text{SFH}, Z/Z_\odot)\cdot \text{age} + B ,
+$$
+so that the differential age required by the cosmic chronometers method can be related directly to the differential $D_n4000$ measured between two redshift bins,
+$$
+H(z) = -\frac{1}{1+z}\, A(\text{SFH}, Z/Z_\odot)\, \frac{dz}{dD_n4000} .
+$$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=0.98\linewidth]{assets/4000-break.png}
+    \captionof{figure}{4000 \AA\ break as age indicator, resulting $H(z)$ measurements \cite{Moresco2016}.}
+    \label{fig:d4000}
+\end{minipage}
+
+Compiling cosmic-chronometer $H(z)$ measurements from a broad range of independent studies (spanning full-spectral-fitting and $D_n4000$-based methods alike) out to $z \sim 2$ yields a Hubble parameter history in good overall agreement with the flat $\Lambda$CDM model calibrated to Planck, and the resulting constraints in the $\Omega_m$-$H_0$ plane are highly complementary to, and consistent with, other late-time probes.
+
+\subsection{Brightest Cluster Galaxies as Chronometers} \label{subsec:bcg_chronometers}
+
+\bfit{Brightest cluster galaxies} (BCGs), the most massive and typically oldest galaxies in the Universe, sitting at the centres of massive galaxy clusters, constitute a particularly attractive chronometer population. Having formed their stars very early and very rapidly ($z > 2$), BCGs represent an unusually homogeneous and ``pure'' sample, reducing the risk of contamination from younger stellar populations that can otherwise bias the inferred age of a more heterogeneous galaxy sample. Applying the $D_n4000$ technique to a BCG sample yields an $H(z)$ measurement fully consistent with, and complementary to, the broader cosmic-chronometer compilation.
+
+\begin{tipsblock}[Standard clocks and chronometers: strengths and limitations]
+The cosmic chronometer method for measuring $H(z)$ features the following:
+
+\begin{itemize}
+    \item \textbf{Pros:}
+\begin{itemize}
+    \item Provides a genuinely \textbf{model-independent} measurement of $H(z)$; does \emph{not} require any assumption about the underlying cosmological model.
+    \item Highly \textbf{complementary} to geometric probes (BAO, SNe Ia, and the CMB), adding independent information.
+    \item  \textbf{Valuable at intermediate redshifts} ($z \sim 0.1$--$2$), where other late-time probes are sparse. 
+\end{itemize}
+
+\item \textbf{Cons:}
+\begin{itemize}
+    \item Requires \textbf{accurate age-dating} of the chronometer (galaxy) population.
+    \item Must control for systematics from stellar population synthesis, star-formation history, and metallicity to avoid biasing $H(z)$.
+\end{itemize}
+\end{itemize}
+\end{tipsblock}
+
+\section{Big Bang Nucleosynthesis} \label{sec:bbn} 
+
+\begin{minipage}{0.45\textwidth}
+
+\textbf{Big Bang nucleosynthesis} (BBN) refers to the synthesis of the light nuclides, principally deuterium (D), helium-3 ($^3\text{He}$), helium-4 ($^4\text{He}$), and lithium-7 ($^7\text{Li}$), during the first few minutes of the Universe's existence. Together with the CMB, BBN constitutes one of the two great pillars of quantitative evidence for the hot Big Bang model, and, crucially, probes cosmological conditions at a far earlier epoch, $t \sim 1$--$300\,\text{s}$, than any other observational method.
+
+\bigskip
+\bigskip
+\end{minipage}%
+\hfill
+\begin{minipage}{0.52\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/bbn.png}
+
+    \captionof{figure}{Thermal history of the Universe.}
+    \label{fig:thermal_history}
+\end{minipage}
+
+\vspace{-2.5em}
+
+\subsection{Physics of BBN} \label{subsec:bbn_physics}
+
+\subsubsection{Neutron-Proton Freeze-out} \label{subsubsec:np_freezeout}
+
+At temperatures $k_BT \gg 1\,\text{MeV}$, the rate of the weak interactions coupling neutrons and protons, $\Gamma_{n\leftrightarrow p}$, greatly exceeds the cosmic expansion rate $H$, so that protons, neutrons, and electrons remain in chemical equilibrium via:
+$$
+e^+ + n \leftrightarrow p + \bar\nu_e , \qquad \nu_e + n \leftrightarrow p + e^- .
+$$
+As the Universe cools below $k_BT \sim 1\,\text{MeV}$ (corresponding to $t \sim 1\,\text{s}$), neutrinos decouple from the thermal plasma and the weak interaction rate falls below the expansion rate, $\Gamma_{n\leftrightarrow p} < H$: neutrons and protons cease to interconvert, and the neutron-to-proton ratio \bfit{freezes out}. At the freeze-out temperature, the equilibrium neutron abundance is suppressed relative to protons by the Boltzmann factor associated with their slightly larger mass, yielding $n/p \simeq 1/6$. Because free neutrons are unstable, with a mean lifetime $\tau_n = 890\,\text{s}$ comparable to the age of the Universe at this epoch, a further slow $\beta$-decay of the surviving free neutrons reduces the ratio to $n/p \simeq 1/7$ by the time nucleosynthesis proper begins.
+
+\subsubsection{Formation of the Light Elements} \label{subsubsec:light_element_formation}
+
+Protons and neutrons combine into $^4\text{He}$ through a short chain of two-body reactions:
+$$
+p + n \leftrightarrow {}^2\text{H} + \gamma , \qquad
+{}^2\text{H} + n \to {}^3\text{H} + \gamma , \qquad
+{}^3\text{H} + p \to {}^4\text{He} + \gamma ,
+$$
+$$
+{}^2\text{H} + p \to {}^3\text{He} + \gamma , \qquad
+{}^3\text{He} + n \to {}^4\text{He} + \gamma .
+$$
+The bottleneck of this entire chain is the formation of \textbf{deuterium}, the first nuclide produced: although deuterium begins forming as soon as $p + n$ collisions become energetically favourable, it is immediately photodissociated by the still-abundant population of energetic photons in the Wien tail of the blackbody spectrum, since even a tiny fraction of photons above the (comparatively low) deuterium binding energy vastly outnumber the baryons. 
+
+\smallskip
+
+Only once the number density of these dissociating photons, $n_\gamma^{\text{diss}}$, falls to a level comparable to the baryon number density $n_b$, at $k_BT \sim 0.1\,\text{MeV}$ ($T \sim 10^9\,\text{K}$, corresponding to $t_{\text{BBN}} \sim 150\,\text{s}$), does deuterium survive in appreciable quantity; this delay relative to the naive binding-energy expectation is known as the \textbf{deuterium bottleneck}. Once the bottleneck is overcome, the subsequent reactions proceed rapidly, and essentially all surviving free neutrons are incorporated into $^4\text{He}$ nuclei.
+
+\medskip
+
+Because the timing of the bottleneck, and hence the final light-element abundances, depends on the relative abundance of photons to baryons, the primordial helium mass fraction $Y_{\text{He}}$ is controlled by three physical inputs: the \textbf{freeze-out temperature} of the weak interactions (which itself depends on the total number of relativistic neutrino species present), the \textbf{mean neutron lifetime}, and the \textbf{baryon-to-photon ratio}:
+$$
+\eta \equiv \frac{n_b}{n_\gamma} = 2.7\times 10^{-8}\,\Omega_b h^2 ,
+$$
+which sets the epoch $t_{\text{BBN}}$ at which deuterium photodissociation becomes inefficient.
+
+\medskip
+
+Further reactions synthesise trace amounts of $^7\text{Li}$:
+$$
+{}^4\text{He} + {}^3\text{H} \leftrightarrow {}^7\text{Li} + \gamma , \qquad
+{}^4\text{He} + {}^3\text{He} \leftrightarrow {}^7\text{Be} + \gamma , \qquad
+{}^7\text{Be} + \gamma \leftrightarrow {}^7\text{Li} + p,
+$$
+with a relative abundance to hydrogen of only $\sim 10^{-9}$-$10^{-10}$. Nucleosynthesis effectively terminates here: no stable isotopes exist with mass number 5 or 8 ($^8\text{Be}$ is unstable), forming a nuclear gap that cannot be bridged at the low densities and temperatures characteristic of the BBN epoch, and the triple-alpha process responsible for producing $^{12}\text{C}$ in stellar interiors requires conditions far denser than those found in the early Universe. All heavier elements, carbon, nitrogen, oxygen, iron, and beyond, are consequently produced later, through thermonuclear processes inside stars.
+
+\subsection{Observational Signatures and Constraints} \label{subsec:bbn_observations}
+
+\subsubsection{Primordial Abundances Determination} \label{subsubsec:primordial_abundances}
+
+Each light nuclide offers a different observational window onto the primordial abundances, according to how strongly its post-BBN evolution is affected by subsequent stellar processing.
+
+\medskip
+
+
+\begin{minipage}{0.52\textwidth}
+    \bfit{Deuterium} is the best probe of primordial baryon density: it is not produced after BBN, and any deuterium passing through stars is destroyed (converted to $^3\text{He}$). Its abundance therefore monotonically decreases over time, so any observed deuterium gives a firm lower limit on the primordial value. The most accurate primordial measurements come from absorption lines seen in a handful of high-redshift, metal-poor quasar sightlines, which are largely untouched by later stellar processing.
     
-    \item Central DM densities in the core regime are expected to be of order $10^7$--$10^8$ $M_\odot$/kpc$^3$, significantly lower than the cusp densities predicted by collisionless CDM simulations.
+    \medskip
+The evolution of $^3\text{He}$ after BBN is much more complicated, involving both stellar production and destruction; as a result, observations are limited to our Solar System and Galactic HII regions. In contrast, $^4\text{He}$ is more straightforward: stars continually convert hydrogen to helium over time, so the observed $^4\text{He}$ abundance today is always at least the primordial value. The key measurements come from hydrogen and helium recombination lines in very metal-poor extragalactic HII regions, chosen to minimize stellar processing effects. 
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/abundances.png}
+    \captionof{figure}{BBN predictions for the primordial abundances \cite{Fields}.}
+    \label{fig:bbn_abundances}
+\end{minipage}
+
+\medskip
+
+Finally, $^7\text{Li}$ observed today is affected by continuous production in stars and cosmic-ray interactions, so its primordial abundance must be estimated from the oldest, most metal-poor halo stars, where subsequent enrichment is minimal.
+
+\begin{observationblock}[The $^7$Li problem]
+Standard BBN, using the CMB-measured baryon density, \textbf{overestimates} the primordial $^7\text{Li}$ abundance by about a factor of 3 compared to observations of old, metal-poor (Population II) halo stars:
+$$
+\left(\frac{^7\text{Li}}{\text{H}}\right)_{\text{BBN}} \sim 5\times10^{-10} , \qquad
+\left(\frac{^7\text{Li}}{\text{H}}\right)_{\text{obs}} \sim 1.6\times10^{-10} .
+$$
+This ongoing disagreement is the well-known \bfit{lithium problem}. Two main explanations have been proposed, but neither fully resolves it. One possibility is lithium depletion in old stars through stellar processes (like diffusion, mixing, or destruction), yet no model accounts for the consistently low lithium found in metal-poor halo stars. The other is that nuclear reaction rates, especially those for $^7\text{Be}$ destruction, have been underestimated, but updated lab measurements have not solved the issue.
+\end{observationblock}
+
+\subsubsection{Effective Number of Relativistic Species} \label{subsubsec:neff}
+
+Besides determining light-element abundances, BBN and the CMB also constrain the early Universe's total radiation content via the \bfit{effective number of relativistic species}, $N_{\text{eff}}$. This parameter measures the energy density contributed by relativistic particles other than photons, mainly the three known neutrino types, but also any possible new, light, weakly interacting species:
+$$
+\rho_{\text{rad}} = \left[1 + \frac{7}{8}\left(\frac{4}{11}\right)^{4/3} N_{\text{eff}}\right] \rho_\gamma .
+$$
+The Standard Model, allowing for small neutrino heating from $e^+e^-$ annihilation, predicts $N_{\text{eff}} = 3.044$. Any new relativistic particles would increase $N_{\text{eff}}$, raising the radiation density at a fixed photon temperature. This speeds up the cosmic expansion during BBN and recombination (as $H \propto \sqrt{\rho_{\text{rad}}}$), affecting both primordial element abundances and the pattern of CMB acoustic peaks. Combined analyses of the CMB, BAO, and primordial abundance data (including recent deuterium and helium measurements from extremely metal-poor regions) currently find $N_{\text{eff}}$ in excellent agreement with the Standard Model, placing strong limits on the existence of new light particles.
+
+\newpage
+
+\section{Cluster Number Counts} \label{sec:cluster_number_counts}
+
+Beyond their internal astrophysics (\cref{ch:icm}), galaxy clusters are a valuable cosmological probe: as the most massive peaks in the matter density field, their abundance as a function of mass and redshift is highly sensitive to both the growth of structure and the Universe's expansion history.
+
+\subsubsection{Galaxy Clusters as a Cosmological Probe} \label{subsubsec:clusters_cosmo_probe}
+
+The number and distribution of galaxy clusters depend mainly on two factors: the \bfit{growth of structure}, described by the fluctuation amplitude $\sigma_8$ (the root-mean-square of the density field on $8\,h^{-1}\,\text{Mpc}$ scales), and the \bfit{expansion history} set by $\Omega_m$. Because these effects are partly degenerate in cluster counts, and weak lensing mainly constrains their combination,
+\smallskip
+$$
+S_8 \equiv \sigma_8 \left(\Omega_m / 0.3\right)^{0.5}
+$$
+$S_8$ has become the standard parameter for comparing late-time measurements of structure growth (from clusters and lensing) to early-Universe (CMB) predictions. Cluster abundance is also sensitive to the dark energy equation-of-state $w$, the total neutrino mass, and possible deviations from General Relativity, making cluster counts a powerful and versatile cosmological probe.
+
+
+\subsection{Structure Formation and the Spherical Collapse Model} \label{subsec:spherical_collapse}
+
+As introduced in \cref{subsec:structure_formation}, structure grows hierarchically in the $\Lambda$CDM scenario: small overdensities are the first to decouple from the cosmic expansion and collapse, and the resulting \textbf{dark matter halos} subsequently merge into progressively more massive systems, culminating in the galaxy clusters that occupy the knots of the cosmic web.
+
+\smallskip
+
+A simple but remarkably useful analytic tool for understanding when and where these halos form is the \textbf{spherical collapse model}, which follows the evolution of an isolated, spherically symmetric density perturbation embedded in an otherwise homogeneous, expanding background.
+
+\smallskip
+
+\begin{center}
+    \includegraphics[width=0.8\textwidth]{assets/spherical-collapse.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{\textbf{Left:} Stages of spherical collapse: initial expansion, turnaround, and final virializaion. \textbf{Right:} Evolution of the overdense region's density compared to the background density as a function of scale factor, highlighting turnaround, collapse, virialisation, and key overdensity milestones.}
+\end{center}
+
+\smallskip
+
+At first, the overdense region expands together with the Universe: the mean background density evolves as $\bar\rho_{\text{bkg}} \propto a^{-3}$. However, because the perturbation is denser than its surroundings, it expands more slowly. Eventually, it reaches a key stage called \textbf{turnaround}, defined by $\dot a = 0$: here, the overdensity stops expanding, detaches from the overall Hubble flow, and starts to collapse under its own gravity. In an idealized scenario (perfectly spherical, no pressure), this collapse would produce a singularity. In reality, as material falls in, outer mass shells overtake inner ones (\textbf{shell crossing}), mixing orbits and causing the system to \textbf{virialise} into a stable, gravitationally bound halo.
+
+\smallskip
+
+Applying the scalar virial theorem ($2K + U = 0$) reveals that the final, virialised halo has a radius half that at turnaround: $R(a_{\text{vir}}) = R(a_{\text{max}})/2$. As a result, its density increases by a further factor of $2^3 = 8$ beyond the turnaround stage. 
+
+\smallskip
+Although the spherical collapse model breaks down after shell crossing, it still gives reliable estimates for key thresholds in the \emph{linearly} evolved density field:
+
+\begin{itemize}
+    \item The critical, linearly extrapolated \textbf{density threshold} for collapse is $\delta_{\text{lin}} = \delta_c \simeq 1.686$ (nearly invariant for Einstein-de Sitter cosmologies).
+    \item Virialised halos are expected to have a mean \textbf{overdensity} of $\Delta_{\text{vir}} \simeq 178$ times the background density at the time of collapse.
+\end{itemize}
+
+\smallskip
+
+\begin{minipage}{0.52\textwidth}
+The value $\delta_c$ provides the collapse criterion for the full, three-dimensional density field: at any point $\vec{x}$ and time $t$, a region is expected to have collapsed into a halo once its linearly extrapolated density contrast exceeds $\delta_c$. Assuming the initial density field is Gaussian, the fraction of cosmic volume satisfying $\delta(\vec x, t) > \delta_c$ depends only on the variance of the (smoothed) density field, $\sigma^2 = \langle \delta^2 \rangle$: this statistic thus directly connects primordial density fluctuations to the abundance of collapsed halos, forming the basis of the halo mass function below.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/delta_c.png}
+    \captionof{figure}{1D density field with peaks above threshold $\delta_c$ marked as forming halos}
+\end{minipage}
+
+\subsection{The Halo Mass Function} \label{subsec:halo_mass_function}
+
+The observed abundance of clusters, differential in redshift and solid angle, factorises into a purely geometric term and a term encoding the growth of structure:
+
+$$
+\frac{dN}{dz\,d\Omega} = \underbrace{\frac{dV}{dz\,d\Omega}}_{\text{geometry}}\;\underbrace{n(M,z)}_{\text{growth}} ,
+$$
+where $dV/(dz\,d\Omega)$ is the comoving volume element (itself a function of $H(z)$ and hence of the expansion history) and $n(M,z)$ is the \bfit{halo mass function}: the comoving number density of halos per unit mass at redshift $z$.
+
+\medskip
+
+\begin{minipage}{0.58\textwidth}
+Extending the spherical collapse argument of \cref{subsec:spherical_collapse}, the halo mass function is written as
+$$
+n(z,M) = \frac{\rho_m}{M}\,f(\sigma)\,\frac{d\ln(\sigma^{-1})}{dM} ,
+$$
+where $\rho_m/M$ converts a comoving number density of collapsed regions into a number density of halos of mass $M$, and $f(\sigma)$, the \textbf{multiplicity function}, encodes the fraction of mass collapsed into halos as a function of the variance $\sigma$ evaluated on the mass scale $M$. The variance is obtained from the matter power spectrum,
+$$
+\sigma(z,R) = \frac{1}{2\pi^2}\int_0^\infty dk\,k^2\,P_m(z,k)\,|W(kR)|^2 ,
+$$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.39\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/hmf-vs-mass.png}
+    \captionof{figure}{Halo mass function (HMF) vs.~mass at $z=0$ for different values of $\Omega_m$, $\sigma_8$, and $w$}
+\end{minipage}
+
+\smallskip
+
+with $W(kR)$ a window function (typically a top-hat) smoothing the density field on the comoving scale $R$ corresponding to mass $M$.
+
+\begin{minipage}{0.58\textwidth}
+    The abundance of galaxy clusters as a function of redshift and mass offers key insights into both structure growth and cosmic expansion. The comoving volume element reflects how observable volume changes with redshift, while the halo mass function tracks the buildup of structure over time. Since the halo mass function falls off exponentially at high masses (as shown in the logarithmic plots), and is highly sensitive to cosmological parameters, cluster counts serve as a powerful probe of cosmology.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/cluster-counts.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Cluster counts vs redshift.}
+\end{minipage}
+
+\vspace{-1.2em}
+
+\subsubsection{Massive Neutrinos} \label{subsubsec:hmf_neutrinos}
+
+\textbf{Massive neutrinos} have a distinctive impact on cosmic structure formation. Their high thermal velocities prevent them from clustering on small (galaxy-sized) scales, reducing the number of galaxy clusters that can form. In the early Universe, neutrinos are produced in thermal equilibrium and decouple from the plasma at temperatures around $T_{\text{dec}} \sim 2$-$4\,\text{MeV}$. At decoupling, sub-eV neutrinos are still highly relativistic, contributing to the energy density as \textit{radiation} and moving (“free-streaming”) nearly at the speed of light, with a typical free-streaming length $\lambda_{\text{fs}} \sim c/H \sim ct$. As the Universe expands and cools, each neutrino species eventually becomes non-relativistic at a redshift
+$$
+1 + z_{\text{nr}} = \frac{1}{a_{\text{nr}}} \simeq 2\times10^3 \left(\frac{m_\nu}{1\,\text{eV}}\right) ,
+$$
+after which massive neutrinos contribute to the \textit{matter} budget. The free-streaming wavenumber is:
+$$
+k_{\text{nr}} = 2\pi\,\frac{a_{\text{nr}}}{\lambda_{\text{fs}}} \simeq 0.018\,\Omega_m^{1/2}\left(\frac{m_\nu}{1\,\text{eV}}\right) h\,\text{Mpc}^{-1} ,
+$$
+marks the transition, in $k$-space, between a super-horizon regime (where perturbations remain frozen) and a growth regime accessible to structure formation.
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.36\textwidth]{assets/free-evo.png}
+    \hspace{1em}
+    \includegraphics[width=0.5\textwidth]{assets/neutrino-mf.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{\textbf{Left}: free-streaming wavenumber $k_{\text{fs}}$ vs.\ scale factor $a$, showing transition regimes. \textbf{Right}: suppression of the halo mass function for increasing total neutrino mass $\sum m_\nu$.}
+\end{center}
+
+\medskip
+
+Because free-streaming neutrinos remain diffuse and effectively unclustered on scales below $\lambda_{\text{fs}}$, they contribute a smooth background that does not participate in gravitational collapse. Massive neutrinos therefore leave two imprints on structure formation: they \textbf{delay the epoch of matter-radiation equality} (since a larger radiation-like component at early times pushes equality to lower redshift), and they \textbf{suppress the growth of density fluctuations} on scales smaller than the free-streaming length. The net effect is a suppression of the halo mass function that grows with the total neutrino mass $\sum m_\nu$ and is most pronounced at the high-mass end, making cluster counts, together with the CMB and large-scale structure, one of the most sensitive cosmological probes of $\sum m_\nu$.
+
+\subsubsection{Modified Gravity} \label{subsubsec:hmf_modgrav}
+
+An alternative to a dark energy component is to modify the gravitational action itself. A widely studied class of such models is $f(R)$ gravity, in which the Einstein-Hilbert action is generalised to
+
+$$
+S = \frac{1}{16\pi G}\int \sqrt{-g}\,\bigl[R + f(R)\bigr]\,d^4x .
+$$
+
+Suitably chosen functions $f(R)$ can drive accelerated expansion without an explicit cosmological constant, while simultaneously enhancing the effective strength of gravity on cosmological scales, which in turn boosts the growth rate of structure and enhances the halo mass function relative to $\Lambda$CDM, particularly at the massive end and at low redshift. Because unscreened enhanced gravity would violate stringent Solar System tests of GR, viable $f(R)$ models incorporate a \bfit{screening mechanism} (the chameleon mechanism) that restores standard GR in high-density environments, such as the interior of massive halos, while allowing modified dynamics to operate in the low-density cosmic web; this environment dependence is itself a distinctive observational signature that halo-mass-function measurements can, in principle, test.
+
+\subsubsection{The Multiplicity Function and its universality} \label{subsubsec:multiplicity_function}
+
+The functional form of $f(\sigma)$ was first derived analytically by Press \& Schechter (1974) from the spherical collapse of a Gaussian density field, and later refined by Sheth \& Tormen (1999) using an ellipsoidal collapse model, which better captures tidal deformations of collapsing regions. Modern studies of $f(\sigma)$, however, are calibrated directly against large suites of N-body simulations, which capture the full non-linear collapse dynamics that analytic models can only approximate.
+
+\smallskip
+
+The multiplicity function is often described as "\bfit{universal}", in the sense that a single functional form of $f(\sigma)$ is assumed to hold across cosmologies, redshifts, and halo definitions. In practice this universality is only approximate, and its calibration depends sensitively on several choices: the specifics of the N-body simulation used (box size, particle number, force softening), the halo-finding algorithm (e.g.\ friends-of-friends or spherical-overdensity finders), the adopted mass definition (e.g.\ $M_{200,m}$ or $M_{500,c}$), and the cosmological model itself (massive neutrinos and modified gravity both induce departures from a fixed $\Lambda$CDM model). Precision cluster cosmology therefore requires recalibrating, or validating, $f(\sigma)$ for the specific simulation pipeline, mass definition, and cosmological model being tested.
+
+\subsubsection{Baryonic Effects} \label{subsubsec:hmf_baryons}
+
+\begin{minipage}{0.44\textwidth}
+
+Dark-matter-only simulations miss crucial processes: \bfit{baryonic feedback}, from radiative cooling, star formation, supernovae, and AGN feedback, can redistribute or expel gas from halo centres, altering the total mass assigned by standard halo finders. These baryonic effects are most pronounced in halo cores and low-mass systems, but even cluster-scale halos can be affected. For accurate cosmological results, halo mass function calibrations must rely on hydrodynamical simulations including baryonic physics, or explicitly correct for baryonic effects as a function of mass and radius.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.54\textwidth}
+    \centering
+    \includegraphics[height=0.17\textheight]{assets/baryons.png}
+    \hfill
+    \includegraphics[height=0.17\textheight]{assets/baryons-1.png}
+
+    \captionof{figure}{\textbf{Left}: Relative halo mass change for different feedback models. \textbf{Right}: Mass correction for two AGN feedback strengths: strong feedback gives more suppression; effect weakens with redshift.}
+\end{minipage}
+
+\newpage
+
+\section{From Theory to Observation} \label{sec:theory_to_observation}
+
+
+\subsection{Observable-Mass Relations and Selection Functions} \label{subsec:observable_mass}
+
+Halo mass is not itself an observable quantity: cluster surveys instead detect and characterise clusters through some observable proxy $\mathcal{O}$ (richness, X-ray luminosity or photon counts, SZ signal), whose connection to the halo mass function prediction $n(M,z)$ must be modelled explicitly before a comparison to theory is possible.
+
+\smallskip
+
+\begin{minipage}{0.4\textwidth}
+
+Because individual, high-precision mass measurements are expensive and infeasible for entire cluster samples, cosmological analyses instead rely on an \textbf{observable-mass relation}, $P(\mathcal{O}\mid M)$, calibrated on a smaller, well-characterised sub-sample with independent mass estimates (typically from weak lensing).
+\end{minipage}%
+\hfill
+\begin{minipage}{0.57\textwidth}
+    \vspace{-1em}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/mass-estimate.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Cluster mass must be inferred by combining multiple observable proxies}
+\end{minipage}
+
+\smallskip
+
+A second essential ingredient is the survey's \textbf{selection function}: the probability that a cluster of a given true mass is actually detected and included in the catalogue, which in flux- or S/N-limited surveys is generally a smoothly increasing function of mass rather than a sharp cut. Because cosmological and observable-mass relation parameters are highly degenerate in the observed counts, robust cluster cosmology requires \textit{jointly} fitting cluster abundance and independent mass calibration data (typically weak-lensing estimates), to constrain both cosmology and the observable-mass relation together.
+
+\smallskip
+
+\begin{minipage}{0.47\textwidth}
+    A shallower or steeper slope, or a higher or lower amplitude, in the observable-mass relation shifts the inferred abundance-cosmology constraints along essentially the same degeneracy direction in the $(\Omega_m, \sigma_8)$ plane as a genuine change in cosmological parameters. In practice, uncertain mass calibration is the leading systematic that constrains how tightly current cluster cosmology can be limited.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.5\textwidth}
+    \vspace{-0.5em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/obs-mass-rel.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Observable-mass slope or amplitude shifts mimic cosmological changes.}
+\end{minipage}
+
+\vspace{-0.5em}
+
+\subsection{Cluster Detection Techniques} \label{subsec:cluster_detection}
+
+Different observational windows probe different cluster components (\cref{subsec:galaxy_clusters}) and consequently define distinct detection techniques, mass proxies, and selection functions.
+
+\subsubsection{Photometric Surveys} \label{subsubsec:photometric_detection}
+
+Optical and NIR surveys detect clusters as overdensities of red-sequence galaxies (passive, uniformly red member galaxies occupying a tight colour-magnitude relation) or through their weak-lensing signal. The principal mass proxy is the \textbf{richness} $\lambda$, an estimate of the number of red-sequence member galaxies above some luminosity threshold; luminosity, lensing signal, and (where spectra are available) velocity dispersion provide complementary or cross-calibrating proxies. Photometric, richness-selected catalogues such as the \textbf{redMaPPer} algorithm applied to the Dark Energy Survey reach considerably lower mass limits than ICM-selected samples (see \cref{subsubsec:cluster_catalogs_multi}), at the cost of a selection function that is intrinsically harder to model, since richness is more susceptible to projection effects and to the details of galaxy evolution than either X-ray or SZ observables.
+
+
+\subsubsection{X-ray Surveys} \label{subsubsec:xray_detection}
+
+Building on the bremsstrahlung physics introduced in \cref{subsec:icm_spectrum}, X-ray surveys detect clusters as extended, luminous X-ray sources, with mass proxies including the X-ray luminosity $L_X$, the spectroscopic temperature $T_X$, and the combined thermal energy proxy $Y_X \equiv M_{\text{gas}}\,T_X$. Because the X-ray emissivity scales as $n_e^2$ (\cref{subsec:icm_spectrum}), X-ray surveys are comparatively insensitive to line-of-sight projection effects (which mainly wash out the sharp $n_e^2$ contrast, rather than mimicking a spurious detection): a genuine advantage over richness-based selection, though it comes at the cost of the steep $(1+z)^{-4}$ surface-brightness dimming already discussed in \cref{subsubsec:icm_sb}, which limits the depth of flux-limited X-ray cluster samples at high redshift.
+
+\vspace{-0.5em}
+
+\subsubsection{SZ Surveys} \label{subsubsec:sz_detection}
+
+Exploiting the thermal SZ effect introduced in \cref{subsec:tsz}, millimetre surveys detect clusters via matched filtering of the Compton-$y$ signal (\cref{subsubsec:tsz_secondary} and, in more detail, \cref{subsec:sz_catalogs}). Because the SZ amplitude is, to good approximation, independent of redshift (\cref{subsec:tsz}), SZ-selected catalogues probe massive clusters out to considerably higher redshift than flux-limited X-ray samples for a comparable exposure, at a selection threshold set essentially by mass alone.
+
+\vspace{-0.5em}
+
+
+\subsubsection{Cluster Catalogues Across Wavelengths} \label{subsubsec:cluster_catalogs_multi}
+
+\begin{minipage}{0.5\textwidth}
+\textbf{ICM-selected catalogues} (X-ray/SZ surveys) detect clusters above $M \sim 2\times10^{14}\,M_\odot$, offering a clean selection function—especially for SZ, which is redshift independent. However, optical or NIR follow-up is needed for redshift confirmation, spectroscopic identification, and lensing-based mass calibration.
+
+\textbf{Optically selected catalogues}, in contrast, reach lower masses ($M \sim 5\times10^{13}\,M_\odot$) and yield about ten times more clusters, with weak-lensing and photometric-redshift data readily available. However, their selection function is harder to model due to increased sensitivity to projection and galaxy evolution effects.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.47\textwidth}
+    \vspace{-2em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/cluster-surveys.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Mass-redshift coverage of major cluster surveys in X-ray, millimetre, and optical bands.}
+\end{minipage}
+
+\vspace{-0.5em}
+
+\subsection{Cluster Mass Measurements} \label{subsec:cluster_mass_measurements}
+
+\subsubsection{X-ray Hydrostatic Masses} \label{subsubsec:xray_mass_recap}
+
+The hydrostatic mass estimator was already derived in \cref{subsec:hse}; for dynamically relaxed clusters, comparisons against simulations indicate a hydrostatic-to-true mass ratio $M_{\text{HE}}/M_{\text{true}} \sim 0.85$, with a scatter of order $10\%$, consistent with the hydrostatic mass bias discussed there.
+
+\vspace{-0.5em}
+
+\subsubsection{Dynamical Masses from Spectroscopy} \label{subsubsec:dynamical_mass}
+
+An independent mass estimate follows from the kinematics of the cluster's galaxy population itself. Assuming spherical symmetry and dynamical equilibrium, the \textbf{Jeans equation} relates the enclosed mass to the radial velocity dispersion profile $\sigma_r(r)$ and the number density profile $n_{\text{gal}}(r)$ of a tracer population (here, member galaxies):
+$$
+M(<r) = -\frac{r\,\sigma_r^2}{G}\left(\frac{d\ln \sigma_r^2}{d\ln r} + \frac{d\ln n_{\text{gal}}}{d\ln r} + 2\beta\right)
+$$
+where $\beta$ is the velocity anisotropy parameter, quantifying any preference for radial versus tangential orbits among the tracer population.
+
+
+Because line-of-sight velocities alone cannot separate radial and tangential motions, $\beta$ is typically either assumed or constrained jointly with the mass profile using extended spectroscopic samples.
+
+\smallskip
+
+\begin{minipage}{0.56\textwidth}
+    A complementary technique, the \textbf{caustic method}, uses the full projected phase-space distribution (line-of-sight velocity vs. projected radius) of galaxies around a cluster. The escape velocity as a function of radius forms a characteristic "trumpet"-shaped caustic that ideally separates bound members from interlopers, allowing the cluster mass profile to be reconstructed without assuming dynamical equilibrium as in the Jeans method. In practice, however, real survey (e.g. Euclid) are much noisier: contaminants can occupy the same phase-space regions as cluster members, and low number statistics further complicate the analysis. As a result, applying the caustic method robustly is challenging.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.41\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/caustic.png}
     
-    \item However, SIDM halos are not immune to baryonic effects: gas cooling and stellar feedback can deepen the gravitational potential and restore a cusp-like profile, partially erasing the SIDM core — making observational tests model-dependent.
-\end{itemize}
+    \captionof{figure}{Caustic diagram: line-of-sight velocity versus projected radius.}
+\end{minipage}
+
+\smallskip
+
+Both techniques fundamentally depend on accurate membership identification, as contamination from interloping galaxies (objects not physically bound to the cluster) remains one of the principal sources of systematic uncertainty in mass estimates.
 
 
-The bullet cluster:
 
-The offset between the EM and WL signal peaks, along with the shape of the shock wave, provide compelling evidence for the presence of dark matter; moreover it allows to place constraints on the dark matter cross-section
+\begin{minipage}{0.57\textwidth}
+    \subsubsection{Masses from Gravitational Lensing} \label{subsubsec:lensing_mass}
 
-El Gordo:
+Gravitational lensing offers what is often regarded as the most direct cluster mass estimator, since the deflection of background light depends only on the total projected mass along the line of sight and not on the cluster's dynamical state. Two regimes are relevant. In the cluster core ($\sim$ a few hundred kpc), the deflection can be strong enough to produce multiple images or extended arcs of a single background source (\textbf{strong lensing}), enabling precise measurements of the projected mass enclosed by the arcs, though the reconstruction depends on assumptions about the lens geometry and mass model, introducing systematic uncertainties of order $10$-$20\%$.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
 
-El Gordo (ACT-CL J0102-4915) is one of the most massive high-redshift galaxy cluster systems known, located at $z \approx 0.87$. It is the result of a major merger between two massive clusters, making it an exceptional laboratory for studying dark matter properties.
+    \vspace{-0.5em}
 
-Observations show significant spatial offsets between its three main components:
+    \centering
+    \includegraphics[width=0.87\textwidth]{assets/strong-lensing.png}
+
+    \vspace{-1em}
+
+
+    \captionof{figure}{Strong-lensing arcs and surface-mass-density in a cluster core.}
+\end{minipage}
+
+\medskip
+
+At larger radii ($R \gtrsim 300\,\text{kpc}$), the cluster's tidal field instead produces a subtle, coherent distortion in the shapes of background galaxies, the \textbf{weak lensing} regime.
+
+\smallskip
+ 
+\begin{minipage}{0.57\textwidth}
+
+Measuring the mean tangential shear profile $\gamma_t(R)$ around the cluster allows the projected surface mass density $\Sigma(R)$ to be reconstructed,
+$$
+\Sigma(R) = \int_{-\infty}^{\infty} d\chi\;\Delta\rho\!\left(\sqrt{R^2+\chi^2}\right) ,
+$$
+though converting this into a three-dimensional mass profile requires assuming a parametric halo density model (e.g.\ NFW or Einasto, \cref{subsec:hmf_baryons_profile}) together with a term describing correlated structure along the line of sight (the "2-halo" term). Because the weak-lensing signal of an individual cluster is noisy, wide-field surveys typically stack the shear of many clusters at fixed observable to calibrate the mean observable-mass relation, reducing shape noise and projection systematics.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.87\textwidth]{assets/weak-lensing.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{\textbf{Left}: Weak lensing effect. \textbf{Bottom} measured stacked tangential shear profile.}
+\end{minipage}
+
+\medskip
+
+    A comparison of mass profiles reconstructed from these independent techniques, dynamical (Jeans and caustic), weak lensing, and strong lensing, generally shows \bfit{good mutual consistency} across the radial ranges where they overlap, lending confidence to the combined multi-technique mass profile as a benchmark for validating X-ray hydrostatic masses.
+
+\subsubsection{CMB Cluster Lensing} \label{subsubsec:cmb_cluster_lensing}
+
+\begin{minipage}{0.55\textwidth}
+A further, largely independent lensing channel exploits the CMB itself as the background source at $z\approx 1100$. As CMB photons traverse a foreground cluster, they are gravitationally deflected by its potential well; because the CMB temperature field carries a local gradient (from the primary anisotropies), this deflection locally shifts the observed gradient, imprinting a characteristic \bfit{dipole-like distortion} in the temperature (or polarisation) map centred on the cluster, with an amplitude proportional to the cluster mass and to the magnitude of the local CMB gradient.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.41\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/cmb-lensing.png}
+    \captionof{figure}{Clusters deflects CMB photons, imprinting a dipole-like distortion.}
+\end{minipage}
+
+\smallskip
+
+The induced distortion is tiny, of order $10\,\mu\text{K}$ for a $10^{15}\,M_\odot$ halo, well below the noise level of any individual cluster measurement, but it can be recovered statistically by stacking the CMB signal around large samples of optically or SZ-selected clusters; applying this technique to thousands of redMaPPer clusters yields a robust detection of the stacked convergence profile. 
+
+\smallskip
+
+\begin{minipage}{0.57\textwidth}
+    Measuring CMB lensing in $E$-mode polarisation offers a somewhat cleaner version of this technique, since polarisation is less affected by common astrophysical foregrounds like the tSZ effect and radio sources compared to temperature maps. SPT-Pol data, for example, have already achieved a $4.8\sigma$ detection of the polarisation lensing dipole. Since this method uses the CMB as a background at a fixed and very high redshift, it provides a cluster mass calibration that is systematically independent from optical weak-lensing measurements.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/cmb-pol-lensing.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Filtered SPTpol $Q$ and $U$ stacks around clusters.}
+\end{minipage}
+
+\subsection{Scaling Relations and Multi-Wavelength Correlations} \label{subsec:scaling_relations}
+
+Different detection techniques imply different mass proxies, different calibration datasets, and different systematics; a rigorous calibration of the observable-mass relation(s) therefore requires, jointly: a well-defined selection function, a model for the parent halo population as a function of mass (the halo mass function itself), and a model for the full probability distribution of the multivariate observable space, $P(\mathcal{X}, \mathcal{O}\mid M)$, where $\mathcal{X}$ denotes a low-scatter mass proxy (e.g.\ from lensing) used for calibration and $\mathcal{O}$ the primary detection observable.
+
+\medskip
+
+Several statistical effects complicate a naive fit of the observable-mass relation to real data:
 \begin{itemize}
-    \item \textbf{Hot gas (X-ray)}: The intracluster medium, traced by X-ray emission, is shock-heated and spatially displaced due to ram pressure during the collision.
-    \item \textbf{Galaxies}: The stellar component of member galaxies, which are effectively collisionless and pass through the merger relatively unimpeded.
-    \item \textbf{Dark Matter}: Detected via gravitational lensing reconstruction, the DM distribution shows offsets from both the gas and galaxies.
+    \item \textbf{Malmquist bias} arises because a flux- or signal-to-noise-limited sample preferentially detects the intrinsically brighter (or higher-signal) objects at a given mass, biasing a naive fit toward higher observable amplitudes near the detection threshold.
+    \item \textbf{Eddington bias} is the related effect whereby, because the mass function falls steeply with mass, scatter in the observable-mass relation preferentially up-scatters more numerous low-mass objects into a high-observable bin, again biasing naive fits.
+    \item When several observables are measured for the same cluster (e.g.\ richness, X-ray luminosity, and SZ signal), their scatter about the mean observable-mass relation is generally \textbf{correlated}, since a single physical property of the cluster (such as its dynamical state or orientation) can simultaneously boost or suppress several observables at once; ignoring this correlated scatter biases both the mass calibration and the resulting cosmological constraints.
 \end{itemize}
 
-There are multiple ways to study these kinds of merging systems. One approach is to compare DM mass density profiles from lensing reconstruction with hydrodynamical simulation outputs (e.g., Valdarnini 2025).
+All of these effects must be forward-modelled, rather than corrected for post hoc, within a joint cosmology plus scaling-relation analysis.
 
-Self-Interacting Dark Matter (SIDM) constraints from El Gordo:
+\begin{center}
+    \centering
+    \includegraphics[width=0.46\textwidth]{assets/scaling-relations.png}
+    \hspace{2em}
+    \includegraphics[width=0.37\textwidth]{assets/correlation.png}
+    \captionof{figure}{\textbf{Left}: Malmquist bias, Eddington bias, and correlated scatter in observable-mass relations. \textbf{Right}: Correlation matrix and scatter plot of log-residuals for 2D observables.}
+\end{center}
+
+\smallskip
+
+A closely related complication is that cluster observables are measured in \textit{projection}: any single sightline captures only the two-dimensional projected mass or emission along a cylinder through the cluster, rather than the intrinsic three-dimensional quantity. Comparisons between projected and de-projected quantities in simulated cluster catalogues show that line-of-sight projections systematically increase the scatter and skewness of observable-mass relations, and, because a given large-scale-structure filament along the line of sight can simultaneously boost several observables, they introduce additional correlations between observables measured at different wavelengths beyond those present in the fully three-dimensional (de-projected) observable space.
+
+\subsection{Recent Cosmological Constraints and Limitations} \label{subsec:cluster_cosmo_constraints}
+
+Recent cosmological studies using galaxy clusters (X-ray, SZ, and optical) provide consistent measurements of key parameters such as $\Omega_m$ and $\sigma_8$.
+
+\smallskip
+
+\begin{minipage}{0.56\textwidth}
+    For example, eROSITA finds $\Omega_m = 0.29^{+0.01}_{-0.02}$, $\sigma_8 = 0.88 \pm 0.02$, and $S_8 = 0.86 \pm 0.01$, generally in good agreement with results from weak lensing and other probes. However, a mild tension exists between cluster-derived $S_8$ values and those from the CMB (e.g. Planck), with clusters typically preferring slightly lower $S_8$. This difference  (often attributed to systematics like cluster mass calibration) remains smaller than current uncertainties. Combining cluster abundances with CMB or lensing data helps break parameter degeneracies and delivers tighter, more robust cosmological constraints.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/cmb-tension.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{$S_8$ tension between cluster abundance and CMB results.}
+\end{minipage}
+
+\section{Other Cosmological Tests with Galaxy Clusters} \label{sec:other_cluster_tests}
+
+Beyond cluster abundance, several further cosmological and fundamental-physics tests exploit individual or stacked cluster observations directly.
+
+\subsection{The Gas Mass Fraction} \label{subsec:gas_mass_fraction}
+
+Because massive, dynamically relaxed clusters are thought to retain a representative sample of the Universe's baryon and dark matter content, their \bfit{gas mass fraction}, $f_{\text{gas}} \equiv M_{\text{gas}}/M_{\text{tot}}$, should approximate the cosmic baryon fraction $\Omega_b/\Omega_m$. 
+
+\smallskip
+
+\begin{minipage}{0.56\textwidth}
+
+The gas mass fraction, $f_{\text{gas}} = M_{\text{gas}} / M_{\text{tot}}$, measured in massive, dynamically relaxed clusters, is a valuable cosmological probe. Both $M_{\text{gas}}$ and $M_{\text{tot}}$ are inferred from X-ray data, with their determination depending on the assumed cosmology, primarily through the angular diameter distance relating flux and luminosity:
+$$
+f_{\text{gas}} \propto \left(\frac{\Omega_b}{\Omega_m}\right)\left[\frac{d^{\text{ref}}(z)}{d(z)}\right]^{3/2}
+$$
+where $d^{\mathrm{ref}}(z)$ is the reference (assumed) luminosity distance, and $d(z)$ is the true luminosity distance. In the correct cosmology, $f_{\text{gas}}$ remains constant with redshift ($d^{\text{ref}}(z)/d(z) = 1$), while deviations from this indicate an incorrect cosmological model.
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/gas-mass.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Gas mass fraction $f_{\rm gas}$ vs.\ redshift for clusters.}
+\end{minipage}
+
+\smallskip
+
+At low redshift ($z \lesssim 0.15$), precise $f_{\text{gas}}$ measurements in clusters, combined with external priors on $\Omega_b h^2$ (mainly) and $h$, provide strong constraints on $\Omega_m$:
+$$
+f_{\text{gas}}(z \lesssim 0.15) \propto \frac{\Omega_b}{\Omega_m} h^{3/2}
+$$
+A nearly flat $f_{\text{gas}}$ at low $z$ therefore selects a specific combination of $\Omega_m$ and $h$, making it a sensitive cosmological tool. At higher redshift, the dependence on angular diameter distance causes $f_{\text{gas}}(z)$ to evolve if an incorrect cosmology is adopted:
+$$
+f_{\text{gas}}(z) \propto d(z)^{-3/2}
+$$
+Maintaining a nearly constant $f_{\text{gas}}(z)$ with redshift thus acts as a geometric test, complementary to those based on cluster abundance.
+
+\subsubsection{Systematics}
+
+The main systematics affecting this test include:
 \begin{itemize}
-    \item A cross-section of $\sigma_{\text{DM}}/m_X \sim 4$--$5$ cm$^2$/g successfully reproduces the observed offsets between galaxies and dark matter.
-    \item However, this level of interaction causes the dark matter halos to develop \textbf{``cores''} (flat density centers) rather than the ``cusps'' (sharp peaks) predicted by standard NFW models and seen in observations.
-    \item This tension between the offset constraints and the core/cusp problem highlights the complexity of using merging clusters to constrain SIDM models.
+    \item \textbf{Uncertainties in mass estimates:} Errors in the total mass determination, especially due to hydrostatic bias, which arises if the intracluster gas is not perfectly supported by thermal pressure.
+    \item \textbf{Selection effects:} Only dynamically relaxed clusters are selected to ensure the validity of hydrostatic equilibrium, which introduces a bias since these clusters may not be representative.
+    \item \textbf{Aperture dependence:} The inferred gas mass fraction $f_{\mathrm{gas}}$ changes with the radius or aperture selected for the measurement.
+    \item \textbf{Deviation from the universal baryon fraction:} The measured $f_{\mathrm{gas}}$ is typically lower than the cosmic baryon fraction due to baryon depletion processes; this depletion factor $Y_B(z)$ must be calibrated from hydrodynamical simulations.
 \end{itemize}
 
-The shape/slope of the halo profile, especially in the inner regions, can be used to test several fundamental physics models, such as the nature of dark matter (e.g. warm vs cold, interacting DM) or GR tesrt.
+\newpage
+\subsection{$H_0$ from X-ray and SZ Distance Measurements} \label{subsec:h0_xsz}
 
-\missing{slide 52}
-
-Linear perturbations of the FLRW metric:
+\begin{minipage}{0.68\textwidth}
+A geometric route to the Hubble constant follows from combining the cluster's X-ray emission with its SZ signal. Both observables depend on the same underlying electron density $n_e$ along the line of sight, but with different powers (\cref{subsec:tsz}): 
 $$
-ds^2= - \left(1 + \dfrac {2\Phi}{c^2}\right) c^2 dt^2 + a^2(t) \left(1-\dfrac{2\Psi}{c^2} \right) [dr^2 + r^2 d\Omega^2]
-$$
-(assuming a flat universe)
-
-\begin{itemize}
-    \item $\Phi$ perturbs the time-time part of the metric $g_{00}$. It controls the motion of slow, non-relativistiv particles, such as cluster galaxies.
-    \item $\Psi$ perturbs the space-space part of the metric $g_{ij}$. It controls ...
-\end{itemize}
-
-
-\subsubsection{Gravitational redshift in galaxy clusters}
-
-Light escaping a gravitational potential well is redshifted:
-$$
-z_{gr} = \nabla \Phi / c^2
+\begin{cases}
+    E \propto \int n_e^2\,dl \\
+    A \propto \int n_e\,dl
+\end{cases}
 $$
 
-For cluster masses $\sim 10^{14} M_\odot$, we have $cz_{gr} \sim 10km/s$ which is very smaller than Doppler broadening ($\sim 1000 km/s$).
+This distinct scaling allows the two observables to be combined into a quantity with dimensions of length, $A^2/E \simeq \Delta L$, independent of any assumed distance; comparing this physical length scale to the cluster's observed angular size $\theta$ then yields a purely geometric estimate of the angular diameter distance,
+$$
+D_A(z) = \frac{A^2}{E\,\theta} ,
+$$
+entirely independent of the local distance ladder.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/X-SZ-dist.png}
+    \captionof{figure}{X-ray/SZ combined into a standard-ruler}
+\end{minipage}
 
-Galaxies near the cluster centre sit deeper in the potential well and are more redshifted, so the GR velocity shift $\Delta(R)$ is most negative at small $R$ and rises (less negative) toward the outskirts. In the rest frame of the brightest cluster galaxy (BCG), this manifests as a systematic blueshift of the velocity distribution centroid.
+\medskip
 
-\chapter{Clustering}
+Combining X-ray and SZ measurements in samples of relaxed clusters across redshift provides a geometric route to $H_0$, but in practice, these estimates carry large uncertainties and show considerable scatter, typically clustering around $60$-$75\,\text{km/s/Mpc}$ and agreeing broadly with other methods. The main limitation is the rarity of clusters with sufficiently high-quality, relaxed systems. In recent years, error bars have often increased, as more sources of systematic uncertainty are identified and treated more conservatively. This reflects a general trend: as understanding improves, recognizing greater astrophysical complexities often leads to larger, not smaller, reported uncertainties.
+
+\bigskip
+
+\begin{minipage}{0.59\textwidth}
+\subsection{Halo Density Profiles} \label{subsec:hmf_baryons_profile}
+
+Collisionless N-body and hydrodynamical simulations of $\Lambda$CDM structure formation robustly predict a characteristic, quasi-universal radial density profile for dark matter halos. The \textbf{Navarro-Frenk-White} (NFW) profile,
+$$
+\rho_{\text{NFW}}(r) = \frac{\rho_s}{(r/r_s)\,(1+r/r_s)^2} ,
+$$
+features an inner \bfit{cusp}, $\rho \propto r^{-1}$, steepening to $\rho \propto r^{-3}$ at large radii, with a transition scale $r_s$; the \bfit{Einasto} profile provides an alternative, slightly better-fitting parametrisation without a sharp asymptotic power-law cusp.
+
+\medskip
+
+The density profile can also be described in terms of its \textbf{concentration parameter}, defined as $c_{\text{NFW}} \equiv r_{200} / r_s$. The concentration reflects how centrally peaked a halo is, and it primarily depends on the halo's mass and redshift: lower-mass and higher-redshift halos tend to be more concentrated because they formed earlier, when the universe was denser. Additional scatter in the concentration-mass relation arises from differences in individual halo formation histories, degrees of dynamical relaxation, and the influence of baryonic processes.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/halo.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{NFW density profile}
+    \includegraphics[width=0.95\textwidth]{assets/concentration.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{$c_{NFW}$-mass relation}
+\end{minipage}
+
+
+
+\begin{minipage}{0.7\textwidth}
+\subsubsection{Self-Interacting and Fuzzy Dark Matter} \label{subsubsec:sidm_fdm}
+
+The central cusp predicted by collisionless CDM is, in principle, a sharp and testable prediction; several proposed extensions to the standard cold, collisionless dark matter paradigm instead predict a flattened central \bfit{core}, motivated in part by observations of low-surface-brightness and dwarf galaxies that appear to favour cored profiles over cusps.
+
+\medskip
+
+In \textbf{self-interacting dark matter} (SIDM) models, dark matter particles scatter off each other, allowing energy to flow from the warmer outer regions inward, thereby reducing central densities and transforming steep cusps into flatter cores. Even relatively modest cross-sections (such as $\sigma/m \sim 1\,\text{cm}^2/\text{g}$) can produce kiloparsec-scale cores with central densities as low as $10^7$-$10^8\,M_\odot/\text{kpc}^3$, significantly lower than those predicted by standard CDM. If SIDM effects operate universally, one would expect to find cored profiles at all halo masses, from dwarf galaxies to clusters. However, baryonic processes like gas cooling and stellar feedback can also alter halo density profiles, so observational constraints on SIDM are inevitably complicated by astrophysical uncertainties and depend strongly on modeling choices.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.28\textwidth}
+    \vspace{-0.5em}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/cmb-simd-density.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{\small CDM vs.\ SIDM density, circular velocity, and velocity dispersion profiles}
+\end{minipage}
+
+\subsection{Merging Clusters: the Bullet Cluster and El Gordo} \label{subsec:merging_clusters_dm}
+
+\begin{minipage}{0.56\textwidth}
+Cluster mergers offer a clean laboratory for testing the collisionless nature of dark matter, because a merger physically separates the cluster's three principal mass components according to their different collisional properties. The hot ICM (traced in X-rays) is baryonic and strongly self-interacting via ram pressure and shocks, and is consequently decelerated and displaced during the collision; the galaxies, in contrast, are effectively collisionless and pass through the merger largely unimpeded; and the dark matter (mapped via lensing) similarly passes through with minimal interaction, tracking the galaxies rather than the shocked gas.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.41\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/bullet.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Bullet Cluster composite: X-ray (baryonic gas) vs.\ weak-lensing mass reconstruction (dark matter)}
+\end{minipage}
+
+\medskip
+
+The \bfit{Bullet Cluster} is a striking example where the spatial offset between X-ray (baryonic) emission and weak-lensing (total mass) peaks, together with the observed bow shock, provides some of the clearest evidence for a dominant, collisionless dark matter component, and places an upper limit on its self-interaction cross-section. \bfit{El Gordo} (ACT-CL J0102-4915, $z \approx 0.87$, $M \approx 3\times10^{15}\,M_\odot$), a major merger of two massive clusters at high redshift, shows similar offsets among its hot gas, galaxies, and dark matter, extending these tests to more massive and earlier systems. 
+
+\smallskip
+
+Comparing the observed offsets in El Gordo to simulations suggests a moderate self-interaction cross-section, $\sigma_{\text{DM}}/m_X \sim 4$-$5\,\text{cm}^2/\text{g}$; however, this value tends to predict cored subcluster halos, inconsistent with the cuspy profiles indicated by lensing. This tension between offset-based and profile-based constraints highlights the challenge of tightly constraining dark matter properties from individual merging systems.
+
+\subsection{Mass Estimates from Accretion Shocks} \label{subsec:accretion_shock_mass}
+
+\begin{minipage}{0.55\textwidth}
+A recent technique exploits the large-scale accretion shock that forms where infalling material from the cosmic web is shock-heated upon entering the cluster's gravitational potential (related to the splashback radius of \cref{subsec:cluster_boundary}). Analysis of simulated clusters shows that the halo mass, the shock radius $R_{\text{sh}}$, and the Mach number $\mathcal{M}_{\text{sh}}$ populate a well-defined plane in this 3D parameter space, yielding an empirical mass estimator based purely on the shock structure of the outer accretion region, largely independent of the assumptions (hydrostatic equilibrium, dynamical relaxation) underlying the more traditional mass estimators:
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/shock.png}
+    
+    \captionof{figure}{Mass-radius-Mach plane.}
+\end{minipage}
+
+\medskip
+
+$$
+\log_{10}\frac{M(<2R_{\text{vir}})}{M_\odot} = 12.760 + 1.910\,\log_{10}\frac{R_{\text{sh}}}{\text{Mpc}} + 0.0117\,\mathcal{M}_{\text{sh}} \qquad (\text{at } z=0) ,
+$$
+
+\subsection{Tests of General Relativity} \label{subsec:gr_tests_clusters}
+
+\subsubsection{Anisotropic Stress from Lensing and Dynamics} \label{subsubsec:anisotropic_stress}
+
+In the perturbed FLRW metric,
+$$
+ds^2 = -\left(1+\frac{2\Phi}{c^2}\right)c^2\,dt^2 + a^2(t)\left(1-\frac{2\Psi}{c^2}\right)\left[dr^2+r^2\,d\Omega^2\right] ,
+$$
+the potential $\Phi$ perturbs the time-time component of the metric and governs the motion of slow, non-relativistic tracers (such as cluster member galaxies), while $\Psi$ perturbs the spatial part of the metric and, together with $\Phi$, governs the deflection of light. 
+
+\medskip
+
+\begin{minipage}{0.55\textwidth}
+
+    In standard General Relativity these two potentials are equal, $\Phi = \Psi$, in the absence of anisotropic stress; many modified-gravity theories, by contrast, predict $\Phi \neq \Psi$. Because gravitational lensing (\cref{subsubsec:lensing_mass}) is sensitive to the sum $\Phi+\Psi$, while galaxy dynamics (\cref{subsubsec:dynamical_mass}) is sensitive only to $\Psi$, comparing the lensing-derived and dynamically derived mass profiles of the same cluster directly constrains the \textbf{anisotropic stress parameter}, $\eta \equiv \Psi/\Phi$ (equal to unity in GR), which is given by:
+    $$
+    \eta(r) = \frac{\int_r^\infty \left[2M_{\text{lens}}(r') - M_{\text{dyn}}(r')\right]\frac{dr'}{r'^2}}{\int_r^\infty M_{\text{dyn}}(r')\,\frac{dr'}{r'^2}} .
+    $$
+    Applied to a sample of nine massive clusters from the CLASH-VLT survey, this comparison yields a combined constraint on $\eta$ fully consistent with the GR expectation $\eta=1$, providing an independent, cluster-scale test of gravity that complements Solar System and binary-pulsar tests at very different mass and length scales.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/clash-vlt.png}
+    \captionof{figure}{Constraints on the anisotropic stress parameter $\eta$ from 9 CLASH-VLT clusters, showing individual and combined posteriors.}
+\end{minipage}
+
+\medskip
+
+
+
+\subsubsection{Gravitational Redshift in Cluster Potentials} \label{subsubsec:gravitational_redshift}
+
+\begin{minipage}{0.55\textwidth}
+Photons escaping a gravitational potential well are redshifted by an amount $z_{\text{gr}} = \nabla\Phi/c^2$; for a cluster of mass $\sim10^{14}\,M_\odot$, this corresponds to $c\,z_{\text{gr}} \sim 10\,\text{km/s}$, roughly two orders of magnitude smaller than the Doppler broadening from the cluster's internal velocity dispersion ($\sim1000\,\text{km/s}$), and therefore undetectable in any individual galaxy's redshift. Because galaxies near the cluster centre sit deeper in the potential well than those at large radius, however, the gravitational redshift shift $\Delta(R)$ is predicted to be most negative near the centre and to rise (become less negative) toward the outskirts; critically, gravitational redshift shifts the \textit{centroid} of the velocity distribution, whereas ordinary Doppler broadening only symmetrically widens it, leaving the centroid unaffected.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/gr.png}
+    \captionof{figure}{stacked line-of-sight velocity distributions in radial bins from 7800 SDSS clusters, showing the systematic centroid shift}
+\end{minipage}
+
+\medskip
+
+This asymmetry can therefore be isolated statistically by stacking the velocity distributions of member galaxies, in radial bins, across a very large cluster sample, using the brightest cluster galaxy as the reference rest frame; applying this technique to some 7\,800 clusters from the Sloan Digital Sky Survey yields a clear detection of the predicted centroid shift, in agreement with the GR prediction and disfavouring the larger deviations predicted by some modified-gravity alternatives (such as $f(R)$ gravity or TeVeS) at the level probed by the current sample.
+
+
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Clustering}
 
 we have seen the cluster counts as the first moment of the density field. Now we will see the second moment of the density field: the variance.
 
-\section{Evolution of density perturbations}
+\subsection{Evolution of density perturbations}
 
 In quantum theory we know that even in empty fields we have small quantum fluctuations, that average to zero.
 
