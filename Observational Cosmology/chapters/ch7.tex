@@ -1144,294 +1144,1075 @@ Photons escaping a gravitational potential well are redshifted by an amount $z_{
 
 This asymmetry can therefore be isolated statistically by stacking the velocity distributions of member galaxies, in radial bins, across a very large cluster sample, using the brightest cluster galaxy as the reference rest frame; applying this technique to some 7\,800 clusters from the Sloan Digital Sky Survey yields a clear detection of the predicted centroid shift, in agreement with the GR prediction and disfavouring the larger deviations predicted by some modified-gravity alternatives (such as $f(R)$ gravity or TeVeS) at the level probed by the current sample.
 
+\newpage
 
+\section{Large-Scale Structure and Clustering} \label{sec:clustering}
 
+Beyond the abundance of individual collapsed halos (\cref{sec:cluster_number_counts}), the spatial arrangement of matter itself, how it clumps, connects, and correlates across cosmic volumes, encodes a further wealth of cosmological information. This section develops the statistical tools used to characterise this \bfit{large-scale structure} (LSS), traces its origin back to the seed perturbations generated during inflation, and shows how its observed clustering pattern is used to constrain both the expansion history and the growth of structure.
 
+\subsection{The Growth of Density Perturbations} \label{subsec:growth_perturbations}
 
+Inflation (\cref{subsubsec:inflation}) generates the primordial density field by amplifying microscopic quantum fluctuations and stretching them to astrophysical scales. A fluctuation of comoving wavenumber $k$ begins deep inside the Hubble radius, oscillating like an ordinary quantum field; as the exponential expansion proceeds, its physical wavelength grows faster than the horizon, and the mode eventually crosses outside it ($k = aH$). Beyond this point of \textbf{horizon exit}, causal microphysics can no longer act on the fluctuation, and it \textit{freezes} as a super-horizon curvature perturbation, $\delta\phi_k \to \zeta_k$. Only once the horizon grows large enough, after inflation ends and the Universe reheats, does the mode \textit{re-enter} the horizon, at which point gravity can once again act on it and drive the \textbf{growth of the density perturbation} $\delta_m(\mathbf{x})$ that ultimately seeds galaxies, clusters, and the cosmic web.
 
+\bigskip
 
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Clustering}
-
-we have seen the cluster counts as the first moment of the density field. Now we will see the second moment of the density field: the variance.
-
-\subsection{Evolution of density perturbations}
-
-In quantum theory we know that even in empty fields we have small quantum fluctuations, that average to zero.
-
-stretching the fluctuations outside the horizon, they freeze and are converted into curvature perturbations. Different regions of the universe have different curvature perturbations.
-
-gravity amplifies overdensities.
-
-$$
-\left[\delta\phi_k \longrightarrow \zeta_k \longrightarrow \delta_m(\mathbf{x})\right]
-$$
-
-\begin{figure}[H]
+\begin{center}
     \centering
-    \includegraphics[width=0.9\textwidth]{assets/density-perturbations.png}
-    \caption{Inflation stretches miscroscopic quantum fluctations to super-horizon scales, where they freeze as curvature perturbations and later seed the growth of cosmic structures.}
-\end{figure}
+    \includegraphics[width=\textwidth]{assets/density-perturbations.png}
+    \captionof{figure}{Inflation stretches miscroscopic quantum fluctations to super-horizon scales, where they freeze as curvature perturbations and later seed the growth of cosmic structures.}
+\end{center}
+\medskip
+$$
+\left[
+\delta\phi_k \rightarrow \zeta_k \rightarrow \delta_m(\mathbf{x})
+\right]
+$$
 
-The simplest models of inflation predict that the initial fluctuations constitute a Gaussian random field, with an almost purely adiabatic primordial perturbations with a near scale-invariant power spectrum. In these models the primordial power spectrum is often described in terms of a spectral index ns and an amplitude of the perturbations As as (k p = 0.05 Mpc-1 = pivot scale ):
+\medskip
 
+The simplest single-field inflationary models predict that these initial fluctuations form a \textbf{Gaussian random field}: statistically homogeneous and isotropic, nearly scale-invariant, and adiabatic. The primordial power spectrum is then fully specified by an amplitude $A_s$ and a spectral tilt $n_s$ about a pivot scale $k_p = 0.05\,\text{Mpc}^{-1}$:
 $$
 P(k) = A_s \left(\frac{k}{k_p}\right)^{n_s}
 $$
+A perfectly scale-invariant spectrum corresponds to $n_s = 1$ (the Harrison-Zel'dovich spectrum); Planck measures $n_s \simeq 0.965$, a small but highly significant deviation that is itself a key prediction of inflation, since the slow but nonzero rolling of the inflaton field breaks exact scale invariance.
 
-\dots
+\medskip
 
-The overdensity field is:
-
+Once fluctuations re-enter the horizon, their subsequent evolution depends on the era (radiation- or matter-dominated) and on whether the perturbation is still super- or already sub-horizon. Defining the \textbf{overdensity field}:
 $$
-\delta(x) = \dfrac{\rho (x) - \langle \rho \rangle}{\langle \rho \rangle}
+\delta(\mathbf{x}) \equiv \frac{\rho(\mathbf{x}) - \langle\rho\rangle}{\langle\rho\rangle} ,
 $$
+the growth of cold dark matter (CDM) and radiation perturbations in the two regimes is:
 
-For the CDM model, we have:
+\medskip
 
-\begin{table}[H]
-    \centering
-    \begin{tabular}{c|c|c}
-        \toprule
-        & $z > z_{eq}$ (RD) & $z < z_{eq}$ (MD) \\
-        \midrule
-        $R > R_H$ & $\delta_r \propto \delta_m \propto a^2$ & $\delta_r \propto \delta_m \propto a$ \\
-        $R < R_H$ & $\delta_{cdm} \sim \text{const}$, $\delta_{b+\gamma}$ oscillations & $\delta_{cdm} \propto a$; $z < z_{rec}$: $\delta_b \rightarrow \delta_{cdm}$ \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-Matter-radiation equality:
-
-$$
-\dfrac{\rho_m (a_{eq})}{\rho_r (a_{eq})} = 1 \qquad \qquad 1 + z_{eq} = \dfrac{a_0}{a_{eq}} \simeq 3250
-$$
-
-The Hubble radius is:
-
-$$
-R_H(a) = \dfrac{c}{H(t)} \sim c t
-$$
-
-The primordial power spectrum of density fluctuations gets “processed” by the growth of density perturbations:
-
-$$
-P(k, z) = P_{primordial}(k) T^2(k, z)
-$$
-
-where the transfer function $T(k)$ takes into account the effects of gravitational amplification of density perturbation mode of wavelength $k$
-
-\textbf{Cosmic Relics}:
-\begin{itemize}
-    \item \textbf{Non-thermal Relics}: not producted in thermal equilibrium (TE) with the rest of the Universe
-    \item \textbf{Thermal Relics}: are held in TE with other components of the Universe until they "decouple", which happens when interaction rate $\Gamma = n(\sigma v)$ drops below expansion rate $H(a)$.
-    \begin{itemize}
-        \item Hot Dark Matter: ...
-        \item Warm Dark Matter: ...
-        \item Cold Dark Matter: ...
-    \end{itemize}
-\end{itemize}
-
-\missing{slide 10: above horizon, below horizon; slide 11: Baryonic Acoustic Oscillations}
-
-\subsection{Two-point correlation function}
-
-%todo: enhance this section
-
-The two-point correlation function, $\xi(r)$, is the excess probability of finding two tracers at a given distance, compared to a random distribution:
-
-$$
-dP = n(\ + \xi(r) dV)
-$$
-
-if $\xi(r) = 0$, then the probability is simply given by the number of tracers per unit volume.
-
-We have 2 correlation function estimators:
-\begin{itemize}
-    \item \textbf{Peebles-Hauser estimator}:
-    $$
-    \hat \xi(r) = \dfrac{DD(r) - RR(r)}{RR(r)}
-    $$
-    \item \textbf{Landy-Szalay estimator} (more unbiased):
-    $$
-    \hat \xi(r) = \dfrac{DD(r) - 2 DR(r) + RR(r)}{RR(r)}
-    $$
-\end{itemize}
-
-Using the two-point correlation function we can characterize the different clustering properties between the distributions.
-
-% todo: add plot of the two-point correlation function
-
-Assuming the universe is isotropic, the correlation function is a function of a scalar distance. The two-point correlation function can then be written as:
-$$
-\xi(r) = \langle \delta(\vec x) \delta(\vec x + \vec r) \rangle
-$$
-
-The two-point correlation function is closely connected to the power spectrum, they form a fourier transform pair:
-$$
-\xi(\vec r) = \dfrac 1{(2\pi)^3} \int d^3 k P(\vec k) e^{i \vec k \cdot \vec r}
-$$
-
-$$
-P(\vec k) = \int d^3 r \xi(\vec r) e^{-i \vec k \cdot \vec r}
-$$
-
-...
-% todo: add considerations
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{assets/2pt-spectrum.png}
-\end{figure}
-
-\subsubsection{Non-linear evolution}
-
-In the linear regime ($\delta \ll 1$) we can calculate the evolution of a density field using linear perturbation theory:
-$$
-P_{\text{Lin}}(k,z) = D(z) P_{\text{Lin}}(k,z=0)
-$$
-
-In the non-linear regime ($\delta > 1$) perturbation theory is no longer valid. \textit{Modes start to couple} to each other, and one can no longer describe the evolution of the density field with a simple growth rate: in general, no analytic solutions exist and we must rely on simulations.
-
-\begin{observationblock}{Mode-coupling}
-    Because of this mode-coupling, the density field loses its Gaussian properties, i.e., in the non-linear regime, we no longer have a Gaussian random field. Hence, higher-order moments are required to completely specify the density field.
-\end{observationblock}
-
-\subsection{Bias}
-
-Halo formation is not a random process; haloes are not a Poisson sampling of the matter field. Rather, they only form where the (smoothed) density field has a sufficiently high value: the critical overdensity for collapse. This "threshold" causes haloes to be biased tracers of the mass distribution: Because of the modulation of the small-scale density field by the long-wavelength modes, overdense regions (on large scales) contain enhanced abundance of dark matter haloes, so that these haloes display enhanced clustering.
-
-\dots
-
-The collapsed structures we observe today, that is, galaxies and galaxy clusters, are formed at the locations of the peaks of the matter density field and more massive objects correspond to higher peaks. Thus, we expect their distribution to be a biased tracers of the underlying mass distribution and the bias grows with the mass of the objects.
-
-$$
-\delta_h = b_h \delta_m
-$$
-
-$$
-\xi_{hh}(r) = \langle \delta_h(x) \delta_h(x + r) \rangle = b_h^2 \xi_{mm}
-\qquad \xrightleftharpoons[\mathcal{F}^{-1}]{\mathcal{F}} \qquad
-P_{hh}(k) = \langle \tilde \delta_h(k) \tilde \delta_h^*(k') \rangle = b_h^2 P_{mm}(k)
-$$
-
-Galaxy clusters, arising from the highest density peak of the matter density field, have the largest bias. Their bias can be predicted from theory (or calibrated from simulations) from the halo mass function:
-
-On the other hand, forming on the rare high density peaks of the matter density field, galaxy clusters are a sparse tracer of $\delta_m$ , and their 2pt CF signal is largely disturbed by shot noise.
-
-\subsubsection{Spectroscopic vs photometric surveys}
-
-% todo: complete this section
-
-\dots
-
-\begin{minipage}{0.49\textwidth}
 \begin{center}
-\textbf{Spectroscopic survey}
-\vspace{1em}
+\small
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lcc}
+    & \makecell{$z > z_{\text{eq}}$\\radiation-dominated} 
+    & \makecell{$z < z_{\text{eq}}$\\matter-dominated} \\
+\midrule
+\makecell{$R > R_H$\\(super-horizon)} 
+    & $\delta_r \propto \delta_m \propto a^2$ 
+    & $\delta_r \propto \delta_m \propto a$ \\
+\makecell{$R < R_H$\\(sub-horizon)} 
+    & \makecell{$\delta_{\text{cdm}} \sim \text{const}$\\$\delta_{b+\gamma}$ oscillates}
+    & \makecell{$\delta_{\text{cdm}} \propto a$\\$z<z_\text{rec}\!: \, \delta_b \to \delta_{\text{cdm}}$} \\
+\end{tabular}
 \end{center}
-\begin{itemize}
-    \item Accurate 3D reconstruction
-    \item Medium depth
-    \item Low density
-    \item Strong selection effects
-\end{itemize}
+
+\bigskip
+
+The key feature of this table is the freezing of sub-horizon CDM growth during radiation domination, known as the \bfit{Mészáros effect}: because radiation dominates the total energy density and expansion rate at that epoch, the gravitational forcing on the (subdominant) dark matter is too weak to overcome the rapid Hubble expansion, so $\delta_{\text{cdm}}$ stagnates until \textbf{matter-radiation equality}:
+
+\smallskip
+
+\begin{minipage}{0.6\textwidth}
+    $$
+    \frac{\rho_m(a_{\text{eq}})}{\rho_r(a_{\text{eq}})} = 1
+    \qquad \Rightarrow \qquad
+    1 + z_{\text{eq}} = \frac{a_0}{a_{\text{eq}}} \simeq 3250 ,
+    $$
+
+    after which CDM perturbations grow freely as $\delta_{\text{cdm}} \propto a$.
+    
+    \smallskip
+    
+    Baryons, by contrast, remain tightly coupled to photons via Compton scattering until recombination, and so continue to oscillate as a photon-baryon fluid (\cref{sec:cmb_anisotropies}) even after equality; only once this coupling breaks do baryons fall into the potential wells already carved out by the dark matter, $\delta_b \to \delta_{\text{cdm}}$. The Hubble radius entering this classification is simply $R_H(t) = c/H(t) \sim ct$.
+
+    \subsubsection{The Transfer Function} \label{subsubsec:transfer_function}
+
+    The net result of this scale-dependent evolution is that the primordial power spectrum is not preserved unaltered down to late times, but is reprocessed by gravitational growth into the power spectrum actually observed today,
+    $$
+    P(k,z) = P_{\text{primordial}}(k)\, T^2(k,z) ,
+    $$
+    where the \textbf{transfer function} $T(k,z)$ encodes the differential growth history of each Fourier mode. Modes that were always super-horizon prior to $z_{\text{eq}}$ (small $k$) grow unimpeded, while modes that entered the horizon during radiation domination (large $k$) suffer the Mészáros suppression described above; the transition scale is set by the horizon size at equality, $k_{\text{eq}} = 2\pi (c\,t_{\text{eq}})^{-1} \propto \Omega_{m,0} h^2$.
+
+    \smallskip
+
+    For CDM, a simple approximation for $T(k)$ is:
+    $$
+    T(k) \simeq
+    \begin{cases}
+    1 , & k \lesssim k_{\text{eq}} \\
+    (k/k_{\text{eq}})^{-2} , & k \gtrsim k_{\text{eq}}
+    \end{cases}
+    $$
 \end{minipage}%
 \hfill
-\begin{minipage}{0.49\textwidth}
-\begin{center}
-\textbf{Photometric survey}
-\end{center}
-\vspace{1em}
-\begin{itemize}
-    \item Low resolution along the line-of-sight
-    \item Usually deeper and larger area (i.e. larger volume)
-    \item High density
-    \item ~ No selection effects
-\end{itemize}
+\begin{minipage}{0.38\textwidth}
+\smallskip
+
+    \centering
+    \includegraphics[width=\textwidth]{assets/decoupling.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Evolution of perturbations for different scales.}
+
+    \smallskip
+
+
+    \includegraphics[width=\textwidth]{assets/tf.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Transfer function T(k) for CDM, baryons, and HDM, showing free-streaming damping at high k for warm/hot dark matter}
+    \label{fig:tf}
 \end{minipage}
 
-\dots
+\medskip
 
-\subsubsection{Angular 2pt correlation function}
+Consequently, if the primordial spectrum follows $P_{\text{primordial}}(k) \propto k^{n_s}$, the processed spectrum steepens across the horizon scale at equality:
+\medskip
+$$
+P(k) \propto k^{n_s} \quad (k \ll k_{\text{eq}}, \text{ above horizon}), \qquad
+P(k) \propto k^{n_s - 4} \quad (k \gg k_{\text{eq}}, \text{ below horizon}) ,
+$$
+producing the characteristic broad turnover visible in the matter power spectrum at $k \sim k_{\text{eq}}$.
 
-Instead of reconstructing the 3d power spectrum, we take bins and then we project them \dots
+\subsubsection{Hot, warm, and cold dark matter}
+
+Dark matter candidates are classified by their kinematic state at decoupling. \bfit{Thermal relics} remain in equilibrium with the primordial plasma until their interaction rate $\Gamma = n\langle\sigma v\rangle$ falls below the expansion rate $H(a)$; if the particle is still relativistic at that moment ($3k_B T_d > m_X c^2$), it constitutes \textbf{hot dark matter} (e.g.\ light, still-relativistic neutrinos), whereas a non-relativistic decoupling ($3k_B T_d < m_X c^2$) yields \textbf{cold dark matter} (e.g.\ WIMPs). An intermediate case, \textbf{warm dark matter} (e.g.\ keV sterile neutrino), decouples while mildly relativistic. \bfit{Non-thermal relics}, such as axions or cosmic strings, are never in thermal equilibrium with the rest of the Universe in the first place.
+
+\medskip
+
+\begin{minipage}{0.54\textwidth}
+    The observational signature of a non-cold dark matter component is \bfit{free-streaming damping}: particles with non-negligible thermal velocity travel a characteristic free-streaming length $\lambda_{\text{fs}}$ before becoming non-relativistic, erasing density perturbations on scales below the corresponding wavenumber:
+    \medskip
+    $$
+    k_{\text{FS}} \sim 15.6\,\frac{h}{\text{Mpc}}\left(\frac{m_{\text{WDM}}}{1\,\text{keV}}\right)^{4/3}\left(\frac{0.12}{\Omega_{\text{DM}}h^2}\right)^{1/3}
+    $$
+
+    This same mechanism causes the neutrino suppression of the halo mass function (\cref{subsubsec:hmf_neutrinos}); measuring the small-scale power spectrum cutoff (e.g.\ via the Lyman-$\alpha$ forest) sets some of the strongest limits on warm dark matter masses.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/dm-tv.png}
+    \captionof{figure}{Transfer function $T(k)$ for CDM, baryons, and HDM; free-streaming erases small-scale fluctuations for hot/warm dark matter.}
+\end{minipage}
 
 
-\section{Baryonic Acoustic Oscillations}
+\subsubsection{Baryon Acoustic Oscillations: Physical Origin} \label{subsubsec:bao_origin}
 
-The clustering of matter encodes a preferred scale, \textit{the sound horizon at the baryon drag epoch} of the early universe. This feature, which is imprinted on the matter distribution of the early universe by physics around recombination and earlier, is stretched with the expansion of the universe, appearing at a comoving galaxy separation of $r_d \sim 150$ Mpc. Since galaxies trace the matter content of the universe, the BAO feature is transferred into galaxy clustering, where it manifests as a single localised peak in the galaxy correlation function and an oscillatory signature, or “wiggles”, in the galaxy power spectrum. The signature is also visible in other tracers of mass such as fluctuations in the Lyman-$\alpha$ forest — spectral features that indicate the radial distribution of neutral hydrogen clouds between the observer and distant quasars, as well as the CMB. Using BAO we can study the evolution of the Universe's geometry, thus test for dark energy dynamics and spatial curvature, and in combination with other probes constrain the Hubble constant, the sum of neutrino masses, and the number of light species.
+Prior to recombination, baryons and photons are tightly coupled by Compton scattering into a single photon-baryon fluid. Within this fluid, gravity acts to compress overdense regions while radiation pressure resists compression, setting up standing acoustic waves, these are the same oscillations that give rise to the acoustic peaks in the CMB power spectrum (\cref{subsubsec:cmb_powerspectrum}). As the Universe cools and recombination occurs, the interaction rate between baryons and photons drops sharply: photons decouple and begin to free-stream, while baryons are left behind, distributed in a thin, roughly spherical shell around each initial overdensity. 
 
-\dots
+\medskip
 
-\subsubsection{Angular diameter distance}
+The radius of this shell is set by the comoving distance sound waves can travel before decoupling, known as the \bfit{sound horizon}. Thereafter, only gravity couples the now decoupled baryons to the dark matter. This imprints a characteristic excess in the late-time matter distribution at a fixed physical scale, corresponding to the \textbf{baryon acoustic oscillations} (BAO). In the matter power spectrum, this appears as a series of oscillatory wiggles at the characteristic wavenumber $k_{\text{BAO}}$, which are the small-amplitude “twinkles” visible in \cref{fig:tf} just after the orange vertical line, further discussed in \cref{subsec:bao}.
+
+\subsection{The Two-Point Correlation Function} \label{subsec:2pcf}
+
+The most direct statistical description of clustering is the \bfit{two-point correlation function} (2PCF), $\xi(r)$: the fractional excess probability, relative to a spatially unclustered (Poisson) distribution, of finding two tracers of the density field (galaxies, clusters, or the underlying dark matter itself) separated by a distance $r$:
+\medskip
+$$
+dP = n\,[1 + \xi(r)]\,dV ,
+$$
+where $n$ is the mean number density of the tracer population. A vanishing correlation function, $\xi(r) = 0$, recovers the purely Poissonian expectation, $dP = n\,dV$.
+
+\medskip
+
+
+\begin{minipage}{0.55\textwidth}
+In practice, $\xi(r)$ is measured by comparing the observed pair counts in a survey, $DD(r)$, against pair counts computed from a random catalogue with the same geometry and selection function, $RR(r)$, and the cross-pairs between data and randoms, $DR(r)$. Two widely used estimators are the original \textbf{Peebles-Hauser} estimator and the \textbf{Landy-Szalay} estimator, the latter offering reduced sensitivity to survey-boundary effects and shot noise:
+$$
+\hat\xi_{\text{PH}}(r) = \frac{DD(r) - RR(r)}{RR(r)}
+$$
+$$
+\hat\xi_{\text{LS}}(r) = \frac{DD(r) - 2\,DR(r) + RR(r)}{RR(r)} .
+$$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/2pt.png}
+\captionof{figure}{Examples of the two-point correlation function for a random (left) and clustered (right) distribution.}
+\end{minipage}
+
+\medskip
+
+Assuming the Universe is statistically isotropic, the correlation function depends only on the scalar separation $r = |\vec r|$, and can be written as an ensemble average of the density field itself:
+\medskip
+$$
+\xi(\vec r) = \big\langle \delta(\vec x)\,\delta(\vec x + \vec r) \big\rangle .
+$$
+The 2PCF and the matter power spectrum $P(k)$ form a Fourier transform pair:
+\medskip
+$$
+\xi(\vec r) = \frac{1}{(2\pi)^3}\int d^3k\; P(\vec k)\, e^{i\vec k\cdot\vec r} , \qquad\qquad
+P(\vec k) = \int d^3r\; \xi(\vec r)\, e^{-i\vec k\cdot\vec r} ,
+$$
+so that, for a Gaussian random field, where the overdensity field is defined to have zero mean, either statistic alone completely characterises the density field; all information is contained in the second moment, and higher-order correlations vanish.
+
+\begin{observationblock}[Non-linear evolution and the loss of Gaussianity]
+In the linear regime ($\delta \ll 1$), each Fourier mode of the density field evolves independently, and the power spectrum simply rescales in amplitude via the linear growth factor $D(z)$,
+\medskip
+$$
+P_{\text{lin}}(k,z) = D(z)^2\, P_{\text{lin}}(k, z=0) .
+$$
+Once perturbations become non-linear ($\delta \gtrsim 1$), however, different Fourier modes begin to couple to one another, and no closed analytic solution exists for the subsequent evolution; N-body simulations are required to follow the density field into this regime. A direct consequence of this mode-coupling is that the density field loses its Gaussian character: the two-point function (or power spectrum) alone no longer fully specifies the field, and higher-order statistics (the bispectrum, trispectrum, and beyond) carry genuinely new information at small scales.
+\end{observationblock}
+
+\subsection{Biased Tracers of the Density Field} \label{subsec:bias}
+
+Neither galaxies nor galaxy clusters directly sample the underlying matter density field; both are \bfit{biased tracers}, in the same sense that the distribution of city lights on Earth traces, but does not linearly reproduce, the distribution of landmass and population density. Halo formation is not a Poisson sampling of the matter field: as established by the spherical collapse picture of \cref{subsec:spherical_collapse}, halos form only where the smoothed density field locally exceeds the critical collapse threshold $\delta_c$. Because the small-scale density field is itself modulated by long-wavelength (large-scale) modes, regions that are already overdense on large scales contain an enhanced abundance of collapsed halos, so that halos display systematically stronger clustering than the underlying matter distribution from which they formed.
+
+\medskip
+
+\begin{minipage}{0.6\textwidth}
+To leading order, this effect is captured by a linear \bfit{bias} parameter $b_h$, relating the halo and matter overdensity fields:
+\vspace{-0.5em}
+$$
+\delta_h = b_h\, \delta_m
+$$
+The halo correlation function and power spectrum then follow directly as:
+\medskip
+$$
+\xi_{hh}(r) = \langle\,\delta_h(x)\,\delta_h(x+r)\,\rangle = b_h^2\, \xi_{mm}(r)
+$$
+
+\vspace{-1.5em}
+
+$$
+\mathcal{F} \Big\uparrow \Big\downarrow \mathcal{F}^{-1} 
+$$
+$$
+P_{hh}(k) = \langle\,\tilde{\delta}_h(k)\,\tilde{\delta}_h^*(k')\,\rangle = b_h^2\, P_{mm}(k)
+$$
+Because more massive halos form at rarer, higher peaks of the density field, the bias grows monotonically with halo mass (and, at fixed mass, with redshift, since a given mass threshold corresponds to a rarer peak at earlier times, when the overall variance of the field was smaller). 
+
+\medskip
+
+Galaxy clusters, forming at the very highest peaks of the density field, therefore carry the largest bias of any commonly used tracer, and this bias can be predicted directly from the halo mass function of \cref{subsec:halo_mass_function}. This large bias comes at a cost, however. Because clusters form at the rarest density peaks, they are also an intrinsically \bfit{sparse} tracer of $\delta_m$: their number density is orders of magnitude lower than that of galaxies ($\sim 10^{3\text{-}4}$ objects in a typical survey, compared to $\sim 10^{8}$ galaxies), so their clustering signal is significantly degraded by shot noise.
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/halo-bias.png}
+    \captionof{figure}{Halo bias $b_h$ versus mass, curves for several redshifts, increasing with both mass and redshift}
+\medskip
+\includegraphics[width=\textwidth]{assets/DESY6.png}
+\captionof{figure}{Matter power spectrum $P_m(k)$ from different surveys.}
+\label{fig:DESY6}
+\end{minipage}
+
+\medskip
+
+Galaxies, in exchange for a much higher number density and correspondingly lower shot noise, have a bias that cannot be predicted from first-principles halo-collapse theory alone, and instead depends sensitively on the specific galaxy sample used (its colour and magnitude selection, in particular), requiring empirical calibration against simulations or joint fits to the data themselves.
+
+\medskip
+
+\cref{fig:DESY6} shows $P_m(k)$ measured by various surveys. DES Y6 galaxies (orange, $z<1$) probe the low-redshift Universe, where non-linear evolution affects small scales, allowing us to study the growth of structure beyond the linear regime. In contrast, high-redshift tracers like the Lyman-$\alpha$ forest (grey, $z>2$) measure $P_m(k)$ before significant non-linearities, and CMB data (Planck, colored points) reveal the primordial, linear spectrum. This multi-probe approach links the initial conditions to present-day structure.
+
+\subsection{Spectroscopic versus Photometric Redshift Surveys} \label{subsec:surveys_specphot}
+
+The clustering signal is intrinsically three-dimensional, but while the angular position of a tracer on the sky is generally straightforward to measure, its radial (line-of-sight) distance can only be inferred from a redshift measurement, whose precision depends critically on the observing technique.
+
+\medskip
+
+\begin{itemize}
+\item \textbf{Spectroscopic redshifts} ($\sigma_z \sim 0.001\,(1+z)$) are obtained by directly measuring a galaxy's spectrum and identifying the Doppler shift of known emission or absorption features. Because the light must be dispersed into narrow wavelength bins, only a small fraction of the total flux falls in each bin, requiring long integration times and effectively restricting the technique to sufficiently luminous sources.
+\item \textbf{Photometric redshifts} ($\sigma_z \sim 0.01\,(1+z)$) are instead estimated from broadband imaging, by fitting template spectral energy distributions (or comparing against galaxies with known spectroscopic redshift). Because photometric bins are far wider, comparable signal-to-noise is reached with much shorter exposures, and wide-field imaging cameras cover far greater sky areas than multi-object spectrographs.
+\end{itemize}
+
+\medskip
+
+These complementary strengths translate directly into the character of the resulting survey.
+
+\medskip
+
+\begin{minipage}{0.58\textwidth}
+\bfit{Spectroscopic surveys} deliver accurate three-dimensional reconstructions of the cosmic web, but at the cost of shallower depth, lower source density, and stronger selection effects, since only the intrinsically brightest sources can be targeted efficiently. \bfit{Photometric surveys}, in contrast, sacrifice line-of-sight resolution for depth, area, and source density, typically probing much larger cosmic volumes with comparatively mild selection effects.
+
+\medskip
+
+Because a spectroscopic redshift error directly perturbs the inferred radial distance of a tracer, it systematically degrades the clustering measurement along the line of sight: the slope of the 2PCF is artificially reduced, and (most notably) the sharp BAO feature discussed below is smeared out and partially washed away, since pairs that are truly close together in comoving distance are scattered to a broader range of apparent separations.
+
+\medskip
+
+Moreover, spectroscopic surveys, thanks to their accurately measured redshifts, yield a sharp three-dimensional correlation function in which the baryon acoustic oscillation (BAO) bump around $100$~Mpc/$h$ is clearly visible. In contrast, photometric surveys suffer from substantial projection effects because redshift uncertainties blur the true radial distances. This smearing smooths out features in the correlation function, making the BAO bump undetectable and reducing the overall precision of large-scale clustering measurements. As a result, while photometric surveys have advantages in area and depth, their scientific reach for certain cosmological measurements (such as precise standard-ruler constraints from the BAO) remains limited by projection effects.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/ph-spec.png}
+    \captionof{figure}{Comparison between spectroscopic and photometric surveys.}
+
+    \bigskip
+
+    \includegraphics[width=\textwidth]{assets/redshift-error.png}
+    \captionof{figure}{2pt corr. function for spectroscopic and photometric surveys.}
+\end{minipage}
+
+\subsubsection{The Angular Two-Point Correlation Function} \label{subsubsec:angular_2pcf}
+
+When the radial resolution of a survey is poor (as in a photometric survey) or entirely absent (as for the last-scattering surface of the CMB), the three-dimensional correlation function cannot be reconstructed directly, and one instead measures the \bfit{angular correlation function} $w(\theta)$, defined in direct analogy with $\xi(r)$ as the excess probability of finding two tracers separated by an angular distance $\theta$ on the sky:
+$$
+dP(\theta) = n\,[1+w(\theta)]\, d\Omega
+$$
+This angular statistic is related to the full three-dimensional correlation function via a line-of-sight projection over the redshift distributions $r(z_1)$, $r(z_2)$ of the two populations being correlated:
+\medskip
+$$
+w(\theta) = \int\!\!\int dz_1\,dz_2\; \xi\!\left(\sqrt{r^2(z_1) + r^2(z_2) - 2\,r(z_1)\,r(z_2)\cos\theta}\right)
+$$
+
+\vspace{-0.5em}
+
+\begin{minipage}{0.72\textwidth}
+Equivalently, $w(\theta)$ can be expanded in Legendre polynomials $L_\ell(\cos\theta)$ and related to the \bfit{angular power spectrum} $C_\ell$:
+\medskip
+$$
+w(\theta) = \sum_\ell \frac{2\ell+1}{4\pi}\, L_\ell(\cos\theta)\, C_\ell, 
+$$
+$$
+C_\ell = 2\pi n_\Omega \int_{-1}^{+1} w(\theta)\, L_\ell(\cos\theta)\, d\cos\theta
+$$
+This is the same formalism used for the CMB temperature and polarisation power spectra in \cref{subsubsec:cmb_powerspectrum}, applied to the projected galaxy density field of photometric surveys.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.25\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/angular-2pt.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Angular 2-pt correlation function.}
+\end{minipage}
+
+\vspace{-0.5em}
+
+\subsection{Baryon Acoustic Oscillations as a Standard Ruler} \label{subsec:bao}
+
+The physical mechanism generating the BAO was introduced in \cref{subsubsec:bao_origin}; here we develop its use as a cosmological probe. The key point is that the propagation of the acoustic waves in the early Universe (determined by the sound speed of the photon-baryon fluid and the timing of the drag epoch) is governed by well-understood microphysics. Consequently, the (comoving) sound horizon at the drag epoch, $r_d$, can be predicted robustly from first principles and is largely insensitive to late-time cosmology. The \textbf{sound horizon} at drag epoch is defined as the distance that sound can travel in the baryon-photon plasma before baryons decouple from photons at $z_d \approx 1060 \approx z_*$:
+\medskip
+$$
+r_d = \int_{z_d}^{\infty} \frac{c_s(z)}{H(z)}\,dz , \qquad
+c_s(z) = \frac{c}{\sqrt{3\left(1 + \dfrac{3\rho_B(z)}{4\rho_\gamma(z)}\right)}} ,
+$$
+where $c_s(z)$ is the sound speed in the coupled photon-baryon fluid, depending on the baryon ($\rho_b$) and photon ($\rho_\gamma$) energy densities. A widely used fitting formula for the value of $r_d$ is
+\medskip
+$$
+r_d \simeq 147.05\,\mathrm{Mpc} \left(\frac{\omega_m}{0.1432}\right)^{-0.23} \left(\frac{N_{\text{eff}}}{3.04}\right)^{-0.1} \left(\frac{\omega_b}{0.02236}\right)^{-0.13}
+$$
+where $\omega_m \equiv \Omega_m h^2$ and $\omega_b \equiv \Omega_b h^2$ are the present-day (physical) matter and baryon densities, and $N_{\text{eff}}$ is the effective number of relativistic species. An increase in $N_{\text{eff}}$ leads to a faster expansion rate, reducing $r_d$.
+
+\medskip
+
+Because its physical length is fixed by early-Universe physics alone, $r_d$ functions as a \bfit{standard ruler}: comparing this known comoving length to its \textit{observed} angular or redshift extent at any given epoch directly constrains the late-time expansion history.
+
+Thus, by comparing the known comoving size of the sound horizon to its measured angular or redshift extent at different epochs, we can directly track the evolution of cosmic distances and probe the geometry of the Universe.
+
+\subsubsection{Angular Diameter Distance}
+
+\begin{minipage}{0.6\textwidth}
+    This comparison can be performed in two independent directions. \bfit{Perpendicular} to the line of sight, the ruler subtends a preferred angular separation
+\medskip
+$$
+\theta = \frac{r_d(z)}{(1+z)\,d_A(z)}
+$$
+directly probing the angular diameter distance $d_A(z)$. \bfit{Parallel} to the line of sight, the same physical length instead maps onto a preferred redshift separation:
+\medskip
+$$
+\Delta z = \frac{H(z)\, r_d}{c}
+$$
+directly probing the Hubble parameter $H(z)$ itself. Measuring both directions simultaneously therefore yields two independent geometric constraints from a single, well-understood standard ruler.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/bao-ruler.png}
+    \captionof{figure}{BAO standard ruler: comoving sphere of radius $r_d$ subtending angle $\theta$ (perpendicular) and redshift interval $\Delta z$ (parallel) to the observer.}
+\end{minipage}
+
+\medskip
+
+In a spatially flat $\Lambda$CDM Universe at redshifts well below matter-radiation equality ($z \ll z_{\text{eq}}$), the \textbf{angular diameter distance} and \textbf{Hubble parameter} are given by:ù
+\medskip
+$$
+d_A(z) = \frac{c}{H_0}\,\frac{1}{1+z}\int_0^z \frac{dz'}{\sqrt{\Omega_{m,0}(1+z')^3 + \Omega_{\Lambda,0}}} , \qquad
+H(z) = H_0\sqrt{\Omega_{m,0}(1+z)^3 + \Omega_{\Lambda,0}}
+$$
+These are the same expressions introduced previously in \cref{subsec:luminosity_distance}.
+
+\medskip
+
+\begin{minipage}{0.4\textwidth}
+The angular diameter distance $d_A(z)$ rises rapidly with redshift at first, reaches a maximum (the "cosmic lens" or "focus" effect), and then decreases at higher $z$ as objects appear smaller. The exact location and height of this maximum depend on the matter and dark energy density: higher $\Omega_{m,0}$ or positive curvature shift the peak to lower $z$ and lower $d_A$, while a cosmological constant (flat, $\Omega_{\Lambda,0} > 0$) increases $d_A$ at high $z$. 
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.58\textwidth}
+    \includegraphics[width=\textwidth]{assets/Angular-diam-dist.png}
+    \captionof{figure}{\textbf{Left:} Angular diameter distance $d_A(z)$ versus redshift. \textbf{Right:} Angular scale (arcmin/Mpc) of a fixed physical ruler as a function of redshift}
+\end{minipage}
+
+\medskip
+
+Intuitively, we expect that a more distant object should always appear smaller on the sky—a behaviour that would indeed occur in an "empty universe" ($\Omega_{m,0} = 0$, $\Omega_{k,0} = 1$). However, in realistic cosmologies with matter and dark energy, the angular scale subtended by a standard ruler actually decreases with redshift only up to the maximum of $d_A(z)$, and then starts to increase again for more distant objects. This non-monotonic behaviour means that sufficiently distant galaxies can actually appear larger in angular size than nearer ones. The detailed redshift at which this "cosmic lens" effect occurs, as well as the minimum angular scale, depend sensitively on the values of $\Omega_{m,0}$ and $\Omega_{\Lambda,0}$.
+
+\medskip
 
 The turnover point occurs because of the expansion of the universe and the finite speed of light: very distant objects were closer to us when they emitted the light we see today. At that time they spanned a larger angle.
 
-\dots
+\begin{minipage}{0.65\textwidth}
+    \includegraphics[width=\textwidth]{assets/apparent-angle.png}
+    \captionof{figure}{\textbf{Left:} At high redshift, objects can appear larger because their light was emitted when they were closer to us.}
 
-\subsubsection{Redshift space distortions}
+    \medskip
 
-Due to peculiar velocities (along the line of sight), the redshift
-distances available from a galaxy redshift survey deviate from
-the true, proper distances. This results in redshift space
-distortions in the clustering measurements.
+    Very distant objects do not always appear smaller as they recede. Beyond a critical redshift, the expansion of the universe and the finite speed of light mean we receive light that was emitted when the object was much closer to us than its current distance. Thus, extremely distant galaxies can actually span a larger apparent angle, even though they are farther away now. This counterintuitive effect, linked to the evolution of the angular diameter distance with redshift, is a clear signature of the universe's geometry and expansion history.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.32\textwidth}
+    \includegraphics[width=\textwidth]{assets/apparent-angle-1.png}
+    \captionof{figure}{Galaxy $Y$ is now farther than $X$, but was physically closer when it emitted the light we see today.}
+\end{minipage}
+
+\medskip
+
+\begin{minipage}{0.52\textwidth}
+    In observations, the BAO feature shows up as a single broad bump in the galaxy two-point correlation function, $\xi(r)$, at $r \sim 100$-$130\,h^{-1}\,\text{Mpc}$, on top of a smooth background. In Fourier space, this becomes a set of damped oscillatory "wiggles" in the galaxy power spectrum $P(k)$. Because the amplitude is small ($\Omega_b \ll \Omega_m$), early surveys like BOSS needed samples of over a million galaxies to detect the signal clearly above noise.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/baryonic-peak.png}
+    \captionof{figure}{BAO peak in galaxy 2-pt correlation function (real and Fourier space).}
+\end{minipage}
+
+\medskip
+
+Beyond galaxies, the same physical scale imprints an 
+analogous signature in quasar clustering and in the Lyman-$\alpha$ forest (\cref
+{subsec:lyman_alpha}), whose absorption pattern traces the distribution of neutral 
+hydrogen along many independent lines of sight and so offers a probe of the BAO scale 
+at higher redshift ($z \sim 2$-$3$) than galaxy samples alone can reach.
+
+\medskip
+
+\begin{minipage}{0.58\textwidth}
+Once imprinted at the drag epoch, the BAO scale preserves its comoving size $r_d$ and simply expands with the Hubble flow, acting as a cosmological standard ruler. By measuring the angular scale $\alpha_\perp$ (often from the observed BAO angle $\theta_{\text{BAO}}(z)$) and the line-of-sight scale $\alpha_\parallel$ (from the BAO redshift separation $\Delta z_{\text{BAO}}(z)$) across different redshifts, modern spectroscopic surveys map out both the angular diameter distance $d_A(z)$ and the Hubble parameter $H(z)$ as a function of cosmic time. This provides a precise geometric probe of the Universe's expansion history, dark energy, and spatial curvature. When combined with an external calibration of the sound horizon $r_d$ (e.g., from CMB measurements or Big Bang nucleosynthesis), BAO serve as an independent route to determining the Hubble constant $H_0$.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.39\textwidth}
+
+    \vspace{-0.5em}
+
+    \centering
+    \includegraphics[width=\textwidth]{assets/comoving.png}
+    \captionof{figure}{How transverse ($\alpha_\perp$) and LOS ($\alpha_\parallel$) measurements of the BAO at different redshifts constrain the expansion history via $d_A(z)$ and $H(z)$.}
+\end{minipage}
+
+\subsection{Redshift-Space Distortions} \label{subsec:rsd}
+
+A subtlety complicates the direct translation of an observed redshift into a true, physical distance: the observed redshift of a galaxy is not purely cosmological, but also carries the imprint of its \textbf{peculiar velocity}, $v_{\text{pec}}$, the galaxy's motion relative to the smooth Hubble flow, itself sourced gravitationally by the surrounding density field,
+$$
+v = v_{\text{exp}} + v_{\text{pec}} = H_0\,d(z) + v_{\text{pec}} , \qquad
+z_{\text{obs}} = z_{\text{exp}} + \frac{v_{\text{pec}}}{c}\,(1+z_{\text{exp}})
+$$
+The proper distance inferred naively from the observed redshift, the \bfit{redshift-space} distance, therefore differs systematically from the true, real-space distance:
+$$
+s = \frac{v}{H_0} = d(z) + \frac{v_{\text{pec}}}{H_0} .
+$$
+Because only the LOS component of the peculiar velocity affects the observed redshift (transverse motions leave the angular position unaffected), this introduces a purely radial distortion: the two-point correlation function, isotropic in real space, becomes anisotropic once measured in redshift space. Decomposing the pair separation into components perpendicular ($\sigma$) and parallel ($\pi$) to the LOS allows this anisotropy to be characterised via $\xi(\sigma,\pi)$.
+
+\medskip
+
+\begin{minipage}{0.62\textwidth}
+Two distinct physical regimes produce opposite distortion patterns. On large scales, peculiar velocities trace the coherent, linear infall of matter toward overdensities: material on the near side of a cluster moves away from the observer (partially cancelling its Hubble recession) while material on the far side moves toward the observer (compounding it), so that a spherical overdensity appears compressed, or "squashed", along the line of sight in redshift space. This is the \textbf{Kaiser effect}. On small scales, by contrast, the virialised, essentially random orbital velocities of galaxies within a single collapsed halo dominate, and these highly nonlinear motions instead stretch a compact structure into an elongated radial feature, the well-known \textbf{Finger-of-God effect}, so named for its characteristic appearance in redshift-space maps of individual clusters.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \vspace{-0.5em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/real-vs-z.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Kaiser squashing versus Finger-of-God stretching.}
+\end{minipage}
+
+\medskip
+
+Peculiar velocities from gravitational clustering affect only the radial (LOS) distances, causing systematic distortions in \bfit{redshift space}: the correlation function, isotropic in real space, appears \textbf{anisotropic} in redshift space.
+
+\medskip
+
+\begin{minipage}{0.48\textwidth}
+
+To quantify this, we decompose the separation between two galaxies into components parallel and perpendicular to the line of sight:
+\medskip
+$$
+\pi \equiv \frac{|\vec{S} \cdot \vec{l}|}{|\vec{l}|}, 
+\qquad
+\sigma \equiv \sqrt{|\vec{S}|^2 - \pi^2}
+$$
+where $\vec{S} = \vec{s}_1 - \vec{s}_2$ is the separation vector, and $\vec{l} = (\vec{s}_1 + \vec{s}_2)/2$ is their mean position. We then measure the correlation function as $\xi(\sigma, \pi)$, which directly reveals the anisotropic structure: "squashing" on large scales (Kaiser effect) and "stretching" on small scales (Finger-of-God).
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.5\textwidth}
+
+    \vspace{-1em}
+
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/kaiser-fog.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{\textbf{Left:} Geometry of $\sigma$ and $\pi$ for a galaxy pair. \textbf{Right:} 2dFGRS $\xi(\sigma, \pi)$: LOS stretch (Finger-of-God) at small scales; LOS compression (Kaiser effect) at large scales.}
+\end{minipage}
+
+\medskip
+
+In the linear regime, the Kaiser effect can be derived analytically, yielding a simple, anisotropic rescaling of the density and power-spectrum amplitudes in Fourier space,
+$$
+\delta_s(\vec k) = \left(1 + \beta\mu^2\right)\delta_r(\vec k) , \qquad
+P_s(k) = \left(1 + \beta\mu^2\right)^2 P_r(\vec k) ,
+$$
+where $\mu$ is the cosine of the angle between the wavevector and the line of sight, and $\beta$ combines the linear growth rate $f(\Omega_m)$ with the tracer's bias $b$ (\cref{subsec:bias}),
+$$
+\beta = \frac{f(\Omega_m)}{b} .
+$$
+\begin{minipage}{0.58\textwidth}
+Because $f(\Omega_m) \equiv d\ln\delta/d\ln a$ measures precisely how efficiently gravity is currently amplifying density perturbations, a measurement of the RSD-induced anisotropy provides a direct, model-independent constraint on the combination $f\sigma_8(z)$, the amplitude of structure growth as a function of cosmic time. This makes RSD a genuinely complementary probe to the geometric information carried by BAO: whereas BAO tests the Universe's expansion history, RSD tests the growth of structure within that expansion history, and any departure between the two (for instance, a growth rate lower than $\Lambda$CDM predicts at fixed expansion history) would be a direct signature of modified gravity, echoing the anisotropic-stress tests of \cref{subsubsec:anisotropic_stress}.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/z-dist-probe.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Measurements of $f\sigma_8$ from redshift-space distortions vs.\ redshift, compared to $\Lambda$CDM (black).}
+\end{minipage}
+
+\medskip
+
+\subsection{The Kinetic SZ Effect as a Growth Probe} \label{subsec:ksz_growth}
+
+The kinetic Sunyaev-Zel'dovich effect, introduced in \cref{subsec:ksz} as a Doppler-induced CMB temperature fluctuation sourced by the bulk motion of cluster gas, offers a further, independent route to the growth rate $f(a)$, complementary to RSD. In the \bfit{pairwise kSZ} technique, the mean relative (infall) velocity of a large sample of cluster pairs at fixed comoving separation $r$ is estimated by stacking the corresponding kSZ temperature signal,
+$$
+T_{\text{pkSZ}}(r) \equiv \bar\tau_e\,\frac{v_{12}(r)}{c}\,T_{\text{CMB}} ,
+$$
+where $\bar\tau_e$ is the mean optical depth of the stacked sample. In linear theory, the mean pairwise infall velocity is directly proportional to the growth rate and to the two-point matter correlation function,
+$$
+v_{12}(r,a) \approx -\frac{2}{3}\,a\,H(a)\,f(a)\,r\,\frac{b\,\bar\xi(r)}{1 + b^2\xi(r)} ,
+$$
+\begin{minipage}{0.58\textwidth}
+so that a measurement of $T_{\text{pkSZ}}(r)$ across a range of separations directly constrains $f(a)$, entirely independently of the RSD formalism above, and without relying on redshift-space distortions of the galaxy field itself. Cross-correlating large photometric or spectroscopic cluster catalogues (such as those from DESI) with high-resolution CMB temperature maps (from Planck, ACT, or SPT) has yielded robust pairwise kSZ detections, providing a genuinely independent cross-check on the growth history inferred from RSD, weak lensing, and cluster abundance (\cref{subsec:cluster_cosmo_constraints}).
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/pksz.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Pairwise kSZ signal as a function of separation.}
+\end{minipage}
+
+
+\section{The CMB Angular Power Spectrum as a probe} \label{sec:cmb_probe_detail}
+
+\cref{sec:cmb_anisotropies} introduced the CMB angular power spectrum and its acoustic peaks in broad terms; here we develop the physics underlying its shape in more detail, since it is this shape, peak by peak, that makes the CMB one of the tightest cosmological probes available.
+
+\subsection{The Last-Scattering Surface Revisited} \label{subsec:lss_revisited}
+
+Recombination is not an instantaneous process, so the CMB photons we observe do not originate from a single, sharp redshift but from a \bfit{last-scattering surface} (LSS) of finite thickness. It is useful to distinguish two closely related but conceptually distinct redshifts. The \textbf{redshift of recombination}, $z_{\text{rec}} \simeq 1090$, is defined as the epoch at which the free-electron (ionisation) fraction drops below some threshold value, conventionally $x_e \simeq 0.1$. The \textbf{redshift of decoupling}, $z_{\text{dec}} \simeq 1080$, is instead defined dynamically, as the epoch at which the Thomson scattering rate falls below the Hubble expansion rate, $\Gamma_{T} = n_e\,\sigma_T\,c \simeq H(z)$; beyond this point photons can no longer scatter frequently enough to remain coupled to the baryons; and it is $z_{\text{dec}}$, rather than $z_{\text{rec}}$, that effectively coincides with the LSS. Because the transition is gradual, the LSS itself has a finite width, $\Delta z \simeq 80$, which becomes directly relevant to the damping tail of the power spectrum discussed below.
+
+\vspace{-0.5em}
+
+\subsection{Decomposing the TT Spectrum} \label{subsec:tt_decomposition}
+
+\subsubsection{Super-Horizon Scales: Sachs-Wolfe effect} \label{subsec:sachs_wolfe}
+
+\begin{minipage}{0.5\textwidth}
+An important angular scale is set by the comoving Hubble radius at decoupling,
+$$
+r_H(z_{\text{dec}}) = \frac{c}{H(z_{\text{dec}})}
+$$
+whose projected angular size on the sky today is:
+$$
+\theta_H = \frac{r_H}{d_A(z_{\text{dec}})\,(1+z_{\text{dec}})} \simeq 0.87^\circ
+$$
+Since an angular scale $\theta$ maps onto a multipole $\ell \sim \pi/\theta\,\mathrm{rad} \sim 180^\circ/\theta$, this corresponds to a characteristic multipole $\ell_H \sim 200$.
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}
+    \vspace{-2em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/cmb-tt.png}
+    \captionof{figure}{CMB TT power spectrum.}
+\end{minipage}
+
+\medskip
+
+Modes with $\ell \lesssim 200$ were therefore still \textbf{super-horizon} at the time of decoupling: causal microphysics (in particular, the acoustic oscillations) had not yet had time to act on them.
+
+On super-horizon scales, only two effects can source a non-zero temperature fluctuation $\Delta T/T$: the intrinsic photon-density fluctuation present at decoupling, and the gravitational redshift (or blueshift) a photon experiences climbing out of (or into) a potential well, since photons emerging from a deeper potential well lose more energy than the mean. The combination of these two effects is known as the (ordinary) \textbf{Sachs-Wolfe effect}, and it sets the low-$\ell$ plateau of the temperature power spectrum, together with part of the normalisation of the first acoustic peak.
+
+\vspace{-0.5em}
+
+\subsubsection{Acoustic Oscillations and the Peak Structure} \label{subsec:acoustic_peaks_detail}
+
+On sub-horizon scales, by contrast, the rich peak structure of the temperature spectrum is a direct consequence of \bfit{acoustic oscillations} in the tightly coupled baryon-photon fluid prior to recombination. Gravitational potential wells, sourced predominantly by the dominant cold dark matter component, drive the compression of the fluid, while photon pressure, arising from Thomson scattering off free electrons, supplies the restoring force; the system behaves as a driven, damped harmonic oscillator, with a Hubble drag term and a pressure (sound-speed) term entering alongside the gravitational driving term.
+
+\smallskip
+
+Because the sound speed of the photon-baryon fluid is common to all Fourier modes, shorter-wavelength modes complete more oscillation cycles by the time of recombination than longer-wavelength ones. The \textbf{first peak} corresponds to the mode caught at its first compression at the moment of recombination; the \textbf{second peak} to the mode that has completed a full cycle of compression and rarefaction; and so on for the higher peaks. The even-numbered peaks are systematically suppressed relative to the odd ones, because the rarefaction phase must work against the inertia of the baryons, which do not participate in the restoring pressure force but do add to the inertial mass of the oscillating fluid.
+
+\smallskip
+
+% After recombination, photons free-stream toward the observer largely unimpeded, carrying the imprint of the oscillation phase of each mode at the moment it was "frozen in". A single Fourier mode, viewed on the last-scattering surface, appears to the observer as a ring of angular temperature fluctuations with a characteristic scale set by the mode's wavelength; the ensemble of all such modes, summed over the sky, produces the full acoustic peak structure observed in $C_\ell$.
+
+% \smallskip
+
+On sufficiently small scales, two effects act together to erase power. First, because photons are not completely frozen, but are able to scatter, this random walk washes out density fluctuations on scales comparable to or smaller than the diffusion length, an effect known as \bfit{Silk damping}. Second, because the LSS has a finite thickness ($\Delta z \simeq 80$, \cref{subsec:lss_revisited}), anisotropies on angular scales smaller than the corresponding width are smeared out by projection along the line of sight. Both effects act above $\ell \gtrsim 1000$, producing the characteristic exponential suppression of power known as the \textbf{damping tail}.
+
+\vspace{-0.5em}
+
+\subsubsection{Secondary Anisotropies} \label{subsec:secondary_anisotropies_detail}
+
+\begin{minipage}{0.57\textwidth}
+
+At angular scales below a few arcminutes, the observed temperature fluctuations are no longer dominated by the primary physics of the last-scattering surface, but instead by \bfit{secondary anisotropies}: distortions imprinted on the CMB by its subsequent interaction with matter along the line of sight. These fall into two broad families, distinguished by the underlying physical mechanism.
+
+\smallskip
+
+The first family comes from the interaction of photons with gravitational potential wells, mainly gravitational lensing (\cref{sec:lensing_probe}) and the \textbf{late Integrated Sachs-Wolfe (ISW) effect}, which appears when gravitational potentials decay after dark energy dominates. Lensing by cosmic structures smooths the acoustic peaks (up to $10\%$ at $\ell > 2000$) and boosts small-scale power, overtaking the primary anisotropies for $\ell > 4000$. Lensing also correlates otherwise independent Fourier modes, introducing a specific non-Gaussian signature in the four-point statistics, allowing reconstruction of the lensing potential (\cref{subsec:cmb_lensing_probe}).
+
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \vspace{-1.5em}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/sec-ani.png}
+    
+    \vspace{-0.5em}
+
+    \captionof{figure}{Secondary CMB anisotropies, caused by gravitational (a) and scattering (b) effects.}
+\end{minipage}
+
+\smallskip
+
+The second family incorporates the effects of photons rescattering off free electrons after recombination: the reionization signature already discussed in \cref{sec:reionization}, and the thermal and kinetic SZ effects of \cref{sec:icm_mm}.
+
+\subsubsection{Spectrum decomposition} \label{subsubsec:spectrum_decomposition}
+
+The observed temperature power spectrum can be usefully decomposed into the sum of several physically distinct contributions: the Sachs-Wolfe and early-ISW terms, which dominate the largest scales and set the low-$\ell$ plateau together with part of the first-peak normalisation; the acoustic oscillation terms proper, which produce the peak-trough sequence; the late-ISW contribution, adding power at the very lowest multipoles from the decay of potentials at late times; a Doppler (velocity) term, contributing around the acoustic region with a phase offset relative to the density term; and the diffusion-damping suppression at high $\ell$ discussed above.
+
+\smallskip
+
+\begin{minipage}{0.38\textwidth}
+    The \textbf{position} of the acoustic peaks is set by two purely geometric quantities: the \bfit{physical size} of the sound horizon at decoupling, and the \bfit{angular diameter distance} to the last-scattering surface. Peak positions therefore encode $\Omega_b h^2$, $\Omega_m h^2$, the spatial curvature $\Omega_k$, and the dark-energy content through its effect on the distance-redshift relation; departures from flatness shift the whole peak pattern horizontally in $\ell$, toward smaller $\ell$ for open models and larger $\ell$ for closed ones.
+
+    \smallskip
+
+\end{minipage}
+\hfill
+\begin{minipage}{0.6\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/cmb-tt-decomposed.png}
+    
+    \vspace{-0.5em}
+
+    \captionof{figure}{Breakdown of the CMB temperature power spectrum into physical components.}
+\end{minipage}
+
+\begin{minipage}{0.56\textwidth}
+    The \textbf{relative heights} of the peaks, by contrast, carry complementary information. Increasing $\Omega_b h^2$ \bfit{enhances the  relative amplitude} of odd peaks to the even ones (the \bfit{baryon-loading effect} already discussed) and deepens the intervening troughs. The overall envelope of the peak heights is additionally sensitive to the primordial scalar amplitude and tilt ($A_s$, $n_s$) and to the time evolution of the gravitational potentials, through the early- and late-ISW terms. 
+
+    \smallskip
+
+    In short, the CMB temperature spectrum constrains the Universe's \textit{geometry} chiefly through the peak positions, and its \textit{composition and dynamics} chiefly through the relative peak heights and the damping tail.
+\end{minipage}
+\hfill
+\begin{minipage}{0.41\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/cmb-tt-probe.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Effect of cosmological parameters on the CMB power spectrum}
+\end{minipage}
+
+\subsection{CMB Polarisation Spectra: EE and TE} \label{subsec:ee_te_detail}
+
+\cref{subsec:cmb_polarization} introduced the generation of CMB polarisation via Thomson scattering off a local quadrupole anisotropy in the radiation field, and the resulting $E$/$B$-mode decomposition. Beyond temperature, polarisation yields two additional two-point observables, $C_\ell^{EE}$ and $C_\ell^{TE}$.
+
+\smallskip
+
+\begin{minipage}{0.59\textwidth}
+    Because polarisation is most efficiently produced on scales comparable to the photon diffusion length near decoupling, the $EE$ spectrum peaks around $\ell \sim 1000$, at an amplitude only a few percent of the temperature fluctuations (few $\mu\text{K}$). A second, much fainter feature appears at low $\ell$: the \textbf{reionisation bump}, sourced by the re-scattering of CMB photons off the free electrons liberated during reionisation (\cref{sec:reionization}); its amplitude is set by the (low) probability of a recent scattering, and its angular position by the size of the horizon at the epoch of reionisation.
+\end{minipage}
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/cmb-pol-signal.png}
+    
+    \vspace{-0.5em}
+    
+    \captionof{figure}{CMB power spectra: TT, EE, TE, and BB components.}
+\end{minipage}
+
+\smallskip
+
+CMB polarisation is produced by the local \textit{velocity} of the photon-baryon fluid at last scattering, because the polarising quadrupole arises from anisotropic photon motion, not directly from density or pressure. In contrast, temperature anisotropies mainly trace density extrema. This causes the $EE$ and $TE$ peaks to be shifted by a quarter cycle relative to the $TT$ peaks. The $TE$ cross-spectrum, which flips sign across multipoles due to this phase shift, is particularly useful for breaking parameter degeneracies left by $TT$ alone.
+
+\smallskip
+
+\begin{minipage}{0.6\textwidth}
+    Modern CMB experiments like Planck, SPT, and ACT now provide the strongest constraints on $\Lambda$CDM parameters, thanks to their precise measurements of both temperature and polarisation anisotropies. All-sky surveys such as Planck reach the limit set by cosmic variance at large angular scales (low $\ell$), with the $TT$ spectrum already cosmic-variance limited for $\ell \lesssim 1500$ (\cref{subsubsec:cmb_powerspectrum}). Further improvement comes from high-resolution polarisation data and by combining experiments with different strengths, merging Planck's full-sky coverage with the finer angular detail of SPT or ACT. These joint analyses increase the accessible multipole range and tighten parameter constraints, as shown in \cref{fig:cmb_param_constraints}, which compares posteriors from different dataset combinations.
+\end{minipage}
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \medskip
+    \includegraphics[width=0.9\textwidth]{assets/cmb-probes.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Constraints on $\Lambda$CDM parameters from combining CMB datasets (SPT-3G, Planck, ACT).} \label{fig:cmb_param_constraints}
+\end{minipage}
+
+\vspace{-1em}
+
+\subsection{The tSZ Angular Power Spectrum} \label{subsec:tsz_power_spectrum_detail}
+
+Beyond counting individual clusters (\cref{subsec:tsz_secondary}), the angular power spectrum of the full Compton-$y$ map, $C_\ell^{\text{tSZ}}$, provides a sensitive cosmological probe. On large scales,
+$$
+C_\ell^{\text{tSZ}} \propto \sigma_8^{8.1}\,\Omega_m^{3.2}\,B^{-3.2}\,h^{-1.7} ,
+$$
+where $B$ is the hydrostatic mass bias (\cref{subsec:hse}). The strong dependence on $\sigma_8$ makes the tSZ power spectrum a powerful probe of structure growth, but large degeneracies with $\Omega_m$ and $B$ makes it mainly constrain combinations as $F \equiv \sigma_8\,(\Omega_m/B)^{0.4}\,h^{-0.21}$, unless bias is externally calibrated.
+
+\medskip
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/tsz-pws.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{tSZ angular power spectrum sensitivity to cosmological and astrophysical parameters.}
+\end{center}
+
+\medskip
+
+\begin{minipage}{0.72\textwidth}
+    Because the tSZ signal is sourced by all collapsed halos along the line of sight, its angular power spectrum can be accurately modeled using the halo model. This naturally splits the total power into two terms:
+    \medskip
+    $$
+    C_\ell^{\mathrm{tSZ}} = C_\ell^{\mathrm{1\text{-}halo}} + C_\ell^{\mathrm{2\text{-}halo}}
+    $$
+
+    The \textbf{1-halo term} captures the power arising from small scales (the internal structure of individual halos) by integrating over the pressure profiles of all clusters and groups. The \textbf{2-halo term} accounts for correlations between separate halos on large scales:
+\end{minipage}%
+\hfill
+\begin{minipage}{0.25\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/halo-terms.png}
+    \captionof{figure}{}
+\end{minipage}
 
 $$
-v = v_{\text{exp}} + v_{\text{pec}} = H_0 d(z) + v_{\text{pec}}
+\begin{cases}
+    \displaystyle C_\ell^{\mathrm{1\text{-}halo}} = \int_0^{z_\mathrm{max}} dz\, \frac{dV_c}{dz\,d\Omega} \int_{M_\mathrm{min}}^{M_\mathrm{max}} dM\, \frac{dn(M, z)}{dM}\; \left|\tilde{y}_\ell(M, z)\right|^2\\
+    \displaystyle C_\ell^{\mathrm{2\text{-}halo}} = \int_0^{z_\mathrm{max}} dz\, \frac{dV_c}{dz\,d\Omega} \times \left[ \int_{M_\mathrm{min}}^{M_\mathrm{max}} dM\, \frac{dn(M, z)}{dM}\; \tilde{y}_\ell(M, z)\, b(M, z) \right]^2 P(k,z)
+\end{cases}
 $$
 
+Here, $dV_c/dzd\Omega$ is the comoving volume element, $dn/dM$ is the halo mass function, $\tilde{y}_\ell(M, z)$ is the Fourier transform of the Compton-$y$ profile of a halo of mass $M$ at redshift $z$, $b(M, z)$ is the halo bias, and $P(k, z)$ is the linear matter power spectrum at wavenumber $k = \ell / D_A(z)$. 
+
+\section{Gravitational Lensing as a Cosmological Probe} \label{sec:lensing_probe}
+
+As light from a distant source travels toward us, it is deflected by every gravitational potential fluctuation it crosses. This \bfit{gravitational lensing} leaves three observable imprints: a shift in the apparent position of the source, a distortion (shear) of its image, and a magnification of its apparent flux. Two regimes are conventionally distinguished. \textbf{Strong lensing}, occurring where the deflection is large (typically in the dense core of a cluster or the potential of an individual galaxy), can produce multiple images of the same source, along with strong distortion and magnification. \textbf{Weak lensing}, occurring everywhere else, produces only a small, statistical distortion of individual source shapes and must be recovered by averaging over large numbers of background sources.
+
+\subsection{The Lens Equation} \label{subsec:lens_equation}
+
+Consider an observer, a lens at comoving distance $\chi_1$, and a source at comoving distance $\chi$, with corresponding angular diameter distances $D(\chi_1)$, $D(\chi)$, and $D(\chi-\chi_1)$ between lens and source. 
+
+\medskip
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/lens-eq.png}
+    \captionof{figure}{Geometry of gravitational lensing.}
+\end{center}
+
+\medskip
+
+The observer sees the source at an apparent angular position $\vec\theta$, while its true, undeflected position is $\vec\beta$. Working in the small-angle approximation (valid for essentially all astrophysical lensing configurations), the physical position of the source in the source plane can be written as:
+\medskip
 $$
-z_{\text{obs}} = z_{\text{exp}} + \frac{v_{\text{pec}}}{c}(1 + z_{\text{exp}})
+\vec\beta\,D(\chi) = \vec\theta\,D(\chi) - \vec\alpha\,D(\chi-\chi_1)
+$$
+where $\vec\alpha$ is the physical bending angle at the lens plane. This rearranges into the \bfit{lens equation}:
+\medskip
+$$
+\vec\beta = \vec\theta - \delta\vec\theta , \qquad
+\delta\vec\theta = \frac{D(\chi-\chi_1)}{D(\chi)}\,\vec\alpha
+$$
+where $\delta\vec\theta$ is the scaled deflection angle and the distance ratio encodes the lensing geometry of the observer-lens-source configuration. The deflection itself follows from treating the light path in the weak-field, perturbed FRW metric,
+\medskip
+$$
+ds^2 = \left(1+\frac{2\Phi}{c^2}\right)c^2\,dt^2 - a^2(t)\left(1-\frac{2\Phi}{c^2}\right)\left(d\chi^2 + D^2(\chi)\,d\Omega^2\right)
+$$
+in which the potential $\Phi$ plays the role of a spatially varying refractive index. Under the further \textbf{thin-lens} and \textbf{Born} approximations (the deflection is treated as occurring instantaneously at the lens plane, evaluated along the unperturbed line of sight), the physical bending angle is:
+\medskip
+$$
+\vec\alpha = \frac{2}{c^2}\int \nabla_\perp \Phi(\chi)\,d\chi
+$$
+where $\nabla_\perp \Phi$ is the transverse gradient of the gravitational potential.
+
+\begin{minipage}{0.62\textwidth}
+    As light propagate through the Universe, it is continually deflected by the gravitational potentials of intervening matter fluctuations. Thus, the cumulative deflection angle is:
+    $$
+    \delta\vec\theta = \vec\theta - \vec\beta = \frac{2}{c^2}\int_0^{\chi_s} d\chi\;\frac{D(\chi_s-\chi)}{D(\chi_s)}\,\nabla_\perp \Phi(\chi)
+    $$
+    It is convenient to represent this deflection field as the gradient of a scalar \textbf{deflection potential}:
+    $$
+    \psi(\vec\theta,\chi_s) = \frac{2}{c^2}\int_0^{\chi_s} d\chi\;\frac{D(\chi_s-\chi)}{D(\chi_s)\,D(\chi)}\,\Phi\big(D(\chi)\,\vec\theta,\,\chi\big)
+    $$
+    This quantity projects the three-dimensional gravitational potential $\Phi$ along the line of sight, weighted by a lensing kernel determined by the source and lens geometry.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.36\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/wl-path.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Gravitational lensing bends light from distant sources, distorting their observed shapes.}
+\end{minipage}
+
+\vspace{-0.5em}
+
+\subsection{Cosmic Shear} \label{subsec:cosmic_shear_detail}
+
+\subsubsection{Convergence and Shear} \label{subsubsec:convergence_shear}
+
+Gravitational lensing has the important property of conserving surface brightness, meaning that while the shapes of images may be distorted and their sizes magnified or demagnified, the intrinsic brightness per unit solid angle remains unchanged. As a result, the observed image intensity at angular position $\vec\theta$ is related to the intrinsic (source plane) intensity by remapping positions according to the lens equation:
+$$
+I(\vec\theta) = I^s(\vec\beta(\vec\theta))
 $$
 
-\textbf{L.o.s. Proper Distance measured in redshift space:}
-
+To quantify how lensing distorts the shapes and orientations of infinitesimal images, we linearise this mapping around a chosen line of sight $I(\vec\theta)= \left[I^s(\vec\beta(\vec\theta_0)) + \mathcal A (\vec \theta_0) \cdot (\vec \theta - \vec \theta_0)\right]$. This leads naturally to the definition of the \bfit{Jacobian (amplification) matrix}, which describes how a small patch in the image plane is mapped to the source plane:
 $$
-s = \frac{v}{H_0} = d(z) + \frac{v_{\text{pec}}}{H_0}
+\mathcal{A}_{ij} = \frac{\partial\beta_i}{\partial\theta_j} = \delta_{ij} - \frac{\partial^2\psi}{\partial\theta_i\,\partial\theta_j} =
+\begin{pmatrix}
+1-\kappa-\gamma_1 & -\gamma_2 \\
+-\gamma_2 & 1-\kappa+\gamma_1
+\end{pmatrix}
+ = \left(1-\kappa\right)
+\begin{pmatrix}
+1-g_1 & -g_2 \\
+-g_2 & 1+g_1
+\end{pmatrix}
+$$
+where $\delta_{ij}$ is the Kronecker delta, $\psi$ is the deflection potential defined above, and $g(\vec\theta) \equiv \frac{\gamma(\vec\theta)}{1-\kappa(\vec\theta)}$ is the \textbf{reduced shear}. The second derivatives of the deflection potential can be decomposed into two distinct physical quantities. The \textbf{convergence} $\kappa$ is an isotropic magnification (or demagnification) of the image, proportional to the projected surface mass density along the line of sight:
+$$
+\kappa = \frac{\psi_{,11}+\psi_{,22}}{2} = \frac{1}{2}\nabla^2\psi
+$$
+ The \textbf{shear} $\gamma$, is a complex quantity describing the anisotropic stretching of the image:
+$$
+\gamma = \gamma_1 + i\gamma_2 = |\gamma|\,e^{2i\varphi} , \qquad
+\gamma_1 = \frac{\psi_{,11}-\psi_{,22}}{2} , \qquad \gamma_2 = \psi_{,12}
+$$
+which is a spin-2 field (invariant under $180^\circ$ rotation) and can be described by modulus and phase.
+
+\begin{minipage}{0.41\textwidth}
+\smallskip
+
+    A circular source of radius $R$ is thus mapped, to linear order, into an ellipse of semi-axes $R/(1-\kappa-|\gamma|)$ and $R/(1-\kappa+|\gamma|)$. Convergence alone rescales the image isotropically, while shear stretches it along a preferred axis set by $\varphi$.
+    \medskip
+\end{minipage}%
+\hfill
+\begin{minipage}{0.56\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/wl-dist.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Effect of convergence and shear.}
+\end{minipage}
+
+\subsubsection{Cosmic Shear} \label{subsubsec:cosmic_shear_detail}
+
+The convergence field along a given line of sight is itself a projection of the intervening matter density contrast,
+$$
+\kappa(\vec\theta) = \int_0^{\chi_{\max}} d\chi\;W(\chi)\,\delta\big(D_A(\chi)\vec\theta,\,\chi\big) ,
+$$
+where the \textbf{lensing efficiency kernel} $W(\chi)$ depends on the redshift distribution of the source population and the observer-lens-source geometry. The corresponding angular convergence (equivalently, shear) power spectrum follows from Limber's approximation as a line-of-sight integral over the three-dimensional matter power spectrum,
+$$
+C_{ij}(\ell) = \int_0^{\chi_{\max}} d\chi\;\frac{W_i(\chi)\,W_j(\chi)}{D_A(\chi)^2}\,P_\delta\!\left(\frac{\ell}{D_A(\chi)},\,\chi\right) ,
+$$
+where the indices $i,j$ label pairs of source redshift bins (tomographic slices). 
+
+\medskip
+
+This \textbf{cosmic shear} signal, the coherent, statistical distortion of background galaxy shapes by the intervening large-scale structure, has the considerable virtue of tracing the total matter distribution directly, without any assumption about the relation between dark and baryonic matter; combined with its sensitivity to both geometry and the growth of structure, this makes it a powerful, largely model-independent probe of dark energy and of modified gravity.
+
+\smallskip
+
+\begin{minipage}{0.59\textwidth}
+In practice, the shear signal is measured statistically by correlating galaxy ellipticities in pairs. Decomposing the shear at each galaxy into components tangential and orthogonal ("cross") to the line joining a pair:
+\medskip
+$$
+\gamma_t = -\mathfrak{Re}\!\left[\gamma\,e^{-2i\varphi}\right] , \qquad \gamma_\times = -\mathfrak{Im}\!\left[\gamma\,e^{-2i\varphi}\right] ,
+$$
+one constructs the rotationally invariant two-point shear correlation functions:
+\medskip
+$$
+\begin{array}{rl}
+    \xi_\pm(\theta) &= \langle\gamma_t\gamma_t\rangle(\theta) \pm \langle\gamma_\times\gamma_\times\rangle(\theta) \\[0.5em]
+    \xi_\times(\theta) &= \langle\gamma_t\gamma_\times\rangle(\theta) \stackrel{!}{=} 0
+\end{array}
+$$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/shear.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Shear geometry.}
+\end{minipage}
+
+related to the convergence power spectrum via a Hankel transform, $\xi_+(\theta) = \int_0^\infty \frac{d\ell\,\ell}{2\pi}\,J_0(\ell\theta)\,P_\kappa(\ell)$. Under parity symmetry, the cross-correlation $\xi_\times(\theta)$ must vanish identically, providing a useful null test for residual systematics in real data.
+
+
+\smallskip
+
+Cosmic shear surveys do not measure the shear $\gamma$ directly, but rather the total observed ellipticity $\epsilon$ of each galaxy, which combines the intrinsic (pre-lensing) ellipticity $\epsilon^s$ and the lensing-induced shear: $\epsilon = \epsilon^s + \gamma$. The main observable (the two-point ellipticity correlation) receives contributions from several effects. For galaxies $i$ and $j$ ($z_i < z_j$), this can be written schematically as:
+$$
+\xi_\pm = \underbrace{\langle \epsilon_i^{\text{lens}} \epsilon_j^{\text{lens}*} \rangle}_{\text{Cosmic shear signal}} + \underbrace{\langle \epsilon_i^{(s)} \epsilon_j^{(s)*} \rangle}_{\text{Intrinsic alignment}} + \underbrace{\langle \gamma_i \epsilon_j^{(s)*} \rangle}_{\text{Shape-shear}} + \underbrace{\langle \epsilon_i^{(s)} \gamma_j^* \rangle}_{\text{Shape-shear}}
 $$
 
+\vspace{-1em}
+
+where
 \begin{itemize}
-    \item \textbf{Kaiser effect:}
-
-    On large scales, peculiar velocities reflect the (linear) infall motions towards overdensities, causing a circle in real space to appear “squashed” in redshift space.
-
-    \item \textbf{Finger-of-God effect:}
-
-    On small scales, peculiar velocities are due to the nonlinear virialized motion of galaxies inside their host haloes, causing a circle in real space to appear “stretched” in redshift space.
+    \item The \bfit{cosmic shear} term is the genuine lensing correlation between galaxies at different redshifts, produced by large-scale structure along the line of sight.
+    \item The \bfit{intrinsic alignment} term, $\langle \epsilon_i^{(s)} \epsilon_j^{(s)*} \rangle$, arises because the intrinsic shapes of galaxies physically close together can be mutually aligned by the tidal field of the same dark matter structure.
+    \item The \bfit{shape-shear} term, $\langle \gamma_i \epsilon_j^{(s)*} \rangle + \langle \epsilon_i^{(s)} \gamma_j^* \rangle$, describes the correlation between the intrinsic shape of a foreground galaxy and the lensing shear of a background one, both sourced by the same large-scale structure.
 \end{itemize}
+
+\begin{minipage}{0.58\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/intrinsic-alignment.png}
+\end{minipage}
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \captionof{figure}{Intrinsic alignment and shape-shear: a foreground galaxy (blue, at $z_i$) is aligned by a nearby dark matter (DM) structure and also lenses a background galaxy (red, at $z_j$). This configuration, shown both projected on the sky and in redshift, leads to both intrinsic alignment and shape-shear correlations.}
+\end{minipage}
+
+\subsubsection{Measuring shapes in practice}
+
+The observed image of a galaxy is shaped by several sequential effects, commonly called the “forward” process:
+
+\begin{enumerate}
+\item Each galaxy starts with an unknown intrinsic structure, which is then distorted by weak lensing shear $g$ (typically $g\sim 0.03$), causing a slight stretch, much smaller than the galaxy's natural ellipticity.
+
+\item The lensed image is blurred by the instrument's \textbf{point spread function} (PSF), reflecting optical imperfections, detector response, and atmospheric turbulence for ground-based telescopes. The PSF typically broadens the image, often to a size comparable to the galaxy itself.
+
+\item Finally, the image is recorded by the detector, becoming pixelated and subject to shot noise and read noise.
+\end{enumerate}
+
+The resulting observed image is therefore both blurrier and noisier than the original.
+
+\smallskip
+
+\begin{center}
+    \includegraphics[width=0.95\textwidth]{assets/forward.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Forward process: Galaxy images are sheared by lensing, blurred by the PSF, pixelated, and made noisy; stars, as point sources, are affected only by the PSF and noise.}
+\end{center}
+
+\smallskip
+
+Recovering weak lensing shear requires astronomers to statistically invert each step of the image formation process. The most critical and difficult part is \bfit{PSF correction}: the true pre-lensed galaxy shape is unknown, so the PSF must be inferred from point sources (stars) in the same field. The PSF is measured from the observed shapes of these stars (since they are effectively point sources) and then deconvolved from the galaxy images. Any PSF modeling or removal error can mimic or hide the subtle shear signal. Because cosmic shear is much smaller than the shape noise of individual galaxies, reliable measurement demands averaging over huge samples and strict control of systematic errors.
+
+\subsection{Cosmic Shear Cosmology}
+
+Cosmic shear was first detected in 2000 by four independent groups, using samples of order $10^4$-$10^5$ galaxies over roughly $1\,\text{deg}^2$; current surveys such as DES and KiDS achieve samples exceeding $10^8$ galaxies over several thousand square degrees, yielding constraints in the $\Omega_m$-$\sigma_8$ plane that are competitive with, and complementary to, those from the primary CMB.
+
+\subsubsection{CMB Lensing} \label{subsec:cmb_lensing_probe}
+
+The CMB itself, originating from the last-scattering surface at $z\simeq1100$, acts as a single, very high-redshift background source, gravitationally lensed by every intervening structure along the line of sight. The lensed temperature field $T(\hat n)$ is related to the unlensed field $\tilde T(\hat n)$ by a remapping through the deflection field $\vec\alpha = \nabla\phi$:
+\medskip
+$$
+T(\hat n) = \tilde T(\hat n + \nabla\phi(\hat n)) \approx \tilde T(\hat n) + \nabla\phi(\hat n)\cdot\nabla\tilde T(\hat n) ,
+$$
+where $\phi$ is the CMB lensing potential (analogue of $\psi$ in \cref{subsec:lens_equation}, for a source at the last-scattering surface). Because this remapping locally rescales the size of hot and cold spots, it mixes Fourier modes that would otherwise be statistically independent in an unlensed, isotropic sky:
+\medskip
+$$
+\langle T(\vec\ell_1)\,T(\vec\ell_2)\rangle_{\text{fixed}\,\phi} \approx f(\vec\ell_1,\vec\ell_2)\,\phi(\vec\ell_1+\vec\ell_2) ,
+$$
+where $f$ is a weight function chosen to maximise the signal-to-noise of the reconstruction. By measuring the resulting correlation between small-scale temperature (and polarisation) fluctuations and the large-scale CMB gradient across the sky, the lensing potential $\phi$, and hence the deflection field, can be reconstructed statistically.
+
+\medskip
+
+
+\begin{minipage}{0.57\textwidth}
+    The lensing potential $\phi$ is an integrated measure of all gravitational potential fluctuations encountered by CMB photons on their journey from the last-scattering surface to us. Its angular power spectrum,
+    \medskip
+    $$
+    C_\ell^{\phi\phi} = \frac{4}{\ell^4}\int_0^{\chi_*} \frac{W^2(\chi)}{\chi^2}\,P_m(k, z)\,d\chi
+    $$
+    serves as a powerful cosmological observable derived from the CMB alone.
+    
+    \smallskip
+    
+    This spectrum captures both the late-time expansion history of the Universe and the growth of large-scale structure, providing information that is only weakly or degenerately accessible from the primary temperature and polarization anisotropies.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/lens-cmb-pws.png}
+    \captionof{figure}{\small Power spectrum of the CMB lensing potential, measured from Planck temperature and polarization maps. the amplitude and shape provide direct constraints on $\Omega_m$, $\sigma_8$, neutrino masses, and dark energy.}
+\end{minipage}
+
+\medskip
+
+    \begin{itemize}
+        \item \textbf{Amplitude}: Measures the total matter content and the amplitude of density fluctuations (constraining parameters like $\Omega_m$, $\sigma_8$).
+        \item \textbf{Shape}: Tracks how structure grows with time, making it sensitive to the summed neutrino mass and the properties of dark energy.
+    \end{itemize}
+
+The remarkable sensitivity of the CMB lensing power spectrum's amplitude and shape now allows leading experiments such as Planck, ACT, and SPT (separately and in combination) to provide increasingly precise measurements.
+
+\section{Multi-Probe Cosmology and Cross-Correlations} \label{sec:multiprobe}
+
+We have seen many cosmological probes: CMB, cluster abundance, cosmic shear, galaxy clustering, and standard candles and rulers. In recent years, combining these probes, rather than single analysis, has been shown to significantly improve cosmological constraints.
+
+\subsection{Cross-Correlations Between Tracers} \label{subsec:cross_correlation}
+
+Combining different cosmological probes is so powerful because the tracers (such as galaxy density, lensing, and clusters) all map the same underlying matter field, and thus are statistically correlated. Where the density of galaxies is high, lensing distortions of background sources will also be larger. These shared fluctuations induce \textbf{cross-correlations} that contain additional information beyond what each probe offers alone. For two tracers $a$ and $b$, their cross angular power spectrum is defined as:
+\medskip
+$$
+\langle a_{\ell m}\,b^*_{\ell' m'}\rangle = C_\ell^{ab}\,\delta_{\ell\ell'}\,\delta_{mm'} , \qquad
+C_\ell^{ab} = 4\pi\int_0^\infty \frac{dk}{k}\,\mathcal{P}_\Phi(k)\,\Delta_\ell^a(k)\,\Delta_\ell^b(k) ,
+$$
+where $\mathcal{P}_\Phi(k)$ is the primordial matter power spectrum, and $\Delta_\ell^{a}(k)$, $\Delta_\ell^{b}(k)$ are the transfer functions describing how primordial fluctuations seed the tracers $a$ and $b$. By measuring these cross-correlations, we gain extra cosmological information and can better self-calibrate key nuisance effects (like galaxy bias or photometric redshift uncertainty) that affect the individual probes.
+
+\subsection{The 3x2pt and 6x2pt+N Analyses} \label{subsec:3x2pt}
+
+A widely used approach to multi-probe cosmology combines three two-point functions from galaxy positions and shapes: \textbf{angular clustering} (galaxy $\times$ galaxy), \textbf{galaxy-galaxy lensing} (galaxy $\times$ shear), and \textbf{cosmic shear} (shear $\times$ shear). This “\bfit{3x2pt}” analysis is standard in modern photometric surveys like DES and KiDS, as all three are affected by the same galaxy bias and lensing systematics, allowing these nuisance parameters to be jointly constrained with cosmology, rather than assumed. The resulting limits on $\Omega_m$ and $\sigma_8$ enhance the ones from single analysis.
+
+\smallskip
+
+These analyses can be further strengthened by including the abundance and clustering of galaxy clusters, as well as their auto- and cross-correlations with galaxies and shear. Depending on which observables and cluster counts $N$ are included, these extensions are called \bfit{4x2pt+N} or \bfit{6x2pt+N}. Because clusters trace the high-mass, highly biased end of the halo mass function, they add complementary information, though at the cost of greater model and covariance complexity. Applied to DES and other datasets, such analyses produce consistent, even tighter $\Omega_m$-$\sigma_8$ constraints, and offer an important cross-check on the mild $S_8$ tension between early- and late-Universe probes.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{assets/real_vs_redshift.png}
+    \includegraphics[width=0.21\textwidth]{assets/3x2pt.png}
+    \hfill
+    \includegraphics[width=0.76\textwidth]{assets/6x2pt.png}
+    \caption{DES Y3 $3\times2pt$ and DES Y1 $6\times2pt+N$}
 \end{figure}
-
-Only radial distances are affected by Doppler shifts from peculiar velocities.  
-The key point is that these peculiar velocities are generated by structure itself, so the clustering pattern measured in redshift space is systematically distorted with respect to real space. As a result, the galaxy two-point correlation function, isotropic in real space, becomes anisotropic in redshift space.
-
-For a galaxy pair, define
-$$
-\mathbf{s} \equiv \mathbf{s}_1-\mathbf{s}_2, 
-\qquad
-\mathbf{l} \equiv \frac{\mathbf{s}_1+\mathbf{s}_2}{2},
-$$
-and decompose the separation into line-of-sight and transverse components:
-$$
-\pi \equiv \frac{|\mathbf{s}\!\cdot\!\mathbf{l}|}{|\mathbf{l}|},
-\qquad
-\sigma \equiv \sqrt{\mathbf{s}\!\cdot\!\mathbf{s}-\pi^2}.
-$$
-We then measure the anisotropic correlation function $\xi(\sigma,\pi)$.
-
-In $\xi(\sigma,\pi)$ contour plots, small-scale elongation along the line of sight traces the Finger-of-God effect, while large-scale compression traces the Kaiser effect.
-
-\dots
-

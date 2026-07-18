@@ -1,0 +1,160 @@
+              %*****************************************%
+              %                                         %
+              % Template standard per la Tesi di Laurea %
+              %            di Stefano Bianchi           %
+              %                                         %
+              %         versione: 27 marzo 2014         %
+              %                                         %
+              %   Updated and translated into English   %
+              %             by Tommaso Fonda            %
+              %                                         %
+              %         revision: 6th Nov. 2023         %
+              %                                         %
+              %*****************************************%
+
+% Replace 'oneside' with 'twoside' for double-side printing
+\documentclass[a4paper,12pt,oneside,openany]{book}
+
+%*******************************************************
+% Packages
+%*******************************************************
+
+% Typographical rules for the English language
+\usepackage[english]{babel}
+
+% Font-related packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{inconsolata}
+
+% Needed to render the cover
+\usepackage{fancyhdr}
+
+% Figures and subfigures
+\usepackage{graphicx}
+\usepackage{subfigure}
+
+% Improved tables
+\usepackage{tabularx}
+\usepackage{longtable}
+
+% To have appendices appear in the TOC
+\usepackage[titletoc]{appendix}
+
+% Needed for floating images
+\usepackage{float}
+
+% Improved verbatim appearance
+\usepackage{fancyvrb}
+
+% Math stuff
+\usepackage{amsmath}
+\numberwithin{equation}{section}
+
+% Clickable links and references
+\usepackage{hyperref}
+
+% For code sections
+\usepackage{minted}
+
+% biblatex is useful because it autodetects unused references
+% and sorts used ones by occurrence.
+\usepackage{csquotes}
+\usepackage[sorting=none]{biblatex}
+\addbibresource{bib/Bibliography.bib}
+
+% Only needed for placeholder text
+\usepackage{lipsum}
+
+% The content of the thesis is to be input in the appropriate .tex files
+% referenced by the \input{} commands
+
+%*******************************************************
+% Pages' and front cover's settings
+%*******************************************************
+\input{settings/Settings}
+
+%*******************************************************
+% Cover
+%*******************************************************
+\input{front/Cover}
+
+%*******************************************************
+% Dedication
+%*******************************************************
+\input{front/Dedication}
+
+% Roman page numbering for abstract, ToC and introduction
+\frontmatter
+\pagenumbering{Roman}
+
+%*******************************************************
+% Abstract
+%*******************************************************
+\input{front/Abstract}
+
+%*******************************************************
+% Table of contents
+%*******************************************************
+{
+    \hypersetup{linkcolor=black}
+    \tableofcontents
+}
+
+%*******************************************************
+% Introduction
+%*******************************************************
+% Do not edit
+\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\ #1}}{}}
+
+\input{front/Introduction}
+
+%*******************************************************
+% Chapters
+%*******************************************************
+\mainmatter
+
+% Do not edit
+\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{\chaptername\ \thechapter.\ #1}}{}}
+
+% Add more \input{} commands as needed. Chapters can all be
+% contained in one single .tex file, or you can have one file
+% per chapter.
+
+\input{main/Chapter1}
+\input{main/Chapter2}
+\input{main/Chapter3}
+\input{main/Chapter4}
+
+%*******************************************************
+% Conclusion
+%*******************************************************
+\input{back/Conclusion}
+
+%*******************************************************
+% Appendix
+%*******************************************************
+% Do not edit
+\pagestyle{fancy}
+\renewcommand{\chaptermark}[1]{\markboth{\MakeUppercase{APPENDIX\ \thechapter.\ #1}}{}}
+
+\appendix
+\label{appendix}
+
+\input{back/Appendix1}
+\input{back/Appendix2}
+\input{back/Appendix3}
+
+\backmatter
+
+%*******************************************************
+% Bibliography
+%*******************************************************
+\printbibliography
+
+%*******************************************************
+% FinalDedication
+%*******************************************************
+\input{back/FinalDedication}
+
+\end{document}
