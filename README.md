@@ -79,8 +79,8 @@
     </tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/Spina/Galaxy%20Astrophysics/main.pdf">Galaxy Astrophysics</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
-      <td>...</td>
-      <td></td>
+      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/Spina/Observational%20Cosmology/main.pdf">Observational Cosmology </td>
+      <td><img src="https://img.shields.io/badge/-REV-blue?style=plastic&logo=searxng&logoColor=white" alt="REV"></td>
       <tr>
       <td><a href="https://raw.githubusercontent.com/Spina02/SDIC-DSAI-Notes/main/Advanced%20Deep%20Learning/main.pdf">Advanced Deep Learning</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
