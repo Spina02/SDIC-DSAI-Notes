@@ -100,7 +100,7 @@
       <td></td>
     </tr>
     <tr>
-      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/main/Advanced%20High%20Performance%20Computing/main.pdf">Advanced High Performance Computing</a></td>
+      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/main/Advanced%20HPC/main.pdf">Advanced High Performance Computing</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
       <td>...</td>
       <td></td>
