@@ -13,8 +13,8 @@
   </thead>
   <tbody>
     <tr>
-      <td><a href="">Statistical Methods</a></td>
-      <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
+      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/refs/heads/main/Algorithms/main.pdf">Algorithms</a></td>
+      <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
       <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/main/Ethics%20and%20Law/main.pdf">Ethics and Law</a></td>
       <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
     </tr>
@@ -29,12 +29,6 @@
       <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
       <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/main/Reinforcement%20Learning/main.pdf">Reinforcement Learning</a></td>
       <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
-    </tr>
-    <tr>
-      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/refs/heads/main/Algorithms/main.pdf">Algorithms</a></td>
-      <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
-      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/refs/heads/main/Deep%20Learning/main.pdf">Deep Learning</a></td>
-      <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
     </tr>
     <tr>
       <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/main/Introduction%20to%20ML/main.pdf">Introduction to Machine Learning</a></td>
