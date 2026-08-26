@@ -1,0 +1,559 @@
+\chapter{Concurrency}
+
+\section{Concurrency vs Parallelism}
+
+Up to now we have looked inside a single core, and asked the compiler to do as much work in parallel as the vector units allow. Vectorization, however, is just the most local form of parallelism we can express in our code. The next step is to consider what happens when we want \emph{several streams of execution} to make progress on the same machine, possibly on different cores.
+
+Two terms are often used interchangeably here, but they refer to different ideas:
+
+\begin{itemize}
+    \item \textbf{Concurrency} is the ability to carry out two or more actions \bfit{in progress at the same time}. It does \emph{not} require multiple cores: a single core can interleave several tasks by repeatedly suspending one and resuming another (\bfit{context switching}).
+    \item \textbf{Parallelism} is the ability to \bfit{execute} two or more actions at the very same instant. This requires distinct execution units (cores, hardware threads, vector lanes, GPU SMs, \dots).
+\end{itemize}
+
+A short slogan captures the difference: \emph{concurrency is about structure, parallelism is about execution}. A concurrent program describes a set of activities that can in principle make progress independently; whether they actually do so simultaneously depends on the hardware that executes the program. The same concurrent program can run serially on a single core (with the OS scheduler interleaving the tasks) or in parallel on multiple cores.
+
+There are two main forms in which concurrency is exposed in a program:
+
+\begin{itemize}
+    \item \textbf{Multithreading} (lower level): several \bfit{threads} are spawned, and they run concurrently (in parallel if possible) on the CPUs at our disposal. Synchronization among threads is usually required to avoid \bfit{data races} and \bfit{deadlocks}.
+    \item \textbf{Asynchronous programming} (higher level): tasks are started without waiting for the previous one to complete. They can run in the background, possibly on other threads, but the user does not need to manage these details. Typical implementations rely on \bfit{callbacks}, \bfit{coroutines}, \bfit{promises} and \bfit{futures}.
+\end{itemize}
+
+In this chapter we focus on the first form: explicit, low-level multithreading using POSIX threads.
+
+\begin{warningblock}[The sorrows of the young multithreader]
+Managing multiple threads requires \bfit{synchronization} among them. Wrong synchronization can cause race conditions, deadlocks and other undefined behaviors. The unpleasant property of these bugs is that they may manifest \emph{very} infrequently: a logically possible race that occurs only $0.01\%$ of the times will not show up during testing, but will eventually fire in production. The historical example is the Therac-25 radiation therapy machine, where a race condition in the operator's terminal interface caused several patients to receive massive radiation overdoses. The lesson is uncomfortable but firm: if a data race is \emph{logically possible}, even if unlikely, it \textbf{must} be avoided by protecting shared resources.
+\end{warningblock}
+
+\section{Processes vs Threads}
+
+Both processes and threads can be used to achieve concurrency, but they differ in how they share state.
+
+A \textbf{process} is the unit through which the operating system isolates running programs. Each process has its own \bfit{virtual address space}, file descriptors, and accounting. Inside that address space the kernel sets up a layout that, in Linux, looks roughly like:
+
+\vspace{-0.5em}
+\begin{itemize}[noitemsep]
+    \item the \textbf{text} segment (program code);
+    \item the \textbf{data} and \textbf{bss} segments (initialized and uninitialized globals);
+    \item the \textbf{heap}, growing upwards via \plaintt{brk}/\plaintt{mmap};
+    \item one \textbf{stack} per thread, growing downwards;
+    \item shared libraries and shared memory.
+\end{itemize}
+
+A \textbf{thread} is an independent unit of execution \emph{inside} a process. All threads of the same process share the text, data, heap, and open files; what is private to a thread are its CPU registers and its own stack. The first thread of a process is the \bfit{main thread}; additional threads can be spawned at runtime.
+
+\begin{observationblock}[Why the difference matters]
+Sharing the address space makes thread-to-thread communication essentially free: a thread can hand a pointer to another and they both see the same memory. The price is that any unsynchronized access to that shared memory becomes a potential data race. Processes pay the opposite trade-off: they are isolated, so communication needs an explicit \bfit{Inter-Process Communication} (IPC) mechanism (pipes, sockets, message queues, shared memory regions), but unsynchronized access is impossible by construction.
+\end{observationblock}
+
+\subsection{Forking a process}
+
+A new process is created on POSIX systems with the \plaintt{fork()} system call. The kernel duplicates the calling process; the call returns once in the parent (with the child's PID) and once in the child (with $0$). Code accordingly switches on the returned value:
+
+\begin{codeblock}[language=C]
+#include <unistd.h>
+#include <sys/types.h>
+
+pid_t pid = fork();
+switch (pid) {
+case -1:                  // something bad happened
+    perror("fork");
+    return EXIT_FAILURE;
+case 0:                   // child process
+    printf("CHILD\n\tPID: %ld, PPID: %ld\n",
+           (long)getpid(), (long)getppid());
+    break;
+default:                  // parent process
+    printf("PARENT\n\tPID: %ld, PPID: %ld\n",
+           (long)getpid(), (long)getppid());
+    break;
+}
+\end{codeblock}
+
+Every process has a Process ID (\plaintt{getpid()}) and a parent PID (\plaintt{getppid()}). The virtual address space of the original process is \bfit{copied-on-write}: as long as both parent and child only \emph{read} the same memory pages, no actual copy occurs and they keep referring to the same physical frames. The first time either side writes to a page, the kernel transparently duplicates it so that the modification is visible only in the writer.
+
+The mechanism is general but it is also \bfit{relatively heavy}: there is at least the cost of cloning page tables and accounting structures, and any subsequent communication has to go through one of the IPC primitives. This is why, for fine-grained concurrent computation on a single node, threads are usually preferred to processes.
+
+\begin{exampleblock}[Code references]
+The \plaintt{Concurrency/code/1-Processed-and-Threads/} directory contains three minimal programs to compare on a live system:
+\begin{itemize}[noitemsep]
+    \item \plaintt{1-Single-Process.c} -- one process, one thread.
+    \item \plaintt{2-Fork.c} -- a parent that \plaintt{fork}s into a child, both calling \plaintt{sleep}.
+    \item \plaintt{3-Multiple-Threads.c} -- a single process with two threads.
+\end{itemize}
+Run \plaintt{make all} in that directory, launch each binary in the background, and inspect them with \plaintt{ps -efT}.
+\end{exampleblock}
+
+\begin{tipsblock}[Listing processes and threads]
+The command
+\begin{codeblock}[language=bash, numbers=none]
+ps -efT
+\end{codeblock}
+lists every process (PID) together with each of its threads (TID, also reported as SPID). To restrict to a specific process,
+\begin{codeblock}[language=bash, numbers=none]
+ps -fT -p <PID>
+\end{codeblock}
+shows the threads of the chosen PID. In \plaintt{top} and \plaintt{htop} (with the right toggles) the column labelled ``PID'' actually shows the \emph{thread} ID, which is sometimes confusing the first time you see it.
+\end{tipsblock}
+
+\section{The pthread library}
+
+We will use the \textbf{Pthread} library (POSIX THREAD), which is the de facto standard threading interface on UNIX-like systems (Linux, BSD, macOS, \dots). It is \emph{not} available natively on Windows, where the equivalent are the Win32 threading primitives.
+
+For portable code there are two alternatives:
+\begin{itemize}[noitemsep]
+    \item In C++ (11 and later), threads live in the standard library through the \plaintt{<thread>} header. The C++ standard also includes higher-level paradigms such as \plaintt{std::async}, \plaintt{std::future} and \plaintt{std::promise}.
+    \item In C (11 and later) the \plaintt{<threads.h>} header offers a similar but smaller API. It is very close to pthread in spirit, but for a long time it was not implemented on Windows and there is much less documentation about it in the wild.
+\end{itemize}
+
+A few practical remarks on Pthread before we start writing code:
+
+\begin{itemize}
+    \item \textbf{Unusual return convention.} A pthread function \plaintt{pthread\_<\dots>} returns an \plaintt{int}: $0$ on success, a \emph{positive} \plaintt{errno}-like value on failure. The global \plaintt{errno} is \emph{not} set, so the usual idiom \plaintt{if(call() < 0) perror(\dots)} is wrong here.
+    \item \textbf{Compile flag.} Compile with \plaintt{-pthread}: this links \plaintt{libpthread} and defines the \plaintt{\_REENTRANT} macro that exposes the reentrant variants of the standard C library functions.
+\end{itemize}
+
+\begin{tipsblock}[A must-have reference]
+For everything that involves the Linux kernel's API surface (system calls, processes, threads, signals, IPC, file I/O, \dots) the canonical reference is M.~Kerrisk, \emph{The Linux Programming Interface}. Whenever you are unsure about the contract of a syscall, \plaintt{man 2 <name>} or \plaintt{man 3 <name>} is the second-best option.
+\end{tipsblock}
+
+\section{Creating and joining threads}
+
+A thread is created with
+
+\begin{codeblock}[language=C]
+#include <pthread.h>
+
+int pthread_create( pthread_t *thread,
+                    const pthread_attr_t *attr,
+                    void *(*start_routine)(void *),
+                    void *arg );
+\end{codeblock}
+
+\begin{itemize}[noitemsep]
+    \item \plaintt{thread} is filled with the thread ID; the type \plaintt{pthread\_t} is implementation-dependent and must be treated as opaque.
+    \item \plaintt{attr} can be \plaintt{NULL} to use the default attributes.
+    \item \plaintt{start\_routine} is the entry point of the new thread.
+    \item \plaintt{arg} is the (single) argument passed to it; \plaintt{NULL} is allowed.
+\end{itemize}
+
+The call returns \emph{immediately} after enqueuing the thread for execution, so the spawning thread keeps running in parallel with the new one.
+
+\begin{codeblock}[language=C]
+void *thread_function(void *unused) {
+    (void)unused;
+    printf("Child thread\n");
+    return NULL;
+}
+
+int main(void) {
+    printf("Main thread\n");
+    pthread_t thread;
+    if (pthread_create(&thread, NULL, thread_function, NULL)) {
+        fprintf(stderr, "pthread_create failure.\n");
+        return EXIT_FAILURE;
+    }
+    sleep(1);          // poor-man synchronization
+    return EXIT_SUCCESS;
+}
+\end{codeblock}
+
+This is the program \plaintt{Concurrency/code/2-Create-and-Join/1-no-Join.c}. The \plaintt{sleep(1)} is a hack: without it, the main thread might \plaintt{return} from \plaintt{main} before the child has even printed, terminating the whole process. The proper way to wait for a thread is \plaintt{pthread\_join}:
+
+\begin{codeblock}[language=C]
+int pthread_join(pthread_t thread, void **retval);
+\end{codeblock}
+
+It blocks the caller until \plaintt{thread} terminates and, if \plaintt{retval} is non-\plaintt{NULL}, stores the value the thread returned. Replacing the \plaintt{sleep} with \plaintt{pthread\_join(thread, NULL)} (\plaintt{2-Master-Join.c}) gives a deterministic program with no arbitrary delays.
+
+\begin{observationblock}[Any thread, any thread]
+\plaintt{pthread\_join} is symmetric: any thread of the process can join any other thread, not only the one that created it. The example \plaintt{3-Multiple-Threads.c} uses this property: thread~$1$ creates thread~$2$, and the main thread later joins both of them through their handles.
+\end{observationblock}
+
+\subsection{Detaching a thread}
+
+If the result of a thread is not needed and we do not want to bother joining it, we can mark the thread as \bfit{detached}. The system then reclaims its resources automatically once it terminates, and the thread becomes no longer joinable.
+
+\begin{codeblock}[language=C]
+int  pthread_detach(pthread_t thread);
+pthread_t pthread_self(void);
+\end{codeblock}
+
+A common idiom is to call \plaintt{pthread\_detach(pthread\_self())} as the first line of the thread function (\plaintt{4-Detach.c}). After that the spawning thread does not need to track the handle.
+
+\subsection{Passing input and returning output}
+
+Both the argument of the thread function and its return value have type \plaintt{void *}: the library erases the type and we have to put it back. The most common patterns are:
+
+\begin{itemize}
+    \item \textbf{Heap-allocated argument.} The spawning thread \plaintt{malloc}s a struct, fills it, and passes the pointer (cast to \plaintt{void *}). The thread function casts back to the original type. Memory ownership has to be agreed on: either the spawning thread frees it after the join, or the thread itself frees it before returning.
+    \item \textbf{Global variable.} Convenient for a one-off but a poor habit: it ties the thread function to a single global, breaks reentrancy, and quickly turns into a synchronization headache.
+    \item \textbf{Type punning.} As long as \plaintt{sizeof(T) <= sizeof(void *)}, one can squeeze a small integer or pointer-sized handle into the \plaintt{void *} slot. This is widely supported but \emph{not} strictly compliant with ISO~C, so avoid it in portable code.
+\end{itemize}
+
+The return value follows symmetric conventions:
+
+\begin{itemize}[noitemsep]
+    \item return a pointer to a heap object (the joiner is responsible for freeing it);
+    \item return a small error code, with the same caveats as above;
+    \item return \plaintt{NULL} and use a different channel to communicate.
+\end{itemize}
+
+A function that terminates the current thread without falling off the end of the entry function is \plaintt{pthread\_exit(void *status)}; it can be called from any function, not only from the thread's entry point.
+
+\begin{exampleblock}[Two flavours of input/output]
+The example \plaintt{Concurrency/code/2-Create-and-Join/5-Input-Output.c} computes the integer division of \plaintt{numerator} by \plaintt{denominator}. The thread receives the operands on the heap and \emph{itself allocates} the output, returning a pointer:
+
+\begin{codeblock}[language=C]
+struct thread_input  { unsigned int numerator, denominator; };
+struct thread_output { unsigned int quotient,  reminder;    };
+
+void *thread_function(void *arg) {
+    struct thread_input  *input  = arg;
+    struct thread_output *output = malloc(sizeof *output);
+    if (!output) return NULL;
+    output->quotient = input->numerator / input->denominator;
+    output->reminder = input->numerator % input->denominator;
+    return output;
+}
+\end{codeblock}
+
+The joiner then has to remember to \plaintt{free(output)}. A cleaner variant is \plaintt{6-Input-Output-better.c}: the input struct \emph{contains} a pointer to the output, so the caller owns both allocations from the start, and the thread function only fills the result and returns \plaintt{NULL}. Ownership is now obvious and there is no risk of a forgotten \plaintt{free}.
+\end{exampleblock}
+
+\section{Synchronization issues and the data race}
+
+So far our threads have not touched any shared data. The moment they do, things become subtle. Consider the following innocent-looking program:
+
+\begin{codeblock}[language=C]
+int counter = 0;             // global, shared variable
+
+void *threadfunc(void *unused) {
+    (void)unused;
+    ++counter;
+    return NULL;
+}
+
+int main(void) {
+    pthread_t t1, t2;
+    pthread_create(&t1, NULL, threadfunc, NULL);
+    pthread_create(&t2, NULL, threadfunc, NULL);
+    pthread_join(t1, NULL);
+    pthread_join(t2, NULL);
+    printf("counter = %d\n", counter);
+}
+\end{codeblock}
+
+We naively expect \plaintt{counter == 2}. In reality the program may also print $1$, and reproducing it is hard. To see why, compile the function with \plaintt{gcc -S -fverbose-asm -g} and look at the body of \plaintt{++counter}:
+
+\begin{codeblock}[language={[x86masm]Assembler}, numbers=none, basicstyle=\ttfamily\scriptsize]
+movl    counter(%rip), %eax        ; load
+addl    $1, %eax                   ; increment in register
+movl    %eax, counter(%rip)        ; store
+\end{codeblock}
+
+The single C statement \plaintt{++counter} is three machine instructions. If the OS preempts thread~$1$ between \plaintt{load} and \plaintt{store}, thread~$2$ may load the same old value, increment its own register, and store it back; when thread~$1$ resumes it overwrites the result with a value that is also wrong by one. We have just exhibited a \bfit{data race}: two threads access the same memory location without synchronization, at least one of them writes, and the outcome depends on which goes first.
+
+\begin{warningblock}[A dangerous situation]
+Even if the timing window for the race is tiny -- say $0.01\%$ of the runs -- the program is \textbf{not} safe. ``It works on my machine'' is not a property of correctness; it is the result of an arbitrary scheduling that the OS is free to change tomorrow. As soon as a data race is logically possible, the shared resource \emph{must} be protected.
+\end{warningblock}
+
+There are two complementary tools to fix this: \bfit{atomic variables}, which make small operations indivisible, and \bfit{mutexes}, which make arbitrary critical sections mutually exclusive.
+
+\section{Atomic variables}
+
+C11 introduced the \plaintt{\_Atomic} type qualifier and the \plaintt{<stdatomic.h>} header. Declaring a variable as
+
+\begin{codeblock}[language=C, numbers=none]
+_Atomic int counter;
+\end{codeblock}
+
+makes every \emph{individual} read, write, increment, decrement, and compound assignment on it atomic with respect to other threads. The compiler emits the appropriate locked instructions (\plaintt{lock add}, \plaintt{cmpxchg}, \dots) so that no thread can ever observe a half-updated value.
+
+A few important caveats:
+
+\begin{itemize}
+    \item Any type other than function and array types can be made \plaintt{\_Atomic}.
+    \item \emph{Not} every \plaintt{\_Atomic} type is guaranteed to be \bfit{lock-free}: for types that the hardware does not support natively (large structs, for instance) the implementation may fall back to an internal mutex.
+    \item Atomic operations introduce \bfit{synchronization} between threads, with five memory orders defined by the C memory model. The default, \plaintt{memory\_order\_seq\_cst}, gives sequential consistency: every thread sees a single global order of all sequentially-consistent operations.
+    \item \textbf{Combinations of atomic operations are not themselves atomic.} If the critical section consists of more than one read--modify--write -- ``test and then set'', ``compare two atomics'', ``increment if positive'' -- a single \plaintt{\_Atomic} variable is not enough; you need a mutex or a higher-level primitive.
+\end{itemize}
+
+In our broken counter example, replacing \plaintt{int counter} with \plaintt{\_Atomic int counter} is enough, because the only operation is \plaintt{++counter}.
+
+\section{Mutexes}
+
+A \textbf{mutex} (\bfit{mut}ual \bfit{ex}clusion) is a synchronization object with two states, \bfit{locked} or \bfit{unlocked}. The contract is:
+
+\begin{itemize}[noitemsep]
+    \item Any thread can attempt to lock the mutex \emph{before} touching the resource it protects.
+    \begin{itemize}[noitemsep]
+        \item If the mutex is unlocked, the call locks it and returns immediately.
+        \item If the mutex is already locked by another thread, the caller is suspended until the mutex is released by its owner.
+    \end{itemize}
+    \item The thread that locked the mutex unlocks it after having finished with the resource. Other threads waiting on the mutex can now acquire it.
+\end{itemize}
+
+Using a mutex is straightforward:
+
+\begin{codeblock}[language=C]
+int counter = 0;
+pthread_mutex_t counter_mtx = PTHREAD_MUTEX_INITIALIZER;
+
+void *threadfunc(void *unused) {
+    (void)unused;
+    pthread_mutex_lock(&counter_mtx);
+    ++counter;
+    pthread_mutex_unlock(&counter_mtx);
+    return NULL;
+}
+\end{codeblock}
+
+Now if thread~$2$ reaches \plaintt{pthread\_mutex\_lock} while thread~$1$ holds the mutex, thread~$2$ is blocked there. When thread~$1$ calls \plaintt{pthread\_mutex\_unlock}, thread~$2$ acquires the mutex and proceeds. The increment is sequentialised even though the original instruction sequence is not atomic.
+
+Any other use is \bfit{undefined behaviour}: locking the same mutex twice from the same thread, unlocking a mutex one does not own, destroying a locked mutex, \dots~ A subset of these mistakes can be checked at runtime by switching to a non-default mutex type (see below). \emph{Recursive} mutexes are an explicit exception: they may be acquired multiple times by the same thread, provided they are released the same number of times.
+
+\begin{tipsblock}[Protect every access]
+A mutex is just a convention. It is \emph{up to you} to wrap \emph{every} access to the resource with the corresponding lock/unlock pair: if you forget a single read site, the data race is back. A common discipline is to keep the mutex and the resource it protects together in the same struct, and to provide accessor functions that are the only legal way to touch the resource.
+\end{tipsblock}
+
+\subsection{Variants of the lock call}
+
+The pthread library exposes three variants of the lock call:
+
+\begin{itemize}
+    \item \textbf{Blocking}: the standard \plaintt{pthread\_mutex\_lock}/\plaintt{\_unlock} pair shown above.
+    \item \textbf{Time-blocking}: \plaintt{pthread\_mutex\_timedlock(mtx, abstime)} blocks until either the lock is acquired or the absolute time \plaintt{abstime} is reached, in which case it returns \plaintt{ETIMEDOUT}. It requires \plaintt{<time.h>}.
+    \item \textbf{Non-blocking}: \plaintt{pthread\_mutex\_trylock(mtx)} attempts to acquire the lock; if it is already held it returns \plaintt{EBUSY} immediately, leaving the caller free to do other work or retry later.
+\end{itemize}
+
+\subsection{Mutex vs spinlock}
+
+A natural question is what the CPU does while waiting for a mutex. The answer is reassuring: \emph{nothing}. With \plaintt{top} you can see that the CPU consumption of a thread blocked on a mutex is negligible. On Linux, mutexes are implemented in terms of \bfit{atomic variables} and a kernel subsystem called \bfit{futex} (fast userspace mutex) that handles the suspension and the wake-up of contended threads via context switching. The fast path -- the uncontended case -- stays entirely in user space and costs only a few atomic instructions; the slow path crosses into the kernel and pays roughly $\sim 100$ cycles.
+
+A \textbf{spinlock} is semantically similar -- it is a binary lock you acquire and release -- but the implementation is the opposite: the waiter loops on an atomic test-and-set until the lock becomes available, which is a form of \bfit{busy waiting}. With \plaintt{top} the thread shows as $\sim 100\%$ CPU. Spinlocks are lighter than mutexes per acquisition (just an atomic in a tight loop, no syscall) but burn a core while waiting; they are only sensible when the critical section is so short that going to sleep would cost more than spinning.
+
+\subsection{Mutex attributes and dynamic initialization}
+
+The default mutex type is \plaintt{PTHREAD\_MUTEX\_NORMAL}, which is the fastest and the strictest. There are two other useful types:
+
+\begin{itemize}[noitemsep]
+    \item \plaintt{PTHREAD\_MUTEX\_ERRORCHECK} adds runtime checks: locking the same mutex twice from the same thread, or unlocking a mutex one does not own, returns an error instead of producing undefined behaviour.
+    \item \plaintt{PTHREAD\_MUTEX\_RECURSIVE} allows the same thread to lock the mutex multiple times. The mutex is fully released only after the same number of unlocks.
+\end{itemize}
+
+These attributed mutexes are slower than the default. Whenever a custom attribute is used, or when the mutex is allocated on the heap, the static \plaintt{PTHREAD\_MUTEX\_INITIALIZER} cannot be used; we initialize and destroy the mutex explicitly:
+
+\begin{codeblock}[language=C, numbers=none]
+int pthread_mutex_init   (pthread_mutex_t *mtx, const pthread_mutexattr_t *attr);
+int pthread_mutex_destroy(pthread_mutex_t *mtx);
+\end{codeblock}
+
+\section{Deadlocks}
+
+Once we have to lock more than one mutex in the same critical section, a new failure mode appears.
+
+\begin{codeblock}[language=C]
+// Thread 1                     // Thread 2
+pthread_mutex_lock(&first);     pthread_mutex_lock(&second);
+pthread_mutex_lock(&second);    pthread_mutex_lock(&first);
+\end{codeblock}
+
+If thread~$1$ acquires \plaintt{first} just before thread~$2$ acquires \plaintt{second}, both then try to lock the mutex held by the other and block forever. This is a \textbf{deadlock}: a circular wait in which no thread can make progress.
+
+\begin{warningblock}[Deadlocks are hard to spot]
+The same source code may run for a long time without ever deadlocking, because the bug appears only in certain interleavings. The program is still buggy, just lucky. A standard trick to expose the race is to insert a small \plaintt{sleep} between the two locks and run the program many times: the artificial delay widens the dangerous window and the deadlock becomes essentially deterministic.
+\end{warningblock}
+
+\subsection{How not to fix it}
+
+A tempting non-solution is to replace \plaintt{pthread\_mutex\_lock} with \plaintt{pthread\_mutex\_timedlock}: now no thread is stuck forever. Unfortunately, all that we have done is to convert the deadlock into a \bfit{livelock}: both threads time out, retry, and possibly time out again, burning CPU without making progress. The bug is still there, only better disguised.
+
+\subsection{Mutex hierarchy}
+
+The cleanest fix is to define a \bfit{global ordering} on the mutexes and to require that, whenever more than one is needed, every thread acquires them in that order:
+
+\begin{codeblock}[language=C]
+// Both threads acquire `first` before `second`
+pthread_mutex_lock(&first);
+pthread_mutex_lock(&second);
+//      ... critical section ...
+pthread_mutex_unlock(&second);
+pthread_mutex_unlock(&first);
+\end{codeblock}
+
+If thread~$2$ also locks \plaintt{first} before \plaintt{second}, the cycle in the wait graph is broken: whichever thread acquires \plaintt{first} first will then acquire \plaintt{second} as well, while the other simply waits at \plaintt{first}. The order has to be the same project-wide; for that reason this strategy is sometimes called the \emph{lock hierarchy}.
+
+\subsection{Try-and-back-off}
+
+A more flexible, slightly less efficient alternative is to use \plaintt{trylock} to detect a potential deadlock and to back off when one is brewing:
+
+\begin{codeblock}[language=C]
+// Thread 1                                   // Thread 2
+for (;;) {                                    for (;;) {
+    pthread_mutex_lock(&first);                   pthread_mutex_lock(&second);
+    if (pthread_mutex_trylock(&second)) {         if (pthread_mutex_trylock(&first)) {
+        pthread_mutex_unlock(&first);                 pthread_mutex_unlock(&second);
+        sched_yield();                                sched_yield();
+    } else {                                      } else {
+        break;                                        break;
+    }                                             }
+}                                             }
+\end{codeblock}
+
+Each thread holds its first mutex and \emph{tries} to acquire the second; on failure it releases the first one and calls \plaintt{sched\_yield} to let the OS reschedule. Because no thread holds a lock during the back-off, no other thread can be stuck behind it, and the deadlock dissolves. The code is more involved and incurs more lock/unlock pairs in the contended case, but it does not require a global ordering.
+
+\begin{observationblock}[A familiar lesson]
+The first strategy fixes deadlocks by encoding a global structure in the code; the second one fixes them by reacting at runtime to local information. We will see this same trade-off in OpenMP (static vs dynamic scheduling) and in MPI (collective ordering vs one-sided communication): expressing the structure of the problem to the runtime usually wins on performance, while reacting locally usually wins on flexibility.
+\end{observationblock}
+
+\section{Thread safety and reentrancy}
+
+Two related but distinct properties of a function come up constantly in concurrent code.
+
+POSIX defines a hierarchy of \bfit{safety guarantees}:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{MT-Safe}: the function can be called from multiple threads simultaneously without corrupting its internal state. Examples: \plaintt{printf}, \plaintt{malloc}.
+    \item \textbf{AS-Safe}: the function can additionally be called from an asynchronous signal handler. Examples: \plaintt{getpid}, \plaintt{getppid}.
+    \item \textbf{AC-Safe}: the function can be called during asynchronous cancellation.
+\end{itemize}
+
+A \textbf{reentrant} function is one that can be safely re-entered while a previous invocation is still in progress. Two conditions are necessary:
+
+\begin{itemize}[noitemsep]
+    \item it does not act on global or static state;
+    \item it does not use a mutex (a mutex would deadlock the same thread re-entering through a signal handler).
+\end{itemize}
+
+Every reentrant function is MT-safe, but the converse is false: many functions are made thread-safe by acquiring an internal lock and so are \emph{not} reentrant. The classical example is \plaintt{strtok} (not reentrant, because it keeps state in a static variable), versus its reentrant counterpart \plaintt{strtok\_r}, which makes the state explicit through a parameter.
+
+\section{The producer--consumer model}
+
+Mutexes and condition variables are the building blocks of the standard \textbf{producer--consumer} pattern, which we will use as a running example.
+
+In its simplest form there is a \bfit{producer} that generates data items and a \bfit{consumer} that processes them. They communicate through a \bfit{channel}, typically a buffer, and the consumer should pick up data \emph{as soon as} it appears, without leaving the producer waiting indefinitely.
+
+The natural questions are:
+
+\begin{itemize}[noitemsep]
+    \item Is there a speed constraint between producer and consumer? In general no: either may be temporarily faster than the other, and the buffer absorbs the difference.
+    \item How is the channel implemented? A first-in-first-out queue, with a fixed capacity, fits both ends naturally.
+    \item How are producer and consumer synchronized? Through a mutex protecting the buffer, plus a way to make the consumer sleep when the buffer is empty (and the producer when it is full).
+\end{itemize}
+
+The model generalizes immediately to multiple producers and multiple consumers all sharing the same buffer. The race conditions multiply -- two producers may try to push concurrently, two consumers may try to pop the same item -- so the synchronization must be in place from the start.
+
+\begin{exampleblock}[Circular buffer]
+The canonical bounded channel is a \bfit{circular buffer}: a fixed-size array with two indices, a \plaintt{head} where the producer writes and a \plaintt{tail} from which the consumer reads, both wrapping around modulo the capacity. A minimal interface looks like:
+
+\begin{codeblock}[language=C]
+struct circbuf;
+
+void   cb_init    (struct circbuf *cb, void *buf,
+                   size_t el_size, size_t capacity);
+void   cb_unset   (struct circbuf *cb);
+size_t cb_size    (const struct circbuf *cb);
+size_t cb_capacity(const struct circbuf *cb);
+bool   cb_push    (struct circbuf *cb, const void *el);
+bool   cb_pop     (struct circbuf *cb,       void *el);
+\end{codeblock}
+
+\plaintt{cb\_push} returns \plaintt{false} when the buffer is full and \plaintt{cb\_pop} returns \plaintt{false} when it is empty. With this skeleton in mind, the next section discusses how the consumer should wait until \plaintt{cb\_pop} can succeed.
+\end{exampleblock}
+
+\section{Condition variables}
+
+Suppose the consumer wants to wait until the buffer is non-empty. Using only mutexes, the natural attempt is:
+
+\begin{codeblock}[language=C]
+pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
+
+while (!done) {
+    pthread_mutex_lock(&mtx);
+    // ... try to do the job, give up if nothing to do ...
+    pthread_mutex_unlock(&mtx);
+}
+\end{codeblock}
+
+This is \bfit{busy waiting}: the consumer wakes up, locks, checks, unlocks, and tries again, burning a CPU core just to find out that nothing has changed. The point of a condition variable is to put the consumer to sleep \emph{efficiently} until the producer says ``check again''.
+
+\subsection{Pause and notify}
+
+A \textbf{condition variable} is a synchronization object that always comes paired with a mutex. It exposes two families of operations:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Pause} (\plaintt{pthread\_cond\_wait}, \plaintt{pthread\_cond\_timedwait}): atomically releases the associated mutex and puts the calling thread to sleep until it is notified. When the thread wakes up, the mutex has been re-acquired before the function returns.
+    \item \textbf{Notify} (\plaintt{pthread\_cond\_signal}, \plaintt{pthread\_cond\_broadcast}): wakes up one (\plaintt{signal}) or all (\plaintt{broadcast}) of the threads waiting on the condition variable.
+\end{itemize}
+
+A first attempt at the producer/consumer synchronization could be:
+
+\begin{codeblock}[language=C]
+// Consumer                                   // Producer
+pthread_mutex_lock(&mtx);
+                                              // ... produce ...
+pthread_cond_wait(&cv, &mtx);                 pthread_cond_signal(&cv);
+// ... use the data ...
+pthread_mutex_unlock(&mtx);
+\end{codeblock}
+
+This is the right shape, but it is broken in two subtle ways.
+
+\begin{warningblock}[Spurious and lost wakeups]
+A condition variable is allowed to wake a thread up \emph{even when no other thread has signaled it}. This is called a \bfit{spurious wakeup}. It is permitted by the standard for performance reasons, and you must not rely on its absence.
+
+A worse failure happens if the producer signals the condition variable \emph{before} the consumer reaches \plaintt{pthread\_cond\_wait}. The signal targets only currently-waiting threads, so it is silently dropped: the consumer enters \plaintt{cond\_wait} just after, finds nobody to wake it up, and the program deadlocks. This is a \bfit{lost wakeup}.
+\end{warningblock}
+
+\subsection{The predicate idiom}
+
+Both problems are fixed by the same pattern: protect a \bfit{predicate} with the same mutex used by the condition variable, and test it in a \plaintt{while} loop around \plaintt{cond\_wait}:
+
+\begin{codeblock}[language=C]
+// Consumer                                  // Producer
+pthread_mutex_lock(&mtx);                    pthread_mutex_lock(&mtx);
+while (!predicate)                           predicate = true;
+    pthread_cond_wait(&cv, &mtx);            pthread_mutex_unlock(&mtx);
+// ... use the data ...                      pthread_cond_signal(&cv);
+pthread_mutex_unlock(&mtx);
+\end{codeblock}
+
+This is correct against both pitfalls:
+
+\begin{itemize}[noitemsep]
+    \item If the producer sets \plaintt{predicate = true} \emph{before} the consumer enters the \plaintt{while}, the loop test fails and the consumer never even calls \plaintt{cond\_wait}: no wakeup can be lost.
+    \item If a spurious wakeup occurs and the predicate is still false, the loop simply re-enters \plaintt{cond\_wait}.
+\end{itemize}
+
+\begin{tipsblock}[Always the same mutex]
+The predicate \emph{must} be protected by the same mutex that is paired with the condition variable. Mixing two different mutexes (one for the predicate, one for \plaintt{cond\_wait}) reintroduces a window in which the producer's update and the consumer's test can interleave incorrectly, and lost/spurious wakeups come back.
+\end{tipsblock}
+
+\subsection{Condition variable API}
+
+The complete set of calls is small:
+
+\begin{codeblock}[language=C, numbers=none]
+// Pause
+int pthread_cond_wait     (pthread_cond_t *cond, pthread_mutex_t *mtx);
+int pthread_cond_timedwait(pthread_cond_t *cond, pthread_mutex_t *mtx,
+                           const struct timespec *abstime);
+// Notify
+int pthread_cond_signal   (pthread_cond_t *cond);
+int pthread_cond_broadcast(pthread_cond_t *cond);
+\end{codeblock}
+
+Static initialization uses \plaintt{PTHREAD\_COND\_INITIALIZER}; for dynamic allocation or custom attributes, use \plaintt{pthread\_cond\_init} and \plaintt{pthread\_cond\_destroy}.
+
+\subsection{Signal or broadcast?}
+
+The two notification primitives differ in how many waiting threads they wake up.
+
+\begin{itemize}
+    \item \plaintt{signal} wakes up \emph{at least one} of the threads waiting on the condition variable. It is faster, but if the awoken thread's predicate is not satisfied (e.g., the data was meant for somebody else) we have a deadlock: that thread goes back to sleep and the others were never notified. \plaintt{signal} is the right choice when all the waiting threads share an \emph{equivalent} predicate, so that any of them can make progress.
+    \item \plaintt{broadcast} wakes up \emph{all} the threads waiting on the condition variable. It is slower -- every thread re-acquires the mutex one at a time -- but it guarantees that every predicate is rechecked, which is what you want when the waiters might be looking for different things in the same shared state.
+\end{itemize}
+
+A useful default rule: when in doubt, use \plaintt{broadcast}. Switching to \plaintt{signal} is an optimization that should be made consciously, after checking that all waiters are interchangeable from the predicate's point of view.

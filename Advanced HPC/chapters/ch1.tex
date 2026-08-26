@@ -1,0 +1,1193 @@
+\chapter{Vectorization}
+
+\section{Basic Concepts}
+
+Modern high-performance computing systems exploit multiple layers of parallelism to achieve maximum performance. At the largest scale, clusters or supercomputers are made up of many nodes working together. Within each node, there may be several CPUs (sockets), each containing multiple processing cores capable of running tasks concurrently.
+
+A further dimension in modern HPC is \bfit{offloading}, where compute-intensive tasks and associated data are delegated from the CPU to accelerators such as GPUs (Graphics Processing Units). Offloading entails transferring data across the system's architecture, a process whose performance impact depends on the system's memory configuration and interconnect.
+
+\begin{itemize}
+  \item In \textbf{NVIDIA-based systems}, CPUs typically access DDR5 RAM, while GPUs benefit from their own high-bandwidth HBM3 memory. Data movement across the CPU-GPU boundary (usually via PCIe or NVLink) can be a bottleneck and must be carefully optimized.
+  \item In contrast, \textbf{AMD's recent architectures} (notably with some Instinct GPUs and EPYC CPUs) may feature a unified DDR5 memory pool shared by both CPU and GPU, reducing data transfer overheads and enabling more direct sharing.
+\end{itemize}
+
+In addition to thread and process-level parallelism, modern processors employ a crucial form of parallelism: \textbf{vectorization}. Vectorization embodies \bfit{Single Instruction Multiple Data (SIMD)} execution, a paradigm in which a single instruction operates on multiple data elements simultaneously using specialized hardware known as \bfit{vector registers}.
+
+\textbf{Vector registers} (VREGs) are designed for operations on aggregated data, they are considerably wider than traditional scalar registers, commonly supporting 128, 256, or even 512 bits at a time.
+
+\vspace{-1em}
+
+\begin{minipage}{0.68\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/simd.png}
+    \label{fig:simd_evolution}
+\end{figure}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \captionof{figure}{Intel SIMD ISA Evolution: timeline of vector instruction set extensions introduced with each CPU generation. The diagram shows how SIMD register width increased from MMX and SSE (64-128 bits) to AVX (256 bits) and AVX-512 (512 bits), with each new standard supporting more data parallelism.}
+    \label{fig:simd_evolution}
+\end{minipage}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/cluster.png}
+    \captionof{figure}{The architecture of a modern HPC cluster.}
+    \label{fig:cluster}
+\end{figure}
+
+Modern x86 CPUs have evolved both in structure and capacity. The main idea is straightforward: the wider the register, the more data elements you can work on at once with a single instruction. Intel has introduced three generations of SIMD registers:
+
+\begin{itemize}
+    \item \textbf{SSE (128-bit):} Each register (\texttt{xmm0}) can hold either 2 double-precision (64-bit) values or 4 single-precision (32-bit) floating-point values. This was the first major step for SIMD on x86.
+    \item \textbf{AVX (256-bit):} The register width doubles. Now, a \texttt{ymm0} register can operate on 4 doubles or 8 floats at once, effectively doubling the amount of data processed per instruction.
+    \item \textbf{AVX-512 (512-bit):} The register width doubles yet again. The \texttt{zmm0} register can simultaneously process up to 8 doubles or 16 floats.
+\end{itemize}
+
+\vspace{-1em}
+
+\begin{minipage}{0.75\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/registers.png}
+    \label{fig:simd_registers}
+\end{figure}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.22\textwidth}
+\captionof{figure}{\\SIMD registers: each generation widens the registers, allowing more doubles (dark) or floats (light) to be processed in parallel. \cite{cornellCornellVirtual}}
+\end{minipage}
+
+\vspace{-1em}
+
+Wider registers over the generations (SSE $\rightarrow$ AVX $\rightarrow$ AVX-512) translate directly into the ability to operate on more data elements at once. This increase in register width is key to the dramatic gains in performance for vectorizable workloads, as it enables each instruction to do more useful work in parallel.
+
+
+\subsubsection{How to achieve vectorization?}
+
+Vectorization can be approached at various levels, from the most convenient and portable to the most hardware-specific and optimized:
+
+\begin{itemize}
+    \item \textbf{Explicit compiler pragmas} (e.g., \texttt{\#pragma omp simd}, \texttt{\#pragma vector}): Code annotations that help the compiler vectorize loops or code regions. These are high-level, portable, require few changes, but give only moderate control.
+    \item \textbf{Auto-vectorization by the compiler}: Compilers can often detect and apply SIMD to loops with the right options (\texttt{-O2}, \texttt{-ftree-vectorize}, etc). Convenient, needs no source changes, but gives little control and can miss opportunities.
+    \item \textbf{C++ vector libraries}: Libraries such as \texttt{std::valarray}, \texttt{Vc}, or \texttt{Eigen} let you write high-level vector code, balancing portability and some SIMD control.
+    \item \textbf{Compiler-specific vector extensions}: Using types like \texttt{\_\_m256d} or \texttt{float32x4\_t} gives direct SIMD register access, improving performance but reducing portability.
+    \item \textbf{Intrinsics}: Functions mapping to hardware SIMD instructions (e.g., \texttt{\_mm256\_add\_pd}), allow very fine-grained, fast vector code at the cost of readability and portability.
+    \item \textbf{Handwritten assembly}: Writing assembly gives maximum control and performance, but is not portable and is complex and error-prone.
+\end{itemize}
+
+Higher-level approaches are simpler and portable; lower-level ones give more control and tuning, but cost portability and add complexity.
+
+\begin{minipage}{0.28\textwidth}
+    \captionof{figure}{Approaches to vectorize, from high-level convenience to low-level control. \cite{ADV_HPC}}
+    \label{fig:vect_gradient}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.65\textwidth}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/vect_gradient.png}
+    \label{fig:vect_gradient}
+\end{figure}
+\end{minipage}
+
+\vspace{-1em}
+
+\subsubsection{Different architectures}
+
+Vector ISAs follow two main philosophies. The traditional x86 ISA uses \textbf{fixed-width} vectors, while ARM and RISC-V adopt a \textbf{scalable} design where the vector length is not fixed in the binary.
+
+\vspace{-1em}
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.2}
+\setlength{\extrarowheight}{0pt}
+\begin{tabular}{
+    |>{\arraybackslash}m{0.135\textwidth}
+    ||>{\arraybackslash}m{0.24\textwidth}
+    |>{\arraybackslash}m{0.295\textwidth}
+    |>{\arraybackslash}m{0.22\textwidth}|}
+    \hline
+    \textbf{Feature} & \textbf{x86 (AVX/AVX-512)} & \textbf{ARM (SVE)} & \textbf{RISC-V RVV} \\
+    \hline\hline
+    \textbf{Philosophy} & \bfit{Fixed-width}\newline(128/256/512 bit) & \bfit{Scalable}\newline(128--2048 bit) & \bfit{Scalable}\newline(undefined VLEN) \\
+    \hline
+    \textbf{Binary model} & \bfit{Fragmented}\newline(compile for each target) & \bfit{VLA} (Vector-Length-Agnostic) write once, run anywhere & \bfit{VLA} write once, run anywhere \\
+    \hline
+    \textbf{Register count} & 16 (AVX2)\newline32 (AVX-512) & 32 & 32 + LMUL grouping \\
+    \hline
+    \textbf{Registers \newline flexibility} & None\newline(fixed per register/size) & None (set at HW level, 128--2048 bit) & LMUL\newline(register grouping) \\
+    \hline
+    \textbf{Predication} & 8 mask registers\newline(AVX-512 add-on) & 16 predicate registers\newline(core feature) & Built-in mask operand\newline(often \plaintt{v0}) \\
+    \hline
+    \textbf{Configuration} & \bfit{Implicit}\newline(by the called instruction) & \bfit{Implicit} \ \ \ (type chosen; length is loop-invariant) & \bfit{Explicit}\newline via \plaintt{vsetvl} \\
+    \hline
+    \textbf{ISA \newline complexity} & \bfit{High fragmentation}\newline(AVX-512F, CD, VL, ...) & \bfit{Low fragmentation}\newline(NEON, SVE, SVE2) & \bfit{Unified}\newline(RVV 1.0) \\
+    \hline
+    \textbf{Hardware cost} & Can cause clock throttling\newline(AVX-512) & Designed for power/performance scaling & --- \\
+    \hline
+\end{tabular}
+\normalsize
+\end{center}
+
+\begin{itemize}
+\item \textbf{Fixed vs Scalable size}: On x86\_64 you must target a specific register width (SSE 128, AVX 256, AVX-512 512) and call the corresponding instructions or binaries. This forces specialized code paths and \bfit{fragmentation}. With scalable architectures (SVE, RVV) you write \bfit{Vector-Length-Agnostic (VLA)} code: the same loop adapts to the hardware at run time, running efficiently on a 128-bit core or on a server with 1024-bit registers, greatly reducing fragmentation.
+
+\item \textbf{Native vs add-on predication}: Predication lets a vector instruction conditionally process elements without branching, by creating a boolean \emph{mask} to decide which lanes are active.
+
+\vspace{-0.5em}
+\begin{codeblock}[language=C, numbers=none]
+for (int i = 0; i < N; ++i)
+    if (data[i] > 0.0)
+        data[i] *= 2.0;
+\end{codeblock}
+If the mask for an 8-lane vector is, for instance:
+
+\vspace{-0.5em}
+\begin{codeblock}[language=C, numbers=none]
+mask: [ 0 0 1 1 1 0 1 1 ]
+data: [ u u p p p u p p ]  // u = unchanged, p = processed
+\end{codeblock}
+
+The inactive lanes (0) are left untouched, while the active lanes (1) are updated. In practice there are two ways to realize this: 
+\begin{itemize}[noitemsep]
+    \item skip the false lanes so they are not executed at all; or
+    \item execute all lanes but ignore the results of the false lanes (``blend'' them with the old values).
+\end{itemize}
+
+SVE provides \textbf{native predication} via 16 predicate registers and rich lane-wise logic; RVV uses a built-in mask operand (commonly \texttt{v0}) as part of the ISA. In x86, predication is an \emph{add-on} of AVX-512 (8 mask registers), while up to AVX2 it is emulated via blending operations.
+
+\end{itemize}
+
+\section{Checking for SIMD capabilities}
+
+You can check \textbf{statically} the value for your cpu, for instance by grepping the output of either \texttt{lscpu} or \texttt{/proc/cpuinfo}. But what if you want to check the capabilities of the architecture where the code is running?
+We can use multiple methods to check the capabilities of the architecture:
+
+\begin{itemize}
+    \item \textbf{Compiler built-in functions}: The compiler provides built-in functions to check the capabilities of the architecture.
+
+\begin{codeblock}[language=C, basicstyle=\ttfamily\scriptsize]
+#include <cpuid.h>
+
+int main() {
+    __builtin_cpu_init();
+
+    if (__builtin_cpu_supports("avx512f")) 
+        ...
+    if (__builtin_cpu_supports("avx2"))
+        ...
+    if (__builtin_cpu_supports("avx"))
+        ...
+    if (__builtin_cpu_supports("sse4.2"))
+        ...
+    if (__builtin_cpu_supports("sse4.1"))
+        ...
+    if (__builtin_cpu_supports("sse3"))
+        ...
+\end{codeblock}
+
+\item \textbf{Compiler intrinsics}: The compiler provides intrinsics to check the capabilities of the architecture.
+
+\begin{codeblock}[language=C, basicstyle=\ttfamily\scriptsize]
+#include <immintrin.h>
+
+#ifdef __AVX512__
+#define V_DSIZE (sizeof( __m512d ) / sizeof(double) )
+
+#elif defined ( __AVX__ ) || defined ( __AVX2__ )
+#define V_DSIZE (sizeof( __m256d ) / sizeof(double) )
+
+#elif defined ( __SSE4__ ) || defined ( __SSE3__ )
+#define V_DSIZE (sizeof( __m128d ) / sizeof(double) )
+
+#else
+#define V_DSIZE 1UL
+#endif
+\end{codeblock}
+\end{itemize}
+
+\begin{tipsblock}[\plaintt{-march=native}]
+    By default, the compiler is able to correctly recognize the CPU's capabilities but actually gets a wrong vector size. We need to use the \plaintt{-march=native} flag, since it will not be able to detect the vector capabilities of the architecture.
+\end{tipsblock}
+
+In some cases, you might need to explicitly target a particular SIMD extension (for either Intel or AMD architectures). This can be accomplished by specifying the appropriate compiler flags:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{\plaintt{-mavx512f}}: Enables AVX-512 instructions.
+    \item \textbf{\plaintt{-mavx2}}: Enables AVX2 instructions.
+    \item \textbf{\plaintt{-mavx}}: Enables AVX instructions.
+    \item \textbf{\plaintt{-msse4.2}}: Enables SSE4.2 instructions.
+    \item \textbf{\plaintt{-msse4.1}}: Enables SSE4.1 instructions.
+    \item \textbf{\plaintt{-msse3}}: Enables SSE3 instructions.
+\end{itemize}
+
+\vspace{-0.3em}
+
+\section{Vector Types via Intrinsics}
+
+\vspace{-0.3em}
+
+Once we include the \plaintt{<immintrin.h>} header, we get access to the intrinsincs routines and types. \textbf{Intrinsics} are functions that are provided by the compiler to allow the programmer to directly use the vector instructions of the architecture.
+
+\vspace{-1em}
+
+\begin{table}[H]
+\centering
+\begin{minipage}{0.47\textwidth}
+    \centering
+    \textbf{\small INTEGER types} \\
+    \vspace{0.5em}
+    \footnotesize
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        \textbf{\shortstack{types\\name}} & \textbf{\shortstack{int\\8bits}} & \textbf{\shortstack{int\\16bits}} & \textbf{\shortstack{int\\32bits}} & \textbf{\shortstack{int\\64bits}} \\
+        \hline
+        \plaintt{\scriptsize \_\_m64}    & 8x  & 4x  & 2x  & 1x  \\
+        \hline
+        \plaintt{\scriptsize \_\_m128i}  & 16x & 8x  & 4x  & 2x  \\
+        \hline
+        \plaintt{\scriptsize \_\_m256i}  & 32x & 16x & 8x  & 4x  \\
+        \hline
+        \plaintt{\scriptsize \_\_m512i}  & 64x & 32x & 16x & 8x  \\
+        \hline
+    \end{tabular}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.51\textwidth}
+    \centering
+    \textbf{\small FLOATING-POINT types} \\
+    \vspace{0.5em}
+    \footnotesize
+    \begin{tabular}{|c|c|c|}
+        \hline
+        \textbf{\shortstack{types name}} & \textbf{\shortstack{single precision}} & \textbf{\shortstack{double precision}} \\
+        \hline
+        \plaintt{\scriptsize \_\_m128}   & 4x  & -- \\
+        \hline
+        \plaintt{\scriptsize \_\_m128d}  & --  & 2x \\
+        \hline
+        \plaintt{\scriptsize \_\_m256}   & 8x  & -- \\
+        \hline
+        \plaintt{\scriptsize \_\_m256d}  & --  & 4x \\
+        \hline
+        \plaintt{\scriptsize \_\_m512}   & 16x & -- \\
+        \hline
+        \plaintt{\scriptsize \_\_m512d}  & --  & 8x \\
+        \hline
+    \end{tabular}
+\end{minipage}
+\end{table}
+
+\vspace{-1.5em}
+
+To make explicit use of vector types while keeping the code portable across machines, it is convenient to introduce a small layer of typedefs and wrappers that adapts at compile time to the ISA detected by the compiler. The names \plaintt{dvector\_t}, \plaintt{fvector\_t} and \plaintt{ivector\_t} will always exist in our code with the correct width, and a couple of macros expose their element count and bit size.
+
+
+\begin{codeblock}[language=C, basicstyle=\ttfamily\scriptsize]
+// Select vector types based on the available ISA
+#ifdef __AVX512__
+typedef __m512d dvector_t;
+typedef __m512  fvector_t;
+typedef __m512i ivector_t;
+
+#elif defined ( __AVX__ ) || defined ( __AVX2__ )
+typedef __m256d dvector_t;
+typedef __m256  fvector_t;
+typedef __m256i ivector_t;
+
+#elif defined ( __SSE4__ ) || defined ( __SSE3__ )
+typedef __m128d dvector_t;
+typedef __m128  fvector_t;
+typedef __m128i ivector_t;
+
+#else
+typedef double dvector_t;
+typedef float  fvector_t;
+typedef int    ivector_t;
+#endif
+
+// Convenience macros for sizes (elements per vector and bit width)
+#define DV_ELEMENT_SIZE ( sizeof(dvector_t) / sizeof(double) )
+#define DV_BIT_SIZE     ( sizeof(dvector_t) * 8 )
+#define FV_ELEMENT_SIZE ( sizeof(fvector_t) / sizeof(float) )
+#define FV_BIT_SIZE     ( sizeof(fvector_t) * 8 )
+#define IV_ELEMENT_SIZE ( sizeof(ivector_t) / sizeof(int) )
+#define IV_BIT_SIZE     ( sizeof(ivector_t) * 8 )
+\end{codeblock}
+
+In real codes one typically hides the operations behind tiny wrappers so that call sites stay uniform: a short \plaintt{\#ifdef} region selects the proper \plaintt{SSE}/\plaintt{AVX}/\plaintt{AVX-512} intrinsic. As an example, below we provide a simple ``vector summation'' for doubles, floats and integers, via \plaintt{VDSUM}, \plaintt{VFSUM} and \plaintt{VISUM}. We will return to intrinsics usage later in the chapter.
+
+\begin{exampleblock}[Vector summation]
+Wrappers for a ``vector summation'' on doubles, floats and ints:
+\begin{codeblock}[language=C, basicstyle=\ttfamily\scriptsize]
+#ifdef __AVX512__
+#define VDSUM(v1, v2, r) ( (r) = _mm512_add_pd( (v1), (v2) ) )
+#define VFSUM(v1, v2, r) ( (r) = _mm512_add_ps( (v1), (v2) ) )
+#define VISUM(v1, v2, r) ( (r) = _mm512_add_epi32( (v1), (v2) ) )
+#elif defined ( __AVX__ ) || defined ( __AVX2__ )
+#define VDSUM(v1, v2, r) ( (r) = _mm256_add_pd( (v1), (v2) ) )
+#define VFSUM(v1, v2, r) ( (r) = _mm256_add_ps( (v1), (v2) ) )
+#define VISUM(v1, v2, r) ( (r) = _mm256_add_epi32( (v1), (v2) ) )
+#elif defined ( __SSE4__ ) || defined ( __SSE3__ )
+#define VDSUM(v1, v2, r) ( (r) = _mm_add_pd( (v1), (v2) ) )
+#define VFSUM(v1, v2, r) ( (r) = _mm_add_ps( (v1), (v2) ) )
+#define VISUM(v1, v2, r) ( (r) = _mm_add_epi32( (v1), (v2) ) )
+#else
+#define VDSUM(v1, v2, r) ( (r) = (v1) + (v2) )
+#define VFSUM(v1, v2, r) ( (r) = (v1) + (v2) )
+#define VISUM(v1, v2, r) ( (r) = (v1) + (v2) )
+#endif
+\end{codeblock}
+\end{exampleblock}
+
+\begin{warningblock}[Production-ready headers]
+    The approach we have just discussed is intended for didactical purposes. For comprehensive, production-ready headers, consider for instance:
+    \begin{itemize}
+        \item \href{https://agner.org/optimize/#vectorclass}{Agner Fog's VectorClass Library (VCL)}
+        \item \href{https://google.github.io/highway/en/master/}{Google's Highway}
+    \end{itemize}
+\end{warningblock}
+
+\section{Loops auto-vectorization}
+
+Auto-vectorization refers to the compiler's ability to automatically convert suitable loops and code blocks into vector instructions, allowing data-level parallelism and boosting performance even without manual use of SIMD intrinsics. While this is a powerful tool, it is important to be aware that successful auto-vectorization is not always guaranteed. Various elements can limit or block this process, such as:
+
+\begin{itemize}
+    \item loop-carried data dependencies
+    \item complex control dependencies or conditional branches within the loop
+    \item unaligned or poorly aligned memory accesses
+    \item loop structures that do not match vectorization patterns
+    \item strided or irregular memory access patterns
+    \item calls to functions that cannot be inlined or vectorized
+    \item use of math functions that lack vectorizable implementations
+    \item data types unsupported by the target SIMD ISA
+    \item \dots
+\end{itemize}
+
+It's important to keep these obstacles in mind when writing code that we want to auto-vectorize.
+
+To ask the compiler to vectorize loops computations, we can use the following flags:
+
+\begin{center}
+\small
+\begin{tabular}{c|c|p{0.55\textwidth}}
+    \hline
+    \textbf{Compiler} & \textbf{Flag} & \textbf{Description} \\
+    \hline
+    \multirow{4}{*}{GCC} 
+        & \plaintt{\scriptsize -ftree-vectorize} & enables loops vectorization \\
+        & \plaintt{\scriptsize -funroll-loops} & enables the loop unrolling (may or may not issue faster code) \\
+        & \plaintt{\scriptsize -march=native} & specifies the current one as target architecture \\
+        & \plaintt{\scriptsize -mtune=native} & ask maximum code tuning for the host architecture \\
+    \hline
+    \multirow{2}{*}{clang} 
+        & \plaintt{\scriptsize -mllvm} & (uses LLVM's internal vectorization) \\
+        & \plaintt{\scriptsize -force-vector-width=4} & enforces vector width (e.g., 4) for SIMD instructions \\
+    \hline
+    \multirow{2}{*}{Intel} 
+        & \plaintt{\scriptsize -xHost} & enables maximum vectorization available on the target cpu \\
+        & \plaintt{\scriptsize -axFLAG1 -axFLAG2 ...} & enables code for multiple targets \\
+    \hline
+\end{tabular}
+\normalsize
+\end{center}
+
+\vspace{0.3em}
+
+If we want to ask the compiler to report on optimizations and vectorizations, we can use the following flags:
+
+\begin{center}
+\small
+\begin{tabular}{c|c|p{0.5\textwidth}}
+    \hline
+    \textbf{Compiler} & \textbf{Flag} & \textbf{Description} \\
+    \hline
+    \multirow{3}{*}{GCC}
+        & \plaintt{\scriptsize -fopt-info-vec-optimized} & reports on the successful vectorizations \\
+        & \plaintt{\scriptsize -fopt-info-vec-missed}    & reports on the reasons for unsuccessful vectorization \\
+        & \plaintt{\scriptsize -fopt-info-vec-all}       & reports all vectorization optimizations  \\
+    \hline
+    \multirow{3}{*}{clang}
+        & \plaintt{\scriptsize -Rpass=loop-vectorize}        & identifies loops that were successfully vectorized \\
+        & \plaintt{\scriptsize -Rpass-missed=loop-vectorize} & identifies loops that were NOT successfully vectorized \\
+        & \plaintt{\scriptsize -Rpass-analysis=loop-vectorize} & identifies statements that caused vectorization to fail (with \plaintt{-fsave-optimization-record}, detailed causes may be listed) \\
+    \hline
+    \multirow{2}{*}{Intel}
+        & \plaintt{\scriptsize -qopt-report=n} & enables diagnostic output; n=1: vectorized, n=2: non-vectorized+reasons, n=3: dependency info, n=4: only vectorization, n=5: dependency issues \\
+        & \plaintt{\scriptsize -qopt-report-file=\textit{name}} & writes the report to the specified file \\
+    \hline
+\end{tabular}
+\normalsize
+\end{center}
+
+\vspace{0.5em}
+
+In addition to enabling vectorization flags, we can provide the compiler with additional directives and hints to facilitate and optimize code vectorization:
+
+\vspace{-0.5em}
+
+\begin{center}
+\small
+\begin{tabular}{c|c|p{0.48\textwidth}}
+    \hline
+    \textbf{Compiler} & \textbf{Pragma} & \textbf{Description} \\
+    \hline
+    \multirow{2}{*}{GCC}
+        & \plaintt{\scriptsize \#pragma GCC ivdep} & Ignore potential loop-carried dependencies that are not formally proven \\
+        & \plaintt{\scriptsize \#pragma GCC unroll n} & Unroll the subsequent loop body \texttt{n} times \\
+    \hline
+    \multirow{5}{*}{clang}
+        & \plaintt{\scriptsize \#pragma clang ivdep} & Ignore potential loop-carried dependencies \\
+        & \plaintt{\scriptsize \#pragma clang vectorize(enable|disable)} & Enable/disable auto-vectorization of the loop \\
+        & \plaintt{\scriptsize \#pragma clang vectorize\_width(n)} & Specify the vector length (VL) \\
+        & \plaintt{\scriptsize \#pragma clang interleave(enable|disable)} & Enable/disable unrolling/interleaving of the loop \\
+        & \plaintt{\scriptsize \#pragma clang interleave\_count(n)} & Specify how many iterations are to be unrolled/interleaved \\
+    \hline
+    \multirow{4}{*}{Intel}
+        & \plaintt{\scriptsize \#pragma ivdep} & Ignore potential loop-carried dependencies \\
+        & \plaintt{\scriptsize \#pragma vector always} & Vectorize even if the estimated gain is low/negative \\
+        & \plaintt{\scriptsize \#pragma vector aligned} & Assume aligned data \\
+        & \plaintt{\scriptsize \#pragma vector unaligned} & Assume unaligned data \\
+    \hline
+\end{tabular}
+\normalsize
+\end{center}
+
+\begin{tipsblock}[Compiler's manual]
+    Check the compiler's manual for comprehensive and updated descriptions of available vectorization pragmas and options.
+\end{tipsblock}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%       Starting of the section to review  complete
+
+\begin{exampleblock}[Auto vectorizing a simple loop]
+Here we perform a simple reduction of an array, with datatype \plaintt{dtype} that is determined at compile time (\plaintt{int} or \plaintt{float}).
+\begin{codeblock}[language=C]
+    dtype sum_loop ( dtype *array, uint N ) 
+    {
+        dtype sum = 0;
+        for ( uint32_t i = 0; i < N; i++ ) {
+            sum += array[i];
+        }
+        return sum;
+    }
+\end{codeblock}
+Let's compile the code with GCC using different flags:
+\begin{itemize}
+    \item To get the generated assembler in intel syntax:
+    
+    \plaintt{-S -fverbose-asm -masm=intel}
+    \item To enable vectorization and optimization:
+    
+    \plaintt{-O3 -march=native -mtune=native -ftree-vectorize -funroll-loops}
+    \item To get a report on vectorization:
+    
+    \plaintt{-fopt-info-vec-optimized -fopt-info-vec-missed -fopt-info-loop}
+
+    \item To set the data type:
+    
+    \plaintt{-DTYPE=[INTEGER|FPDP]}
+\end{itemize}
+
+Now, inspecting the assembly code for the integer version:
+\begin{codeblock}[language={[x86masm]Assembler}, morekeywords={vpaddd}, basicstyle=\ttfamily\scriptsize]
+.L4:
+    vpaddd  ymm0, ymm0, YMMWORD PTR [rax]
+    add    rax, 32
+    cmp   rdx, rax 
+    jne   .L4
+\end{codeblock}
+which means take what is inside register \plaintt{rax} (the square brackets mean dereferencing), sum it with the value in \plaintt{ymm0} and store the result in \plaintt{ymm0} (all of 32 bytes, or 256 bits). Then increment \plaintt{rax} by 32 bytes (the size of the vector) and repeat until \plaintt{rax} reaches \plaintt{rdx} (the end of the array). This is a clear example of vectorization: we are summing 8 integers at once, instead of one by one.
+
+Vectorizing loops operating on integers works well, but for floating point numbers, we need to be careful.
+
+\begin{codeblock}[language={[x86masm]Assembler}, morekeywords={vaddss}, basicstyle=\ttfamily\scriptsize]
+.L4:
+    vaddss  xmm0, xmm0, DWORD PTR [rax]
+    add     rax, 32
+    vaddss  xmm0, xmm0, DWORD PTR -28[rax]
+    vaddss  xmm0, xmm0, DWORD PTR -24[rax]
+    vaddss  xmm0, xmm0, DWORD PTR -20[rax]
+    vaddss  xmm0, xmm0, DWORD PTR -16[rax]
+    vaddss  xmm0, xmm0, DWORD PTR -12[rax]
+    vaddss  xmm0, xmm0, DWORD PTR -8[rax]
+    vaddss  xmm0, xmm0, DWORD PTR -4[rax]
+    cmp     rax, rcx
+    jne     .L4
+\end{codeblock}
+
+Here, we are using the \plaintt{vaddss} instruction which is actually a scalar instruction, thus we are not actually vectorizing the loop. 
+\end{exampleblock}
+
+What we have just seen should convince you that integers can be easily vectorized by the compiler because there are no constraints on the reshuffling of the operations. Floating points, instead, don't have this advantage: even when some vectorization is possible, the critical paths that we insert through the semantics hinder the expression of data-level parallelism. To further test the result of the compilation, let's profile the codes using \plaintt{perf}:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+    \hline 
+    & \textbf{Int} & \textbf{Float} \\
+    \hline
+    \textbf{Not vectorized} & 0 int\_vec.add\_256 & \begin{tabular}[c]{@{}c@{}}
+        0 \quad vector \\
+        1,000,000 \quad scalar \\
+    \end{tabular} \\
+    \hline
+    \textbf{Vectorized} & 0 int\_vec.add\_256 & \begin{tabular}[c]{@{}c@{}}
+        250,000 \quad vector \\
+        1,000,000 \quad scalar \\
+    \end{tabular} \\
+    \hline
+\end{tabular}
+\end{table}
+
+Of the $250,000$ int\_vec.add\_256, 125k are vector operations to initialize the loop and 12k are vector addition in the summation loop. For the float, 125k are to convert vectors of int to floats and 125k are to mov regs in memory. The $1,000,000$ scalar are not vectorized at all. Hence, autovectorization works nicely for integers but not at all for the floats. This descends from the compiler not being entitled to reshuffle operations in the summation loop. For as we have written it, $s += a_i$, there is a clear critical path on $s$ that must be respected by the compiler. 
+
+\begin{observationblock}[Critical path]
+    From the basic course of HPC you should remember that when trying to optimize a loop, if we are accumulating on a single variable ($S$) it may lead to the execution of a lot of bit reshuffling and scalar add, in place of clean vector operations. 
+    To fix this, we can use partial accumulators:
+\begin{codeblock}[language=C]
+    for (int i=0; i < N; i+=VL) {
+        sum0 += array[i];
+        sum1 += array[i+1];
+        sum2 += array[i+2];
+        sum3 += array[i+3];
+        ...
+    }
+    sum = sum0 + sum1 + sum2 + sum3 + ...;
+\end{codeblock}
+    This exposes a natural vector pattern.
+\end{observationblock}
+
+Now we can rewrite the loop differently, using multiple accumulators to break the critical path:
+\begin{codeblock}[language=C]
+    dtype sum_loop ( dtype * restrict array, const uint N ) 
+    {
+        double sum0 = 0;
+        double sum1 = 0;
+        double sum2 = 0;
+        double sum3 = 0;
+        uint N4 = N\%0xFFFFFFFC;
+        for ( uint32_t i = 0; i < N4; i+=4 ) {
+            sum0 += array[i];
+            sum1 += array[i+1];
+            sum2 += array[i+2];
+            sum3 += array[i+3];
+        }
+        ... 
+        return sum;
+    }
+\end{codeblock}
+
+This way we obtain:
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+    \hline 
+    & \textbf{unroll vectorized} & \textbf{vectorized associative-math} \\
+    \hline
+    \textbf{metrics} & 
+    \begin{tabular}[c]{@{}c@{}}
+        500,000 \quad vector \\
+        0 \quad scalar \\
+    \end{tabular} & 
+    \begin{tabular}[c]{@{}c@{}}
+        500,000 \quad vector \\
+        0 \quad scalar \\
+    \end{tabular} \\
+    \hline
+\end{tabular}
+\end{table}
+
+Hence, re-engineering the code before using the auto-vectorization of the compiler can greatly enhance the achieved vectorization because we expose more parallelism while explicitly relaxing the order of the operations.
+
+\begin{exampleblock}[Another example]
+    Consider this loop:
+\begin{codeblock}[language=C]
+    for (int i = 0; i < N; i++) {
+        sum += A[i]*B[i] + C[i];
+    }
+\end{codeblock}
+    This case has a higher possible parallelism since the reduction comes after the multiply-and-add vector operation. This means that a vector of partial results 
+\begin{codeblock}[language=C]
+    D[i:i+n] = A[i:i+n]xB[i:i+n] + C[i:i+n];
+\end{codeblock}
+    can be preemptively prepared, waiting for the entries to be summed up serially. The compiler in fact opts for this implementation. 
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.7\textwidth]{assets/auto_vectorization_example2.png}
+        \caption{Auto-vectorization of a loop with multiply-and-add operation.}
+    \end{figure}
+    Lots of computation are performed via FMA on vector registers, 256b or 512b depending on what is available on the cpu. However, lots of reshuffling is needed and all the reduction summations are serial. 
+    Opting either for the usage of the \plaintt{associative math} flag or for explicit loop unrolling (using separate accumulators) results in a different, fully vectorizable pattern.
+\end{exampleblock}
+
+So, to express the whole inherent loop-data and instruction-level parallelism is of primary importance to either 
+\begin{itemize}
+    \item authorizing the compiler to \textbf{re-shuffle floating-point} operations or 
+    \item \textbf{unroll the loops} to expose more instruction-level and data-level parallelism.
+\end{itemize}
+
+\begin{tipsblock}
+    Professor tip is to manually refactor the code, so that you can test for the correctness of the results while achieving the same vectorization.
+\end{tipsblock}
+
+
+The ideal situation is to have \bfit{countable} loops.
+
+The iteration space must be known at run-time. The end of the loop can not depend on data. Following is an example of a non-countable loop:
+
+\begin{codeblock}[language=C]
+int i = 0;
+while (i < N) {
+    a[i] = b[i] * c[i];
+    if (a[i] > 0) {
+        break;
+    }
+    i++;
+}
+\end{codeblock}
+
+\begin{tipsblock}[Countable While Loops]
+    Note that a countable while loop is vectorizable as a for loop is.
+\end{tipsblock}
+
+Moreover, there should not be branches, since the SIMD instructions are meant to perform exactly the same operation on multiple data and so different iterations can not have different control flows (if statements are admitted if they can result in a mask-like implementation). For the same reason, we should avoid function calls (vectorizable functions are an exception).
+
+Sometimes it is essential to use specific compiler flags to enable or enhance vectorization of floating-point code, especially in the presence of math library calls or exception handling.
+
+\begin{itemize}
+    \item \textbf{\plaintt{-fno-math-errno}}: Tells the compiler to assume that math functions (like \plaintt{sqrtf}, \plaintt{logf}, etc.) do not set \texttt{errno}, and that your code will not check it. By disabling \texttt{errno} handling, the compiler is free to inline math functions or replace them with fast vector library calls, enabling vectorization even across calls to functions such as \texttt{libm}. This flag lifts a major legality blocker for SIMD.
+    \item \textbf{\plaintt{-fno-trapping-math}}: Informs the compiler that floating-point operations are not expected to raise traps (hardware FP exceptions) that your code will observe. This allows the compiler to speculate or execute floating-point operations in SIMD lanes that may not be used, enabling masked or predicated vectorization (e.g., by computing both sides of a branch and selecting the result).
+\end{itemize}
+
+By default, compilers like GCC have \plaintt{-fmath-errno} and \plaintt{-ftrapping-math} \textbf{enabled} (\plaintt{ON}).
+
+There are many situations where something could go wrong. The first case is when using \textbf{non-contiguous memory access}. It refers to loops that access data with a non-unit stride, or even worse with an irregular pattern. They are rarely vectorized, and that is because while consecutive data can be loaded in a single cache line, or in a register, with a single memory operation, sparse memory access need separate loads and data gathering; if the compiler estimates that this overhead is larger than the benefits, the loop is not vectorized. 
+Another case is when there are \textbf{data dependencies} between iterations of the loop. If the compiler detects that there is a dependency, it can not vectorize the loop because it can not reshuffle the operations without changing the semantics of the code. For this case, we can identify:
+\begin{itemize}
+    \item \textit{Read-After-Write (flow-dependency)} $\to$ A variable is written in an iteration and read on a subsequent one. This loop can NOT be vectorized without leading to wrong results.
+
+    However, let's consider the following 2D case: 
+
+    \begin{codeblock}
+for (int i = 0; i < N; i++) {
+    A[i][0] = C[i][0];
+    for (int j = 0; j < M; j++) {
+        A[i][j] = A[i][j-1] + C[i][j];
+    }
+}
+    \end{codeblock}
+
+    the dependency is carried in the inner loop, while the outer loop iterations do not exhibit any dependency and the \textbf{outer loop vectorization} can be performed.
+
+    \begin{figure}[H]
+        \centering
+        \begin{minipage}[c]{0.5\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{assets/data-dep.png}
+        \end{minipage}
+        \hfill
+        \begin{minipage}[c]{0.45\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{assets/data-dep-2.png}
+        \end{minipage}
+        \caption{RAW data dependency: 4 (or 8) outer iterations can be executed together because there are no vertical dependencies (outer loop vectorization)}
+        \label{fig:data_dep}
+    \end{figure}
+
+    Consider the dependency graph of the iteration space. It clearly shows that there are no vertical dependencies. Hence, the outer loop can be vectorized: 4 (or 8) outer iterations can be executed together because there are no vertical dependencies. However, if the elements are stored in memory in row-major order that require a lot of memory gather and scatter operations. If not supported in hw, they must be emulated, which is even more expensive. Thus, we may consider to write the data column-major if possible. 
+
+    \item \textit{Write-After-Read (anti-dependency)} $\to$ A variable is read in one iteration and written in a subsequent one. Unsafe for parallelism (no strict order among iterations assigned to tasks), normally safe for vectorization. Consider this example:
+    \begin{codeblock}[language=C]
+for (int i = 1; i < N; i++) {
+    a[i-1] = a[i] + c[i];
+}
+    \end{codeblock}
+    while the following cannot be vectorized because it's unclear if \plaintt{a[i]} may be overwritten before the summation to \plaintt{sum}:
+    \begin{codeblock}[language=C]
+for (int i = 0; i < N; i++) {
+    a[i-1] = a[i] + c[i];
+    sum += a[i];
+}
+    \end{codeblock}
+
+    \item \textit{Write-After-Write (output dependency)} $\to$ The same variable is written in more than one iteration. Generally unsafe both in parallelization and in vectorization.
+    \begin{codeblock}[language=C]
+double sum = 0;
+for (int i = 1; i < N; i++) {
+    a[i-1] = function1(i);
+    a[i] = function2(i);
+}
+    \end{codeblock}
+    \item \textit{Memory ambiguity} $\to$ Typically due to memory aliasing. It may be impossible for the compiler to decide whether, for some value of \plaintt{i, a[i], b[i]} and \plaintt{c[i]} will somehow overlap. If that is the case, it will not issue a vector code. When it is possible, the compiler will issue more than one version of the loop and a code that performs an overlap test among the pointers. Then the execution will be routed to the correct version at run-time. 
+    \begin{codeblock}[language=C]
+void function (int *a, int *b, int *c, int N) {
+    for (int i = 0; i < N; i++) {
+        c[i] = a[i] + b[i];
+    }
+}
+    \end{codeblock}
+    We can disambiguate using the \plaintt{restrict} qualifier, which tells the compiler that the pointers do not alias each other. This allows the compiler to vectorize the loop without generating multiple versions and runtime checks. Also the \plaintt{const} qualifier can help, as it tells the compiler that the data pointed to by the pointer will not be modified, which can also enable vectorization.
+
+\end{itemize}
+
+A variable is said to be \textbf{aligned} in memory when its first byte's address is a multiple of the variable's type size:
+\begin{itemize}
+    \item \plaintt{short int} $\to$ 2 bytes: 0, 2, 4, 6, 8, ... are aligned placements;
+    \item \plaintt{int / float} $\to$ 4 bytes: 0, 4, 8, 12, ... are aligned placements;
+    \item \plaintt{long long / double} $\to$ 8 bytes: 0, 8, 16, 24, ... are aligned placements.
+\end{itemize}
+Consequently, an aligned variable is also aligned w.r.t. the cache line it belongs to: it means that an aligned variable will never cross 2 cache lines! 
+However, let's imagine that we allocate a bunch of memory and we consider it as an array of elements with byte size $s_B$. Let's say that:
+\begin{itemize}
+    \item its starting byte is aligned at $a_B$ bytes ($a_B$ is a multiple of $s_B$);
+    \item we access this array by vectors of element-size $V_L$ (meaning that every vector has $V_L$ elements); hence we will access $V_L\times s_B$ bits every time.
+\end{itemize}
+Then if 
+\[
+(a_B + V_L \times s_B) \% C_L == 0 \quad (C_L\text{ being the cache capacity in terms of elements})
+\]
+all the vectors will stay in the same cache line and will require 1 load; otherwise, a vector will be mapped into two differnt cache lines and will require 2 loads. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ex1_unaligned_mem.png}
+    \caption{Example 1: an array of float aligned at 64 bits accessed as vector of size 4 (cache capacity is 16 with a std cache line of 64B) $a_B = 8B, V_L = 4, s_B = 4, C_L = 16$ every vector will occupy exactly 1 cache line.}
+    \label{fig:ex1_unaligned_mem}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/ex2_unaligned_mem.png}
+    \caption{Example 2: an array of float aligned at 16 bits accessed as vector of size 4 (cache capacity is 16 with a std cache line of 64B) $a_B = 8B, V_L = 4, s_B = 4, C_L = 16$ every vector will occupy exactly 2 cache lines.}
+    \label{fig:ex2_unaligned_mem}
+\end{figure}
+
+\begin{tipsblock}[Data structures]
+    \begin{itemize}
+        \item Keep together data that are used together in vector operations;
+        \item The smallest the data type you use, the larger the number of data that you can fit in the cache and in the vector registers;
+        \item Do not mix same-type different-size data:
+        \begin{codeblock}
+func ( float *A, float *B, double *C, int N ) {
+    for ( int i = 0; i < N; i++ ) {
+        A[i] = B[i] * C[i];
+    }
+}
+        \end{codeblock}
+        the type conversion renders things less efficient (\plaintt{long double} type is not supported on GPUs).
+    \end{itemize}
+\end{tipsblock}
+
+Very commonly the data are multi-dimensional and hence the most natural representation is by a structure that encapsulates all the quantities for a single data point. Every entry of the array that contains all the data points is then a structure:
+
+\begin{codeblock}
+data[i].pos[3], data[i].acc[3], data[i].mass, ...
+\end{codeblock}
+
+This is the \textbf{Array of Structures (AoS)} representation. and is a very convenient
+representation in many respects. However, when the structures collects many and diverse data, the SoA have several inconvenience too when computational performance is considered.
+
+Let's consider the following example that occupies 96 bytes:
+
+\begin{codeblock}
+    struct particle {
+        double pos[3];
+        double acc[3];
+        double mass;
+        ...
+    };
+\end{codeblock}
+
+As a first consideration, even a single particle could not fit in a cache line. Second, most probably pos[3] will be used, likely with mass, to get accel[3] and then vel[3] will be updated.
+
+Very likely every of these calculations may have a high degree of vectorization. However, there is no way in which those quantities can be loaded from memory to vector register efficiently without lots of overhead, either using gathering instructions or allocating additional memory and moving there only the variables used for every calculation.
+
+So, a very first step consist in opting for \textbf{Structures of Arrays of (small)Structures} (SoAoS):
+
+\begin{codeblock}
+struct Ppos       { double pos[3], double mass; };  Ppos *mpositions;
+struct Paccel     { double accel[3]; };             Paccel *accelerations;
+struct Pvel       { double vel[3]; };               Pvel *velocities;
+struct Pchemistry {float elements[n_el];};          Pelems *Pchemistry;
+                                                    long long int *PIds;
+\end{codeblock}
+
+Clearly, that alleviates the aforementioned issues but it is still sub-optimal. 
+
+If, instead, we opt for a \textbf{Structure of Arrays} (SoA) approach:
+
+\begin{codeblock}
+double *x, *y, *z, *mass, *xacc, *yacc, *zacc, ...
+long long *ids;
+\end{codeblock}
+
+the possible vectorization is definitely higher. Data rearranged in SoA approach definitely would expose more, and more efficient, vectorization opportunities.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/SoA.png}
+    \caption{AoS vs SoA}
+    \label{fig:aos_soa}
+\end{figure}
+
+\begin{warningblock}
+    What is really convenient in every specific case may depend on several additional factors and that, in the context of this lecture, hinders more than just mentioning and explaining the vectorization advantage of SoA.
+\end{warningblock}
+
+\section{Vector Types}
+
+It is possible to use a vector type (not present in standard C, but commonly accepted by compilers) to declare a vector of a given type.
+
+\begin{codeblock}[language=C]
+typedef type name __attribute__((vector_size,(bytes)));
+\end{codeblock}
+
+where:
+\begin{itemize}
+    \item \textbf{type}: the basic type for every element of the vector.
+    \item \textbf{name}: the name with which you will refer to the type in your code.
+    \item \textbf{bytes}: the number of bytes of the vector.
+\end{itemize}
+
+\begin{codeblock}[language=C]
+/* Declare a vector of 4 doubles */
+typedef double v4d __attribute__((vector_size,(4*sizeof(double))));
+/* Declare a vector of 8 doubles */
+typedef double v8d __attribute__((vector_size,(8*sizeof(double))));
+/* Declare a vector of 4 integers */
+typedef int v4i __attribute__((vector_size,(4*sizeof(int))));
+\end{codeblock}
+
+It is not possible to access the elements of a vector type directly, in the same way as you cannot access a single byte of a double. However, there is a standard way to do that:
+
+\begin{codeblock}[language=C]
+typedef union {
+    v4d v;
+    double d[VD_SIZE];
+} v4d_u;
+\end{codeblock}
+
+\subsection{Memory Alignment}
+
+It is mandatory that memory regions accessed by vector instructions are aligned (32B for AVX/AVX2 and 64B for AVX-512).
+
+Loops translated by the compiler consist of three sections:
+\begin{enumerate}
+    \item \textbf{Peeling loop} - scalar until aligned addresses are reached ($\to$ avoided by proper alignment);
+    \item \textbf{Main body} - well vectorized from aligned addresses;
+    \item \textbf{Remainder loop} - scalar operations if the number of elements is not a multiple of the VL ($\to$ maybe avoided by hinting the compiler like \plaintt{\_\_attribute\_\_((\_\_assume(N\%4==0))) } or by accounting for the main body and the remainder explicitly).
+\end{enumerate}
+
+To allocate memory in an aligned way, we can use C11 and POSIX functions:
+
+\begin{itemize}
+    \item \textbf{C11}:
+    \texttt{void *aligned\_alloc(size\_t alignment, size\_t size);}
+    \item \textbf{POSIX}:
+    \texttt{void *posix\_memalign(void **memptr, size\_t alignment, size\_t size);}
+\end{itemize}
+
+It is also possible to use a static allocation (i.e. variables or automatic arrays):
+
+\begin{codeblock}[language=C, numbers=none]
+__attribute__((aligned(base))) <var>;
+\end{codeblock}
+
+And it is also possible to assume that the memory is aligned:
+
+\begin{codeblock}[language=C, numbers=none]
+assume_aligned(<array>, base);
+\end{codeblock}
+
+\begin{observationblock}[Unrolling loops by hands]
+    When unrolling a loop by hands, which you typically do in order to expose more parallelism as we have discussed previously, you also need to separately handle the main loop and the remind loop.
+    \begin{codeblock}[language=C]
+for (int i = 0; i < N; i++) ... 
+    \end{codeblock}
+    becomes:
+    \begin{codeblock}[language=C]
+int N4 = (N/4)*4;   // --> integer division ensures that N4 is the 
+                    // largest multiple of 4 smaller than N 
+for (int i = 0; i < N4; i+=4) ... // main body 
+
+for (int i = N4; i < N; i++) ... // remainder loop 
+    \end{codeblock}
+    You can give some additional hint to the compiler so that to avoid the issuing of additional codes to check the peeling. The line 
+    \begin{codeblock}[language=C]
+int N4 = (N/4)*4;
+    \end{codeblock}
+    can be replaced by 
+    \begin{codeblock}[language=C]
+N4 = N&0xFFFFFFFC;  // --> use 0xFFFFFFF8 for 8
+                    // --> use 0xFFFFFFFFFFFFFFF<C|8> for 64 bits integers
+    \end{codeblock}
+    this will hint the compiler that N4 is a multiple of 4, without need of issuing additional code. Alternatively,
+    \begin{codeblock}[language=C]
+N4 __attribute((__assume(N4\%4==0)));
+    \end{codeblock}
+    may also work on some compilers.
+\end{observationblock}
+
+
+\begin{exampleblock}[Working with vectors]
+    Let's re-implement the following loop using the vector types and check what changes in the generated assembler code and in the run-time.
+
+    \begin{codeblock}[language=C, morekeywords=double, morekeywords=restrict]
+double kernel( double *restrict A, double *restrict B, double *restrict C, int N ) {
+    double sum = 0;
+    for ( int i = 0; i < N; i++ )
+        sum += A[i]*B[i] + C[i];
+    return sum;
+}
+\end{codeblock}
+
+At first we need to define the appropriate vector variables:
+
+\begin{codeblock}[language=C, firstnumber=7, morekeywords=v4df, morekeywords=v4df_u]
+#define VD_SIZE 4
+typedef double v4df __attribute__((vector_size(VD_SIZE*sizeof(double))));
+typedef union {
+    v4df v;
+    double d[VD_SIZE];
+} v4df_u;
+
+v4df *VA = (v4df *) A;
+v4df *VB = (v4df *) B;
+v4df *VC = (v4df *) C;
+
+v4df vsum = {0};
+\end{codeblock}
+
+Now we can actually implement the sum:
+
+\begin{codeblock}[language=C, firstnumber=19, morekeywords=v4df, morekeywords=v4df_u]
+int N4 = N&0xFFFFFFFC;
+
+for (int i = 0; i < N4; i++) {
+    vsum += VA[i] * VB[i] + VC[i];
+}
+
+v4df_u *vsum_u = (v4df_u *) &vsum;
+vsum_u->v[0] += vsum_u->v[1] + (vsum_u->v[2] + vsum_u->v[3]);
+
+for (int i = N4; i < N; i++) {
+    sum += A[i]*B[i] + C[i];
+}
+
+sum += vsum_u->v[0];
+
+return sum;
+\end{codeblock}
+\end{exampleblock}
+
+\newpage
+
+\subsection{Conditional evaluation}
+
+When our code contains conditional statements, we need to pay special attention if we want to use vector types. Vectorization is usually only possible if the condition is simple and the code inside the conditional is not too complex, for example a single operation or a small sequence of straightforward instructions.
+
+\begin{codeblock}[language=C]
+void kernel( double * restrict A, double * restrict B, const int N ) {
+    for ( int i = 0; i < N; i++ )
+        if ( A[i] < B[i] ) swap(A, B);
+    return;
+}
+\end{codeblock}
+
+Actually this code can be easily fully vectorized by the compiler itself with the appropriate compilation flags. The idea is to create a mask of the condition and then use it to select the appropriate values.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/conditional.png}
+    \caption{Conditional evaluation \cite{ADV_HPC}}
+    \label{fig:conditional}
+\end{figure}
+
+\begin{tipsblock}
+    The concept of vectorized conditional flow can really be thought as "projecting" througha mask so that the final values that are "impressed" in the memory positions pass through the "transparent" entries and are blocked by "opaque" ones. Many projected values could of course overlap by using multiple masks combined with bit-wise operators.   
+\end{tipsblock}
+
+To efficiently handle conditionals in vectorized code, we first implement the mask logic. The ternary operator is particularly well-suited for expressing such element-wise conditional assignments:
+
+\begin{codeblock}[language=C]
+void kernel( double *A, double *B, int N ) {
+    // element-wise swap of A and B so that
+    // A[i] > B[i] for every i
+
+    for ( int i = 0; i < N; i++ ) {
+        double min = (A[i]>B[i] ? B[i] : A[i]);
+        double max = (A[i]>=B[i] ? A[i] : B[i]);
+        A[i] = max;
+        B[i] = min; 
+    }
+    return;
+}
+\end{codeblock}
+
+Now we can vectorize the code using the vector types and the mask logic.
+
+\begin{codeblock}[language=C]
+dvector_t *vA = (dvector_t *)__builtin_assume_aligned(A, VALIGN);
+dvector_t *vB = (dvector_t *)__builtin_assume_aligned(B, VALIGN);
+
+int VN = (N/DVSIZE)&0xFFFFFFFC;
+IVDEP
+LOOP_VECTORIZE
+LOOP_UNROLL_N(4)
+for ( int i = 0; i < VN; i++ ) {
+    dvector_t a = vA[i];
+    dvector_t b = vB[i];
+    llvector_t keep = (vA[i]>=vB[i]);
+    vA[i] = (dvector_t)(((llvector_t)a & keep) | 
+            ((llvector_t)b & ~keep));
+    vB[i] = (dvector_t)(((llvector_t)b & keep) | 
+            ((llvector_t)a & ~keep));
+}
+
+int j = VN*DVSIZE;
+process ( &A[j], &B[j], N-j+1);
+\end{codeblock}
+
+\todo{Add second version and possibly comment}
+
+\section{Vectorization by OpenMP SIMD directive}
+
+The OpenMP compiler may transform a loop that is marked with the simd construct into a SIMD loop. As a result, multiple iterations of the loop may be executed concurrently by a single thread. A SIMD loop of length $n$ consists of the logical iterations $0,1,\dots,n-1$. The numbering denotes the sequential order in which loop iterations are executed. 
+
+A SIMD \textit{chunk} refers to the set of iterations that are executed concurrently by a SIMD instruction in a single thread. Within a chunk, each iteration is executed by a SIMD \textit{lane}, which refers to the mechanism that a SIMD instruction uses to process one data element. The number of iterations in a SIMD chunk is the vector length. 
+
+The OpenMP specification describes the execution model of the simd construct as follows: "When an OpenMP thread encounters a \plaintt{simd} construct, the iterations of the loop asociated with the construct may be executed concurrently using the SIMD lanes that are available to the thread." Intentionally, this allows for much freedom in the implementation. 
+
+\begin{codeblock}[language=C]
+#pragma omp simd [clause [[,] clause] ...]
+\end{codeblock}
+
+The clauses are:
+
+\begin{itemize}
+    \item \texttt{private(list)} and \texttt{lastprivate(list)}: they have exatly the same meaning as in “thread-related” OpenMP.
+    The execution instances in this context are the SIMD lanes; hence, an instance of every private variables is created per SIMD lane.
+    \begin{codeblock}[language=C]
+int i;
+double tmp, sum=0;
+
+#pragma omp simd private(tmp) reduction(+:sum)
+for (int i = 0; i < N; i++) {
+    tmp = function(b[i]);
+    array[i] = tmp;
+    sum += tmp;
+}
+
+// NOTE: i is lastprivate 
+    \end{codeblock}
+    \item \texttt{reduction(identifier: list)} and \texttt{collapse(n)}: they also retain their usual meaning and usage.
+    \begin{codeblock}[language=C]
+int i; 
+double sum=0;
+
+#pragma omp simd reduction(+:sum)
+for (int i = 0; i < N; i++) {
+    for (int j = 0; j < M; j++) {
+        tmp = function(a[i], b[j]);
+        array[i] = tmp;
+        sum += tmp;
+    }
+}
+    \end{codeblock}
+    \item \texttt{simdlen(length)}: It has the goal of suggesting the element-size of the vector lane to be adopted, i.e., the count of elements in the vector. 
+    \begin{codeblock}[language=C]
+int i; 
+double tmp;
+
+#pragma omp simd simdlen(32/sizeof(double))
+for (int i = 0; i < N; i++) {
+    tmp = function(b[i]);
+    array[i] = tmp;
+}
+
+// NOTE: i is lastprivate 
+    \end{codeblock}
+    \item \texttt{safelen(length)}: It is used to specify at the compiler the maximum length not having dependences inside the loop. In the following example, we instruct the compiler that 8 is a safe length for vectorization;
+    \begin{codeblock}[language=C]
+#pragma omp simd safelen(8)
+for (int i = 0; i < N; i++) {
+    a[i] = pow(b[i-k], 3.14); // here the compiler does not know a priori 
+}
+\end{codeblock}
+    \item \texttt{linear(list[: linear-step])};
+    \item \texttt{aligned(list[ : alignment ])};
+\end{itemize}
+
+\subsection{The omp SIMD functions}
+
+In general, every non-linear element in the execution flow is at high risk a disruption in the vectorization. Function call above all, but also, for instance, conditionals.
+
+OpenMP SIMD offers the possibility of automatically build vector version of code segments through the \texttt{declare simd} directive. These functions can then be called from a simd loop. 
+\begin{codeblock}[language=C]
+#pragma omp declare simd 
+double foo (double x, double y, double z) {
+    double res = x*y + z;
+    return res;
+}
+
+void loop (double *a, double *b, double *c, int N){
+    #pragma omp simd 
+    for (int i = 0; i < N; i+=4) {
+        a[i] = foo(a[i], b[i], c[i]);
+    }
+}
+\end{codeblock}
+
+The \texttt{declare simd} directive instructs the compiler to generate at least one additional simd version of the function \texttt{foo} because it will be called from a simd loop. That variant will be called from inside the simd loop in the function \texttt{loop}. 
+
+However, when declaring \texttt{foo}, can we give the compiler more details about how $x,y$ and $z$ are changing? In this form, the best assumption is that they must be incremented by 1 in the simd version.
+
+The possible clauses are:
+
+\begin{itemize}
+    \item \texttt{uniform}: when listed as uniform, a parameter is intended to be invariant for all the concurrent calls to the function, i.e. all the simd lanes will observe the same value
+    \item \texttt{linear}: at odds, being linear means that a parameter changes linearly with the indicated step
+    \item \texttt{simdlen}: retains the same meaning as in the simd directive
+    \item \texttt{aligned}: as exactly the meaning than in normal code
+    \item \texttt{inbranch}: informs the compiler that the function will be called from in a conditional branch.
+    \item \texttt{notinbranch}: informs the compiler that the function will not be called from in a conditional branch.
+\end{itemize}
+
+\todo{add examples}
+
+\subsection{The omp SIMD conditionals}
+
+OpenMP simd offers two additional clauses that work as assertions: \texttt{inbranch} and \texttt{notinbranch}. The former informs the compiler that the function will be called from within a conditional branch, whereas the last guarantees the compiler that this will not happen. 
+The compiler can then opt for very different optimizations and how to manage the vectorization.
+
+\begin{codeblock}[language=C]
+#pragma omp declare simd inbranch
+float do_mult(float x) {
+    return (-2.0*x);
+}
+
+#pragma omp declare simd notinbranch 
+extern float do_pow(float);
+
+void simd_loop_with_branch(float *a, float *b, int n) {
+    #pragma omp simd 
+    for (int i = 0; i < n; i++) {
+        if (a[i] < 0.0) {
+            b[i] = do_mult(a[i]);
+        }
+        b[i] = do_pow(b[i]);
+    } // end simd region 
+}
+\end{codeblock}
+
+Finally, multiple simd versions of the same function can be generated with multiple declarations:
+\begin{itemize}
+    \item \texttt{\#pragma omp declare simd linear(pixel) uniform(mask) inbranch};
+    \item \texttt{\#pragma omp declare simd linear(pixel) notinbranch};
+    \item \texttt{\#pragma omp declare simd};
+    \item \texttt{extern void compute\_pixel(char *pixel, char mask)};
+\end{itemize}

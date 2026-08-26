@@ -1,0 +1,1007 @@
+\chapter{OpenMP}
+
+
+
+\section{Tasks}
+
+A \textbf{task} in OpenMP is an independent unit of work, comprising a well-defined set of instructions that can be executed asynchronously, enabling the decomposition of complex computations into smaller pieces that can be scheduled and executed in parallel by different threads. This \textbf{task abstraction} allows for flexible parallelism, supporting dynamic workloads with unpredictable execution flows.
+
+\textbf{Data Abstraction} refers to the encapsulation of logically uniform pieces of information (arrays, structures, ...) that may be accessed concurrently by multiple threads. Proper management of data abstraction is essential to avoid race conditions and ensure consistency, especially when multiple tasks access shared data out-of-order. Mechanisms such as data dependencies, synchronization constructs, and memory models are employed to manage safe and efficient concurrent access.
+
+Tasks often interact through shared data, giving rise to dependencies. They form a \textbf{task dependency graph}, where nodes represent tasks and directed edges represent data dependencies (i.e., a task must wait for another due to shared data). It is crucial that this graph is \bfit{acyclic}, ensuring there are no circular wait conditions or deadlocks.
+It is sometimes possible to parallelize a workflow that is irregular or depends on runtime conditions using \bfit{sections}. However, these solutions often become difficult to manage, and the intrinsic rigidity of the sections construct makes it difficult to express dynamic patterns of parallelism.
+
+Since version 3.0, OpenMP introduced the \textbf{task} construct, which provides a flexible way to handle irregular execution flow and dynamic task creation. When defining a task, OpenMP internally creates a "unit of work", bundling together all necessary code, data, and local variables. This work is then scheduled for execution at some future point. 
+Behind the scenes, OpenMP employs a queuing system to orchestrate the assignment of these tasks to the available threads, balancing the workload and enabling dynamic parallelism.
+A main thread generates tasks and a pool of threads executes them. As soon as they are free, the threads pick up one queued task each and execute it. When the main thread finishes creating tasks, it picks up a queued task and executes it as well.
+
+\begin{observationblock}[Tasks vs Threads]
+Creating tasks does not mean creating threads. The tasks are “units of work” that are assigned to the running threads. The pool of threads is unaltered (unless nested parallelism is involved) and mapped onto the underlying physical cores.
+\end{observationblock}
+
+Task management in OpenMP revolves around three key concepts to take into account for writing correct and efficient parallel code with OpenMP tasks:
+\begin{itemize}[noitemsep]
+    \item \textbf{Data environment}: how data is assigned to each task, distinguishing shared and private variables.
+    \item \textbf{Creation and execution}: when and how many tasks are generated, who executes them, and whether prioritization applies.
+    \item \textbf{Synchronization and dependence}: how tasks are coordinated, scheduled, and whether they depend on other tasks' completion.
+\end{itemize}
+\subsection{Creating tasks}
+
+Let's start with a simple example, where we have a single region with a single thread that creates two tasks and then waits for all the other threads to finish. Once the tasks are created, they become available to be executed by the other available threads.
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+#pragma omp parallel
+{
+    #pragma omp single // a single thread creates the tasks
+    {
+        printf( "Yuk yuk, here is thread %d from "
+            "within the single region\n", omp_get_thread_num() );
+        #pragma omp task
+        {
+            printf( "\tHi, here is thread %d "
+                "running task A\n", omp_get_thread_num() );
+        }
+        #pragma omp task
+        {
+            printf( "\tHi, here is thread %d "
+                "running task B\n", omp_get_thread_num() );
+        }
+    } // all the other threads waits here
+    printf(" :Here is thread %d after the single region, I was"
+        "waiting for all the others\n", omp_get_thread_num());
+}	// end of the parallel regions	\
+\end{codeblock}
+
+Running this multiple times shows that a random thread enters the single region while others wait at the barrier. Some waiting threads will pick up the generated tasks. Once all tasks are completed, every thread proceeds.
+
+\begin{codeblock}[language = {}, numbers=none, basicstyle=\ttfamily\scriptsize]
+ Yuk yuk, here is thread 5 from within the single region
+	Hi, here is thread 2 running task A
+	Hi, here is thread 1 running task B
+ :Hi, here is thread 5 after the single region, I was waiting for all the others
+ :Hi, here is thread 1 after the single region, I was waiting for all the others
+ :Hi, here is thread 0 after the single region, I was waiting for all the others
+ :Hi, here is thread 6 after the single region, I was waiting for all the others
+ :Hi, here is thread 4 after the single region, I was waiting for all the others
+ :Hi, here is thread 3 after the single region, I was waiting for all the others
+ :Hi, here is thread 7 after the single region, I was waiting for all the others
+ :Hi, here is thread 2 after the single region, I was waiting for all the others
+\end{codeblock}
+
+\subsubsection{Nowait}
+
+If we add a \texttt{nowait} clause to the single directive, we will get that the greeting message from all the other threads will almost certainly arrive before the greetings from the tasks execution.
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+#pragma omp parallel
+{
+    #pragma omp single nowait
+    {
+    ...
+\end{codeblock}
+
+In fact, the \texttt{nowait} lets the threads skip the single region entirely, and execute what is next, until the first scheduling point; which now is the very end of the parallel region.
+
+\subsubsection{Taskwait}
+
+Adding a \texttt{taskwait} directive at the end of the single region introduces an explicit synchronization point: the thread executing the single region will suspend at that point until all tasks it directly created have completed. Only then proceeds to subsequent statements within the single block.
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+#pragma omp parallel
+{
+    #pragma omp single nowait
+    {
+        #pragma omp task
+        { /* Tasks A, B, ... */ }
+
+        #pragma omp taskwait  // wait for A and B to complete
+        printf("All tasks have been executed\n");
+    }
+    printf(" :Here is thread %d after the single region\n",
+        omp_get_thread_num());
+}
+\end{codeblock}
+
+The print following \texttt{taskwait} executes only after all tasks have finished. Meanwhile, the \texttt{nowait} clause allows other threads to proceed and print their messages independently of task completion.
+
+\begin{codeblock}[language = {}, numbers=none, basicstyle=\ttfamily\scriptsize]
+ :Here is thread 3 after the single region
+ :Here is thread 4 after the single region
+ :Here is thread 2 after the single region
+ :Here is thread 6 after the single region
+ :Here is thread 7 after the single region
+ :Here is thread 0 after the single region
+ :Here is thread 1 after the single region
+	Hi, here is thread 7 running task A
+	Hi, here is thread 4 running task B
+ All tasks have been executed
+ :Here is thread 5 after the single region
+\end{codeblock}
+
+\begin{warningblock}[Shallow synchronization]
+The \plaintt{taskwait} directive waits only for tasks directly created within the enclosing task region. If Task A itself creates Task A1, the \plaintt{taskwait} will return as soon as A completes, even if A1 is still running. For deep synchronization that includes all descendants, use \plaintt{taskgroup}.
+\end{warningblock}
+
+\subsubsection{Task scheduling points}
+
+A \textbf{task scheduling point} is when the runtime may suspend the current task and switch to another; the choice among available tasks is implementation-defined. Scheduling points occur during and after explicit task generation, after task completion, within \texttt{taskyield} regions, and inside synchronization constructs:
+
+\begin{itemize}
+    \item \textbf{barrier} (implicit or explicit): All tasks created by any thread in the current \texttt{parallel} region are guaranteed to be complete when the barrier exits. Implicit barriers occur at the end of \texttt{parallel}, \texttt{for}, \texttt{sections}, and \texttt{single} (without \texttt{nowait}).
+
+    \item \textbf{taskwait}: The encountering task suspends until all its \textit{direct child} tasks have completed; it does \textit{not} wait for descendants.
+
+    \item \textbf{taskgroup}: All tasks generated within the region, \textit{including their descendants}, are guaranteed to complete before the region exits.
+\end{itemize}
+
+\subsection{Scope of variables}
+
+A key consideration when working with tasks is that a task may be executed at an arbitrary time after its creation, potentially by a different thread. The data environment of the task (which variables it can access and how) must therefore be determined at the moment of task creation, not execution.
+
+\subsubsection{Data-sharing clauses}
+
+\begin{itemize}
+    \item \texttt{shared()}: All accesses inside the task refer to the \textit{same} storage as the original variable in the enclosing context. No copy is made; changes are visible to other tasks/threads.
+    
+    \item \texttt{private()}: Each task gets its own \textit{uninitialized} copy of the variable. The original is unaffected.
+    
+    \item \texttt{firstprivate()}: Each task gets its own private copy, \textit{initialized} with the value the variable had at task creation time. This is the safest choice for local variables whose value the task needs.
+\end{itemize}
+
+\begin{warningblock}[Common pitfall]
+If a task uses a \plaintt{shared} reference to a local variable, and it goes out of scope before the task executes, the behavior is undefined. Use \plaintt{firstprivate} to capture the value safely.
+\end{warningblock}
+
+\subsubsection{Implicit data-sharing rules for tasks}
+
+The rule-of-thumb is: \textit{data, unless otherwise stated, are copied into local copies to preserve the data context at the moment of task creation}. The effect is the same as \texttt{firstprivate}.
+
+\begin{itemize}[noitemsep]
+    \item If a variable is \textbf{shared} in all enclosing constructs up to and including the innermost enclosing \texttt{parallel} region, then it is \textbf{shared} in the task.
+    \item Otherwise, the variable is implicitly \textbf{firstprivate}.
+    \item Variables with automatic storage declared inside the task region are \textbf{private}.
+    \item Global and static variables are \textbf{shared} (predetermined).
+    \item Dynamically allocated memory (heap) is \textbf{shared}.
+\end{itemize}
+
+Tasks need to capture the values of local variables at creation time (since may go out of scope or change before the task runs), while truly shared data should remain accessible to all tasks.
+
+\begin{codeblock}[language=C]
+double pi = 3.1415;
+double a = 0.0;
+
+#pragma omp parallel
+{
+    // pi, a : shared
+    #pragma omp single private (a)
+    {
+        int i = 1;
+        // a : private but not initialized
+        // i : private because it's a local variable
+        #pragma omp task
+        {
+            int j = 0;
+            // i, a : firstprivate by default (value is undefined)
+            // j : is a task's private variable
+            // pi : shared
+        }
+    }
+}
+    
+\end{codeblock}
+
+\subsubsection{Tied and untied tasks}
+
+By default, tasks are \textbf{tied}: once a thread begins executing a tied task, only that same thread can resume it if the task is suspended. This simplifies reasoning about thread-local state.
+
+With the \texttt{untied} clause, a suspended task may be resumed by \textit{any} available thread in the team:
+
+\begin{codeblock}[language=C]
+#pragma omp task untied
+{ // This task can migrate between threads }
+\end{codeblock}
+
+Untied tasks offer more flexibility and can improve load balancing, but with some caveats:
+\begin{itemize}[noitemsep]
+    \item \texttt{threadprivate} variables must not be used (the executing thread may change).
+    \item The value of \texttt{omp\_get\_thread\_num()} may change after a scheduling point within the task.
+    \item Thread-local resources (e.g., thread-specific allocators) need to be handled carefully.
+\end{itemize}
+
+\subsection{Tasks synchronization}
+
+A fundamental consideration in asynchronous task execution is determining \textit{when} tasks actually run and how to properly coordinate them. Upon creation, a task may either be \textbf{deferred} (scheduled for later execution while the generating task region is suspended) or executed immediately. This flexibility introduces synchronization challenges: not all techniques that work well for thread-based parallelism apply directly to task-based execution.
+
+In particular, \textbf{mutual exclusion} mechanisms (critical sections, atomic operations, locks) remain valid for tasks, since they protect shared data regardless of which thread or task accesses it. However, \textbf{event synchronization} constructs (barriers, busy-wait loops, boolean flags) are problematic: because tasks may be deferred or migrated, waiting for an event that depends on another task's progress can easily lead to deadlock if the waiting thread is the one that would otherwise execute the awaited task.
+
+\subsubsection{Synchronization constructs}
+
+We have already seen that constructs such as \texttt{taskwait}, \texttt{taskgroup} and \texttt{barrier} can be used to synchronize tasks.
+
+\begin{itemize}
+    \item \texttt{barrier}: A barrier synchronizes all threads in the current team. All threads must reach the barrier before any can proceed. Note that barriers apply to threads, not tasks: using a barrier inside a task can lead to deadlock if not all threads reach it.
+    
+    \item \texttt{nowait}: This clause removes the implicit barrier at the end of worksharing constructs (such as \texttt{single}, \texttt{for}, \texttt{sections}). When applied to a \texttt{single} construct that generates tasks, other threads skip the single region and continue execution. Note that \texttt{nowait} does \textit{not} wait for child tasks to complete; it only removes the implicit barrier for the worksharing construct itself.
+    
+    \item \texttt{taskwait}: This directive causes the encountering task to wait until all its \textit{direct} child tasks have completed. It binds to the current task region, and the set of binding threads is the current team. When a thread encounters a \texttt{taskwait} construct, the current task region is suspended until all child tasks generated before the \texttt{taskwait} complete execution. Note that \texttt{taskwait} does \textit{not} wait for descendants of child tasks (i.e., grandchildren).
+    
+    \item \texttt{taskgroup}: This construct provides more sophisticated synchronization by waiting for all \textit{descendant} tasks (children, grandchildren, etc.) created within the taskgroup region to complete. This is useful for complex workflows with nested task generation.
+\end{itemize}
+
+\subsubsection{Task reductions}
+
+Reductions on a \texttt{parallel} or \texttt{for} construct combine private partial results when the worksharing region ends. Tasks complicate this picture: tasks may be deferred, picked up by any thread in the team, and they do not participate in the enclosing \texttt{reduction(...)} clause. A naive ``parallel reduction'' on a variable updated from inside tasks therefore loses the contribution of every task.
+
+A first attempt is to fall back to an \texttt{atomic update} on a shared accumulator:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double result = 0;
+#pragma omp parallel reduction(+:result)
+{
+    #pragma omp single nowait
+    while (more_work()) {
+        #pragma omp task firstprivate(first, last) shared(result) untied
+        {
+            double myresult = 0;
+            for (int ii = first; ii < last; ii++)
+                myresult += heavy_work(array[ii]);
+            #pragma omp atomic update
+            result += myresult;
+        }
+    }
+}
+\end{codeblock}
+
+This is correct, but every task contends on the same memory location at the end of its work, and the enclosing \texttt{reduction(+:result)} is misleading because the actual combination happens inside the tasks, not at the end of the parallel region.
+
+OpenMP 5.0 introduced a dedicated mechanism: a \texttt{taskgroup} can declare a \texttt{task\_reduction(op:var)}, and individual tasks join the reduction with the \texttt{in\_reduction(op:var)} clause. Each participating task receives a private copy of \texttt{var}; partial values are combined when the taskgroup ends.
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double result = 0;
+#pragma omp parallel
+{
+    #pragma omp single nowait
+    {
+        #pragma omp taskgroup task_reduction(+:result)
+        {
+            while (more_work()) {
+                #pragma omp task in_reduction(+:result) \
+                    firstprivate(first, last) untied
+                {
+                    double myresult = 0;
+                    for (int ii = first; ii < last; ii++)
+                        myresult += heavy_work(array[ii]);
+                    result += myresult;   // local private copy
+                }
+            }
+        } // results combined here
+    }
+}
+\end{codeblock}
+
+Inside the task, \texttt{result} refers to a thread-private copy associated with the reduction; no atomic update is needed. The OpenMP runtime can also combine partial results in a tree, so even with many participating tasks the final reduction does not serialize on a single cache line.
+
+\begin{tipsblock}[\plaintt{atomic update} vs \plaintt{task\_reduction}]
+Use \plaintt{task\_reduction}/\plaintt{in\_reduction} whenever many tasks contribute to the same accumulator: it removes contention on the shared variable and expresses the intent at the construct level. Reserve \plaintt{atomic update} for cases where only a few tasks update a shared counter, or where the accumulator is structurally not a reduction (e.g. a histogram bin chosen at runtime).
+\end{tipsblock}
+
+\subsection{Memory consistency model}
+
+\subsubsection{Sequential Consistency}
+
+Consider the following scenario: we have two shared variables, $A = 0$ and $B = 0$, and two threads:
+
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \textbf{Thread a}
+    \begin{codeblock}[language = C, numbers=none]
+    [a1] A = 1;
+    [a2] print(B);
+    \end{codeblock}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \centering
+    \textbf{Thread b}
+    \begin{codeblock}[language = C, numbers=none]
+    [b1] B = 1;
+    [b2] print(A);
+    \end{codeblock}
+\end{minipage}
+
+One may ask: what values can be printed for $A$ and $B$ by the respective threads? To answer this, let's introduce \textbf{Sequential Consistency}, a memory model defined by Leslie Lamport in 1979.
+
+Sequential consistency means that the results of execution are the same as if all operations from all threads were executed in some sequential order, and each thread's operations appear in this sequence in the order written in the code.
+Put simply, every individual thread issues memory operations in program order, and all such operations appear as though they are executed one at a time in a global sequence.
+
+In our example, under sequential consistency, the possible outputs printed by each thread for $A$ and $B$ are restricted by the orderings of the two stores and loads. For instance, it won't be possible for both threads to print 0, since that would imply that both the write to $A$ and the write to $B$ happened after both reads, which contradicts a single global ordering. Instead, possible outputs include (A=0, B=1), (A=1, B=0), or (A=1, B=1), depending on how the stores and loads are interleaved. Sequential consistency guarantees that the memory operations will be observed in an order that makes intuitive sense, as if there were some global sequence in which all operations happened.
+
+\subsubsection{Relaxed Consistency}
+
+Let's consider now the following scenario:
+
+\begin{minipage}{0.32\textwidth}
+    \centering
+    \textbf{Thread a}
+    \begin{codeblock}[language = C, numbers=none]
+    [a1] A = 1
+    \end{codeblock}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.32\textwidth}
+    \centering
+    \textbf{Thread b}
+    \begin{codeblock}[language = C, numbers=none]
+    [b1] A = 2
+    \end{codeblock}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.32\textwidth}
+    \centering
+    \textbf{Thread c}
+    \begin{codeblock}[language = C, numbers=none]
+    [c1] print A
+    \end{codeblock}
+\end{minipage}%
+
+Even in the presence of local memory, which is permitted by OpenMP's memory model, the cache coherency protocol guarantees that writes to the same memory location are observed by all threads in the same order, regardless of what that order is.
+Under sequential consistency, either [a1] or [b1] must appear first in the global memory order, and all threads will observe that same ordering. 
+
+The drawback of sequential consistency is performance: it effectively serializes memory operations, preventing many hardware optimizations. For this reason, modern systems implement \textbf{relaxed memory models} that are better suited to out-of-order CPUs with deep cache hierarchies.
+
+Under a relaxed memory model, threads may buffer writes to local storage (such as cache memory) before propagating them to main memory. Consider again our first example with threads $a$ and $b$: thread $a$ writes to $A$ and reads $B$, while thread $b$ writes to $B$ and reads $A$. The key insight is that there is no ordering constraint between thread $a$'s write to $A$ and thread $b$'s read of $A$, nor between thread $b$'s write to $B$ and thread $a$'s read of $B$.
+
+This means both threads could buffer their writes locally and issue their reads before those writes become visible to other threads. Without explicit synchronization, each thread reads from main memory (or its private cache), where both $A$ and $B$ are still 0. The result: both threads print 0, an outcome that sequential consistency would forbid.
+
+\subsubsection{OpenMP memory model}
+
+To understand how OpenMP handles these complexities, its memory model is defined in terms of two key concepts:
+\begin{itemize}
+    \item \textbf{Coherence}: the prescribed behavior of the memory system when multiple accesses to the same memory location are performed by different threads.
+    \item \textbf{Consistency}: the order in which memory accesses by different threads become visible to one another.
+\end{itemize}
+These concepts work together to specify when and how memory updates propagate between threads.
+
+The OpenMP memory model is a relaxed-consistency, shared-memory model. All threads share access to a common memory space where variables can be stored and retrieved. However, each thread is also permitted to maintain its own \textbf{temporary view} of memory, which may reside in registers, cache, or other local storage. This temporary view allows threads to avoid accessing main memory on every variable reference, improving performance. Importantly, a thread's temporary view can become inconsistent with main memory or with other threads' views until an explicit synchronization occurs, typically via \texttt{flush}, barriers, or other synchronization constructs that force the views to reconcile. In addition to shared memory, each thread has access to \textbf{threadprivate memory}, a private storage area that cannot be accessed by other threads.
+
+In practice, the relaxed memory model introduces several layers of reordering between what the programmer writes and what actually happens in memory:
+
+\begin{minipage}{0.52\textwidth}
+    \medskip
+\begin{enumerate}[leftmargin=*]
+    \item \textbf{Compiler reordering}: 
+    
+    The compiler may rearrange the source code's operations into any semantically equivalent order that it deems more efficient.
+    \medskip
+    
+    \item \textbf{Hardware reordering}: 
+    
+    The processor may further reorder instructions at runtime, so the actual memory commit order can differ from the compiled code order.
+    \medskip
+    
+    \item \textbf{Temporary views}: 
+    
+    Each thread's temporary view of memory may diverge from main memory (and from other threads' views) until synchronization occurs.
+    \medskip
+
+\end{enumerate}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.46\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/openmp_mm.png}
+\end{minipage}
+
+The consistency model specifies which orderings between reads (R), writes (W), and synchronizations (S) are guaranteed. OpenMP enforces that all S operations (barriers, flushes, locks, etc.) appear in the same order across threads, giving a sequentially consistent view for synchronization events. Within each thread, the following orderings are preserved: $R \rightarrow R$, $W \rightarrow W$, $R \rightarrow W$, $S \rightarrow R$, $S \rightarrow W$, $R \rightarrow S$, $W \rightarrow S$, and $S \rightarrow S$. Notably, $W \rightarrow R$ is \emph{not} guaranteed, meaning a read may be reordered before a preceding write, so only synchronization points prevent stale data from being observed.
+
+Recall that under sequential consistency, all memory operations appear to execute in some global order that respects each thread's program order, and all threads observe the same ordering. In this case, the program order, code order, and commit order are effectively equivalent. Relaxed consistency lifts some of these constraints: threads may observe memory updates in different orders, and only synchronization points enforce a consistent view across threads to ensure safe, predictable parallel execution.
+
+\subsection{NUMA, affinity and the first-touch policy}
+
+The relaxed consistency model tells us \textit{when} a memory update becomes visible; on a multi-socket machine we also have to worry about \textit{where} a memory page physically lives. Modern HPC nodes are \textbf{NUMA} (Non-Uniform Memory Access) systems: each socket has its own memory controller, and a thread accessing a page on a remote socket pays a latency and bandwidth penalty compared to a local access. Thread placement and data placement therefore become first-class performance concerns alongside synchronization.
+
+\subsubsection{The first-touch rule}
+
+Linux (and most modern operating systems) allocates virtual address space lazily: \texttt{malloc} only reserves the range, while a physical page is actually mapped on the first write. The kernel then places the page on the NUMA node of the thread that performed that first write. This is the \textbf{first-touch policy}, and it has a sharp consequence for OpenMP: the thread that initialises the data effectively decides which socket owns it for the rest of the program.
+
+\subsubsection{Touch by one --- the wrong default}
+
+The simplest pattern (initialise serially, then process in parallel) places \emph{all} of the data on the master thread's NUMA node:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double *array = malloc(N * sizeof(double));
+
+// Serial init: master thread first-touches every page
+for (int ii = 0; ii < N; ii++)
+    array[ii] = (double)ii;
+
+#pragma omp parallel for reduction(+:S)
+for (int ii = 0; ii < N; ii++)
+    S += array[ii];
+\end{codeblock}
+
+Every worker thread that does not live on the master's socket has to fetch the data over the inter-socket link. The reduction loop is now bandwidth-bound on a single memory controller, no matter how many cores participate.
+
+\subsubsection{Touch by all --- first-touch via parallel init}
+
+The fix is to initialise the array in a \texttt{parallel for} with the same schedule that will be used to process it. Each thread first-touches the slice it will later read:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double *array = malloc(N * sizeof(double));
+
+#pragma omp parallel for schedule(static)
+for (int ii = 0; ii < N; ii++)
+    array[ii] = (double)ii;
+
+#pragma omp parallel reduction(+:S)
+{
+    #pragma omp for schedule(static) reduction(+:S)
+    for (int ii = 0; ii < N; ii++)
+        S += array[ii];
+}
+\end{codeblock}
+
+The two loops use the same \texttt{schedule(static)} chunking, so iteration $ii$ is touched and later read by the same thread, on the same socket. The data is now spread across all NUMA nodes, and aggregate memory bandwidth scales with the number of sockets.
+
+\begin{warningblock}[Schedules must match]
+First-touch only pays off if the init schedule matches the use schedule. A \plaintt{schedule(dynamic)} use loop after a \plaintt{schedule(static)} init loop scrambles the mapping and reintroduces remote accesses.
+\end{warningblock}
+
+\subsubsection{threadprivate arrays --- explicit local allocation}
+
+For maximum locality, each thread can allocate its own array via \texttt{threadprivate}. The array variable itself is replicated per thread, and each thread calls \texttt{calloc} (or \texttt{malloc} + write) inside the parallel region:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+double                 *array  = NULL;
+unsigned long long int  mywork = 0, first_iteration = 0;
+#pragma omp threadprivate(array, mywork, first_iteration)
+
+#pragma omp parallel
+{
+    int nthreads = omp_get_num_threads();
+    mywork = N / nthreads + 1;
+    array  = calloc(mywork, sizeof(double));   // first-touch is local
+
+    #pragma omp for schedule(static)
+    for (unsigned long long ii = 0; ii < N; ii++)
+        array[ii - first_iteration] = (double)ii;
+
+    #pragma omp for schedule(static) reduction(+:S)
+    for (unsigned long long ii = 0; ii < N; ii++)
+        S += array[ii - first_iteration];
+}
+\end{codeblock}
+
+Each thread now owns a contiguous, NUMA-local buffer. The trade-off is that \texttt{array} is no longer a single contiguous region visible from outside the parallel region: code that needs to operate on the whole array as one object (gather, MPI send, file I/O, \dots) has to reassemble the partitions or use a different layout.
+
+\begin{tipsblock}[Pinning threads with \plaintt{proc\_bind} and \plaintt{OMP\_PLACES}]
+First-touch only works if threads stay on the core that did the first write. Use \plaintt{OMP\_PROC\_BIND=true} (or a placement policy: \plaintt{close}, \plaintt{spread}, \plaintt{master}) and \plaintt{OMP\_PLACES=cores} (or \plaintt{sockets}, \plaintt{threads}) at runtime, and the \plaintt{proc\_bind(close|spread|master)} clause on a \plaintt{parallel} region for finer control. Without binding, the kernel scheduler is free to migrate a thread to another socket and the locality argument collapses.
+\end{tipsblock}
+
+\subsection{FLUSH operations}
+
+OpenMP \texttt{flush} operations are used to enforce the consistency between a thread's temporary view of the main memory and the main memory itself, or between multiple threads' temporary views.
+
+\subsubsection{Strong FLUSH}
+
+A strong flush operation enforces consistency between a thread's temporary view and main memory. It is applied to a specified set of variables called the \textbf{flush-set}. When a strong flush is executed, the implementation must not reorder memory operations for variables in the flush-set with respect to the flush itself; this restriction applies both to the code generated for memory operations and to the code for the flush operation on those variables.
+
+The primary purpose of a strong flush is to \bfit{guarantee that a value written to a variable by one thread may be read by a second thread}. To achieve this, the programmer must ensure that the second thread has not written to the variable since its last strong flush, and that the following sequence of events occurs in this specific order:
+\begin{enumerate}
+    \item Thread 1 writes the value to the variable.
+    \item Thread 1 performs a strong flush of the variable.
+    \item Thread 2 performs a strong flush of the variable.
+    \item Thread 2 reads the value from the variable.
+\end{enumerate}
+This protocol ensures that the write by thread 1 is committed to main memory before thread 2 attempts to read it, thereby preventing stale or inconsistent values from being observed.
+
+\subsubsection{Release or acquire FLUSH}
+
+Release and acquire flushes enforce consistency between the memory views of two synchronizing threads, rather than between a thread and main memory directly.
+
+A \textbf{release flush} guarantees that any prior operation that writes or reads a shared variable will appear to complete before any operation that writes or reads the same shared variable and follows an acquire flush with which the release flush synchronizes. Concretely, a release flush propagates the values of all shared variables in the thread's temporary view to memory prior to performing any subsequent atomic operation that may establish a synchronization.
+
+An \textbf{acquire flush} discards any value of a shared variable in the thread's temporary view that has not been written since the last release flush. It then loads any value of a shared variable propagated by a release flush that synchronizes with it into the temporary view, making that value available for subsequent reads.
+
+Release and acquire flushes may also be used to guarantee that a value written to a variable by one thread can be read by a second thread. To accomplish this, the programmer must ensure that the second thread has not written to the variable since its last acquire flush, and that the following sequence of events occurs in this specific order:
+\begin{enumerate}
+    \item The value is written to the variable by thread 1.
+    \item Thread 1 performs a release flush.
+    \item Thread 2 performs an acquire flush.
+    \item The value is read from the variable by thread 2.
+\end{enumerate}
+This protocol establishes a synchronization edge between the release and acquire operations, ensuring that writes made visible by the release are observable after the acquire.
+
+\begin{exampleblock}[FLUSH example]
+
+    Consider the following snippet where multiple threads increment a shared counter:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+#pragma omp parallel
+{
+    ...
+    #pragma omp atomic update
+    counter++;
+    ...
+    double z = f(counter, ...);
+}
+\end{codeblock}
+
+how can you ensure that all the threads have updated \plaintt{counter} before any thread calls \plaintt{f}?
+
+\medskip
+
+\textbf{Approach 1:} The most straightforward solution is to insert a \textbf{barrier} before line 8. A barrier implies a strong flush, guaranteeing that all updates are visible to all threads. However, barriers are expensive because they force all threads to synchronize, which is inherently serializing and can severely limit parallel performance.
+
+\medskip
+
+\textbf{Approach 2:} A more targeted solution uses an \textbf{explicit flush} directive to force the thread to read from main memory rather than its local cache:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+#pragma omp parallel
+{
+    ...
+    #pragma omp atomic update
+    counter++;
+    ...
+    #pragma omp flush(counter) acquire
+    double z = f(counter, ...);
+    ...
+}
+\end{codeblock}
+
+The \plaintt{acquire} flush ensures that the thread discards any stale cached value of \plaintt{counter} and reads the most recent value from memory. This approach is lighter than a full barrier.
+
+\medskip
+
+\textbf{Approach 3:} For protecting more complex operations involving shared variables, \textbf{named critical regions} provide both mutual exclusion and implicit strong flushes:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+#pragma omp parallel
+{
+    ...
+    #pragma omp critical (update_counter)
+    counter++;
+    ...
+    #pragma omp critical (read_counter)
+    double z = f(counter, ...);
+    ...
+}
+    
+\end{codeblock}
+
+Named critical regions ensure that only one thread at a time executes each named section, and the implicit flush guarantees memory consistency. Different names allow unrelated critical sections to execute concurrently, reducing contention compared to unnamed critical regions.
+
+\end{exampleblock}
+
+\subsubsection{Implicit flushes}
+
+OpenMP provides implicit flushes at specific synchronization points, eliminating the need for explicit \texttt{flush} directives in most cases:
+
+\begin{codeblock}[language = C]
+#pragma omp barrier     // Implicit flush of all variables
+#pragma omp critical    // Flush on entry and exit
+#pragma omp ordered     // Flush on entry and exit
+#pragma omp parallel    // Flush on entry (fork) and exit (join)
+#pragma omp for         // Flush at implied barrier (if present)
+#pragma omp single      // Flush at implied barrier (if present)
+\end{codeblock}
+
+These implicit flushes apply to \emph{all} shared variables (the so-called ``strong flush''), not merely those modified within the region. Additionally, \textbf{lock operations} (\texttt{omp\_set\_lock}, \texttt{omp\_unset\_lock}) carry implicit flushes, as discussed in the following section.
+
+\begin{warningblock}[No implicit flush for \plaintt{master}]
+The \plaintt{\#pragma omp master} directive does \textbf{not} include an implicit flush. If memory consistency is required after master-only code, an explicit flush or barrier must be inserted.
+\end{warningblock}
+
+\subsubsection{Memory ordering semantics}
+
+OpenMP 5.x adopted the C++11/C11 memory model, exposing fine-grained control over memory ordering. The available orderings, from strongest to weakest, are:
+
+\begin{codeblock}[language = C]
+seq_cst   // sequential consistency (default)
+acq_rel   // acquire-release
+release   // release only
+acquire   // acquire only
+relaxed   // no synchronization guarantees
+\end{codeblock}
+
+\begin{enumerate}[leftmargin=*]
+\item \texttt{seq\_cst}: is the default memory order. It is the most strict memory order and it is the most expensive. A single thread must execute all operations in the order they are written in the code.
+
+\item \texttt{acq\_rel}: is the acquire-release memory order. It combines acquire semantics on reads and release semantics on writes. It ensures that all memory operations before a release are visible to any thread that performs an acquire on the same synchronization variable. It is less strict than \texttt{seq\_cst} (no global total order) but sufficient for most producer-consumer patterns.
+
+\item \texttt{release}: it is like doing a write back of whatever is in the local cache to the main memory.
+
+\item \texttt{acquire}: it is like doing a read from the main memory to the local cache.
+
+\item \texttt{relaxed}: is the least strict memory order and it is the cheapest. It is used when you do not need to ensure that all operations are executed in the order they are written in the code.
+\end{enumerate}
+
+A \texttt{release} operation on a variable ensures that \bfit{all preceding} memory operations (reads and writes) by the executing thread become visible to any other thread that subsequently performs an \texttt{acquire} operation on the same synchronization variable.
+
+\begin{codeblock}[language = C]
+x = 1;
+y = 2;
+#pragma omp atomic write release
+z = 3; // Release on z synchronizes x, y as well
+\end{codeblock}
+
+\subsubsection{Locks}
+
+OpenMP provides explicit lock routines for mutual exclusion when \texttt{critical} sections are too coarse-grained or when finer control over synchronization is needed. Unlike named critical regions (which serialize all threads entering a region with the same name), locks can be associated with specific data structures, enabling concurrent access to different parts of a shared resource.
+
+A lock is represented by the \texttt{omp\_lock\_t} type. For scenarios where a thread needs to acquire the same lock multiple times (e.g., recursively), OpenMP provides \textbf{nested locks} via \texttt{omp\_nest\_lock\_t}. It can be acquired multiple times by the same thread that originally acquired it; each acquisition increments an internal counter, and the lock is only released when this reaches zero.
+
+\begin{warningblock}[Memory consistency]
+Lock operations imply an implicit \textbf{flush} of all the thread's visible variables. Specifically, \plaintt{omp\_set\_lock} has \textbf{acquire} semantics and \plaintt{omp\_unset\_lock} has \textbf{release} semantics, establishing a happens-before relationship between the lock release and subsequent acquisitions.
+\end{warningblock}
+
+
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{} >{\ttfamily\footnotesize}l p{0.58\textwidth} @{}}
+\toprule
+\textbf{Function} & \textbf{Description} \\
+\midrule
+omp\_init\_lock(omp\_lock\_t *) & Initialize a lock (must be called before first use). \\
+omp\_destroy\_lock(omp\_lock\_t *) & Destroy a lock (must not be locked when destroyed). \\
+omp\_set\_lock(omp\_lock\_t *) & Acquire a lock; \textbf{blocks} until the lock is available. \\
+omp\_unset\_lock(omp\_lock\_t *) & Release a lock (must be called by the owning thread). \\
+omp\_test\_lock(omp\_lock\_t *) & \textbf{Non-blocking} attempt to acquire the lock; returns nonzero on success (lock acquired), zero on failure. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Nested lock variants (\texttt{omp\_init\_nest\_lock}, \texttt{omp\_set\_nest\_lock}, etc.) follow the same pattern.
+
+The function \texttt{omp\_set\_lock} blocks until the lock becomes available, which can lead to deadlock if threads hold locks while waiting for others. The non-blocking \texttt{omp\_test\_lock} returns immediately, allowing the caller to take alternative action if the lock is unavailable:
+
+\begin{codeblock}[language=C]
+if (omp_test_lock(&lock)) {
+    // Lock acquired: perform critical operation
+    omp_unset_lock(&lock);
+} else {
+    // Lock unavailable: retry later or take alternative action
+    #pragma omp taskyield  // Yield to allow other tasks to progress
+}
+\end{codeblock}
+
+This pattern is essential for implementing deadlock-free algorithms: if a thread cannot acquire all required locks, it releases those already held and retries, preventing circular wait conditions.
+
+When acquiring multiple locks, always follow these principles:
+\begin{itemize}[noitemsep]
+    \item \textbf{Consistent ordering}: acquire locks in a fixed global order (e.g., by memory address).
+    \item \textbf{Try-lock with backoff}: use \plaintt{omp\_test\_lock}; if it fails, release all held locks and retry.
+    \item \textbf{Never block while holding}: avoid \plaintt{omp\_set\_lock} when already holding another lock
+\end{itemize}
+
+\begin{advancedblock}[Lock hints]
+OpenMP 5.0 introduced lock hints to guide runtime optimizations:
+
+\begin{codeblock}[language=C, basicstyle=\ttfamily\scriptsize]
+omp_init_lock_with_hint(omp_lock_t *lock, omp_sync_hint_t hint);
+omp_init_nest_lock_with_hint(omp_nest_lock_t *lock, omp_sync_hint_t hint);
+
+// Available hints (can be combined with bitwise OR):
+omp_sync_hint_none           // No hint (default)
+omp_sync_hint_uncontended    // Lock is usually uncontended
+omp_sync_hint_contended      // Lock is often contended
+omp_sync_hint_nonspeculative // Prefer non-speculative implementation
+omp_sync_hint_speculative    // Allow speculative (e.g., HTM-based) implementation
+\end{codeblock}
+
+These hints allow the runtime to select appropriate implementations: an uncontended lock might use a simple spinlock, while a contended lock might use a queue-based algorithm to reduce cache-line bouncing. Note that as of 2025, compiler support for these hints remains limited; the runtime may ignore unsupported hints.
+\end{advancedblock}
+
+\begin{tipsblock}[Memory ordering decisions]
+    Do you need atomicity of an operation?
+
+    ├─ YES: Use atomic\\
+    │ $\quad$ └─ Single variable access?\\
+    │ $\qquad\quad$ ├─ YES: atomic read/write with acquire/release\\
+    │ $\qquad\quad$ └─ NO: atomic capture or use lock\\
+    └─ NO: Do you need memory ordering?\\
+    \phantom{$\qquad$} ├─ YES: Can you use implicit synchronization (barrier, lock)?\\
+    \phantom{$\qquad$} │ $\quad$ ├─ YES: Use barrier/lock (preferred)\\
+    \phantom{$\qquad$} │ $\quad$ └─ NO: Consider atomic release/acquire pattern\\
+    \phantom{$\qquad$} └─ NO: Use reduction or thread-private variables
+\end{tipsblock}
+
+\subsubsection{Case study: from critical to locks}
+
+To see why the lock zoo exists, consider a recurrent pattern from $N$-body tree codes: each thread iterates over a list of \emph{active} particles, and before computing a force on a particle it must first \emph{drift} that particle to the current time. Many threads may need the same particle, so the drift must be protected from data races, but only \emph{distinct} particles really conflict --- two threads updating two different particles should run in parallel.
+
+\paragraph{Stage 1 --- coarse-grained \texttt{critical}.} The minimal protection is a critical section around the update:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+if (P[idx].time < update_time) {
+    #pragma omp critical
+    {
+        if (P[idx].time < update_time)        // double-check
+            update_particle(&P[idx], update_time);
+    }
+}
+\end{codeblock}
+
+Entry to the critical region performs an implicit acquire flush; exit performs a release flush, so the new \texttt{time} is visible to subsequent readers. The cost is that \emph{every} update is serialised, even between threads working on different particles: the critical region behaves as a global lock.
+
+\paragraph{Stage 2 --- per-particle \texttt{omp\_lock\_t}.} Move the lock from the algorithm to the data: give every particle its own lock, and use \texttt{omp\_test\_lock} so a thread that finds the particle already busy can do something else instead of blocking.
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+if (omp_test_lock(&P[idx].lock)) {
+    update_particle(&P[idx], update_time);
+    omp_unset_lock(&P[idx].lock);
+} else {
+    // Another thread is updating this particle.
+    // Don't acquire the lock; just wait for the work to be done.
+    while (P[idx].time < update_time)
+        nanosleep(...);
+}
+\end{codeblock}
+
+This unlocks parallelism between disjoint particles, but \texttt{omp\_lock\_t} is an opaque, runtime-managed structure: it is large (taking memory away from useful state) and every \texttt{set}/\texttt{unset} is a function call into the OpenMP runtime.
+
+\paragraph{Stage 3 --- custom atomic spinlock.} If the contention is low and the runtime overhead dominates, the lock can be replaced by an \texttt{int} field updated through atomic operations, with explicit acquire/release semantics:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+int my_lock;
+#pragma omp atomic capture
+{ my_lock = P[idx].lock; P[idx].lock++; }   // fetch-and-add
+
+if (my_lock == 0) {                         // we got the lock
+    update_particle(&P[idx], update_time);
+
+    #pragma omp atomic write release        // publish the update
+    P[idx].lock = 0;
+} else {
+    #pragma omp atomic read acquire         // see the latest time
+    double t = P[idx].time;
+    while (t < update_time) { /* spin */ }
+}
+\end{codeblock}
+
+The \texttt{release} on the unlock guarantees that everything written inside \texttt{update\_particle} is visible to any thread that subsequently performs the \texttt{acquire} read.
+
+\begin{center}
+\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabular}{@{} l c c c c @{}}
+\toprule
+\textbf{Stage} & \textbf{Complexity} & \textbf{Memory} & \textbf{Concurrency} & \textbf{Latency} \\
+\midrule
+\texttt{critical}        & low    & none              & very low (global)    & high \\
+\texttt{omp\_lock\_t}    & medium & high (opaque)     & high (per-particle)  & medium (runtime) \\
+atomic spinlock          & high   & low (\texttt{int})& high (per-particle)  & low (CPU-level) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{observationblock}[False sharing on tightly packed structures]
+If \texttt{P[idx]} is small (say 16 bytes), several particles share a 64-byte cache line. Locking \texttt{P[0]} invalidates that line on every other socket, and a thread reading \texttt{P[1]} or \texttt{P[2]} suffers a cache miss even though the data it wants is logically untouched. Padding each entry to a full cache line removes the false sharing at the cost of memory footprint --- a trade-off worth measuring on the target machine.
+\end{observationblock}
+
+\subsubsection{Case study: optimistic concurrency on a sorted linked list}
+
+Lock granularity also shapes the design of concurrent data structures. Consider a sorted, doubly linked list into which many threads insert in parallel. A single global lock around \texttt{find\_and\_insert} would serialise all insertions; per-node locks open the door to real concurrency, but the algorithm becomes subtle.
+
+\paragraph{Optimistic search, then validate.} The standard pattern is: search without holding any lock, then lock the two neighbours of the candidate insertion point and \emph{validate} that the structure has not changed under us:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+llnode_t *prev = NULL, *next = NULL;
+find(start, value, &prev, &next);             // optimistic, lock-free
+
+// Acquire prev then next, in a fixed order, with non-blocking try-lock
+while (!try_lock_pair(prev, next))
+    #pragma omp taskyield;
+
+// Validate: did somebody insert between prev and next while we waited?
+if (prev->next != next || next->prev != prev) {
+    unlock_pair(prev, next);
+    continue;                                 // restart from head
+}
+insert_between(prev, value, next);
+unlock_pair(prev, next);
+\end{codeblock}
+
+The validation step is what makes the algorithm correct: between the lock-free \texttt{find} and the moment we own the locks, another thread may have inserted a new node exactly where we wanted to insert ours.
+
+\paragraph{Pitfall 1 --- blocking lock during repair walk.} A natural optimisation is, on a failed validation, to walk locally from \texttt{prev} to find the new \texttt{next} instead of restarting from the head. The temptation is to grab each successive lock with the blocking \texttt{omp\_set\_lock}, since we already hold one lock and ``only'' need to acquire one more. This reintroduces the classic deadlock:
+
+\begin{warningblock}[Never block while holding a lock]
+Two threads walking in opposite directions can each block on the lock the other one holds, forming a circular wait. Inside a repair walk, use \plaintt{omp\_test\_lock} with a bounded number of attempts; if the limit is reached, release everything and restart. Blocking acquisitions are only safe when no other lock is currently held.
+\end{warningblock}
+
+\paragraph{Pitfall 2 --- accidentally shared cursor.} A subtler bug shows up in the surrounding task code. The repair walk needs a per-task cursor, e.g.\ \texttt{start}, that each task updates as it advances:
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+llnode_t *start = head;          // declared OUTSIDE the task
+
+#pragma omp task                 // BUG: start is implicitly shared
+{
+    for (int b = 0; b < batch; b++)
+        find_and_insert(start, new_value, &start);
+}
+\end{codeblock}
+
+By the implicit data-sharing rules introduced earlier in this chapter, a variable that is shared in the enclosing parallel region remains shared in the task. Every task therefore reads and writes the same \texttt{start}, racing on the cursor. The fix is to declare \texttt{firstprivate(start)} (or \texttt{firstprivate(head)} and let each task maintain its own cursor) so that each task gets an independent copy.
+
+\paragraph{Putting it together.} The correct version combines (i) optimistic search, (ii) deadlock-free local repair walk via bounded \texttt{omp\_test\_lock} attempts with fall-back to a full restart, (iii) a second validation after the repair walk in case the structure changed again while we were re-acquiring locks, and (iv) \texttt{firstprivate} on the per-task cursor. Once the locks provide acquire/release fences at every \texttt{set}/\texttt{unset}, the underlying atomic loads on \texttt{prev}/\texttt{next} pointers can use \texttt{memory\_order\_relaxed} --- the lock pair is doing the heavy synchronization.
+
+\subsection{Controlling the task creation - Clauses}
+
+The task creation construct adtmits a number of clauses that allow to control the creation of tasks:
+
+\begin{codeblock}[language = C]
+#pragma omp task clause, clause, ...
+{ 
+    /* code */
+}
+\end{codeblock}
+
+\begin{center}
+	\small
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{@{} >{\ttfamily\footnotesize}l p{0.78\textwidth} @{}}
+\toprule
+\textbf{Clause} & \textbf{Description} \\
+\midrule
+if (expr) & When \texttt{expr} evaluates \texttt{false}, the encountering thread does not create a new task in the task queue; instead, the execution of the current task is suspended and the newly created task is \textit{undeferred} and started. The task suspended is resumed afterwards. \\
+
+final (expr) & The \texttt{final(expr)} clause can be used to suppress the task creation and then to control the tasking overhead, especially in recursive task creation. If \texttt{expr} evaluates \texttt{true}, no more tasks are generated and the code is executed immediately. That is propagated to all the children tasks. That is called an \textit{included} task and is always undeferred. Use \texttt{omp\_in\_final()} to check if the task is a final one. \\
+
+mergeable & This clause avoids a separated data environment to be created if a task is undeferred or included. \\
+
+tied, untied & This clause lets a suspended task be resumed by a different thread than the one that started it. The default option is \texttt{tied}. \\
+
+depend, priority & \textit{We will cover this afterwards} \\
+
+\bottomrule
+\end{tabular}
+\normalsize
+\end{center}
+
+\subsubsection{Task creation in loops}
+
+Many times happens that you need to create tasks in a loop (for instance, a task for every entry, or sections, of an array).
+The taskloop construct has been conceived to ease this cases, combining the for loops and the tasks natively.
+
+\begin{codeblock}[language = C]
+#pragma omp taskloop [clause [[,] clause] ...]
+{
+    for-loops // (perfectly nested)
+}
+\end{codeblock}
+
+Clauses are very similar to both the usual for and task constructs:
+\texttt{private}, \texttt{firstprivate}, \texttt{lastprivate}, \texttt{shared}, \texttt{default}, \texttt{if}, \texttt{final}, \texttt{priority}, \texttt{untied}, \texttt{mergeable}
+
+There are 3 specific clauses for \texttt{taskloop}:
+
+\begin{itemize}
+    \item \texttt{grainsize(arg)}: \texttt{arg} is a positive integer. This clause regulates the granularity of the work assignment, ensuring that the amount of work per task is not too small. The number of loop iterations assigned to each task is at least the grainsize and at most $2 \times$ grainsize, but not more than the number of iterations left.
+    \item \texttt{num\_tasks(arg)}: \texttt{arg} is a positive integer, indicating the maximum number of tasks that can be generated at runtime. This is useful to limit the task creation overhead.
+    \item \texttt{nogroup}: Specifies that the tasking construct is not embedded in an otherwise implied \texttt{taskgroup} construct.
+\end{itemize}
+
+\subsection{Task priority and dependencies}
+
+\subsubsection{Task priority}
+
+Even when tasks can execute concurrently, it is sometimes beneficial for certain tasks to run earlier than others. For instance, tasks that receive data should typically execute before tasks that post-process the results. The \texttt{priority(p)} clause allows the programmer to suggest a scheduling preference to the OpenMP runtime: higher values of \texttt{p} indicate higher priority.
+
+\begin{codeblock}[language = C, morekeywords={pragma}]
+#pragma omp parallel
+#pragma omp single
+{
+    #pragma omp task priority(100)
+    read_data(...);
+    #pragma omp task priority(50)
+    process_and_save_data(...);
+    #pragma omp task priority(10)
+    postprocess_and_send_data(...);
+}
+\end{codeblock}
+
+Note that priority is a \emph{hint} to the scheduler, not a strict ordering guarantee. The runtime may ignore priorities under certain conditions (e.g., when work-stealing from another thread's queue).
+
+\subsubsection{Data races and dependencies}
+
+A \bfit{data race} leads to undefined behavior; it occurs when three conditions are simultaneously met: 
+
+\begin{enumerate}[label=\roman*,align=Center, noitemsep]
+\item two or more threads access the same memory location, 
+\item at least one access is a write
+\item the accesses are not ordered by synchronization.
+\end{enumerate}
+
+\begin{tipsblock}[Debugging data races]
+The compiler flag \plaintt{-fsanitize=thread} enables runtime detection of data races:
+
+\begin{center}
+\plaintt{gcc -fopenmp -fsanitize=thread -g -o program program.c}
+\end{center}
+\end{tipsblock}
+
+In task-based parallelism, data dependencies frequently arise: one task may need the results produced by another, or must wait for another task's operations to complete before proceeding. OpenMP provides the \texttt{depend} clause to express these relationships explicitly, allowing the runtime to schedule tasks in a valid order while maximizing parallelism.
+
+OpenMP recognizes three primary \textbf{dependence types}:
+
+\begin{itemize}
+    \item \texttt{in}: the task depends on any \emph{previously generated} task that has an \texttt{out}, \texttt{inout}, or \texttt{mutexinoutset} dependence on the same memory region.
+    
+    \item \texttt{out} (and \texttt{inout}): the task depends on any previously generated task with an \texttt{in}, \texttt{out}, \texttt{inout}, or \texttt{mutexinoutset} dependence on the same memory region.
+    
+    \item \texttt{mutexinoutset}: similar to \texttt{out}, but tasks with \texttt{mutexinoutset} on the same variable are \emph{mutually exclusive}: they may execute in any order, but never concurrently.
+\end{itemize}
+
+\vspace{-0.2em}
+
+\begin{observationblock}[\plaintt{inout} is equivalent to \plaintt{out}]
+In OpenMP 5.x, \plaintt{inout} is treated as an alias for \plaintt{out}. The distinction is purely semantic (indicating that the task both reads and writes a variable); the scheduling behavior is identical.
+\end{observationblock}
+
+
+The dependence types above correspond to well-known data hazards from instruction parallelism:
+
+\begin{itemize}
+\item \textbf{Read-after-Write (RaW)}
+
+also called a \emph{true dependency} or \emph{flow dependency}, occurs when a task must read data produced by a previous task. This is the fundamental producer-consumer relationship:
+
+\begin{codeblock}[language=C]
+#pragma omp task depend(out:result)
+compute_result(&result);
+
+#pragma omp task depend(in:result)
+use_result(&result);
+\end{codeblock}
+
+\item \textbf{Write-after-Read (WaR)}
+
+also known as an \emph{anti-dependency}, occurs when a task overwrites data that a previous task is still reading. The write must wait until all prior reads complete:
+
+\begin{codeblock}[language=C]
+#pragma omp task depend(in:buffer)
+read_buffer(&buffer);
+
+#pragma omp task depend(out:buffer)
+overwrite_buffer(&buffer);
+\end{codeblock}
+
+\item \textbf{Write-after-Write (WaW)}
+
+also known as \emph{output dependency}, occurs when two tasks write to the same location. The final value must come from the logically later task. This is sometimes called a \emph{false dependency} or \emph{name dependency}, since renaming the variable could eliminate it:
+
+\begin{codeblock}[language=C]
+#pragma omp task depend(out:x)
+initialize_x(&x);
+
+#pragma omp task depend(out:x)
+reinitialize_x(&x);
+\end{codeblock}
+
+\item \textbf{Read-after-Read (RaR)} 
+
+involves two tasks reading the same memory region. Since neither modifies the data, there is no actual dependency; both tasks can execute concurrently:
+
+\begin{codeblock}[language=C]
+#pragma omp task depend(in:data)
+analyze_data(&data);
+
+#pragma omp task depend(in:data)
+visualize_data(&data);
+\end{codeblock}
+\end{itemize}
+
+\begin{tipsblock}[OpenMP 5.x synchronization best practices]
+When choosing synchronization mechanisms, prefer higher-level constructs that are easier to reason about:
+
+\begin{enumerate}
+    \item \textbf{First choice}: High-level constructs (\plaintt{barrier}, \plaintt{critical}, \plaintt{atomic})
+    \item \textbf{Second choice}: Atomics with explicit memory order (\plaintt{acquire}/\plaintt{release})
+    \item \textbf{Last resort}: Explicit \plaintt{flush} (only when synchronizing multiple variables at once)
+    \item \textbf{Avoid}: \plaintt{volatile} provides no synchronization guarantees in OpenMP
+\end{enumerate}
+\end{tipsblock}
