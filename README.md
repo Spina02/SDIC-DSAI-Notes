@@ -13,7 +13,7 @@
   </thead>
   <tbody>
     <tr>
-      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/refs/heads/main/Algorithms/main.pdf">Algorithms</a></td>
+      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/heads/main/Algorithms/main.pdf">Algorithms</a></td>
       <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
       <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/main/Ethics%20and%20Law/main.pdf">Ethics and Law</a></td>
       <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
@@ -71,7 +71,7 @@
       <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/main/Multi-Agent%20Systems/main.pdf">Multi-Agent Systems</a></td>
       <td><img src="https://img.shields.io/badge/-DONE-brightgreen?style=plastic&logo=ticktick&logoColor=white" alt="DONE"></td>
     </tr>
-      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/Spina/Galaxy%20Astrophysics/main.pdf">Galaxy Astrophysics</a></td>
+      <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/refs/heads/main/Galaxy%20Astrophysics/main.pdf">Galaxy Astrophysics</a></td>
       <td><img src="https://img.shields.io/badge/-WIP-orange?style=plastic&logo=vlcmediaplayer&logoColor=white" alt="WIP"></td>
       <td><a href="https://media.githubusercontent.com/media/Spina02/SDIC-DSAI-Notes/Spina/Observational%20Cosmology/main.pdf">Observational Cosmology </td>
       <td><img src="https://img.shields.io/badge/-REV-blue?style=plastic&logo=searxng&logoColor=white" alt="REV"></td>
