@@ -44,28 +44,28 @@ $$
 
 The \textbf{azimuthal (or horizontal) system} is defined relative to the observer's specific position on Earth. Its reference plane is the local \textit{horizon} (the plane tangent to the Earth at the observer's location). Where this plane meets the celestial sphere forms the visible horizon. The point directly overhead is the \textit{zenith}; the point directly beneath is the \textit{nadir}.
 
+\smallskip
 
 \begin{minipage}{0.55\textwidth}
     
     Great circles passing through the zenith are called \textit{verticals}, and each one meets the horizon at a right angle. As the Earth rotates, stars appear to rise in the east, reach their highest point (culminate) when they cross the \textit{meridian} (the vertical circle connecting north, zenith, and south) and set in the west. The intersection points of the meridian with the horizon define the north and south directions.
 
+    \smallskip
+
     In this system, one coordinate is the \bfit{altitude} (or elevation), $a$, the angle between the horizon and the object along its vertical circle. Altitude ranges from $-90^\circ$ to $+90^\circ$, and is positive above the horizon.
 \end{minipage}%
 \hfill
 \begin{minipage}{0.42\textwidth}
-
-\vspace{-2em}
-
-    \begin{figure}[H]
+% \vspace{-1em}
         \centering
         \includegraphics[width=\textwidth]{assets/az-sys.png}
-        \caption{The Azimuthal System \cite{karttunen}}
-    \end{figure}
 
-    \vspace{0.1em}
+        \vspace{-0.5em}
+
+        \captionof{figure}{The Azimuthal System \cite{karttunen}}
 \end{minipage}
 
-\vspace{-0.2em}
+\smallskip
 
 The second coordinate is the \bfit{azimuth}, $A$: the angle measured along the horizon from a fixed reference direction to the object's vertical circle. The reference is often north or south, and by convention the angle is measured clockwise (see tip below).
 
@@ -480,14 +480,16 @@ In most stellar and galactic contexts, velocities are much smaller than the spee
 
 An observed redshift generally has two main contributions: a \bfit{kinematic} term $z_{\mathrm{kin}}$ from the galaxy's peculiar motion and a \bfit{cosmological} term $z_{\mathrm{cosm}}$ from the expansion; they do \textbf{not} add linearly.
 
+\subsubsection{Cosmological redshift from clusters}
+
 In a cluster of $N$ galaxies, individual galaxies show slightly different observed redshifts $z_i$ from both peculiar motions and expansion. The mean over $N$ members defines the cluster redshift:
 $$
 z_{\text{cluster}} = \frac{1}{N} \sum_{i=1}^N z_i
 $$
 
-Since peculiar velocities roughly average to zero in the cluster frame, this identifies the cosmological redshift:
+If the cluster as a whole has no net (bulk) motion, then the individual peculiar velocities of member galaxies approximately cancel out in the cluster frame. As a result, the average observed redshift directly reflects the cosmological redshift:
 $$
-z_{\text{cluster}} = z_{\text{cosm}}
+z_{\text{cluster}} \approx z_{\text{cosm}}
 $$
 For each galaxy in the cluster, we can define its ``rest-frame'' (or peculiar) redshift:
 $$
@@ -499,11 +501,10 @@ Here, $z_{\mathrm{obs}}$ is the total observed redshift for an individual galaxy
 
 \bfit{Proper motion} ($\mu$) is a star's apparent angular motion across the sky relative to the Sun, measured in arcseconds per year. This motion is most evident for nearby stars or those with large \textit{peculiar motions} (different from the Sun's motion).
 
-A star's space velocity splits into a \bfit{radial velocity} ($v_r$) and a \bfit{tangential velocity} ($v_t$). The tangential velocity results in the proper motion, which can be measured by taking plates at intervals of several 
-years or decades.
+A star's space velocity splits into a \bfit{radial velocity} ($v_r$) and a \bfit{tangential velocity} ($v_t$). The tangential velocity leads to the observed proper motion, which can be measured by comparing the star's position on the sky at different times, separated by several years or decades. Let $\alpha$ be the angle swept out by the star on the sky due to its proper motion over a time interval $\Delta t$, $x$ the arc length traveled by the star during that interval, and $d$ the distance from the Sun to the star. Then:
 
 $$
-\tan{\dfrac{\alpha}{2}} \sim \dfrac {x/2}{d}
+\tan{\dfrac{\alpha}{2}} \sim \dfrac{\alpha}{2} \sim \dfrac {x/2}{d}
 \qquad \Rightarrow \qquad 
 \mu \sim \dfrac{v_t}{d}
 $$
@@ -526,14 +527,14 @@ where $4.74$ converts to km/s when using the units below:
 \medskip
 
 The proper motion $\mu$ is usually described in terms of two components: one along the declination direction, $\mu_\delta 
-= \Delta \delta / 1\,\mathrm{year}$, and one along the right ascension direction.
+= \Delta \delta / 1\,\mathrm{year}$, and one along the right ascension direction $\mu_\alpha = \Delta \alpha / 1\,\mathrm{year}$.
 
 \vspace{-0.5em}
 
 \begin{minipage}{0.64\textwidth}
     However, to properly express the motion in right ascension, we need to take into account that lines of right 
     ascension (hour circles) get closer together as you move away from the celestial equator towards the poles. 
-    Therefore, the component in right ascension is written as $\mu^*_{\alpha} = \mu_\alpha \cos \delta$, with $\mu_\alpha = \Delta \alpha / 1\,\mathrm{year}$, where the factor of $\cos \delta$ adjusts for this effect.
+    Therefore, the component in right ascension is written as $\mu^*_{\alpha} = \mu_\alpha \cos \delta$, where the factor of $\cos \delta$ adjusts for this effect.
 
     The total proper motion is then:
     $$
@@ -632,7 +633,7 @@ Observed flux densities are usually very small, so a more convenient unit is oft
 $1 \text{Jy} = 10^{-26} \text{W\,m}^{-2} \text{Hz}^{-1}$.
 
 \begin{minipage}{0.64\textwidth}
-    The \bfit{luminosity} $L$ of an object is the power emitted by the object throughout a closed surface surrounding it, and it is given by:
+    The \bfit{luminosity} $L$ of an object is the power emitted by the object throughout a closed surface $\Sigma$ surrounding it, and it is given by:
     $$
     L = \int_{\Sigma} F \, dA
     $$
