@@ -1,0 +1,351 @@
+\chapter{Stellar Astrophysics}
+
+Stellar astrophysics is the study of the physical properties and evolution of stars. Although this course focuses on galaxies, a solid grounding in stellar astrophysics is essential: many key concepts from the study of stars are fundamental to understanding the formation, structure, and behavior of galaxies. In this chapter, we will briefly review the fundamental properties, classification, and evolution of stars as background for galactic astrophysics.
+
+\section{Star Classification}
+
+To classify a star, astronomers rely on several complementary observational techniques, each revealing key aspects of its physical properties and evolutionary state. The two most fundamental sources of information are:
+
+\begin{itemize}
+    \item Spectra: $I_\nu$
+    \item Light curves: $I = I(t)$ (mainly for variable stars)
+\end{itemize}
+
+Spectra and light curves together enable astronomers to systematically categorize stars, unravel their physical processes, and place them within broader frameworks such as the Hertzsprung-Russell diagram and stellar evolution theory.
+
+\subsection{Stellar Spectra}
+
+A stellar spectrum provides information about the effective temperature, surface gravity, chemical composition, radial velocity $\vec{v}$, rotational broadening, and magnetic field $\vec{B}$. Light curves characterize variability and, for some classes of stars, can also be used to determine distances.
+
+The two most important methods for obtaining a spectrum are the objective prism and the slit spectrograph. In the objective prism method, a photograph is taken where each stellar image has been dispersed into a spectrum. Up to several hundred spectra can be photographed on a single plate and used for spectral classification.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/star-spectra.png}
+    \caption{Typical stellar spectra. The spectrum of $\eta$ Pegasi (f) is very similar to that of the Sun. The continuous spectrum is brightest at about 550 nm and becomes fainter toward shorter wavelengths. Dark absorption lines are superimposed on the continuum. \cite{karttunen}}
+\end{figure}
+
+\subsection{The MK Classification}
+
+Currently, we use a 2D classification scheme, the \textbf{MK system}, which is based on both the spectral type (a temperature sequence) and the luminosity class (a gravity/luminosity sequence).
+
+\subsubsection{The Harvard Spectral Classification}
+
+Stellar spectra are classified according to the atomic (and, in cool stars, also molecular) spectral lines that are present. Based on line strengths and their ratios, the Harvard sequence of stellar spectra was introduced.
+These spectral classes follow a sequence denoted by the letters O, B, A, F, G, K, M, L, T; besides these, a few other spectral classes exist that will not be discussed here. This sequence corresponds to a sequence in effective temperature: O stars are very hot, while T stars are very cool.
+
+\vspace{-0.4em}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{ccc}
+        \toprule
+        \textbf{Class} & \textbf{Typical Color} & \textbf{$T_{\mathrm{eff}}$ (K)} \\
+        \midrule
+        O & blue & $> 30{,}000$ \\
+        B & blue-white & $10{,}000$-$30{,}000$ \\
+        A & white & $7{,}500$-$10{,}000$ \\
+        F & yellow-white & $6{,}000$-$7{,}500$ \\
+        G & yellow & $5{,}200$-$6{,}000$ \\
+        K & orange & $3{,}700$-$5{,}200$ \\
+        M & red & $2{,}400$-$3{,}700$ \\
+        L & dark red & $1{,}300$-$2{,}400$ \\
+        T & brown & $550$-$1{,}300$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\vspace{-0.7em}
+
+For a finer classification, each spectral class is supplemented by a number between 0 and 9: A1 stars have spectra very similar to A0 ones, whereas A5 stars share features with both A0 and F0.
+
+\subsubsection{The Yerkes Luminosity Classification}
+
+Stellar luminosity is categorized using the MK (or Yerkes) classification, which relies on visually inspecting slit spectra and comparing them to standard stars, focusing on features sensitive to gravity and luminosity. In this system, stars are grouped into six main luminosity classes:
+
+\vspace{-0.4em}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{cc}
+        \toprule
+        \textbf{Class} & \textbf{Description} \\
+        \midrule
+        Ia  & most luminous supergiants \\
+        Ib  & less luminous supergiants \\
+        II  & luminous giants \\
+        III & normal giants \\
+        IV  & subgiants \\
+        V   & main sequence stars (dwarfs) \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\vspace{-0.7em}
+
+The luminosity class is determined from spectral features that depend strongly on the stellar surface gravity, which is closely related to luminosity.
+
+\begin{tipsblock}[Sun and Vega classification]
+    The \bfit{Sun} is classified as a G2V star: it is a main-sequence star (luminosity class V) with a spectral type G2, indicating a yellow star with an effective temperature of about $5{,}800\,\mathrm{K}$. 
+
+    \medskip
+
+    \bfit{Vega}, on the other hand, is an A0V star: it is also a main-sequence star but of spectral type A0, making it much hotter (about $9{,}600\,\mathrm{K}$) and whiter in color. 
+\end{tipsblock}
+
+\section{Radiation Processes}
+
+Atoms and molecules emit or absorb electromagnetic radiation when they transition between different energy levels. If an atom loses energy by an amount $\Delta E$, it emits a photon (a quantum of electromagnetic radiation) whose frequency $\nu$ is related to the energy change by:
+$$
+\Delta E = h\nu
+$$
+where $h$ is the Planck constant ($h = 6.626 \times 10^{-34} \text{ J s}$). Conversely, when an atom absorbs a photon of frequency $\nu$, it gains energy according to the same formula: $\Delta E = h\nu$.
+
+In atoms, energy levels typically refer to those belonging to electrons, which are not continuous and can only take on specific, discrete values. As a result, atoms can only absorb or emit radiation at particular frequencies $\nu$, corresponding to the differences between these allowed energy levels.
+
+\begin{minipage}{0.46\textwidth}
+This phenomenon creates line spectra, with each element displaying its own unique pattern. When a hot, low-pressure gas emits light, it produces an emission spectrum made up of sharp, discrete lines. If the same gas is cool and observed in front of a bright continuous source, it absorbs light at those same wavelengths, resulting in dark absorption lines.
+
+If a free electron passes near a nucleus or ion and is deflected without being captured, the interaction can change the electron's kinetic energy and produce a \bfit{free-free} radiation. This is the case of galaxy clusters, where we have the \textit{Intra Cluster Medium} (ICM), which is an extremely hot gas ($T > 10^6$ K), where hydrogen is fully ionized. This process, called \bfit{thermal bremsstrahlung}, is the dominant source of emission.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.52\textwidth}
+    \vspace{-0.5em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/rad-transitions.png}
+    \caption{Different kinds of transitions between energy levels.
+    Absorption and emission occur between two bound states, whereas ionization and recombination occur between a bound and a free state. Interaction of an atom with a free electron can result in a free-free transition \cite{karttunen}}
+\end{figure}
+\end{minipage}
+
+\vspace{-0.5em}
+
+\subsubsection{The hydrogen atom}
+
+The hydrogen atom is the simplest atom, consisting of a single proton and a single electron. When an electron transitions between two quantized energy levels $n_1$ and $n_2$, it must emit or absorb a photon with energy:
+$$
+\Delta E = h\nu = E_{n_2} - E_{n_1}
+$$
+corresponding to a specific wavelength $\lambda = c / \nu$.
+
+Electronic transitions ending at particular levels produce characteristic series of lines:
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Lyman series} ($n_1=1$): transitions from $n\geq 2$ to $n=1$, all in the ultraviolet (UV).
+    \item \textbf{Balmer series} ($n_1=2$): transitions from $n\geq 3$ to $n=2$, visible and near-UV. 
+    
+    These lines appear as dark absorption lines in stellar spectra (H15, H12, H10, H9, H$\beta$, \dots).
+    \item \textbf{Paschen series} ($n_1=3$): transitions from $n\geq 4$ to $n=3$, infrared.
+    \item \textbf{Bracket series} ($n_1=4$): infrared.
+    \item \textbf{Pfund series} ($n_1=5$): far infrared.
+\end{itemize}
+
+The \bfit{Balmer discontinuity} occurs at $364.7$ nm, representing the \textit{"edge"} in the spectrum corresponding to the ionization energy from the $n=2$ level, where electrons can be ejected from this state. At wavelengths shorter than this limit, photons have enough energy to ionize hydrogen atoms from the $n=2$ state; this is known as the Balmer limit.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.6\textwidth}
+        \includegraphics[width=\textwidth]{assets/h-trans.png}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.35\textwidth}
+        \captionof{figure}{
+            Hydrogen atom transitions and spectral lines. The lower image shows the spectrum of star HD193182, with the dark hydrogen Balmer absorption lines converging toward the Balmer discontinuity at $\lambda = 364.7$\,nm (the ionization limit from $n=2$) on the left. The numbers indicate the higher quantum levels $n$ in each transition. The adjacent iron emission lines, with known wavelengths, serve as calibration references. \cite{karttunen}
+        }
+    \end{minipage}
+\end{figure}
+
+\vspace{-1.5em}
+
+\subsubsection{Line profile}
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.72\textwidth}
+        The previous discussion suggests that spectral lines would have an infinitely narrow and sharp profile. In reality, however, they are somewhat broadened. They have a so-called "\bfit{Voigt profile}": atoms of a gas move faster at higher temperatures, so spectral lines arising from individual atoms are shifted by the Doppler effect.
+
+        \medskip
+
+        A way to characterize the width of a spectral line is by its \textbf{full width at half maximum (FWHM)}, but it is typically larger than the intrinsic (natural) width of the line due to Doppler broadening.
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.25\textwidth}
+        \includegraphics[width=\textwidth]{assets/voigt-profile.png}
+        \vspace{-1.5em}
+        \captionof{figure}{\centering \\ Voigt profile. \cite{karttunen}}
+    \end{minipage}
+\end{figure}
+
+\vspace{-0.5em}
+
+\begin{minipage}{0.3\textwidth}
+    \includegraphics[width=\textwidth]{assets/ew.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.66\textwidth}
+    The \textbf{equivalent width} is another measure of a line's strength. It is the area of rectangular line that has the same area as the line profile and that emits no light at all. The equivalent width can be used to describe the energy corresponding to a line independently of the shape of the line profile.
+\end{minipage}
+
+% The full width at half maximum and the equivalent width both characterize line strength, but they typically differ, though their values are often similar.
+
+\subsubsection{Stellar spectroscopy}
+
+Stellar spectroscopy is a powerful tool that allows us to infer several fundamental properties of a star by carefully analyzing its spectrum:
+
+\begin{enumerate}
+    \item \textbf{Temperatures derived from the spectrum}
+    \begin{itemize}
+        \item \textbf{Color temperature} ($T_\mathrm{col}$): Estimated from color indices ($B - V$). It indicates the spectral peak according to blackbody radiation.
+        \item \textbf{Effective temperature} ($T_\mathrm{eff}$): Defined such that the star emits the same total energy per unit area as a blackbody of temperature $T_\mathrm{eff}$; related to luminosity by $L = 4 \pi R^2 \sigma T_\mathrm{eff}^4$.
+        \item \textbf{Ionization temperature} ($T_\mathrm{ion}$): The temperature that characterizes the state of ionization of atoms, estimated using the Saha equation.
+        \item \textbf{Excitation temperature} ($T_\mathrm{exc}$): The temperature associated with the distribution of atoms in various excited states, deduced using the Boltzmann law.
+    \end{itemize}
+
+    \item \textbf{Surface gravity ($g$)} 
+    
+    Surface gravity determines the pressure broadening of spectral lines and is defined as $g \equiv \frac{GM}{R^2}$, where $M$ is the stellar mass and $R$ is its radius. Higher density ($\rho$) at the stellar surface leads to a greater $g$.
+    
+    \begin{itemize}
+        \item \textbf{Main sequence stars} (luminosity class V): Have higher densities, so as $\rho$ increases, $g$ increases, resulting in broader spectral lines due to pressure broadening (Stark effect).
+        \item \textbf{Giant and supergiant stars} (luminosity classes I, II): Have larger radii and lower densities ($\rho$ decreases as $R$ increases), resulting in higher luminosity ($L$) and narrower spectral lines.
+    \end{itemize}
+
+    \item \textbf{Chemical composition}
+    
+    The presence and strengths of absorption lines, particularly in the ultraviolet, allow us to determine the abundances of various elements within the stellar atmosphere. Specific spectral features correspond to elements and their ionization states, revealing the star's metallicity and chemical history.
+\end{enumerate}
+
+\subsection{Stellar Spectral Types}
+
+\cref{tab:stellar-spectral-types} shows the standard classes used in the Harvard sequence and provide a compact overview of the dominant spectral features, approximate temperatures, and typical colors of stars.
+In practice, each broad class is further divided into finer subclasses, and additional uncommon spectral types exist beyond those shown here.
+    
+\vspace{-0.4em}
+
+\begin{table}[h]
+    \centering
+    \small
+    \begin{tabular}{@{}c l c c@{}}
+        \toprule
+        \textbf{Type} & \textbf{Main spectral features} & \textbf{$T$ (K)} & \textbf{Color} \\
+        \midrule
+        O & He II lines dominate; ionized helium visible & 20{,}000-35{,}000 & Blue \\
+        B & He I lines; few H I lines & 10{,}000-20{,}000 & Blue-white \\
+        A & Strong H I lines & 7{,}500-10{,}000 & White \\
+        F & Weak H I lines; first metallic lines (Ca II) & 6{,}000-7{,}500 & White-yellow \\
+        G & Metallic lines (Ca II), G band & 5{,}200-6{,}000 & Yellow \\
+        K & Metallic lines begin to disappear; molecular lines appear & 3{,}700-5{,}200 & Orange-yellow \\
+        M & Strong molecular bands & 2{,}400-3{,}700 & Red \\
+        \bottomrule
+    \end{tabular}
+    \vspace{-0.2em}
+    \caption{Stellar spectral types, their main features, approximate temperatures, and typical colors.}
+    \label{tab:stellar-spectral-types}
+\end{table}
+
+
+
+
+
+
+
+
+% ================================================================
+% ================================================================
+% ================================================================
+% ================================================================
+% ================================================================
+% ================================================================
+
+
+
+
+\vspace{-1.2em}
+
+\subsection{The Hertzsprung--Russell Diagram}
+
+The \textbf{Hertzsprung--Russell (HR) diagram} is a scatter plot of stars showing the relationship between their luminosity (or absolute magnitude) and their effective temperature (or spectral type/color). It is one of the most important tools in stellar astrophysics.
+
+Stars occupy well-defined regions in the HR diagram:
+
+\vspace{-1em}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.52\textwidth}
+        \begin{itemize}
+            \item The \textbf{main sequence} runs diagonally from the upper-left (hot, luminous O stars) to the lower-right (cool, faint M dwarfs). Most stars, including the Sun, spend the majority of their lives on the main sequence, burning hydrogen in their cores.
+            \item \textbf{Giants} and \textbf{supergiants} occupy the upper-right region (cool but very luminous).
+            \item \textbf{White dwarfs} form a faint sequence in the lower-left (hot but very low luminosity), corresponding to luminosity class $L \sim 10^{-4}\,L_\odot$.
+        \end{itemize}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.46\textwidth}
+        \vspace{-0.2em}
+        \includegraphics[width=\textwidth]{assets/hr_diagram.png}
+
+        \vspace{-0.5em}
+        \captionof{figure}{Hertzsprung-Russell diagram}
+    \end{minipage}
+\end{figure}
+
+\begin{observationblock}[density in the diagram]
+    The densest regions in the diagram are not the ones containing the largest number of stars intrinsically, but those where stars spend most of their lifetimes. E.g., the main sequence is the most populated region because stars spend about 90\% of their lives there, whereas the giant and supergiant regions are sparser because stars pass through those phases more quickly.
+    In catalogues, however, the apparent magnitude is often used. In that case, the most frequent objects are those with higher apparent magnitude only because they are more luminous to us.
+\end{observationblock}
+
+\subsubsection{Age of a Stellar Cluster: the Turn-off Point}
+
+The HR diagram is particularly useful for studying \textbf{stellar clusters}, which are groups of coeval (same-age) stars. Since all stars in a cluster formed at approximately the same time from the same gas cloud, they share a common age but differ in mass.
+
+Stars leave the main sequence at the so-called \textbf{turn-off point}: massive stars evolve faster and leave first (upper end), while less massive stars remain on the main sequence for longer. Given $L \propto M^{3.5}$, the main-sequence lifetime is approximately:
+$$
+t_\mathrm{MS} \lesssim \frac{E_\mathrm{MS}}{L} \approx \frac{Mc^2}{L}
+$$
+A useful empirical relation for the main-sequence lifetime is:
+$$
+t_\mathrm{MS} \approx 8 \times 10^9 \left(\frac{M}{M_\odot}\right)^{-3.5} \,\mathrm{yr}
+$$
+The position of the turn-off point in a cluster's HR diagram therefore directly gives the \textbf{age of the cluster}: the higher the turn-off luminosity, the younger the cluster.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{assets/turning-point.png}
+    \caption{Turn-off point in cluster HR diagrams}
+\end{figure}
+
+\subsection{Variable Stars}
+
+\textbf{Variable stars} are stars whose brightness changes with time. There are two main categories:
+
+\begin{itemize}
+    \item \textbf{Extrinsic variables}: their brightness variability is not due to intrinsic physical changes. A major subclass is \textbf{binary stars}, where two stars orbit each other and periodically eclipse one another along the line of sight (\textit{eclipsing binaries}).
+
+    \item \textbf{Intrinsically variable stars}: stars that are physically varying (e.g.\ pulsating or erupting). Within this category, \textbf{periodically variable stars} (such as Cepheids and RR~Lyrae stars) occupy an \textit{instability strip} in the HR diagram. These stars pulsate radially, and their light curves show regular, well-defined periods.
+\end{itemize}
+
+\subsubsection{The Period--Luminosity Relation for Cepheids}
+
+\textbf{Cepheid variables} are massive, luminous, pulsating stars (typical type: F--G supergiants). They obey a tight \textbf{period--luminosity relation}: more luminous Cepheids pulsate more slowly.
+
+The period-luminosity relation makes Cepheids excellent \textbf{standard candles}: by measuring the pulsation period, one can infer the absolute magnitude $M$, and then use the distance modulus to determine the distance:
+$$
+m - M = 5 \log\left(\frac{D}{\mathrm{pc}}\right) - 5 + A_V
+$$
+where $A_V$ is the extinction in the $V$ band. Cepheids are used as primary distance indicators out to tens of Mpc, bridging the distance ladder between the local Universe and extragalactic scales.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.52\textwidth]{assets/cepheids.png}
+    \hspace{3em}
+    \includegraphics[width=0.35\textwidth]{assets/cepheids_period.png}
+    \caption{Left: Period-luminosity relationship for pulsating variable stars, (Cepheids Type I and II, and RR Lyrae). Right: Cepheid phase curves over one pulsation cycle.}
+    \label{fig:cepheids}
+\end{figure}
+
+\vspace{-1em}
+
+The underlying physics of the phase curves shown in \cref{fig:cepheids} reflects the thermodynamic cycle of the stellar envelope. According to the Stefan-Boltzmann law, the intrinsic luminosity is proportional to the fourth power of the effective temperature ($L \propto T^4$). Dynamically, a negative radial velocity indicates an expanding envelope, which induces a blueshift in the spectral lines; conversely, a positive radial velocity corresponds to contraction and a subsequent redshift. However, due to the phase lag in the pulsation mechanism, the star reaches its maximum temperature (becoming bluer) near the compression phase, whereas it cools down (becoming redder) during expansion.

@@ -1,0 +1,266 @@
+\chapter{Galaxy SED and Evolution} \label{ch:galaxy_seds}
+
+\begin{warningblock}[Chapter not finished!]
+This chapter is not finished yet: still need to check for correctness and add images
+\end{warningblock}
+
+\section{The Galaxy SED as a Multi-Component System} \label{sec:galaxy_sed_intro}
+
+\begin{minipage}{0.55\textwidth}
+A galaxy's \textbf{spectral energy distribution} (SED) is a measurement of its flux (or luminosity per unit area per unit time) as a function of wavelength or frequency, typically spanning from the ultraviolet (UV) to the infrared (IR), in units of $\text{erg\,s}^{-1}\text{cm}^{-2}\text{\AA}^{-1}$ or $\text{erg\,s}^{-1}\text{cm}^{-2}\text{Hz}^{-1}$. Unlike the spectrum of a single star, a galaxy SED is not the emission of a single physical source, but the superposition of light from several distinct baryonic components: the \textbf{stars}, the \textbf{ionised gas}, the \textbf{dust}, and, where present, an \textbf{active galactic nucleus} (AGN, \cref{ch:agn}).
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \missing{Figure: characteristic SEDs of an elliptical, a spiral (Sb, Sd), and a QSO, spanning UV to far-IR.}
+\end{minipage}
+
+\medskip
+
+Each of these components leaves a distinct imprint on the observed SED. \textbf{Stars} dominate the UV-to-NIR continuum and its absorption-line structure. The \textbf{ionised gas} surrounding young, massive stars produces a nebular continuum and characteristic emission lines. \textbf{Dust} absorbs and scatters starlight, preferentially at short wavelengths, and re-radiates the absorbed energy thermally in the infrared. An \textbf{AGN}, when present, can contribute a power-law-like continuum from the accretion disc and hot corona, together with a distinct mid-infrared bump from a dusty torus. Because these components combine in different proportions depending on a galaxy's morphology, gas content, and evolutionary state, the overall shape of the SED already encodes a great deal of physical information, even for a galaxy that is spatially unresolved: an elliptical galaxy, with its old, quiescent stellar population and negligible gas and dust content, shows a red SED peaking in the near-infrared, while a gas- and dust-rich spiral shows a bluer UV continuum together with strong mid- and far-infrared emission from dust heated by ongoing star formation. A QSO, by contrast, is dominated by AGN light across UV, optical, and mid-IR wavelengths, largely outshining its host galaxy.
+
+\medskip
+
+The remainder of this chapter develops, in turn, how each of these components is modelled (\cref{sec:stellar_pop_synthesis,sec:nebular_emission,sec:dust_seds,sec:agn_seds}), and how the resulting composite SED is compared against observations to recover a galaxy's physical properties (\cref{sec:sed_fitting_principle,sec:stellar_mass,sec:sfr_estimators,sec:age_sfh_metallicity,sec:galaxy_classification}).
+
+\section{Stellar Population Synthesis} \label{sec:stellar_pop_synthesis}
+
+To first approximation, the light of a galaxy is simply the sum of the light of all its stars. Building this sum requires three physical ingredients: the distribution of stellar masses at birth, the way each star evolves in luminosity and temperature over time, and the spectrum emitted by a star of given mass, age, and metallicity.
+
+\subsection{The HR Diagram, Isochrones, and the IMF} \label{subsec:hr_isochrones}
+
+\begin{minipage}{0.56\textwidth}
+The \textbf{Hertzsprung-Russell} (HR) diagram, plotting stellar luminosity against effective temperature (or spectral type), is the basic tool used to describe stellar evolution. More massive stars are hotter, bluer, and more luminous, and spend a correspondingly shorter time on the main sequence before evolving off it into giant, supergiant, or degenerate remnant phases. An \bfit{isochrone} is a curve on the HR diagram connecting stars of a single age and metallicity but different initial masses: it describes how a coeval population of stars, all born simultaneously from a single burst, distributes itself across the HR diagram at any subsequent time, as the most massive stars evolve away from the main sequence first.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \missing{Figure: HR diagram with isochrones of different ages, showing the main sequence turn-off moving to lower masses with increasing age.}
+\end{minipage}
+
+\medskip
+
+The relative number of stars formed at each initial mass is set by the \textbf{Initial Mass Function} (IMF). Different IMF parametrisations (e.g.\ Salpeter, Kroupa, Chabrier) assign different relative weights to low- and high-mass stars, and consequently to how the total stellar mass and luminosity of a population are distributed: because low-mass stars vastly outnumber high-mass ones but contribute comparatively little light, the choice of IMF strongly affects the conversion between an observed luminosity and an inferred stellar mass, an effect discussed further in \cref{sec:stellar_mass}.
+
+\medskip
+
+Individual stellar spectra vary systematically along the main sequence. Hot, massive \textbf{O and B} stars dominate the UV continuum and show strong ionised helium lines; intermediate-temperature \textbf{A} stars exhibit the strongest hydrogen (Balmer) absorption lines; cooler \textbf{G, K, and M} stars are instead characterised by strong metallic absorption lines and, in the coolest cases, molecular bands (e.g.\ TiO). This progression directly shapes how the integrated spectrum of a stellar population evolves with age, since the population is dominated at any given time by whichever spectral types are still present on (or have only recently left) the main sequence.
+
+\subsection{Simple and Composite Stellar Populations} \label{subsec:ssp_csp}
+
+\begin{definitionblock}[Simple Stellar Population]
+A \bfit{Simple Stellar Population} (SSP) is an idealised population of stars that are all born at the same instant, from a single IMF, and share a common metallicity $Z$. It is not a realistic description of any real galaxy, but it constitutes the fundamental building block from which more realistic populations are constructed. Combining the IMF, a set of isochrones, and a library of stellar spectra yields the SSP spectrum as a function of age and metallicity, $f_{\text{SSP}}(t, Z)$.
+\end{definitionblock}
+
+The SED of an SSP evolves dramatically with age, tracking the evolution of the dominant spectral type along the isochrone. A very young SSP (a few to tens of Myr) is dominated by short-lived, hot O and B stars and is correspondingly blue, with strong Balmer absorption lines once the OB population has faded and A stars dominate. As the population ages further (hundreds of Myr to a few Gyr), massive stars die off, the UV flux fades, and the spectrum reddens; two features become increasingly prominent in this phase: the \textbf{Balmer break}, a discontinuity in the continuum around $3646\,\text{\AA}$, and the \textbf{$4000\,\text{\AA}$ break} (\cref{subsec:d4000_galaxy}), a drop in flux shortward of $4000\,\text{\AA}$ caused by the build-up of metal absorption lines in cooler stellar atmospheres. By an age of order $10\,\text{Gyr}$, the population is dominated by cool, low-mass stars and evolved giants, showing strong metallic lines, weak Balmer absorption, and a pronounced $4000\,\text{\AA}$ break. Additional, more subtle features include the Lyman break at $912\,\text{\AA}$ (far-UV) and a $1.6\,\mu\text{m}$ "bump" produced by an opacity minimum of the H$^-$ ion in cool stellar atmospheres.
+
+\medskip
+
+Real galaxies, however, do not form in a single instantaneous burst: they build up their stellar content over an extended, and often complicated, \textbf{star formation history} (SFH), while simultaneously enriching their gas (and hence their newly formed stars) in metals. A \bfit{Composite Stellar Population} (CSP) accounts for this by integrating the time-dependent SSP spectrum against both the SFH and the chemical enrichment history:
+$$
+f_{\text{CSP}}(t) = \int_0^t \psi(t')\, f_{\text{SSP}}\big(t-t',\, Z(t')\big)\, dt' ,
+$$
+where $\psi(t')$ is the star formation rate at time $t'$ and $Z(t')$ the metallicity of the gas (and newly formed stars) at that time. Commonly adopted parametric forms for $\psi(t)$ include constant, exponentially declining ("$\tau$-models"), rising, and delayed star formation histories; \cref{sec:age_sfh_metallicity} discusses the systematic uncertainties that this choice of parametrisation introduces into the recovered galaxy properties.
+
+\begin{tipsblock}[Ingredients of stellar population synthesis]
+Predicting the spectrum of a stellar population, whether an SSP or a CSP, always rests on the same three ingredients: the \textbf{IMF} (how many stars of each mass are born), the \textbf{isochrones} (how each star's temperature and luminosity evolve with time), and a library of \textbf{stellar spectra} (what each star looks like at a given mass, age, and metallicity). Different choices for any of these three ingredients, commonly packaged together into a stellar population synthesis (SPS) code (e.g.\ BC03, FSPS, BPASS, M05), can lead to systematically different predicted SEDs, and hence to different inferred galaxy properties (\cref{sec:sed_fitting_principle}).
+\end{tipsblock}
+
+\section{Nebular Emission from Ionised Gas} \label{sec:nebular_emission}
+
+A stellar population alone does not fully reproduce an observed galaxy SED: real spectra also show emission lines that stellar photospheres cannot produce. These originate not from the stars themselves but from the surrounding \textbf{ionised gas}. The intense UV radiation field of young, massive O and early B stars is capable of photoionising the surrounding hydrogen, producing \bfit{HII regions}: clouds of ionised gas that emit both a nebular continuum and a rich set of recombination and collisionally excited emission lines.
+
+\medskip
+
+Beyond the hydrogen recombination lines (e.g.\ H$\alpha$, H$\beta$), HII regions also emit lines from heavier, partially ionised elements such as oxygen, nitrogen, and sulphur. The relative strengths of these lines depend on the \textbf{ionisation parameter} (the ratio of ionising photon density to hydrogen density), on the gas-phase \textbf{metallicity}, and on the nitrogen-to-oxygen (N/O) abundance ratio, which itself reflects the galaxy's star formation and chemical enrichment history, as well as gas inflows and outflows. Because these dependencies are non-trivial, diagrams of emission-line ratios (most notably the BPT diagram, \cref{subsec:agn_selection_lines}) are widely used both to diagnose the physical conditions of star-forming gas and to distinguish star formation from AGN-driven ionisation.
+
+\section{Dust: Extinction and Re-emission} \label{sec:dust_seds}
+
+Cosmic dust, composed of silicate and carbonaceous grains (including graphite and polycyclic aromatic hydrocarbons, PAHs), reshapes the galaxy SED twice over: it first absorbs and scatters starlight, preferentially at short wavelengths, and then re-radiates the absorbed energy thermally at much longer, infrared wavelengths.
+
+\subsection{Dust Extinction and Attenuation Curves} \label{subsec:dust_extinction}
+
+\begin{minipage}{0.55\textwidth}
+Dust \textbf{extinction} describes the wavelength-dependent dimming and reddening of starlight passing through a column of dust, quantified logarithmically via $A_\lambda = -2.5\log_{10}(F_\lambda/F_\lambda^0)$, where $F_\lambda^0$ is the intrinsic (unattenuated) flux. The \bfit{extinction curve}, $A_\lambda$ as a function of wavelength, generally rises steeply toward the UV, so that short-wavelength light is far more strongly suppressed than infrared light; a prominent feature at $\sim 220\,\text{nm}$, commonly attributed to graphite grains, appears as a "bump" superposed on this general decline.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \missing{Figure: extinction curve showing the UV rise and 220\,nm bump, compared for MW, LMC, and SMC dust.}
+\end{minipage}
+
+\medskip
+
+The precise shape of the extinction curve is not universal: it depends on the composition, size distribution, and geometry of the dust relative to the emitting stars, and consequently varies both between galaxies and along different lines of sight within a single galaxy. The Milky Way, Large Magellanic Cloud, and Small Magellanic Cloud, for instance, are each characterised by extinction curves of somewhat different shape, so that the same intrinsic starlight is attenuated differently depending on which dust law applies. When a full mixture of stars and dust (rather than a single background source behind a foreground screen) is considered, the resulting galaxy-integrated relation is more properly termed an \bfit{attenuation curve}, since geometric effects (scattering back into the line of sight, and differential coverage of older and younger stellar populations by dust) modify the pure extinction law.
+
+\subsection{Dust Re-emission} \label{subsec:dust_reemission}
+
+The energy absorbed by dust grains is not lost, but re-radiated thermally in the infrared, closing the galaxy's energy budget between its UV/optical and IR emission. The resulting IR SED is not a single blackbody, but a superposition of components at different characteristic temperatures. At mid-infrared wavelengths ($\lesssim 30\,\mu\text{m}$), the emission is dominated by very small grains and PAH molecules, which can be transiently heated to temperatures of order $100$-$1000\,\text{K}$ by the absorption of a single energetic photon; this component also carries a set of characteristic PAH emission bands (e.g.\ at $6.2$, $7.7$, $8.6$, $11.3$, and $17.0\,\mu\text{m}$). At far-infrared wavelengths ($\gtrsim 30\,\mu\text{m}$), the emission instead comes from larger grains in thermal equilibrium with the ambient radiation field, typically at colder temperatures ($T \lesssim 40\,\text{K}$), and it is this component that carries most of the total absorbed energy. Because more intense star formation heats the dust to higher temperatures, a quiescent star-forming galaxy and a starburst galaxy of comparable dust mass show characteristically different far-infrared peak wavelengths, colder and warmer respectively.
+
+\medskip
+
+Combining these effects, a galaxy SED computed with dust included differs sharply from the same galaxy modelled without dust: the UV and optical continuum is suppressed relative to the dust-free case, while a substantial new component appears in the infrared, peaking where the dust-free spectrum is essentially featureless. This UV-suppression/IR-emission pairing is the basis for several of the star-formation-rate estimators discussed in \cref{sec:sfr_estimators}.
+
+\section{Active Galactic Nuclei in the SED} \label{sec:agn_seds}
+
+Where present, an AGN can contribute significantly to, or even dominate, the observed SED. Its intrinsic spectrum is itself composite: the \textbf{accretion disc} produces a strong, blue UV/optical continuum; the \textbf{hot corona} up-scatters disc photons via inverse Compton scattering into an X-ray continuum; and a surrounding \textbf{dusty torus}, heated by the intense central UV/X-ray radiation field, re-emits this energy predominantly in the mid-infrared. Additional features include broad and narrow emission lines from photoionised gas clouds at different distances from the black hole, and, for radio-loud systems, non-thermal synchrotron emission from relativistic jets.
+
+\medskip
+
+The relative prominence of these components in the observed, combined host-galaxy-plus-AGN SED depends both on the AGN's intrinsic luminosity relative to the host and on its orientation. As the AGN becomes more luminous relative to its host, its power-law continuum and torus emission increasingly dominate the UV/optical and mid-infrared, respectively. Orientation matters chiefly through \textbf{obscuration}: in a Type~1 (unobscured) AGN, viewed close to face-on, the accretion disc and broad emission lines are directly visible, producing a strong optical/UV continuum; in a Type~2 (obscured) AGN, the torus blocks the direct view of the disc, so the observed SED instead shows a comparatively flat, featureless mid-infrared continuum with the UV/optical AGN light suppressed. Because obscured and unobscured AGN nonetheless display very similar power-law behaviour in the mid-infrared, this common signature underlies the two-colour AGN selection technique discussed in \cref{subsec:agn_selection_lines}.
+
+\section{From Observed SED to Galaxy Properties} \label{sec:sed_fitting_principle}
+
+\subsection{The Principle of SED Fitting} \label{subsec:sed_fitting_principle_detail}
+
+Observationally, a galaxy is characterised either through \textbf{spectroscopy} (detailed measurements across a continuous range of wavelengths, revealing individual absorption and emission features) or through \textbf{photometry} (integrated flux measurements through a discrete set of broad, medium, or narrow filters, sampling the SED only at a handful of points). Either kind of observation may be \textbf{resolved}, isolating individual regions within a galaxy, or, as is the case for the majority of extragalactic sources, \textbf{unresolved}, integrating the light of the entire galaxy along a single line of sight.
+
+\medskip
+
+Regardless of which observational mode is used, the underlying strategy for recovering physical properties is the same: a theoretical CSP model, combined with a prescription for nebular emission, dust attenuation and re-emission, and (where relevant) an AGN component, is used to generate a synthetic SED for an assumed set of physical parameters (SFH, metallicity history, dust content, AGN fraction, redshift). This synthetic SED is then compared against the observed photometry or spectrum, and the parameters of the best-fitting model are adopted as estimates of the galaxy's properties: principally its \textbf{stellar mass}, \textbf{age and star formation history}, \textbf{stellar and gas-phase metallicity}, \textbf{dust mass and temperature}, \textbf{AGN contribution}, and \textbf{redshift}.
+
+\subsection{Photometric Redshifts} \label{subsec:photo_z}
+
+\begin{minipage}{0.55\textwidth}
+When only broadband photometry is available, redshift must be estimated from the position of characteristic spectral breaks (the Lyman break at $912\,\text{\AA}$, the Balmer break at $\sim 3646\,\text{\AA}$, or the $4000\,\text{\AA}$ break) as they shift to longer observed wavelengths with increasing redshift. A single colour is generally insufficient to constrain redshift (with a few exceptions, such as the $3.6$-$4.5\,\mu\text{m}$ colour), but combining two or more colours substantially improves the precision, since a genuine spectral break produces a colour signature that a smooth continuum, or a different-redshift interloper, does not reproduce.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \missing{Figure: photometric colour tracking a spectral break as it shifts through observed filters with increasing redshift.}
+\end{minipage}
+
+\medskip
+
+This principle underlies a family of \textbf{colour-colour selection} techniques targeting galaxies in specific redshift ranges: examples include the $3.6$-$4.5\,\mu\text{m}$ colour for $z \gtrsim 0.9$, the $BzK$ diagram (separating passive and star-forming galaxies at $z \gtrsim 1.5$), and $J - 3.6\,\mu\text{m}$ versus $R - J$ diagrams at $z > 2$. At the very highest redshifts ($z \gtrsim 3$ and $z \gtrsim 6$), the \bfit{dropout technique} exploits the Lyman break directly: once it shifts into a given filter, essentially all flux blueward of the break is absorbed by the intergalactic medium, so the galaxy appears to "drop out" of that filter entirely while remaining detected redward of it.
+
+\medskip
+
+More generally, dedicated \textbf{photometric redshift} (photo-z) codes fit the full observed multi-band photometry against a library of galaxy templates spanning a range of ages, star formation histories, dust content, and redshifts, and return both a best-fit redshift and its associated probability distribution. The accuracy of this procedure, quantified by the scatter and outlier fraction relative to spectroscopic redshifts, improves with the number and wavelength coverage of the photometric bands used, with the signal-to-noise of the photometry, and with the sophistication of the fitting templates; accuracy generally degrades for fainter, lower signal-to-noise galaxies.
+
+\subsection{Degeneracies in Parameter Estimation} \label{subsec:sed_degeneracies}
+
+A central difficulty of SED fitting is that several distinct combinations of physical parameters can reproduce very similar observed SEDs. The best-known example is the \textbf{age-metallicity-dust degeneracy}: a young, metal-rich, dusty galaxy and an older, metal-poor, dust-free galaxy can show nearly indistinguishable broadband colours, since dust reddening mimics the reddening produced by an ageing stellar population. This degeneracy is compounded by the fact that the \bfit{light-weighted age} of a stellar population is itself strongly wavelength-dependent: UV light is dominated by the youngest, most massive stars present, so the light-weighted age in the UV can be far younger than the true mass-weighted age of the population, while optical and near-infrared light, increasingly sensitive to older giants and lower-mass stars, tracks an age much closer to the mass-weighted value. Colour-colour diagrams combining a dust-sensitive colour (e.g.\ $U-V$) with a less dust-sensitive one (e.g.\ $V-J$) are commonly used to at least partially break this degeneracy, since a vector of fixed dust reddening moves through such a diagram along a direction distinguishable from the locus traced by ageing, dust-free populations.
+
+\begin{observationblock}[Sensitivity to modelling choices]
+Beyond genuine physical degeneracies, the recovered galaxy properties are also sensitive to purely methodological choices. The assumed \textbf{parametric form of the SFH} (constant, exponentially declining, rising, delayed, or including a late burst or rapid quenching episode) can bias the recovered stellar mass, SFR, metallicity, and dust attenuation, particularly because simplified parametric SFHs do not fully capture the fluctuating star formation histories seen in cosmological simulations. The choice of \textbf{stellar population synthesis library} (e.g.\ BC03, FSPS, BPASS, M05) introduces systematic offsets in stellar mass of order $0.1$-$0.2\,\text{dex}$, driven by differences in the underlying stellar evolution tracks and atmosphere models. Finally, the assumed \textbf{IMF} directly rescales the inferred stellar mass for a given luminosity, since different IMFs distribute mass and light differently between low- and high-mass stars; changing the assumed IMF alone can shift derived stellar masses by $0.2\,\text{dex}$ or more. Robust inference of galaxy properties therefore requires reporting results together with the specific modelling choices adopted.
+\end{observationblock}
+
+\section{Stellar Mass Estimation} \label{sec:stellar_mass}
+
+Stellar mass is typically estimated by combining an observed luminosity with an assumed \textbf{mass-to-light ratio} (M/L), itself inferred from the galaxy's broadband colour: older, redder stellar populations generally have higher M/L ratios than younger, bluer ones, so that even a single well-chosen colour and magnitude can provide a rough stellar mass estimate. Because different photometric bands are sensitive to different aspects of the underlying stellar population, the choice of band matters: the \textbf{near-infrared} (particularly the K-band) is comparatively insensitive to recent star formation and dust, and consequently more directly tracks the bulk of the stellar mass (dominated by long-lived, low-mass stars), while the \textbf{UV/optical} is far more sensitive to a galaxy's age and recent star formation history. Combining NIR and UV/optical photometry therefore generally yields a more robust stellar mass estimate than either alone, since it constrains simultaneously the bulk of the stellar mass and the modelling choices (SFH, dust, IMF) that otherwise bias a mass-to-light-ratio-based estimate.
+
+\medskip
+
+It is worth emphasising that redder colours do not necessarily indicate an older, quiescent population: a young, dusty, actively star-forming galaxy can appear just as red as an old, dust-free one, since dust attenuation reddens the observed SED in a manner similar to stellar ageing (\cref{subsec:sed_degeneracies}).
+
+\section{Star Formation Rate Estimators} \label{sec:sfr_estimators}
+
+The \textbf{star formation rate} (SFR) measures the rate at which new stars are currently being formed, typically probed over timescales of $10$-$100\,\text{Myr}$, set by the lifetimes of the massive, short-lived stars that dominate the relevant tracers. An ideal SFR indicator should be unobscured by dust, insensitive to viewing angle and environment, and reliable across a wide range of redshift; in practice, no single tracer satisfies all of these criteria simultaneously, which motivates the use of several complementary estimators.
+
+\subsection{Ultraviolet Continuum} \label{subsec:sfr_uv}
+
+The UV continuum (typically probed around $1500$-$2500\,\text{\AA}$) is dominated by young, massive O and B stars, whose short lifetimes ($10$-$100\,\text{Myr}$) mean that their contribution to the total UV flux declines quickly once star formation ceases; this makes the UV luminosity, $\text{SFR}_{\text{UV}} \propto L_\nu$, a direct tracer of recent, unobscured star formation. The conversion factor between UV luminosity and SFR depends on the assumed IMF, metallicity, and recent SFH. Because UV light is strongly affected by dust attenuation (\cref{subsec:dust_extinction}), an uncorrected UV-based SFR systematically underestimates the true star formation rate in dusty galaxies; the slope of the UV continuum ($\beta$) is commonly used as a dust indicator, since it correlates tightly with the infrared-to-UV luminosity ratio (IRX, $L_{\text{IR}}/L_{\text{UV}}$).
+
+\subsection{Nebular Emission Lines} \label{subsec:sfr_lines}
+
+Hydrogen recombination lines, most notably \textbf{H$\alpha$} at $6563\,\text{\AA}$ (rest-frame), trace the ionised gas surrounding young, massive stars (only stars above $\sim 20\,M_\odot$ produce significant ionising flux), giving $\text{SFR}_{\text{H}\alpha} \propto L_{\text{H}\alpha}$. At redshifts above $z \sim 0.5$, H$\alpha$ shifts out of the optical window and is commonly replaced by the \textbf{[O\,\textsc{ii}]} doublet at $3727\,\text{\AA}$; because [O\,\textsc{ii}] is also sensitive to the ionisation state of the gas, its conversion to SFR is comparatively less direct than that of H$\alpha$. Both line-based estimators, like the UV continuum, depend on the assumed IMF and require a dust correction.
+
+\subsection{Infrared Emission} \label{subsec:sfr_ir}
+
+Because dust reprocesses absorbed UV/optical starlight into infrared emission (\cref{subsec:dust_reemission}), the total infrared luminosity, $\text{SFR}_{\text{IR}} \propto L_{\text{IR}}$, provides a tracer of \textbf{obscured} star formation that is largely complementary to the UV. In practice, $L_{\text{IR}}$ can be recovered either by fitting the full mid-to-far-infrared SED with dust emission templates, or by extrapolating from a single IR photometric band using template SEDs; the strength of individual PAH features can also serve as a supplementary SFR indicator.
+
+\subsection{Combining UV and IR: Total SFR} \label{subsec:sfr_combined}
+
+Because the UV traces unobscured star formation while the IR traces the obscured component, the two are naturally combined into a single, more complete SFR estimate,
+$$
+\text{SFR} = \kappa_{\text{UV}}\,L_{\text{UV}}[\text{measured}] + \kappa_{\text{IR}}\,L_{\text{IR}} ,
+$$
+which recovers, to good approximation, the intrinsic (pre-dust) UV luminosity that a purely UV-based estimate would otherwise miss. The fraction of the total SFR recovered in the infrared increases systematically with total infrared luminosity, reflecting the fact that more luminous, more actively star-forming galaxies tend to be more heavily dust-obscured; this makes the combined UV+IR approach particularly important for luminous, dusty star-forming galaxies, where a UV-only estimate can underestimate the true SFR by a factor of several.
+
+\begin{tipsblock}[Radio continuum as a star-formation tracer]
+Beyond the UV, optical, and infrared, the non-thermal \textbf{radio continuum} (synchrotron emission from relativistic electrons accelerated in supernova remnants) offers a further, largely dust-unaffected SFR tracer, since galaxies with higher massive-star formation rates produce more supernovae and correspondingly stronger synchrotron emission. Because both the infrared and radio emission of a star-forming galaxy trace the same underlying population of young, massive stars (via dust heating and supernova-driven particle acceleration respectively), the two luminosities are tightly correlated: the \textbf{IR-radio correlation}, commonly parametrised via
+$$
+q_{\text{IR}} \equiv \log\frac{L_{\text{IR}}/(3.75\times10^{12}\,\text{W})}{L_{1.4}/(\text{W\,Hz}^{-1})} ,
+$$
+holds with a nearly constant value, $q_{\text{IR}} \approx 2.3$, across a wide range of redshift and stellar mass. This robustness makes radio continuum emission, though comparatively insensitive and reliant on the IR-radio correlation itself, a useful cross-check and complementary SFR tracer, particularly valuable because it is essentially unaffected by dust and can be observed from the ground.
+\end{tipsblock}
+
+\section{Ages, Star Formation Histories, and Metallicities} \label{sec:age_sfh_metallicity}
+
+\subsection{Spectral Indices} \label{subsec:d4000_galaxy}
+
+Individual narrow spectral features, or \textbf{indices}, provide comparatively model-independent constraints on a stellar population's age and metallicity. The \textbf{$4000\,\text{\AA}$ break} ($D_n4000$), already introduced in \cref{subsec:d4000} as a cosmic chronometer, strengthens both with the age of a passively evolving population and with its metallicity, since it arises from the build-up of metal absorption lines in the atmospheres of cool, evolved stars. The Balmer absorption index \textbf{H$\delta_A$}, by contrast, is strongest in A-type stars, and consequently peaks for populations that experienced a burst of star formation roughly $100\,\text{Myr}$ to $1\,\text{Gyr}$ in the past (the so-called "post-starburst" or "E+A" phase), while remaining comparatively weak in both very young, continuously star-forming populations and very old, quiescent ones.
+
+\medskip
+
+Crucially, neither index is a pure tracer of age or of metallicity in isolation: both $D_n4000$ and $\text{H}\delta_A$ respond to changes in either parameter, so that a single measured index cannot uniquely determine either quantity. This degeneracy can be substantially reduced by combining two indices into a two-dimensional grid (e.g.\ $\text{H}\delta_A$ versus $D_n4000$, or $\text{H}\beta$ versus a combined metallic-line index such as [MgFe50]$'$), in which lines of constant age and constant metallicity run at a sufficiently different angle to allow both parameters to be constrained simultaneously.
+
+\medskip
+
+The $\text{H}\delta_A$-$D_n4000$ plane is also widely used to give a rough, model-independent classification of a galaxy's recent star formation history (Kauffmann et al.\ 2003): galaxies with high $\text{H}\delta_A$ and low $D_n4000$ have experienced a significant starburst within the last $100\,\text{Myr}$; galaxies with intermediate values of both indices experienced a starburst further in the past; and galaxies with low $\text{H}\delta_A$ and high $D_n4000$ show no evidence of any recent burst. A related classification (Poggianti et al.\ 2009), combining the [O\,\textsc{ii}]$\,3727\,\text{\AA}$ equivalent width with $\text{H}\delta_A$, further distinguishes ongoing, continuous star formation (moderate [O\,\textsc{ii}], weak $\text{H}\delta_A$) from a recently terminated starburst (no detectable [O\,\textsc{ii}], strong $\text{H}\delta_A$), the signature of a "post-starburst" galaxy.
+
+\subsection{Full SED and Spectral Fitting for the SFH} \label{subsec:sed_sfh_reconstruction}
+
+Where sufficient spectral coverage and resolution are available, the full star formation and chemical enrichment history can, in principle, be reconstructed by fitting the observed spectrum with a combination of SSPs of different ages and metallicities, recovering the fraction of stellar mass formed at each lookback time. Tests against synthetic galaxies with known, input star formation and metallicity histories confirm that this approach can recover the true SFH accurately under favourable conditions (high signal-to-noise, well-matched models); in practice, however, the recovered SFH remains sensitive to the assumed parametric form and to the adopted stellar population synthesis library, exactly as already noted in \cref{subsec:sed_degeneracies}.
+
+\subsection{Gas-Phase Metallicity from Emission Lines} \label{subsec:gas_metallicity}
+
+The metallicity of the ionised gas (as opposed to the metallicity of the stars themselves) is estimated from ratios of strong nebular emission lines: for example $R_3 \equiv [\text{O\,\textsc{iii}}]\lambda5007/\text{H}\beta$, $R_2 \equiv [\text{O\,\textsc{ii}}]\lambda3727/\text{H}\beta$, $N_2 \equiv [\text{N\,\textsc{ii}}]\lambda6584/\text{H}\alpha$, or the combined $R_{23} \equiv ([\text{O\,\textsc{ii}}]+[\text{O\,\textsc{iii}}])/\text{H}\beta$, each empirically or theoretically calibrated against the gas-phase oxygen abundance, $12+\log(\text{O/H})$. Many of these diagnostics are \textbf{double-valued}: a single observed line ratio can correspond to two distinct metallicities on either branch of the calibration curve, and most also carry a secondary dependence on the ionisation parameter of the gas. Combining several independent line diagnostics simultaneously is the standard way of breaking these degeneracies and obtaining a more robust metallicity estimate.
+
+\begin{exampleblock}[The fundamental metallicity relation]
+At fixed stellar mass, galaxies with higher star formation rates are observed to have systematically \emph{lower} gas-phase metallicities, and vice versa; this three-way relation between stellar mass, SFR, and metallicity is known as the \bfit{Fundamental Metallicity Relation} (FMR, Mannucci et al.\ 2010). It is naturally interpreted as the result of gas inflows (diluting metallicity during episodes of enhanced star formation, by bringing in comparatively pristine gas) and metal-enriched outflows (more efficient in more actively star-forming galaxies), both of which regulate a galaxy's chemical enrichment as it forms stars.
+\end{exampleblock}
+
+\section{Classifying Galaxies: Star-Forming versus Quiescent} \label{sec:galaxy_classification}
+
+\subsection{AGN Selection} \label{subsec:agn_selection_lines}
+
+Beyond classifying galaxies by their star formation activity, it is often necessary to identify and remove AGN contamination. Two complementary techniques are widely used. The first exploits the mid-infrared \textbf{power-law} continuum shared by both obscured and unobscured AGN (\cref{sec:agn_seds}): AGN preferentially occupy a distinct locus in near-/mid-infrared colour-colour space, allowing an efficient two-colour selection. The second relies on \textbf{optical emission-line ratios}, most commonly displayed in the \textbf{BPT diagram} (Baldwin, Phillips \& Terlevich 1981), which plots $[\text{O\,\textsc{iii}}]/\text{H}\beta$ against $[\text{N\,\textsc{ii}}]/\text{H}\alpha$. Star-forming regions, photoionised by the comparatively soft radiation field of O and B stars, occupy a distinct region of this diagram from Seyferts and LINERs, which are instead photoionised by the much harder, non-thermal radiation field of an accreting black hole.
+
+\subsection{The UVJ Diagram} \label{subsec:uvj_diagram}
+
+A single optical colour, such as $U-V$, is not by itself sufficient to separate quiescent from star-forming galaxies, since dust attenuation can redden an actively star-forming galaxy to the point where it mimics the colour of an old, quiescent population (\cref{subsec:sed_degeneracies}). This ambiguity is resolved by adding a second, less dust-sensitive colour: the \textbf{$U-V$ versus $V-J$} (UVJ) diagram cleanly separates the two populations, since dust reddening moves a star-forming galaxy through this diagram along a direction distinct from the locus occupied by genuinely old, quiescent systems. The UVJ diagram (and its variants) is consequently the standard tool used to classify unresolved galaxies as quiescent or star-forming across a wide range of redshift.
+
+\subsection{Environmental Dependence of Quenching} \label{subsec:environment_quenching}
+
+Whether a galaxy is star-forming or quiescent depends not only on its stellar mass, but also on its environment. At fixed stellar mass, galaxies residing in denser environments (groups and clusters) show, on average, lower star formation rates and a substantially higher quiescent fraction than galaxies in the field; this environmental effect becomes progressively stronger closer to a cluster's centre. Two complementary "quenching efficiencies" are used to disentangle the roles of mass and environment: the \textbf{mass quenching efficiency}, $\varepsilon_m$, which measures the excess quiescent fraction attributable to stellar mass at fixed environment, and the \textbf{environmental quenching efficiency}, $\varepsilon_\rho$, which measures the excess quiescent fraction attributable to environment at fixed stellar mass. Empirically, $\varepsilon_m$ increases strongly with stellar mass and is comparatively insensitive to environment, while $\varepsilon_\rho$ increases with both increasing local density and (at fixed density) is more effective for lower-mass galaxies; both effects are observed to operate across a wide range of redshift ($z \sim 0.3$-$1.1$), indicating that mass quenching and environmental quenching are two long-lived, physically distinct mechanisms shaping the galaxy population.
+
+\begin{minipage}{0.56\textwidth}
+    Interestingly, while the \emph{fraction} of galaxies that are actively star-forming depends strongly on environment, the star-forming \textbf{main sequence} itself, the relation between stellar mass and SFR followed by actively star-forming galaxies, is remarkably insensitive to environment: star-forming galaxies in dense environments follow essentially the same mass-SFR relation as those in the field. Environment therefore appears to regulate primarily \emph{which} galaxies are star-forming, rather than altering the star formation process within those that remain active.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \missing{Figure: SFR-mass main sequence compared between low- and high-density environments, showing consistent slope and normalisation.}
+\end{minipage}
+
+\section{The Galaxy Stellar Mass Function and Cosmic Star Formation History} \label{sec:gsmf_csfh}
+
+\subsection{The Galaxy Stellar Mass Function} \label{subsec:gsmf}
+
+The \textbf{galaxy stellar mass function} (GSMF), $\Phi(M_*)$, describes the comoving number density of galaxies per unit stellar mass, and typically follows a Schechter-like shape: a power-law rise at low mass and an exponential cut-off at high mass. Comparing the GSMF to the dark matter halo mass function (\cref{subsec:halo_mass_function}), scaled by the cosmic baryon fraction, shows that only a small fraction of the baryons available within dark matter halos are ultimately converted into stars; the resulting \textbf{stellar-to-halo mass relation} peaks at an intermediate halo mass of order $10^{12}\,M_\odot$, with star formation efficiency suppressed at both lower masses (attributed to supernova-driven feedback ejecting gas from shallow potential wells) and higher masses (attributed to AGN feedback and virial shock heating).
+
+\medskip
+
+The GSMF evolves substantially with redshift: at fixed stellar mass, the number density of galaxies is lower at higher redshift, and the characteristic (Schechter "knee") mass itself decreases with redshift, so that the most massive galaxies appear to have completed the bulk of their stellar mass assembly earlier than less massive ones, a trend known as \bfit{downsizing}. Splitting the GSMF into quiescent and star-forming subpopulations shows that star-forming galaxies dominate the total number density across most of cosmic history, while quiescent galaxies, comparatively rare and confined to the highest masses at early times, grow steadily in both number and characteristic mass toward the present day; correspondingly, the overall quiescent fraction rises steeply with stellar mass and decreases with increasing redshift, consistent with the mass-dependent quenching already described in \cref{subsec:environment_quenching}.
+
+\subsection{Cosmic Star Formation History} \label{subsec:csfh}
+
+Combining UV- and infrared-based SFR estimates (\cref{sec:sfr_estimators}) across large galaxy samples at a range of redshifts yields the \bfit{cosmic star formation rate density}, $\psi(z)$, commonly displayed as the "Lilly-Madau" diagram. Because uncorrected UV measurements systematically underestimate the true SFR in dust-obscured galaxies, dust-corrected UV and IR estimates must agree once combined; both confirm that the cosmic star formation rate density rises from high redshift, peaks around $z \sim 1$-$2$ (the epoch often termed "cosmic noon"), and declines steadily thereafter to the present day. Integrating this cosmic SFR density over time yields the \textbf{cosmic stellar mass density}, $\rho_*(z)$, which correspondingly increases monotonically from high redshift to $z=0$, reflecting the cumulative build-up of stellar mass across cosmic history.
+
+\subsection{The Star-Forming Main Sequence} \label{subsec:main_sequence}
+
+At any given redshift, actively star-forming galaxies populate a tight relation between stellar mass and SFR, the \bfit{star-forming main sequence}, with a positive slope (more massive star-forming galaxies form stars at a correspondingly higher absolute rate) superposed on a "cloud" of quiescent galaxies at much lower SFR. This main sequence shifts to systematically higher SFR at fixed stellar mass with increasing redshift, indicating that galaxies of a given mass were, on average, forming stars more efficiently in the past. A minority of galaxies lie significantly above the main sequence at any given epoch; these \textbf{starbursts} form a comparatively small, high-SFR tail of the overall star-forming population.
+
+\medskip
+
+The typical stellar age of a galaxy, and the redshift at which its star formation peaked, both correlate with its present-day stellar mass: more massive galaxies tend to have older stellar populations and to have formed the bulk of their stars earlier and more rapidly, again consistent with downsizing. It is important to distinguish this stellar \textbf{formation time}, when the stars themselves were formed, from the galaxy's \textbf{assembly time}, when its total mass (stars and dark matter together) was accumulated through mergers and accretion: massive galaxies generally form their stars early, but can continue to assemble additional mass, largely through mergers, over much longer timescales, particularly at lower redshift.
+
+\begin{tipsblock}[Early massive galaxies and JWST]
+Observations with the James Webb Space Telescope have identified a population of massive galaxies at surprisingly high redshift ($z \gtrsim 10$, including confirmed systems out to $z \approx 14$), some approaching or exceeding the stellar mass expected to be achievable, within standard $\Lambda$CDM structure formation, in the available cosmic time. Reconstructed star formation histories for several such systems show rapid, intense bursts of star formation, and some studies report a higher observed number density of massive, early galaxies than predicted by current cosmological simulations (e.g.\ EAGLE, TNG). Whether this tension reflects genuinely new physics, an unaccounted systematic in mass estimation, or simply the small-number statistics of an emerging observational frontier remains an open question, actively being addressed as JWST samples of high-redshift galaxies continue to grow.
+\end{tipsblock}
+
+\begin{advancedblock}[COSMOS Web Tool]
+The \href{https://cosmos2025.iap.fr/fitsmap}{COSMOS2025 FitsMap viewer} provides an interactive interface for exploring multi-wavelength imaging data from the COSMOS field, allowing users to visualise galaxy photometric redshifts and derived physical parameters such as stellar mass and star formation rate across one of the most extensively studied extragalactic survey fields.
+\end{advancedblock}

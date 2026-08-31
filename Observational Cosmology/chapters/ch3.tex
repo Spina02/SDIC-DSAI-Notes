@@ -1,0 +1,601 @@
+\chapter{The Interstellar Medium} \label{ch:ism}
+
+\vspace{-0.3em}
+
+\section{Introduction}
+
+\subsubsection{Historical Recognition of the ISM} \label{subsec:ism_history}
+
+The existence of an interstellar medium was inferred long before its true nature was clear. In 1795, Herschel, compiling the first nebulae catalogue, noticed dark starless patches, "\textit{a hole in the sky}", not realising these were actually opaque dust clouds. More direct evidence came in 1904, when Hartmann observed fixed Ca\,II absorption lines in the spectrum of binary star $\delta$~Ori: unlike stellar lines, these remained at constant velocity, revealing absorption by intervening gas. Plaskett and Pearce (1933) confirmed the interstellar origin by showing stronger absorption for farther stars. 
+
+\smallskip
+
+Independent evidence for a diffuse absorbing medium came from Trumpler's 1930 analysis of $\sim$100 Galactic open clusters. Assuming clusters have similar physical size and luminosity, their distance can be estimated both from angular diameter and apparent magnitude. Trumpler found that, for distant clusters, photometric distances exceeded those from angular diameters, indicating additional light extinction along the line of sight. This extinction is quantified by
+$$
+m - M = 5\log_{10}(d/10\,\text{pc}) + A_V ,
+$$
+
+\vspace{-0.3em}
+
+with $A_V \sim 1\,\text{mag}\,\text{kpc}^{-1}$ in the Galactic plane. 
+
+\smallskip
+
+Several additional advances rounded out the picture: interstellar molecules (CH, CH$^+$, CN) were observed by the late 1930s; van~de Hulst, in 1945, predicted the HI 21\,cm line; polarisation measurements in 1949 revealed a Galactic magnetic field; and, in the 1950s, the first HI surveys of the Milky Way uncovered its spiral arms.
+
+\subsubsection{ISM composition}
+
+The \bfit{interstellar medium} (ISM) is the diffuse matter, gas and dust, that fills the space between stars within a galaxy. It is conventionally split into two components:
+\begin{itemize}
+    \item The \textbf{circumstellar medium} is directly associated with individual stars, typically young, luminous objects or the end-of-life phases of stellar evolution, and includes reflection nebulae, HII regions, planetary nebulae, and supernova remnants. 
+    \item The \textbf{diffuse component} is not tied to any single star and instead pervades the general volume of the galaxy; its distribution can be traced, for instance, through 21\,cm HI line map of the sky.
+\end{itemize}
+
+\smallskip
+
+\begin{center}
+\begin{minipage}{0.58\textwidth}
+    \centering
+    \includegraphics[height=0.16\textheight]{assets/HI-map.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[height=0.16\textheight]{assets/crab-nebula.png}
+\end{minipage}
+\captionof{figure}{\textbf{Left}: All-sky HI map from Effelsberg (100-m) and Parkes (64-m) telescopes, tracing total hydrogen content. \textbf{Right}: The Crab Nebula, SN 1054 remnant (ex. of circumstellar medium).}
+\end{center}
+
+\section{Circumstellar Regions} \label{sec:circumstellar}
+
+Let's take a closer look at the four main types of circumstellar regions, which each illustrate a different stage in how stars interact with their surrounding galactic environment.
+
+\subsection{Reflection Nebulae} \label{subsec:reflection_nebulae}
+
+\begin{minipage}{0.56\textwidth}
+\textbf{Reflection nebulae} arise when circumstellar gas and dust scatter the light of a nearby, relatively cool star. If the star is not hot enough to produce photons above the hydrogen ionisation threshold ($E > 13.6\,\text{eV}$), the surrounding gas remains neutral, and the dominant interaction is elastic scattering of starlight off dust grains ($d \sim 0.01$-$0.3\,\mu$m). Because scattering efficiency increases toward shorter wavelengths, the nebula appears distinctly blue. 
+
+\smallskip
+
+Their lifetime, of order $10^6$-$10^7\,\text{yr}$, is set by the duration of proximity to a luminous star (a B-type star lives $\sim 10^7\,\text{yr}$) and by the survival of the dusty envelope itself against stellar winds, radiation pressure, and supernova feedback.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/reflection-nebula.png}
+    \captionof{figure}{The reflection nebula surrounding V838~Mon. (HST image).}
+    \label{fig:reflection_nebula}
+\end{minipage}
+
+\subsection{HII Regions and the Strömgren Sphere} \label{subsec:hii_regions}
+
+\begin{minipage}{0.56\textwidth}
+\bfit{HII regions} are low-density clouds of partially ionised gas surrounding short-lived, early-type stars. Ionisation proceeds through two channels: direct photoionisation by UV photons ($E > 13.6\,\text{eV}$) from the central O/B stars, and collisional ionisation in shocks driven by stellar winds. HII regions are closely \textit{associated with regions of recent star formation} and giant molecular clouds and can extend up to $\sim 100\,\text{pc}$.
+
+\smallskip
+
+Their lifetime, $1$-$10\,\text{Myr}$, is set by that of the massive stars powering them ($M > 20\,M_\odot$). The primary optical diagnostic is the H$\alpha$ line, the $n=3 \to n=2$ Balmer transition at $656.28\,\text{nm}$.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.85\textwidth]{assets/orion-nebula.png}
+    \captionof{figure}{Orion Nebula: a classic HII region (visible+IR composite, HST).}
+    \label{fig:orion}
+\end{minipage}
+
+\medskip
+
+An HII region settles into ionisation equilibrium: the rate at which ionising photons are absorbed must balance the rate at which free electrons and protons recombine into neutral hydrogen. This balance defines the \bfit{Strömgren sphere}.
+
+\begin{center}
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/stromgren.png}
+\end{minipage}%
+\hspace{2em}
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/rosette_nebula.png}
+\end{minipage}
+\captionof{figure}{\textbf{Left:} Strömgren sphere. \textbf{Right:} Rosette Nebula with central Strömgren sphere.}
+\label{fig:stromgren}
+\end{center}
+
+\medskip
+
+Let $N$ denote the number of ionising photons emitted per second by the central star, $\alpha$ the recombination coefficient, and $n_H^{\phantom{ }}$ the hydrogen number density (assumed uniform). In equilibrium, the total recombination rate within a sphere of radius $r_S$ must equal the ionising photon rate:
+$$
+N = \frac{4}{3}\pi r_S^3\;\cdot\; n_H^2\, \alpha
+\qquad \Rightarrow \qquad
+\boxed{r_S \simeq \left(\frac{3N}{4\pi\alpha}\right)^{1/3} n_H^{-2/3}}
+$$
+Observed values of $r_S$ range from below $0.1\,\text{pc}$ in dense, compact regions to over $100\,\text{pc}$ in low-density environments, reflecting the strong sensitivity of $r_S$ to the ambient density.
+
+
+\begin{minipage}{0.59\textwidth}
+    \subsection{Planetary Nebulae} \label{subsec:planetary_nebulae}
+
+    \textbf{Planetary nebulae} are expanding, photoionised shells of gas ejected during the late evolution of low- to intermediate-mass stars ($\approx 1$-$8\,M_\odot$). During the red giant phase, strong stellar winds expel the star's outer layers; once most of the envelope has dissipated, the exposed hot core emits UV radiation that ionises the ejected material, causing it to glow as a compact, brightly coloured nebula. 
+
+\medskip
+
+Their lifetime is comparatively short, of order $10^4\,\text{yr}$, set by the expansion timescale of the shell.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \bigskip
+
+    \includegraphics[width=0.95\textwidth]{assets/ring-nebula.png}
+    \captionof{figure}{The Ring Nebula (NGC~6720), JWST NIRCam image.}
+    \label{fig:ring_nebula}
+\end{minipage}
+
+\vspace{-1em}
+
+\subsection{Supernova Remnants} \label{subsec:snr}
+
+\begin{minipage}{0.59\textwidth}
+A \bfit{supernova remnant} (SNR) is the expanding shock structure left behind when a supernova explosion interacts with the surrounding interstellar or circumstellar medium. The explosion ejects much or all of the progenitor's mass at supersonic velocities up to $10^4\,\text{km/s}$; the resulting shock heats the swept-up plasma to $T > 10^6\,\text{K}$. 
+
+\smallskip
+
+As the remnant expands, it continuously sweeps up ambient material and decelerates, eventually merging into the general ISM once its expansion speed falls below the local sound speed, after tens of parsecs and a lifetime of $10^4$-$10^5\,\text{yr}$.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/kepler-snr.png}
+    \captionof{figure}{Kepler's Supernova Remnant (SN~1604) in X-ray, visible, and infrared \cite{nasa_sankrit_blair_image}.}
+    \label{fig:kepler_snr}
+\end{minipage}
+
+\section{The Diffuse Interstellar Medium}
+
+By the ISM we generally mean the diffuse component of the interstellar medium: the gas and dust that pervades a galaxy's disk, as distinct from the localised circumstellar structures discussed in \cref{sec:circumstellar}. In what follows, unless stated otherwise, values refer to the Milky Way.
+
+\subsection{General Properties} \label{sec:ism_generalities}
+
+The ISM is best understood as a non-linear, self-regulated, multiphase system, in which gravity, turbulence, magnetic fields, and radiative processes jointly govern the baryon cycle of a galaxy. Although it hosts only a few percent of a galaxy's total mass (in the Milky Way, the ISM amounts to roughly $10$-$15\%$ of the stellar mass), its radiation, faint and emitted predominantly in the radio and infrared, encodes the physical conditions that regulate star formation. By mass the ISM is overwhelmingly gaseous ($\sim 99\%$ gas, $\sim 1\%$ dust), with a chemical composition close to primordial plus modest enrichment ($\sim 74\%$ H, $\sim 24\%$ He, $\sim 1$-$2\%$ metals by mass).
+
+\medskip
+
+\begin{minipage}{0.57\textwidth}
+    The ISM is a dynamic, continuously recycled reservoir. Fresh gas accretes from the Galactic halo at about $0.5\,M_\odot\,\text{yr}^{-1}$, while star formation consumes material at a similar rate of $1.3\,M_\odot\,\text{yr}^{-1}$. Stars return matter to the ISM via winds, planetary nebulae, and supernovae, together supplying roughly $0.5\,M_\odot\,\text{yr}^{-1}$ back to the cycle. 
+    
+    \smallskip
+    
+    This returned gas is not only enriched with heavy elements forged in stellar cores, but also injects considerable energy and momentum, stirring turbulence and heating the surrounding environment.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.41\textwidth}
+\centering
+\includegraphics[width=0.95\textwidth]{assets/ism.png}
+\captionof{figure}{ISM flow in the MW \cite{draine}.}
+\end{minipage}
+
+\smallskip
+
+A key feature of the ISM is its \textbf{multiple thermal phases} in rough pressure equilibrium: from cold molecular clouds ($T \sim 10$-$50\,\text{K}$, $n \sim 10^3$-$10^6\,\text{cm}^{-3}$), through the cool and warm neutral media ($T \sim 10^2$-$10^4\,\text{K}$), to diffuse HII regions ($T \sim 10^4\,\text{K}$) and hot coronal gas ($T \gtrsim 3\times10^6\,\text{K}$). Despite huge differences in temperature and density, these phases share similar thermal pressures ($p/k_B \sim 2.5 \times 10^3 \,\text{K}\,\text{cm}^{-3}$), allowing them to coexist within the same galactic volume. The ISM also spans a wide range of ionisation states, contains dust, weak magnetic fields ($B \sim 5\,\mu\text{G}$), intense radiation fields, and cosmic rays. Because of the long mean free paths characteristic of this low-density gas, strict thermodynamic equilibrium is rarely achieved.
+
+\smallskip
+
+\begin{minipage}{0.55\textwidth}
+    These phases are not static compartments but stages in a single ongoing process: stars form within dense molecular clouds, and as they evolve, their radiation and winds progressively reshape the surrounding gas, altering both its physical state and its chemical composition. When massive stars die, the ejecta from winds and supernovae mix into the diffuse ISM, and the newly synthesised elements they carry are gradually incorporated into the next generation of clouds, stars, and planets. It is this continuous exchange of matter, energy, and metals among phases, and between stars and gas, that ties the properties described above into a single coherent, self-regulating system.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+\centering
+\includegraphics[width=\textwidth]{assets/ism-phases.png}
+\captionof{figure}{Schematic view of the ISM's distinct thermal/ionisation phases.}
+\end{minipage}
+
+
+\subsection{Interstellar Dust} \label{sec:ism_dust}
+
+\vspace{-0.3em}
+
+\begin{minipage}{0.68\textwidth}
+    \subsubsection{Properties and Lifecycle} \label{subsec:dust_properties}
+
+    Dust grains, typically sized around $0.1\,\mu\text{m}$ and accounting for just $\sim 1\%$ of the ISM's mass, have a far-reaching impact on its physics and chemistry. Their main components are \bfit{silicates} (in larger grains up to $\lesssim 1\,\mu\text{m}$), \bfit{graphitic carbon} (smaller grains, around $100$\,\AA), and \bfit{polycyclic aromatic hydrocarbons} (PAHs), planar molecules made of fused rings, with up to $\lesssim 100$ atoms. 
+    
+    These materials give rise to the distinctive radiative and catalytic effects of dust, promoting further chemical complexity in the ISM.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.28\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/ism-dust.png}
+    \captionof{figure}{Presolar grains from meteorites \cite{hoppe}.}
+    \label{fig:presolar_grains}
+\end{minipage}
+
+\smallskip
+
+Dust is not a static component of the ISM but is continuously processed through a \bfit{dust lifecycle}: grains condense in the outflows of AGB stars and Type~II supernovae, are subsequently reshaped within the ISM through sputtering, shattering, coagulation, and icing as they cycle between diffuse and molecular phases, and are eventually incorporated into new stars (\textbf{astration}), closing the loop.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{assets/dust-cycle.png}
+    \captionof{figure}{Lifecycle of interstellar dust: sources, sinks, and grain processing \cite{gallianoHDR}.}
+\end{figure}
+
+\subsubsection{Physical Effects of Dust} \label{subsec:dust_effects}
+
+Dust grains influence the ISM and its observable properties in several ways. They cause starlight \textbf{extinction and reddening}, absorbing and scattering ultraviolet and optical photons more efficiently than infrared ones; the absorbed energy is re-emitted thermally in the far-infrared, from grains typically heated to $10$-$20\,\text{K}$ in the diffuse ISM (corresponding to $\lambda \sim 100$-$200\,\mu\text{m}$). This thermal emission also makes dust an effective \textbf{coolant} for molecular clouds. Grains further act as a \textbf{catalyst}, providing the primary surfaces on which H$_2$ forms, a process critical to star formation, and they drive \textbf{metal depletion}, locking refractory elements such as Ca, Fe, Al, and Si out of the gas phase.
+
+\medskip
+
+
+\begin{minipage}{0.46\textwidth}
+    Elongated dust grains, when aligned with the Galactic magnetic field, give rise to two key polarisation effects:
+    \begin{itemize}
+        \item \textbf{Polarisation-dependent extinction}: Light vibrating parallel to the grain's long axis (and thus the magnetic field) is preferentially absorbed or scattered, polarising starlight \emph{along} the magnetic field ($\parallel B$). This creates a wavelength-dependent polarisation seen in reddened stars.
+        \item \textbf{Polarised thermal radiation}: These aligned grains emit thermal radiation that is polarised \emph{perpendicular} to the magnetic field direction ($\perp B$), reflecting the orientation of the grains themselves.
+    \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.52\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/dust-polarization.png}
+    \captionof{figure}{How aligned, spinning dust grains create polarised light: starlight passing through is polarised \emph{along} the magnetic field by differential absorption, while emitted dust radiation in the submillimetre is polarised \emph{perpendicular} to the field.}
+\end{minipage}
+
+\begin{minipage}{0.68\textwidth}
+Dust extinction refers to the wavelength-dependent attenuation of starlight caused by both absorption and scattering from dust grains. This effect is observable across wavelengths from roughly $0.1$ to $20\,\mu\text{m}$, with the strongest extinction occurring in the ultraviolet and progressively weakening toward the infrared. The resulting attenuation features a characteristic continuum, superimposed by distinct spectral features that reveal details about the composition of the dust grains.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/dust-absorption.png}
+    \captionof{figure}{Dust absorption}
+\end{minipage}
+
+The attenuation is conventionally parametrised through the \bfit{colour excess},
+$$
+E(B-V) = (B-V)_{\text{obs}} - (B-V)_{\text{true}} ,
+$$
+and the extinction in the visual band,
+$$
+A_V = R_V\, E(B-V), \qquad R_V \simeq 3.1 ,
+$$
+with the Galactic average $R_V = 3.05 \pm 0.15$. The wavelength dependence of the extinction follows
+$$
+A_\lambda = 2.5\log_{10}\!\left(\frac{F_0(\lambda)}{F(\lambda)}\right) = R(\lambda)\,E(B-V) .
+$$
+
+\begin{center}
+    \begin{minipage}{0.37\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/dust-ext.png}
+    \end{minipage}%
+    \hspace{2em}
+    \begin{minipage}{0.52\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/dark-nebula.jpg}
+    \end{minipage}
+    \captionof{figure}{\textbf{Left:} ISM extinction curves for three directions into the ISM \cite{dust-ext}. \textbf{Right:} Barnard 68 at six wavelengths ($0.44$-$1.65\,\mu$m), showing stronger dust obscuration at shorter wavelengths \cite{eso-dark}.}
+\end{center}
+
+\medskip
+
+Dark nebulae are the conspicuous dark patches seen in visible images of the sky, now known to be regions of dense, opaque dust clouds that effectively block background starlight. These clouds vary enormously in size, from compact \bfit{Bok globules} of just $\sim0.01\,\text{pc}$ to giant structures spanning tens of parsecs. Some of these clouds remain dark even at mid-infrared wavelengths and are known as \bfit{Infrared Dark Clouds} (IRDCs), highlighting extremely high column densities. While dark in the optical and mid-IR, such dust clouds frequently shine brightly in the far-infrared, as dust grains heated to temperatures of $10$-$20\,\text{K}$ emit efficiently at wavelengths from a few microns up to the submillimetre range.
+
+
+\begin{observationblock}[2175\AA bump]
+    A pronounced feature known as the "UV extinction bump" appears near $2175$\,\AA\ in the Galactic extinction curve. Despite decades of study, its precise origin remains debated. The leading candidates are small graphite grains or polycyclic aromatic hydrocarbons (PAHs), both of which have electronic transitions at similar wavelengths.
+\end{observationblock}
+
+\subsubsection{Observations} \label{subsubsec:dust_observations}
+
+Because extinction is dominated by dust within our own Galaxy (foreground extinction), mapping it accurately along every line of sight is essential for correcting extragalactic observations. The \textbf{DIRBE}/\textbf{FIRAS} instruments on \textit{COBE} (1989-1993) provided one of the first direct measurements of the diffuse infrared sky in the $125$-$5000\,\mu\text{m}$ range. The \textbf{IRAS Sky Survey Atlas} (ISSA) subsequently scanned the Galaxy at 12, 25, 60, and $100\,\mu\text{m}$, from which dust column density, and hence $E(B-V)$, could be inferred using the intrinsic colours of elliptical galaxies as calibrators, converted to extinction via the standard $R_V = 3.1$.
+
+\medskip
+
+\begin{minipage}{0.5\textwidth}
+    More recently, \textbf{Planck} measured dust emission across nine channels from 30 to $857\,\text{GHz}$ ($10$-$0.35\,\text{mm}$), allowing an accurate separation of foreground and background emission and, since interstellar dust is not isothermal, the most detailed maps to date of "cold" versus "warm" dust regions, essential for computing $A_V$ along individual lines of sight. Planck's polarisation measurements additionally enabled the first global mapping of the Galactic magnetic field via its imprint on dust emission.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.48\textwidth}
+    \vspace{-0.5em}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/plank.png}
+    \captionof{figure}{Planck all-sky maps: thermodynamic temperature (K\textsubscript{CMB}) at 30-353\,GHz, surface brightness (MJy/sr) at 545 and 857\,GHz.}
+    \label{fig:dirbe}
+\end{minipage}
+
+\medskip
+
+Extinction is most intense along the horizontal plane of the Milky Way. Because the density of dust and stars is highest toward the \textbf{Galactic Bulge}, the extinction and reddening ($E(B{-}V)$) are significantly stronger in that direction compared to the galactic poles. While concentrated in the disk, dust is present in every direction, requiring astronomers to integrate the extinction "in the line of sight" for every extragalactic source.
+
+\subsection{Molecular Clouds} \label{sec:ism_molecular}
+
+\begin{minipage}{0.56\textwidth}
+\textbf{Molecular clouds} constitute the coldest and densest phase of the ISM, exhibiting typical densities of $100$-$1000\,\text{cm}^{-3}$, low temperatures near $10\,\text{K}$, and internal velocity dispersions of approximately $10\,\text{km/s}$ shaped by supersonic turbulence. The largest of these, known as giant molecular clouds (GMCs), can amass $M \sim 10^6\,M_\odot$ within radii of $R \sim 50\,\text{pc}$, yielding characteristic gas surface densities $\Sigma_{\rm gas} \sim 100\,M_\odot\,\text{pc}^{-2}$. Molecular clouds are primarily composed of molecular hydrogen (H$_2$), but also contain significant amounts of carbon monoxide (CO), heavier elements such as carbon, oxygen, and nitrogen, as well as a substantial population of dust grains.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/eagle.png}
+    \captionof{figure}{Eagle Nebula (M16) \cite{NASA_Hubble_M16}.}
+    \label{fig:eagle_nebula}
+\end{minipage}
+
+\subsubsection{CO as molecular gas tracer}
+
+Despite being the most abundant molecule in the Universe, H$_2$ is symmetric and possesses no permanent electric dipole moment; it radiates only when shocked or irradiated to $T \gtrsim 1000\,\text{K}$, well above the typical $10$-$100\,\text{K}$ of molecular clouds, making direct detection of the bulk of the molecular gas essentially impossible. Polar molecules, by contrast, possess a non-zero dipole moment and radiate through rotational and vibrational transitions. 
+
+\medskip
+
+For a diatomic molecule, the rotational energy at quantum level $J$ is
+$$
+E_{\text{rot}} = \frac{J(J+1)\hslash^2}{2I}, \qquad J = 0,1,2,\dots ,
+$$
+with the selection rule $\Delta J = \pm 1$ and emitted frequency
+$$
+\nu = \frac{\hslash J}{2\pi m r_{\text{eq}}^2} .
+$$
+
+\medskip
+
+Since H$_2$ cannot be observed directly, astronomers typically \bfit{trace molecular gas using CO}, which is the second most abundant molecule in the Galaxy. The $J=0 \to 1$ transition of CO emits at a wavelength of $2.6\,\text{mm}$ ($115\,\text{GHz}$), while the $J=1 \to 2$ line emerges at $1.3\,\text{mm}$ ($230\,\text{GHz}$). These transitions correspond to excitation temperatures of about $11\,\text{K}$ and $17\,\text{K}$, respectively; importantly, the critical density for the $J=1$-$2$ transition, around $700\,\text{cm}^{-3}$, matches the conditions found in typical Galactic giant molecular clouds. 
+
+To estimate the amount of H$_2$ present, astronomers empirically calibrate the relationship between the observed CO emission and the underlying H$_2$ column density as
+$$
+X_{\text{CO}} = 2\times10^{20}\;\text{molecules\,cm}^{-2}\,(\text{K\,km\,s}^{-1})^{-1} .
+$$
+This factor is roughly constant across the Milky Way, but is not expected to be universal in other galaxies, making it a manjor source of systematic uncertainty in extragalactic molecular gas studies.
+
+\subsubsection{Molecular gas in the Milky Way (Heyer \& Dame 2015)}
+
+Extensive surveys of CO emission indicate that the Milky Way contains a total molecular hydrogen mass of about $(1.0 \pm 0.3)\times 10^9\,M_\odot$. The majority of this molecular gas (between 60\% and 70\%) resides within the solar circle ($R_\odot = 8.5\,\text{kpc}$ from the Galactic center). 
+
+\begin{minipage}{0.52\textwidth}
+Vertically, the distribution is sharply concentrated: H$_2$ is found in a thin layer centered on the Galactic plane, with a typical full width at half maximum (FWHM) near $90\,\text{pc}$ in the inner regions. This thickness increases to several hundred parsecs at Galactocentric radii beyond $10$\,kpc. On large scales, molecular gas is not spread evenly through the disk, but is preferentially located within the spiral arms of the Galaxy.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/h2-map.png}
+    \captionof{figure}{CO J=1-0 emission (Dame+ 2001; Mizuno \& Fukui 2004).}
+    \label{fig:h2_map}
+\end{minipage}
+
+\section{Atomic Hydrogen and the 21\,cm Line} \label{sec:ism_hi}
+
+Hydrogen is the most abundant element both in the Universe and in the ISM of the Milky Way, yet the cold neutral gas emits no visible radiation. Instead, neutral atomic hydrogen (\bfit{HI}) radiates through a hyperfine transition between two closely spaced sublevels of its ground state, arising from the coupling between the electron's spin and the proton's nuclear spin: the higher-energy configuration, with the two spins aligned, spontaneously flips to the lower-energy, anti-aligned configuration, emitting a photon at radio wavelengths.
+
+\medskip
+
+The rest frequency of this transition is fixed by quantum mechanics,
+$$
+\nu_{10} = \frac{8}{3}g_I\left(\frac{m_e}{m_p}\right)\alpha^2(R_M c) = 1420.406\,\text{MHz} ,
+$$
+corresponding to a wavelength of $21.106\,\text{cm}$. 
+
+\begin{minipage}{0.52\textwidth}
+The associated Einstein $A$-coefficient is remarkably small, $A = 2.87\times10^{-15}\,\text{s}^{-1} = (11\,\text{Myr})^{-1}$, meaning that an individual hydrogen atom spends on average $\sim 10^7\,\text{yr}$ in the excited sublevel before spontaneously de-exciting. Despite the extreme weakness of the transition for any single atom, the line is readily detected throughout the Galaxy because of the vast abundance of interstellar hydrogen.
+
+\medskip
+
+The 21\,cm line was predicted by van~de Hulst in 1947 and detected independently, and nearly simultaneously, in 1951: Ewen and Purcell built a horn antenna and first observed the line at Easter 1950, while Oort and his student Mueller, working with a repurposed wartime radar antenna, had their initial apparatus destroyed by fire and only rebuilt it in time to publish jointly with Ewen and Purcell the following year.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.44\textwidth}
+    \centering
+    % \todo{Hyperfine splitting diagram of atomic hydrogen ground state}
+    \includegraphics[width=\textwidth]{assets/21cm.png}
+    \captionof{figure}{Hyperfine transitions are a consequence of coupling between nuclear spin and the magnetic field generated by the orbiting electron.The $S=1 \to 0$ transition emits the 21\,cm line .}
+    \label{fig:hyperfine}
+\end{minipage}
+
+\vspace{-1em}
+
+\subsubsection{Mapping the Milky Way in HI} \label{subsec:hi_mapping}
+
+By measuring the Doppler shift of the 21\,cm line,
+$$
+z = \frac{\lambda_{\text{obs}} - \lambda_{\text{em}}}{\lambda_{\text{em}}} = \frac{\nu_{\text{em}} - \nu_{\text{obs}}}{\nu_{\text{obs}}}, \qquad v = cz ,
+$$
+one obtains the radial velocity of individual HI clouds, while integrating the observed brightness temperature over frequency yields the HI column density along the line of sight,
+\smallskip
+$$
+N(\text{HI}) = 1.821\times10^{13}\int_{\text{line}} T\,\tau_v\,dv .
+$$
+Reconstructing the spatial distribution of HI requires a kinematic model of Galactic rotation, $\omega(R)$: assuming interstellar clouds move on circular orbits at Galactocentric radius $R$ with angular velocity $\omega(R)$, the observed radial velocity at a given Galactic longitude can be converted into a distance.
+
+\begin{center}
+    \begin{minipage}{0.4\textwidth}
+        \centering
+        \includegraphics[height=0.23\textheight]{assets/mw-rot-model.png}
+    \end{minipage}%
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[height=0.23\textheight]{assets/oort-map.png}
+    \end{minipage}
+    \captionof{figure}{\textbf{Left:} Rotational model: clouds orbit the Milky Way center at angular velocity $\omega(R)$. \textbf{Right:} Velocity map from 21\,cm HI measurements \cite{Oort1958}; first evidence of spiral arms existence.}
+    \label{fig:h2_map}
+\end{center}
+
+\medskip
+
+This method is only valid for $R < R_\odot$, since a given line of sight samples a given radius twice for material inside the solar circle. Applying this technique to 21\,cm surveys provided the first proof of the Milky Way's spiral structure (Oort, Kerr \& Westerhout 1958) and revealed that hydrogen gas is predominantly confined to the Galactic disk.
+
+
+\begin{minipage}{0.6\textwidth}
+    \subsubsection{Extragalactic observations}
+
+Observations of external galaxies in emission lines such as H$\alpha$ (tracing ionised hydrogen) and the 21\,cm line (tracing HI) enable astronomers to map the distribution of gas across galaxy disks. By measuring emission intensity at each point, detailed maps of both neutral and ionised gas can be created, showing that HI and dust are mainly concentrated within spiral arms.
+
+\medskip
+
+To separate gas at different locations along the line of sight, astronomers use narrow frequency or velocity channels (a few km\,s$^{-1}$ wide). This allows isolating specific velocities of the interstellar medium, enabling a three-dimensional reconstruction of the gas structure using position-velocity mapping, as found in classic channel maps of spiral galaxies.
+
+\medskip
+
+Because HI in galaxy disks is usually optically thin, the 21\,cm line experiences minimal self-absorption. This means the total mass of neutral hydrogen can be straightforwardly determined from the integrated line intensity. 
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/21cm-ext-obs.jpg}
+
+    \vspace{-0.3em}
+
+    \captionof{figure}{Maps of the 21 cm line radiation of NGC 5033 \cite{bosma1978}.}
+    \label{fig:21cm_ext_obs}
+\end{minipage}
+
+
+The relation is:
+$$
+\mathcal{M}(\text{HI}) = 2.36\times10^5\,\mathcal{M}_\odot \times d^2 \int F_\nu\!\left[1421\,\text{MHz}\times\left(1-\frac{V_r}{c}\right)\right] dV_r
+$$
+where $d$ is the distance (in Mpc), $F_\nu$ is the measured line flux density, and the integration is performed over all observed velocities $V_r$. This approach, typically using both the 21\,cm line and H$\alpha$ emission, provides a comprehensive view of the gas structure and kinematics in galaxies.
+
+\medskip
+
+Applying this technique to external spirals, 21\,cm measurements of \textbf{rotation curves} (Vera Rubin, 1970s), after Zwicky's measurements of Virgo galaxy cluster mass, provided key evidence for \textbf{dark matter}: rather than falling off as expected for visible mass alone ($v \propto R^{-1/2}$), rotation curves remain flat to the edge of the HI disk, indicating much more mass than stars and gas account for.
+
+\begin{center}
+    \begin{minipage}{0.4\textwidth}
+        \centering
+        \includegraphics[height=0.17\textheight]{assets/gal-rot.png}
+    \end{minipage}%
+    \begin{minipage}{0.5\textwidth}
+        \centering
+        \includegraphics[height=0.17\textheight]{assets/gal-rot-1.png}
+    \end{minipage}
+
+    \vspace{-0.3em}
+
+    \captionof{figure}{Observed (left) and schematic (right) galaxy rotation curves.}
+    \label{fig:galactic_rotation}
+\end{center}
+
+\begin{observationblock}[SKA - 21cm to study the early universe]
+Redshifted to cosmological distances, the 21\,cm line also opens a direct observational window on the early Universe: at $200\,\text{MHz}$ it probes $z \approx 6$, and at $80\,\text{MHz}$, $z \approx 17$, spanning the epoch of the first stars and galaxies (\textbf{cosmic dawn}). This is a principal science driver for next-generation radio facilities such as the SKA (\cref{subsec:facilities}), alongside galaxy evolution, large-scale structure cosmology, and tests of general relativity in the strong-field regime.
+\end{observationblock}
+
+\section{Ionized Phases of the ISM} \label{sec:ism_ionized}
+
+Beyond the neutral and molecular gas, a substantial fraction of the ISM is ionised, spanning a wide range of temperatures and densities. Two distinct ionised phases are recognised: a hot, collisionally ionised component associated with supernova activity, and a warm, photoionised component associated with massive star formation.
+
+\subsection{Hot Ionized Medium} \label{subsec:him}
+
+\begin{minipage}{0.55\textwidth}
+The \textbf{Hot Ionized Medium} (HIM) is primarily created and energised by supernovae and the intense radiation of high-mass stars; it represents the \textit{hottest phase} of the interstellar cycle, following the injection of processed stellar material (\textit{"stardust injection"}) into the surrounding gas. Its defining properties are a very \textit{low density} ($\sim 10^{-3}\,\text{cm}^{-3}$), an \textit{extremely high temperature} ($\sim 10^6\,\text{K}$, at which the gas is almost completely ionised), \textit{thermal velocities} of order $100\,\text{km/s}$, and complex kinematics. It is traced observationally through \textit{X-ray emission} and high-ionisation far-UV absorption lines such as  O\,VI, C\,IV, and N\,V.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    % \todo{M82 composite: Halpha (red) + Chandra X-ray (blue)}
+    \includegraphics[width=\textwidth]{assets/HIM.jpg}
+    \captionof{figure}{M82 in H$\alpha$ (warm gas, red) and Chandra X-rays (hot gas, blue), tracing outflowing ionised material.}
+    \label{fig:m82_him}
+\end{minipage}
+
+\medskip
+
+The HIM occupies a remarkably large fraction of the ISM by volume, roughly $50\%$, thanks to its very low density that allows it to fill an immense spatial volume. Its vertical scale height is of order $3\,\text{kpc}$, which is why it is sometimes referred to as the hot "corona" of the galaxy. This gas is often buoyant, rising as bubbles of characteristic size $\sim 20\,\text{pc}$ and forming galactic fountains that extend well above and below the disk. It is collisionally ionised and cools, primarily via adiabatic expansion and X-ray emission, on timescales of order $1\,\text{Myr}$.
+
+\subsection{Warm Ionized Medium} \label{subsec:wim}
+
+\begin{minipage}{0.55\textwidth}
+The \textbf{Warm Ionized Medium} (WIM), also referred to as the \textbf{diffuse ionised gas} (DIG), is ionised by photons that escape the boundaries of HII regions rather than by direct stellar radiation. It has a \textit{density} of $\sim 0.2\,\text{cm}^{-3}$ and a \textit{temperature} of $\sim 10^4\,\text{K}$, and represents a \textit{transition phase} sitting between the hot, high-energy HIM and the cooler neutral and molecular clouds. Despite its modest density, the WIM constitutes roughly \textit{$90\%$ of all ionised hydrogen mass} in the Galaxy ($\sim 10^9\,M_\odot$) and fills about \textit{$20\%$ of the ISM volume}, since it extends well beyond the boundaries of individual star-forming regions.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \vspace{-1em}
+
+    \centering
+    % \todo{WHAM Halpha all-sky survey integrated intensity map}
+    \includegraphics[width=\textwidth]{assets/WIM.png}
+    \captionof{figure}{The Wisconsin H-Alpha Mapper (WHAM) all-sky survey, tracing the pervasive H$\alpha$ emission of the WIM.}
+    \label{fig:wham}
+\end{minipage}
+
+\medskip
+
+The WIM produces a faint, pervasive H$\alpha$ emission, arising as electrons recombine with hydrogen nuclei in the warm gas, detectable in essentially every direction across the sky. In external galaxies, it is often resolved into discrete loops, filaments, and shells not directly coincident with any HII region, and accounts for $30$-$50\%$ of a galaxy's total H$\alpha$ emission. As with HI, this H$\alpha$ intensity is measured across narrow velocity channels, exploiting the Doppler effect to recover the kinematics of the ionised gas.
+
+\section{Observing the ISM Across the Spectrum} \label{sec:ism_observing}
+
+Each wavelength of the electromagnetic spectrum reveals different phases and processes within the interstellar medium (ISM). The images below, from \cite{nasa_mwmw_project}, illustrate how observing the Milky Way band by band uncovers the complex, multi-phase nature of the ISM.
+
+\bigskip
+
+\begin{itemize}[itemsep=0.6em]
+\item \textbf{Radio continuum (408 MHz):} Synchrotron radiation from relativistic electrons (accelerated by SN shocks and pulsars) spiraling in the $\sim \mu G$ galactic magnetic field.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-radio.jpg}
+\end{center}
+\item \textbf{Atomic hydrogen (21\,cm):} HI neutral atomic hydrogen, detected via the hyperfine transitions.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-atomic.jpg}
+\end{center}
+\item \textbf{Radio continuum (2.5\,GHz):} Synchrotron + bremsstrahlung (free-free) from supernova remnants and hot gas.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-radio-Ghz.jpg}
+\end{center}
+\item \textbf{Molecular hydrogen (CO):} Traces molecular gas in the Galactic plane.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-molecular.jpg}
+\end{center}
+\item \textbf{Far Infrared:} Thermal emission from dust, heated by old stars (diffuse "cirrus") or by young massive stars in molecular clouds.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-fir.jpg}
+\end{center}
+\item \textbf{Mid Infrared:} PAH emission lines from polycyclic aromatic hydrocarbons in the diffuse dust.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-mir.jpg}
+\end{center}
+\item \textbf{Near Infrared:} Emission from old stars (main sequence + giants) with little dust absorption.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-nir.jpg}
+\end{center}
+\item \textbf{Optical:} Emission from stars with dust absorption.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-opt.jpg}
+\end{center}
+\item \textbf{X-ray:} X-ray binaries and diffuse hot gas; some absorption by neutral hydrogen.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-x.jpg}
+\end{center}
+\item \textbf{Gamma-ray:} Compact sources + $\gamma$-ray photons from cosmic ray collisions with diffuse gas.
+
+\medskip
+
+\begin{center}
+    \includegraphics[width=0.97\textwidth]{assets/mw-gamma.jpg}
+\end{center}
+
+\end{itemize}

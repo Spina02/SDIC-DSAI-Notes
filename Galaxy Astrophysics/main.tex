@@ -1,4 +1,5 @@
 \documentclass[a4paper,12pt]{report}
+% \documentclass[a4paper,12pt,draft]{report}
 
 %%%%%%%%%%%%
 % packages %
@@ -9,6 +10,23 @@
 \usepackage{../template/frames}
 \usepackage{../template/macros}
 
+% \usetikzlibrary{external}
+% \tikzexternalize[prefix=assets/]
+
+%%%%%%%%%%%%
+% additional stuff %
+%%%%%%%%%%%%
+
+\usepackage{marvosym}
+\usepackage{mathtools}
+
+\usepackage{amsmath, bm}
+
+\usepackage{multirow}
+\usepackage{scalerel}
+\newcommand\Tau{\scalerel*{\tau}{T}}
+\newcommand{\ion}[2]{#1\,\textsc{\lowercase{#2}}}
+
 %%%%%%%%%%%%%%
 % Title Page %
 %%%%%%%%%%%%%%
@@ -16,7 +34,7 @@
 \institute{UniTs - University of Trieste}
 \faculty{Scientific and Data Intensive Computing}
 \department{mathematics informatics and geosciences}
-\title{Astrofisica delle Galassie}
+\title{Galaxy Astrophysics}
 \author{Andrea Spinelli}
 \lecturer{Prof. Girardi Marisa}
 \date{\today}
@@ -28,7 +46,9 @@
 % document %
 %%%%%%%%%%%%
 
-%\addbibresource{./references.bib}
+\addbibresource{./references.bib}
+
+\includeonly{chapters/ch1}
 
 \begin{document}
 
@@ -45,9 +65,6 @@
 \includechapters
 
 % Bibliography
-%\printbibliography
+\printbibliography
 
 \end{document}
-
-
-

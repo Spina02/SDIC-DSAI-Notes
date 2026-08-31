@@ -1,0 +1,203 @@
+Galaxy SED as a sum of:
+
+stars
+gas
+AGN
+dust
+
+from the flux we can understand the different kind of galaxies we are looking at, even if not resolved
+
+-> the main differences between the kinds of galaxies (dust, gas, stars, agn)
+
+procedure:
+- from stars -> sfh, chemical evolution, ssp -> CSPs
+- account for dust -> emission/attenuation
+
+
+What do we have:
+
+    spectra (or spectral features / indices)
+    color (broad/medium/narrow-band SEDs)
+    resolved / unresolved ?
+
+what do we want:
+
+    stellar mass
+    stellar age / SFH/ SFR
+    metallicity (stellar / gas)
+    dust mass / temperature
+    AGN ?
+    galaxy redshift
+
+for most of the objects we don't have hi-res spectra -> colors (color-z, composition, ...)
+
+stellar age -> starforming/quiescent
+U-V-J method -> quiescents (U-V is not enaugh: dust make sf galaxies red too)
+
+impact of environmetn: in clusters quiescent >> starforming
+
+gas - stellar mass function
+
+---
+
+observations with radio (slides 6)
+
+
+\chapter{Galaxy history} % lecture 16/03/2026
+
+\missing{Chaper is WIP}
+
+% To understand a galaxy spectrum, we can consider it as the sum of the ight from all its stars.
+
+% We need to know in the Hertzsprung-Russell diagram, how many stars are in each time step of the diagram (isochrones).
+
+% We need to know the population of stars and their spectrum, and then we can sum them up to get the spectrum of the galaxy.
+
+% \textbf{Simple Stellar Population} (SSP) is a population of stars that are all at the same age and metallicity, it is not a realistic population of stars, but it is the first step we need to understand the spectrum of a galaxy.
+
+% Therefore we assume all the stars born at the same time and have the same metallicity:
+
+% $$
+% f_{SSP}(t, Z) = ...
+% $$
+
+% The presence of O, B stars (very luminous), tells us that the galaxy is young. After circa 1Gyr we are dominated by A and F stars, and after 10Gyr we are dominated by G stars\dots
+
+% Some important features of the spectrum of a galaxy are:
+
+% \begin{itemize}
+%     \item Balmer break
+%         \item 4000 \r{A} break
+%         \item Balmer lines
+%         \item Metallic lines
+% \end{itemize}
+
+% from the SSP we have just created, we can convolve it with the chemical evolution model (known if we know the star formation history), to obtain the \textbf{composite stellar population} (CSP).
+
+% The galaxy SED has also some "emission lines" which are not modeled by our previous model.
+
+% Emission lines comes from gas, not from stars.
+
+% To include these emission lines, we need to add a new component to our model: the \textbf{ionized gas}.
+
+% Remaining components is dust, it is not uniformally distributed within the galaxy.
+% Once we have the dust extintion, 
+% different galaxies have different extintion curves, depending on properties, distribution and geometry of the dust vs. stars.
+% Thus, for different emission laws we can obtain different spectral shapes.
+
+% Regions with hotter gas emit in higher energy bands, while regions with cooler gas emit in lower energy bands.
+
+% $$
+% f_{CSP}(t) = ...
+% $$
+
+% \section{Estimate galaxy properties from observed SED}
+
+% For the most of the observations, we cannot distringuish indivisual regions in the SED of a galaxy, therefore we are mainly talking about unresolved galaxies. 
+
+% Depending on the inclination (Face-on or Edge-on) of the AGN we can observe different SEDs.
+
+% we are interested into knowing:
+
+% \begin{itemize}
+%     \item Stellar mass
+%     \item stellar age
+%     \item metallicity
+%     \item dust mass and temperature
+%     \item redshift
+% \end{itemize}
+
+% There are many approaches, the main principle is:
+
+% \subsubsection{Photometric Redshift}
+% %todo: complete this paragraph
+
+% With a single color is not usually possible to estimate redshift, but there are some exceptions ($3.6 - 4.5 \mu \text{m}$ colors).
+
+% Using two colors we can estimate redshift with better accuracy.
+
+% For many yeasr we have used the color-color diagram to estimate redshift, but now we have more accurate methods.
+
+% \dots
+
+% %todo: something about Mass and Light weighted ages
+
+% \subsubsection{Parametric star formation history}
+
+% we have differnt kinds of sfh: constant, declining, rising and delayed.
+
+% We want to fit our star formation history to the theoretical models:
+
+% %todo: add plot
+
+% \dots
+
+% \section{Stellar Mass}
+
+% Mass to light ratio (M/L) cottelates with galaxy color: we can get stellar mass estimate even from one (well chosen) color (and one magnitude) only.
+
+% %todo: add plot
+
+% if we want to be sensitive to stellar mass -> NIR
+
+% if we are interested in ages of stars -> UV/optical
+
+% Our reconstract will be sensitive to different models (dust/no dust, history model, ...)
+
+% One of the most impactful parameter is the Initial Mass Function (IMF)
+
+% Intrinsic colors of a stellar population correlate with age / sSFR (specific star formation rate)
+
+% Red does not necessarily mean old or quiescent, it can also mean that the galaxy is dusty.
+
+% The combination of NIR and UV/optical may give us a better estimate of the stellar mass.
+
+% \subsection{Star Formation Rate}
+
+% The estimate of the rate at wich stats are being formed relies on \dots
+
+% proxies fot star formation rate are emission lines, UV luminosity, H$\alpha$, PAH, IR gas emission, partial / full SED modelling.
+
+% indices are affected by both age and metallicity: there is no spectral index with is pure mteallicity or pure age. If we combine them we can couple indices to get a more accurate estimate.
+
+% with sufficient spectral coverage and resolution we can attempt to reconstruct the SFH.
+
+% %todo: add plot about synthetic SED reconstruction
+
+% \subsubsection{Dust}
+
+% dust extintion can be estimated from $L_{IR} / L_{UV}$ ratio, UV slope or Balmer decrement.
+
+% ...
+
+% \subsubsection{AGNs}
+
+% 2-color selection at NIR/mid-IR wavelenghts has also been used for AGN selection.
+
+% ...
+
+% \begin{advancedblock}[COSMOS Web Tool]
+%     The \href{https://cosmos2025.iap.fr/fitsmap}{COSMOS2025 FitsMap viewer} provides an interactive interface for exploring multi-wavelength imaging data from the COSMOS field. This tool allows users to visualize galaxy properties, photometric redshifts, and derived physical parameters such as stellar masses and star formation rates across one of the most extensively studied extragalactic survey fields.
+% \end{advancedblock}
+
+% \subsubsection{Stellar mass density in SF and Q galaxies}
+
+% At low redshift quiescent galaxies' star formation rate is faster than other galaxies, but we can observe that at high redshift it is slower.
+
+
+% \section{Cosmic star formation history}
+
+% \dots
+
+% \subsection{Main sequence of star-forming galaxies}
+
+% the main sequence of star-forming galaxies: the star formation rate of galaxies depends on stellar mass.
+
+% %todo: add main sequence sf galaxies plot
+
+% galaxies with same stellar masses but at higher redshift forms stars faster.
+
+% \subsubsection{Age/SFH vs stellar mass}
+
+% At high redshift, galaxies with same stellar masses but at higher redshift forms stars earlier and faster.
+

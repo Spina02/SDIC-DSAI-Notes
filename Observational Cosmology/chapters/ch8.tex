@@ -1,0 +1,437 @@
+\chapter{Weak Lensing Cosmology} \label{ch:weak_lensing}
+
+\section{Introduction} \label{sec:wl_intro}
+
+We previously introduced \bfit{weak gravitational lensing}, the deflection of light by large-scale structure, in \cref{sec:lensing_probe}. This chapter focuses on the practical, often complex process of turning raw telescope images into a calibrated catalogue of galaxy shapes and redshifts, emphasizing the instrumental and astrophysical systematics that ultimately limit the cosmological power of cosmic shear.
+
+\subsubsection{A Brief History of Gravitational Lensing} \label{subsec:wl_history}
+
+According to general relativity, mass curves spacetime and bends the path of light—an effect famously confirmed by Eddington during the 1919 solar eclipse, verifying Einstein's prediction. The concept evolved gradually: Chwolson (1924) and Einstein (1936) predicted the “Einstein ring” from perfect source-lens alignment; Zwicky (1937) proposed that entire galaxy clusters could act as lenses, a hypothesis proven decades later. The first gravitationally lensed object, the double quasar Q0957+561, was discovered in 1979. Soon after, Soucail et al.\ (1987) identified giant arcs in clusters, and Tyson et al.\ (1990) made the first statistical detection of \textbf{weak lensing}: a coherent distortion found by averaging the shapes of many faint galaxies. \bfit{Cosmic shear}, the lensing caused by large-scale structure, was first observed in 2000 by four groups, each using samples of $\sim 10^4$ galaxies. Since then, the field has grown rapidly: von der Linden et al.\ (2012) used lensing to calibrate cluster masses, and recent surveys have provided precise cosmological constraints using millions of galaxy shapes. Ongoing and upcoming projects will soon chart the shapes of up to a billion galaxies across the sky.
+
+\subsection{Convergence, Shear, and the Critical Surface Density} \label{sec:wl_formalism}
+
+The lens equation and its decomposition into convergence $\kappa$ and shear $\gamma$ were introduced previously (\cref{sec:lensing_probe}); here we focus on the key relations relevant for observational weak lensing.
+
+\smallskip
+
+The convergence is defined by the projected surface mass density $\Sigma$ of the lens:
+$$
+\kappa(\vec\theta) = \frac{\Sigma(D_d\vec\theta)}{\Sigma_{\text{cr}}} , \qquad
+\Sigma_{\text{cr}} = \frac{c^2}{4\pi G}\,\frac{D_s}{D_d D_{ds}} ,
+$$
+where $D_d$, $D_s$, and $D_{ds}$ are the angular diameter distances to the lens, source, and between lens and source. The \bfit{critical surface density} $\Sigma_{\text{cr}}$ is the mass scale for strong lensing ($\kappa \gtrsim 1$); most galaxies and clusters are in the weak regime ($\kappa \ll 1$, $|\gamma| \ll 1$), producing only small, statistical shape distortions.
+
+\medskip
+
+Since $\kappa$ and $\gamma$ are both second derivatives of the lensing potential, the deflection angle can also be written as a convolution of $\kappa$:
+$$
+\vec\alpha(\vec\theta) = \frac{1}{\pi}\int d^2\theta'\; \kappa(\vec\theta')\,\frac{\vec\theta-\vec\theta'}{|\vec\theta-\vec\theta'|^2} ,
+$$
+analogous to solving $\nabla^2\psi = 2\kappa$. Once $\kappa$ is known, the full lensing effect is determined, but in practice, $\kappa$ is not directly observed. Instead, we reconstruct the mass distribution from measurements of the shear field $\gamma$, which is what distorts galaxy shapes.
+
+\subsubsection{Galaxy Shapes and Shear Estimators} \label{sec:wl_shapes}
+
+Weak lensing is fundamentally a statistical measurement. Lensing conserves surface brightness (no photons are created or destroyed), so the observed image $I(\vec\theta) = I^{(s)}[\vec\beta(\vec\theta)]$ of any single background galaxy is remapped. However, the resulting change in the galaxy's shape from a typical weak shear is much smaller than the galaxy's intrinsic ellipticity, a random quantity known as \bfit{shape noise}, typically around $0.3$. As a result, individual galaxy shapes are overwhelmingly dominated by this intrinsic variability and contain negligible information about the shear; only by averaging over large populations of galaxies can the small lensing signal be extracted.
+
+\smallskip
+
+\begin{minipage}{0.6\textwidth}
+The size and shape of a galaxy image are defined through the second moments of its surface brightness profile $I(x_1,x_2)$,
+$$
+I_{\mu\nu} = \frac{\int dx_1\,dx_2\; I(x_1,x_2)\,(\mu-\bar\mu)(\nu-\bar\nu)}{\int dx_1\,dx_2\; I(x_1,x_2)} , \small \qquad \mu,\nu \in \{x_1,x_2\}
+$$
+from which the size $T \equiv I_{x_1x_1}+I_{x_2x_2}$ and the complex \bfit{ellipticity} are constructed:
+$$
+e = e_1+ie_2 = \frac{I_{x_1x_1}-I_{x_2x_2}+2iI_{x_1x_2}}{I_{x_1x_1}+I_{x_2x_2}+2\sqrt{I_{x_1x_1}I_{x_2x_2}-I_{x_1x_2}^2}}
+$$
+\end{minipage}%
+\hfill
+\begin{minipage}{0.36\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/shears.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Shear is detectable only by averaging many galaxies.}
+    \label{fig:wl_shape_shear}
+\end{minipage}
+
+\medskip
+
+Under a reduced shear $g = \frac{\gamma}{1-\kappa}$, the observed ellipticity of a source with intrinsic ellipticity $\epsilon^{\text{orig}}$ transforms as:
+$$
+\epsilon^{\text{obs}} = \frac{\epsilon^{\text{orig}}+g}{1+g^*\epsilon^{\text{orig}}} \approx \epsilon^{\text{orig}} + \gamma ,
+$$
+where $g^*$ is the complex conjugate of the reduced shear $g$. A shift so small in practice, that it is comparable to the difference in ellipticity between Uranus and the Moon as seen on the sky. Averaging over many galaxies, and assuming their intrinsic orientations are random ($\langle\epsilon^{\text{orig}}\rangle = 0$), the mean observed ellipticity becomes a direct, unbiased estimator of the reduced shear: $\langle\epsilon\rangle = g$.
+
+\subsection{Two-Point Shear Statistics and the Convergence Power Spectrum} \label{sec:wl_stats}
+
+The convergence and shear are determined by all the matter along the line of sight, so their statistics depend on cosmology both through the geometry (the angular diameter distances) and the growth and clustering of matter. To lowest order, the projected mass can be treated as an effective surface density $\kappa$, as in a single lens, but now integrated over all source and lens distances. The resulting \bfit{convergence power spectrum} (\cref{subsubsec:cosmic_shear_detail}) is given by:
+$$
+P_\kappa(\ell) = \int d\chi\, G^2(\chi)\, P_\delta\!\left(k=\frac{\ell}{\chi}\right) , \qquad
+G(\chi) = \frac{3}{2}\left(\frac{H_0}{c}\right)^2 \frac{\Omega_m}{a(\chi)} \int_\chi^{\chi_{\lim}} d\chi'\, p(\chi')\, \frac{\chi'-\chi}{\chi'} ,
+$$
+where $p(\chi')$ is the normalized redshift distribution of source galaxies. The convergence power spectrum thus depends on the matter density $\Omega_m$, the source redshift distribution $p(\chi')$, and the geometry captured by the lensing efficiency factor $(\chi'-\chi)/\chi'$.
+
+\subsubsection{From Fourier Space to the Real-Sky Correlation Function} \label{subsec:wl_realspace}
+
+The convergence power spectrum $P_\kappa(\ell)$ is defined in Fourier space, but galaxy shapes are measured at discrete, irregular sky positions. To connect theory and data, one can either Fourier-transform the observed shear field (possible only for sufficiently regular, unmasked surveys) or, more usually, compute the two-point shear correlation functions $\xi_\pm(\theta)$ in real space (\cref{subsubsec:cosmic_shear_detail}) and compare them to the theoretical prediction via inverse Fourier transform. The correlation-function approach is almost universally used, as it naturally accommodates masked and irregular survey footprints.
+
+\smallskip
+
+Because the shear field is the gradient of a scalar potential, its curl must vanish: the divergence-free (\bfit{B-mode}) component of two-point shear statistics should be zero for pure gravitational lensing. Any measured B-mode is therefore not a sign of new physics, but a key diagnostic for residual systematics, PSF modeling errors, or uncorrected instrumental effects in a shape catalogue.
+
+\medskip
+\vspace{-1em}
+
+\begin{minipage}{0.7\textwidth}
+    \subsubsection{Tomography} \label{subsec:wl_tomography}
+
+Splitting the source sample into several redshift bins, a technique known as \bfit{tomography}, and computing both the auto-correlation of each bin and the cross-correlations between bins, enhances the constraining power on the expansion history and the dark-energy equation of state $w$. Because the lensing efficiency kernel $G(\chi)$ peaks at different comoving distances for each bin, tomographic analyses probe different combinations of geometry and growth, leading to more detailed cosmological information.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.26\textwidth}
+    \bigskip
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/tomography.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Tomographic analysis.}
+    \label{fig:wl_tomography}
+\end{minipage}
+
+\vspace{-1em}
+
+\subsection{Weak Lensing Applications} \label{sec:wl_applications}
+
+\subsubsection{Galaxy-Galaxy Lensing} \label{subsec:wl_gg_lensing}
+
+\begin{minipage}{0.68\textwidth}
+    Beyond the two-point statistics of galaxy shapes alone, weak 
+    lensing can be used as independent tracer of the 
+    foreground mass distribution. In \bfit{galaxy-galaxy lensing}, the tangential shear of distant background sources is measured around foreground lens galaxies at lower redshift. By stacking many lens-source pairs, this method reveals the typical excess projected mass surrounding lens galaxies. Combined with clustering measurements of the same galaxies (\cref{subsec:bias}), galaxy-galaxy lensing yields direct constraints on galaxy bias $b_h$. Because lensing and clustering respond differently to bias and the matter power spectrum, their combination breaks degeneracies that clustering alone cannot resolve.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/galaxy-galaxy.png}
+    \captionof{figure}{\small Tangential shear as a function of distance to the lens.}
+\end{minipage}
+
+\subsubsection{Weak-Lensing Masses of Galaxy Clusters} \label{subsec:wl_cluster_masses}
+
+Weak lensing provides a uniquely direct way to estimate cluster masses, fundamentally different from X-ray or dynamical methods. Because the deflection of background light depends only on the total projected mass (dark matter included) weak-lensing mass measurements require no assumptions about hydrostatic or dynamical equilibrium. Although individual cluster measurements are noisy (each shear profile is built from relatively few background sources), the method is unbiased on average. This makes weak lensing invaluable for calibrating the observable-mass relations central to cluster cosmology (\cref{subsec:observable_mass}), and for anchoring the total mass used in gas-mass-fraction tests (\cref{subsec:gas_mass_fraction}).
+
+\begin{observationblock}[Weak lensing near clusters versus the field]
+Shear measurements around massive clusters differ from cosmic-shear measurements in key ways: the signal is about ten times stronger; the higher local density of cluster galaxies increases source blending; and, since a single cluster covers only a tiny sky area, there are far fewer background sources: up to $10^4$ times fewer than in field surveys. As a result, cluster weak-lensing analyses must carefully account for contamination by cluster members and typically rely on stacking many clusters to boost signal-to-noise.
+\end{observationblock}
+
+\section{Building Weak-Lensing Catalogues} \label{sec:wl_catalogues}
+
+Every step from photon detection to a cosmological constraint introduces its own systematics; producing a weak-lensing catalogue accurate enough for precision cosmology is, in practice, at least as demanding as the theoretical modelling. This section follows that pipeline from the focal plane to the final shape and redshift catalogue.
+
+\subsection{Wide-Field Cameras and Observing Conditions} \label{subsec:wl_cameras}
+
+Weak lensing requires measuring the shapes of very large numbers of faint galaxies, current surveys reach effective source densities of several tens of galaxies per square arcminute, which in turn demands wide fields of view built from mosaics of many CCD detectors. Reading out a single, very large detector would be prohibitively slow and noisy; splitting the focal plane into individual chips of order $8$-$16$ megapixels each keeps readout time and noise manageable while still covering fields of a degree or more. \cref{tab:wl_telescopes} summarises the cameras of the principal current and upcoming weak-lensing surveys.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}lccccc@{}}
+        \toprule
+        \textbf{Telescope} & \textbf{Mirror (m)} & \textbf{Location} & \textbf{Camera} & \textbf{Chips} & \textbf{FoV (deg$^2$)} \\
+        \midrule
+        Euclid & 1.2 & L2, space & VIS & 36 & 0.56 \\
+        VST & 2.6 & Cerro Paranal & OmegaCam & 32 & 1 \\
+        CFHT & 3.6 & Mauna Kea & MegaCam & 40 & 1 \\
+        Victor Blanco & 4 & Cerro Tololo & DECam & 62 & 2.2 \\
+        Subaru & 8.2 & Mauna Kea & Hyper Suprime-Cam & 104 & 1.8 \\
+        Vera Rubin & 8.4 & Cerro Pach\'on & LSSTCam & 189 & 9.6 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Wide-field telescopes and cameras used by current and upcoming weak-lensing surveys.}
+    \label{tab:wl_telescopes}
+\end{table}
+
+\vspace{-1em}
+
+The point-spread function that every galaxy image is convolved with sets a hard floor on how small a shear signal can be recovered. From the ground, atmospheric turbulence (seeing) dominates, giving a PSF of order $0.6$-$1''$, mitigated by observing from high-altitude, dry sites on dark, moonless nights. From space the PSF is instead diffraction-limited and correspondingly smaller, of order $0.1''$, and far more temporally stable, though its detailed structure is considerably more complex to model than a roughly Gaussian ground-based seeing disc. Processing the resulting data volumes is itself a significant undertaking: the Vera C. Rubin Observatory alone will generate some $20$~TB of raw imaging per night, accumulating to roughly $80$~PB over the survey lifetime, processed across distributed computing centres on multiple continents.
+
+\medskip
+
+\begin{minipage}{0.6\textwidth}
+    \subsection{Pixel-Level Calibration} \label{subsec:wl_pixel_cal}
+
+An ideal detector would provide perfectly uniform, equal-sized, and independent pixels, exhibit a strictly linear response to incident flux, possess a point-spread function fully independent of source brightness, and maintain an absolutely uniform flux scale across every chip and exposure. In reality, however, cameras deviate from this ideal in several important ways. Each of these imperfections must be carefully characterised and corrected so that final pixel values are accurate to the sub-percent level required for precision shear measurement.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/real.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Mosaic image from a wide-field camera.}
+\end{minipage}
+
+\begin{itemize}
+\item \textbf{Bias}: CCDs carry an intrinsic voltage offset even in the absence of any signal. A zero-exposure \textbf{bias frame} isolates this offset, and the readout noise, and is subtracted from every image.
+\item \textbf{Non-linearity}: the recorded counts must be proportional to the number of incident photons for an image to be photometrically calibrated at all; this is verified and corrected by exposing a uniform illumination screen for a sequence of increasing exposure times.
+\item \textbf{Crosstalk}: a bright source on one amplifier or chip can imprint a faint, mirrored "ghost" signal onto a neighbouring amplifier or chip, requiring a dedicated correction once the crosstalk pattern of the camera has been mapped.
+\item \bfit{Brighter-fatter effect}: because accumulated charge in a pixel repels further incoming charge, the effective PSF measured from stars depends weakly on their brightness, a purely detector-level effect that must be corrected before stellar images can be used as an unbiased PSF model.
+\end{itemize}
+
+\vspace{-0.5em}
+
+\subsubsection{Flat-fielding}
+
+\vspace{-0.5em}
+
+\begin{minipage}{0.6\textwidth}
+Beyond per-pixel corrections, variations in pixel sensitivity are addressed by flat-fielding. This usually starts with a routine \textbf{domeflat}: an exposure of a uniformly lit screen that corrects for instrumental effects like pixel-to-pixel response and vignetting. However, domeflats cannot correct for differences in the sky area subtended by each CCD (caused by the curved sky) so sky brightness can still vary across the focal plane. To solve this, an additional \textbf{starflat} correction, typically at the $\sim10\%$ level, is derived from a set of dithered stellar exposures. The starflat traces how the detector responds to real starlight from the sky, ensuring uniform photometric calibration across the camera.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+\vspace{-1em}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/domeflat.png}
+
+    \vspace{0.5em}
+
+    \includegraphics[width=0.95\textwidth]{assets/flat-frames.png}
+    
+    \vspace{-0.5em}
+    
+    \captionof{figure}{\textbf{Top}: domeflat. \textbf{Bottom} Flat-field correction.}
+\end{minipage}
+
+\vspace{-0.5em}
+
+\subsubsection{Sky subtraction, calibration and stacking}
+
+Despite all previous corrections, astronomical images still contain significant diffuse background light arising from various sources, such as atmospheric airglow, scattered moonlight or zodiacal light originating within the Solar System. All of these must be accurately modelled and subtracted to achieve a \textbf{background} with zero mean. In addition, transient artefacts like cosmic ray hits, satellite trails, and diffraction spikes from bright stars are common and must be systematically identified and \textbf{masked} to avoid contaminating scientific measurements.
+
+Precise science also demands robust \textbf{astrometric calibration}, which defines the mapping from pixel coordinates to sky positions. This process must tie images both to external reference catalogues (such as Gaia) and ensure consistency between different exposures of the same field. Equally crucial is \textbf{photometric calibration}, which systematically establishes the zero-point that translates measured fluxes into well-defined magnitudes, $ m = -2.5\log_{10}(f) + \text{zp} $ for every chip and exposure in the survey. Photometric calibration encompasses three key aspects:
+\begin{enumerate}
+    \item \textbf{Relative calibration between exposures:} ensures that the zero point is consistent across all CCDs and repeated observations, so that the same object is assigned the same magnitude throughout the survey.
+    \item \textbf{Colour calibration between filters:} aligns the relative zero points of different filters, guaranteeing that measurements of galaxy colours (i.e., flux ratios between bands) are accurate, which is essential for photometric redshifts and stellar population studies.
+    \item \textbf{Absolute flux calibration:} ties the magnitude system to a physical, externally-defined standard (such as a set of spectrophotometric stars or laboratory light sources), allowing conversion of measured magnitudes into absolute flux units.
+\end{enumerate}
+
+\smallskip
+
+\begin{minipage}{0.67\textwidth}
+    Following calibration, each exposure is transformed onto a common pixel grid and merged to produce a single, deeper image through a process known as \textbf{stacking} or \textbf{coaddition}. Stacking serves several key purposes:
+    \begin{itemize}
+        \item Smoothly fills in the physical gaps between detector chips, creating contiguous coverage
+        \item Boosts the signal-to-noise ratio (SNR) by coherently combining multiple exposures
+        \item Efficiently rejects transient artefacts (such as cosmic rays and satellite trails), especially when employing robust combination methods like median stacking
+        \item Facilitates downstream analysis by enabling measurements on a single, high-quality image rather than many individual frames
+    \end{itemize}
+    Stacking, however, comes with its own compromises: the resampling process introduces correlated noise, and if care is not taken, can lead to discontinuities in the point-spread function (PSF) at the borders of input images.
+
+\end{minipage}%
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.98\textwidth]{assets/stacking.png}
+    \captionof{figure}{One euclid VIS imag vs a stack of 42 images.}
+\end{minipage}
+
+\subsubsection{Calibration times}
+
+    Calibration steps are required at different intervals depending on the correction. Some detector-specific corrections (such as crosstalk, non-linearity, or the brighter-fatter effect) are essentially \bfit{static}; once characterised, they do not need to be repeated. Others, like the starflat, must be recalibrated \bfit{whenever the camera is adjusted} or remounted on the instrument. Domeflats are typically acquired \bfit{every day}, providing daily monitoring and updates.
+    For ground-based surveys, exposures are commonly grouped and processed in blocks of about \textasciitilde2 weeks, a cadence determined largely by the lunar cycle, as observing conditions around the full moon are typically unsuitable for deep imaging. Within each two-week period, bias and flat-field frames are combined, striking a balance between the benefit of recalibrating often and the improved statistical accuracy achieved by averaging multiple calibration exposures.
+
+
+\subsection{Source Detection, PSF Modelling, and Shape Measurement} \label{subsec:wl_detection_psf}
+
+\begin{minipage}{0.67\textwidth}
+Object detection is typically carried out on the deepest available image, usually a coadded stack, using dedicated detection software such as \textbf{SExtractor}, which excels at identifying and cataloguing sources in noisy astronomical data. Employing a median-combined stack, rather than a simple mean coadd, provides greater robustness against spurious detections arising from residual cosmic rays, satellite trails, or other transient artefacts. To distinguish point sources (stars) from extended sources (galaxies), astronomers use diagnostic plots of half-light radius versus magnitude; stars populate a tight, nearly vertical locus within this plane, cleanly separating them from galaxies and thus providing the high-purity star sample essential for accurate PSF modelling.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.98\textwidth]{assets/src.png}
+    \captionof{figure}{ Half-light radius vs. magnitude.}
+\end{minipage}
+
+\smallskip
+
+Because the PSF varies across the focal plane and from one exposure to the next, it must be modelled independently for every exposure: stars, being intrinsically point-like, are selected, their measured shapes are fit with a flexible model, and that model is interpolated across the full field of view to predict the PSF at the position of every galaxy.
+
+The point-spread function (PSF) influences shear estimation in two fundamental ways:
+\begin{enumerate}
+    \item It smooths and circularizes galaxy images, diluting the intrinsic shapes and thus diminishing the measured lensing signal.
+    \item It can introduce spurious, coherent shape distortions that mimic genuine gravitational shear. Specifically, mismatches in the PSF's size translate into a multiplicative bias in the recovered shear, while residual errors in the PSF's ellipticity result in an additive bias.
+\end{enumerate}
+
+\smallskip
+
+Accurate Point Spread Function (PSF) modeling and interpolation is vital for weak lensing analyses, as errors in the PSF propagate directly into biases in galaxy shape measurements. Two key diagnostic tools are used to evaluate the quality of the PSF model:
+
+\begin{itemize}
+    \item \textbf{Rho statistics}: These are two-point correlation functions that test how well the PSF shape model captures the true PSF properties across the field of view. Specifically,
+    \medskip
+    $$
+    \rho_1(\theta) \equiv \big\langle \delta e^*_{\text{PSF}}(\vec x)\,\delta e_{\text{PSF}}(\vec x+\vec\theta)\big\rangle,\qquad
+    \rho_2(\theta) \equiv \big\langle e^*_{\text{PSF}}(\vec x)\,\delta e_{\text{PSF}}(\vec x+\vec\theta)\big\rangle,
+    $$
+    where $\delta e_{\text{PSF}}$ denotes the residual between the modelled and the true PSF ellipticity. $\rho_1$ measures the spatial correlation of the PSF modeling residuals, and $\rho_2$ assesses whether errors in the PSF model are correlated with the underlying PSF shape itself. Ideally, both should be minimized across all scales, indicating accurate and unbiased interpolation.
+    
+    \item \textbf{PSF leakage}: Even after correction, some residual PSF shape can "leak" into galaxy shape measurements, biasing the inferred lensing signal. This effect is parametrized as
+    \medskip
+    $$
+    e_{\text{gal}} = e_{\text{true}} + \alpha\, e_{\text{PSF}} + c,
+    $$
+    where $e_{\text{gal}}$ is the measured galaxy ellipticity, $e_{\text{true}}$ is the true (sheared) galaxy ellipticity, $e_{\text{PSF}}$ is the PSF ellipticity, $c$ is an additive residual, and $\alpha$ is the \textit{PSF leakage coefficient}. A perfect correction yields $\alpha \approx 0$, meaning the PSF's shape has no residual influence on the galaxy shapes.
+\end{itemize}
+
+\smallskip
+
+Once a PSF model is available, two principal families of technique are employed to measure galaxy shapes, each with its own strengths and subtleties:
+
+\smallskip
+
+\begin{minipage}{0.67\textwidth}
+    \begin{itemize}
+        \item \textbf{Model-fitting} (or forward-modelling) approaches construct a parametric model for the galaxy light profile (commonly a S\'ersic, Gaussian, or a multi-component bulge-plus-disc model) and convolve it with the local PSF. The parameters describing the model (such as total flux, size, ellipticity, centre position, and component fractions) are then varied to fit the observed pixel data directly. Increasing the number of parameters and moving to more flexible or composite models typically yields a better fit to the galaxy's true structure, but at the expense of computational complexity and increased degeneracies in the higher-dimensional parameter space.
+        
+        \item \textbf{Moment-based} methods, in contrast, quantify galaxy shapes using brightness-weighted second moments $I_{\mu\nu}$, which capture image size and ellipticity. Since real galaxies are noisy and have faint wings extending to infinity, raw moments would diverge. This is addressed by applying a \bfit{weight function} (typically a circular Gaussian, or in more advanced “adaptive moments” schemes, adjusted iteratively to the galaxy profile) which downweights the noisy outskirts. The resulting weighted moments are then corrected for missing flux and PSF blurring, yielding an unbiased estimate of the intrinsic ellipticity.
+    \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.31\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/modeling.png}
+    \captionof{figure}{HST $i$-band image and best model fits.}
+\end{minipage}
+
+\subsection{Shear Calibration and Photometric Redshifts} \label{subsec:wl_shear_photoz_cal}
+
+\textbf{Shape is not a well-defined property for realistic galaxies!} For actual galaxies, the notion of "shape" depends on the particular estimator and weighting scheme chosen, making direct, object-by-object shape comparisons essentially meaningless, especially between different measurement techniques. What matters physically is not the shape assigned to any single galaxy, but rather the ensemble statistics of the estimator and how they respond to a true gravitational shear.
+
+\medskip
+
+However, no shape estimator has a perfectly linear response to shear. The response is generally characterized by multiplicative and additive biases:
+$$
+g_i = (1+m_i)\, g_i^{\text{tr}} + c_i ,
+$$
+where $g_i$ is the measured shear, $g_i^{\text{tr}}$ is the true shear, $m_i$ is the multiplicative bias, and $c_i$ is the additive bias. The goal of shear calibration is to accurately determine $m_i$ and $c_i$ for the ensemble of galaxies measured by a given estimator. This calibration is performed \emph{statistically}, since individual galaxy shapes are not uniquely or physically meaningful.
+
+\medskip
+
+Two main strategies are used to calibrate these biases:
+
+\begin{enumerate}
+
+    \item \textbf{image simulations}, where mock galaxies with known true shapes are lensed, rendered with realistic noise and PSF, and measured with the same pipeline as the real data to recover the sheared ensemble response;
+    \item \textbf{metacalibration}, which sidesteps the need for simulated populations by applying a small, artificial shear directly to real galaxy images and quantifying the resulting change in the measured shapes. Both approaches calibrate the ensemble shear response, not the "true" individual galaxy shapes.
+\end{enumerate}
+    
+\begin{warningblock}[Shape estimator comparison]
+    Shapes output by different estimators cannot be meaningfully compared on a galaxy-by-galaxy basis; only their ensemble response to shear is physically interpretable.
+\end{warningblock}
+
+\medskip
+
+The multiplicative bias ($m$-bias) in weak lensing shear measurements arises from multiple sources:
+
+\medskip
+
+\begin{minipage}{0.56\textwidth}
+\begin{itemize}
+    \item \textbf{Model bias:} The adopted parametric model does not fully capture the true galaxy light profile, introducing systematic deviations.
+    \item \textbf{Noise bias:} Real galaxy images are pixelated and noisy, and the estimator can be systematically biased by the correlated effect of noise and pixel sampling.
+    \item \textbf{Blending:} Overlapping or nearby sources on the sky affect measured shapes and flux, making it difficult to assign accurate shapes to individual galaxies.
+    \item \textbf{Selection effects:} The measurement process itself can introduce bias, e.g., highly elliptical galaxies or those with lower surface brightness may be less likely to exceed the detection threshold, skewing the ensemble.
+    \item \textbf{PSF size errors:} Imperfect knowledge or modeling of the size of the PSF also propagates into shear calibration bias.
+\end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/bias-origin.png}
+    \captionof{figure}{Galaxy blends seen from space (left) and ground (right); improved resolution reduces multiplicative bias ($m$-bias) from blending. Adapted from \cite{Dawson_2016}.}
+\end{minipage}
+
+\subsubsection{Photometric redshift}
+
+Weak lensing measurements almost never require the individual photometric redshift of any single source galaxy; what enters the theoretical prediction is only the ensemble redshift distribution $n(z)$ of each tomographic bin.
+
+Most weak lensing measurements do not require the individual photometric redshift (photo-$z$) of each galaxy, but only the ensemble redshift distribution $n(z)$ that enters the theoretical modeling. Spectroscopic redshifts for the faint galaxies used in shape measurement are prohibitively expensive to measure at scale, so weak lensing surveys instead use photometric redshifts (\cref{subsec:surveys_specphot}): estimates derived from a handful of broad-band fluxes, effectively providing a very low-resolution spectrum.
+
+Calibrating these photo-$z$ estimates is one of the key systematics for cosmic shear. The goal is not perfect redshifts for every galaxy, but an accurate $n(z)$ for each tomographic bin, since even small ($\sim$percent-level) biases in the mean or width of $n(z)$ can shift cosmological results.
+
+Photo-$z$ calibration relies on several techniques, each exploiting a different relationship between photometric and spectroscopic samples:
+\begin{itemize}
+    \item \textbf{Direct reweighting:} A spectroscopic subsample is reweighted to match the colour/magnitude distribution of the photometric sources, and then used to estimate $n(z)$. However, the spectroscopic sample rarely reaches as faint or as blue as the full source catalog, causing potential extrapolation biases.
+    
+    \item \textbf{Self-Organizing Maps (SOM):} Galaxies are mapped into colour space and binned, with each cell assigned a redshift using matching spectroscopic objects. This works well where spectroscopic coverage is dense, but fails or requires extrapolation in undersampled regions: a challenge for surveys like Euclid and Rubin, which reach fainter magnitudes than most spectroscopic datasets.
+    
+    \item \textbf{Clustering redshifts:} Based on the idea that all galaxies trace large-scale structure, cross-correlating the positions of sources (unknown $z$) and a tracer sample (secure spectroscopic redshifts) allows statistical inference of the source $n(z)$. The tracer sample need not match the source depth, just overlap in redshift, making this technique especially effective when faint spectroscopic samples are incomplete.
+\end{itemize}
+These calibration approaches are often combined in practice. The continuing challenge is that none can easily access the true $n(z)$ for the faintest galaxies, and the resulting uncertainty is now the dominant systematic in cosmic shear cosmology. 
+
+\section{Modelling Astrophysical Systematics} \label{sec:wl_modeling}
+
+\subsection{Intrinsic Alignments} \label{subsec:wl_ia}
+
+
+The estimator $\langle\epsilon\rangle = g$ of \cref{sec:wl_shapes} assumes that the intrinsic orientations of galaxies are uncorrelated with one another and with the surrounding density field. 
+
+\begin{minipage}{0.7\textwidth}
+    In reality, galaxies forming and evolving within a shared large-scale tidal field can develop a preferred, correlated orientation, an effect already introduced as one of the three contributions to the observed shear-shear correlation in \cref{subsubsec:cosmic_shear_detail}. 
+    \textbf{Intrinsic alignment} models are typically calibrated separately for different galaxy morphological types and physical scales, since the alignment mechanisms proposed for elliptical and spiral galaxies differ, and a standard consistency test splits the source sample by colour, red and passive galaxies versus blue and star-forming ones, since the two populations are expected to show markedly different intrinsic alignment amplitudes.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.28\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/intrinsic-alignment-2.png}
+    \captionof{figure}{Intrinsic alignment.}
+\end{minipage}
+
+\subsection{Baryonic Effects on the Matter Distribution} \label{subsec:wl_baryons}
+
+
+The convergence power spectrum of \cref{sec:wl_stats} depends on the full, non-linear matter power spectrum $P_\delta(k)$, which in reality is shaped not only by dark matter but also by baryonic processes (gas cooling, star formation, and especially feedback from active galactic nuclei) which redistribute matter on the same non-linear scales that dominate the cosmic shear signal. This effect was already introduced for the halo mass function in \cref{subsubsec:hmf_baryons}. 
+
+\smallskip
+
+\begin{minipage}{0.62\textwidth}
+
+Fully hydrodynamical, cosmological-scale simulations are prohibitively expensive, and their results vary widely depending on sub-grid feedback models. To address this, cosmic shear analyses now often adopt semi-analytic \textbf{baryonification} models, which flexibly and efficiently impose a physically motivated, parameterized suppression onto the dark-matter-only power spectrum. Rather than depending on a single simulation, these parameters are tuned to span the range of predictions from leading hydrodynamical simulations, allowing robust cosmological analyses while incorporating baryonic uncertainty into the error budget.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \vspace{-0.5em}
+    \centering
+    \includegraphics[width=\textwidth]{assets/baryonification.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Baryonic suppression of the matter power spectrum.}
+\end{minipage}
+
+\section{Current Results and Open Challenges} \label{sec:wl_results}
+
+
+\begin{minipage}{0.61\textwidth}
+    Modern cosmic shear surveys now constrain $\Omega_m$ and $S_8$ at a level comparable to the CMB, though systematic differences persist. Despite rapid growth in area and depth over the past decade, recent DES releases, spanning an order of magnitude in sample size, yield strikingly consistent results. This stability shows that systematic uncertainties now dominate over statistical errors.
+    
+    \smallskip
+Independent surveys (DES Y6, HSC Y3, KiDS-Legacy) also agree well, and all show a mild ($1$-$2\sigma$) preference for lower $S_8$ than the Planck CMB fit, reflecting the ongoing $S_8$ tension. Notably, shifts in $S_8$ remain sensitive to analysis choices: for example, the update from KiDS-1000 to KiDS-Legacy improved agreement with Planck primarily through better photometric-redshift calibration, rather than new data, and a DES-KiDS analysis swap revealed measurable changes in $S_8$ due to pipeline differences.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.36\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/s8.png}
+    \captionof{figure}{Recent constraints on $S_8$ and $\Omega_m$ from cosmic shear and CMB analyses.}
+\end{minipage}
+
+\begin{observationblock}[Cosmic shear alone is poorly constrained in the $\Omega_m$-$\sigma_8$ plane]
+Cosmic shear itself carves out a narrow, banana-shaped region in the $\Omega_m$-$\sigma_8$ plane, exposing a strong degeneracy along $S_8 = \sigma_8\sqrt{\Omega_m/0.3}$. Many combinations of $\Omega_m$ and $\sigma_8$ produce nearly identical shear signals. Only through joint $3\times2\text{pt}$ analyses, combining shear, galaxy clustering, and galaxy-galaxy lensing can this degeneracy be broken to yield tighter cosmological constraints, which is why top-line results never come from cosmic shear alone.
+\end{observationblock}
+
+Looking ahead, Euclid, Rubin, and Roman will deliver source catalogs far exceeding current surveys (\cref{tab:wl_telescopes}), but it is systematics (PSF modeling, shear and photometric-redshift calibration, intrinsic alignments, baryonic feedback) that will ultimately limit cosmic shear, rather than statistical noise.
