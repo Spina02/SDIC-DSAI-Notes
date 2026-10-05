@@ -594,16 +594,16 @@ In other words, the specific intensity is the amount of energy passing through a
 
     \vspace{1em}
 
+    The \textbf{total intensity} $I$ is obtained by integrating $I_\nu$ over all frequencies:
+    \medskip
+    $$
+    I = \int_0^\infty I_\nu d\nu
+    $$
+    
     The \textbf{Surface Brightness} ($SB$) is used to describe the brightness of an extended object in the sky:
 \medskip
 $$
 SB = \dfrac{Flux}{Solid\ Angle}
-$$
-
-The \textbf{total intensity} $I$ is obtained by integrating $I_\nu$ over all frequencies:
-\medskip
-$$
-I = \int_0^\infty I_\nu d\nu
 $$
 \end{minipage}%
 \hfill
@@ -1075,7 +1075,7 @@ It is important to note that elliptical galaxies exhibit minimal extinction beca
     $$
     dL = -\alpha L\, dr
     $$
-    where the parameter $\alpha$, known as the \bfit{opacity}, quantifies how effectively the medium absorbs or blocks the radiation.The effect of extinction on observed luminosity is conveniently described by the \textbf{optical thickness} $\tau$, defined as:
+    where the parameter $\alpha$, known as the \bfit{opacity}, quantifies how effectively the medium absorbs or blocks the radiation. The effect of extinction on observed luminosity is conveniently described by the \textbf{optical thickness} $\tau$, defined as:
     $$
     d\tau = \alpha\, dr
     $$
@@ -1133,7 +1133,7 @@ The \bfit{bolometric magnitude} measures the brightness integrated over the enti
 $$
 m_\mathrm{bol} = -2.5 \log_{10}\!\left(\int_0^\infty f_\nu \, d\nu\right) + C_\mathrm{bol},
 $$
-where $C_\mathrm{bol}$ is a constant that fixes the zero point. The corresponding \bfit{absolute} bolometric magnitude $M_\mathrm{bol}$ is defined at $10$ pc.
+where $f_\nu$ is the flux density and $C_\mathrm{bol}$ is a constant that fixes the zero point. The corresponding \bfit{absolute} bolometric magnitude $M_\mathrm{bol}$ is defined at $10$ pc.
 
 \subsubsection{Mass-to-light ratio}
 
@@ -1143,12 +1143,14 @@ $$
 $$
 It is customary to express $\gamma_{\,_{X}}$ in solar units, i.e., $[M_\odot / L_{\odot, X}]$. The luminosity of an object in band $X$, relative to the solar luminosity in that band, is related to its absolute magnitude by:
 $$
+M_X - M_{X\odot} = -2.5 \log \left( \frac{L_X}{L_{\odot, X}} \right)
+\qquad \Rightarrow \qquad
 \frac{L_X}{L_{\odot, X}} = 10^{-0.4 (M_X - M_{X\odot})}
 $$
 
 Consequently, the mass-to-light ratio can be written as:
 $$
-\gamma_{\,_{X}} = \frac{M / M_\odot}{L_X / L_{\odot, X}} = \left(\frac{M}{M_\odot}\right) \cdot 10^{+0.4 (M_X - M_{X\odot})}
+\gamma_{\,_{X}} = \frac{M / M_\odot}{L_X / L_{\odot, X}} = \left(\frac{M}{M_\odot}\right) \left(\frac{L_X}{L_{\odot, X}}\right)^{-1} = \left(\frac{M}{M_\odot}\right) \cdot 10^{+0.4 (M_X - M_{X\odot})}
 $$
 
 \subsubsection{Surface brightness of extended sources}
@@ -1161,7 +1163,7 @@ $$
 \qquad \text{or} \qquad
 \text{[I]} = \frac{L_\odot}{pc^2}
 \qquad \text{or} \qquad
-\text{[mu]} = \frac{\text{mag}}{\text{arcsec}^2}
+\text{[\mu]} = \frac{\text{mag}}{\text{arcsec}^2}
 $$
 
 (SB) is \textit{independent of distance} in Euclidean geometry (if one neglects extinction and assumes the universe is not expanding).
