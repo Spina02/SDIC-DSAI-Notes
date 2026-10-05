@@ -8,8 +8,15 @@
 \usepackage{../template/styles}
 \usepackage{../template/frames}
 \usepackage{../template/macros}
+\usepackage{multirow}
+\usepackage{tabularx}
 
 \usetikzlibrary{positioning, arrows}
+
+\renewcommand{\tt}[1]{{\ttfamily\footnotesize #1}}
+
+% Only include ch2.tex
+\includeonly{chapters/ch7}
 
 %%%%%%%%%%%%%%
 % Title Page %
@@ -45,10 +52,9 @@
 
 % Chapters
 \includechapters
+% \include{chapters/ch7_old}
+
 % Bibliography
 \printbibliography
 
 \end{document}
-
-
-

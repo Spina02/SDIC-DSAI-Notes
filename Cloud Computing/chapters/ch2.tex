@@ -1,212 +1,293 @@
+\chapter{Cloud Computing main concepts} \label{ch:cloud_concept}
 
-\chapter{Cloud Computing concept and architecture}
+The previous chapter charted the evolution from single machines to cloud computing. This chapter focuses on cloud computing itself: its definition, distinguishing attributes, the classification of its services and deployment models, and the structure of its architecture built from virtualized, composable components communicating via standard web protocols.
+
+\section{Defining Cloud Computing} \label{sec:defining_cloud}
+
+Cloud computing does not have a single, universally agreed definition; it is more useful to think of it through three complementary lenses. It can be seen as the concrete, commercially \bfit{realized form of utility computing}, as the natural \bfit{evolution of grid computing}, or simply as a \bfit{particular kind of distributed system}, distinguished less by the physical arrangement of its resources and more by the way those resources are exposed, provisioned, and billed to users. This convergence accelerated in the late 2000s, marked by key milestones: Amazon EC2's launch in 2006, Google App Engine in 2008, Microsoft Azure and OpenStack in 2010, and Google Compute Engine in 2013. Meanwhile, grid computing matured alongside the cloud, and HPC cluster power advanced from about a petaflop per second to several hundred petaflops today.
 
 \begin{definitionblock}[Cloud Computing]
-    Cloud computing is a model for enabling
-    convenient, on-demand network access to a
-    shared pool of configurable computing
-    resources (e.g., networks, servers, storage,
-    applications, and services) that can be rapidly
-    provisioned and released with minimal
-    management effort or service provider
-    interaction. This cloud model promotes availability and is
-    composed of five essential characteristics,
-    three service models, and four deployment
-    models.
+    \bfit{Cloud computing} is a model for enabling convenient, on-demand network access to a shared pool of configurable computing resources (e.g., networks, servers, storage, applications, and services) that can be rapidly provisioned and released with minimal management effort or service provider interaction. This cloud model promotes availability and is composed of five essential characteristics, three service models, and four deployment models.
+
+    \hfill \textit{National Institute of Standards and Technology (NIST)}
 \end{definitionblock}
 
-Cloud computing is the on-demand availability of computer system
-resources, especially data storage (“cloud storage”) and computing power,
-without direct active management by the user.
-Clouds may be limited to a single organization (\texttt{private/enterprise} cloud), or
-be available to many organizations (\texttt{public} cloud), maybe a mixture of the
-two (\texttt{hybrid} cloud);
-Cloud implements a \texttt{pay-as-you-go} model based on the concept of infinite
-resources availability;
+Stripped of its formal language, cloud computing is the on-demand availability of computer system resources, especially data storage (\bfit{cloud storage}) and computing power, without direct active management by the user. A cloud may be restricted to a single organization (a \bfit{private} or \bfit{enterprise} cloud), offered openly to many organizations (a \bfit{public} cloud), or built as a mixture of the two (a \bfit{hybrid} cloud). What all three share is a \bfit{pay-as-you-go} pricing model, built on the working assumption, from the consumer's point of view, of an effectively infinite pool of available resources.
 
-Base concepts:
+Two base concepts underpin everything that follows:
 \begin{itemize}
-    \item \textbf{Abstraction}: the process of removing or reducing the
-        complexity of a system by hiding or suppressing details;
-    \item \textbf{Virtualization}: the process of creating a virtual version of
-        something, including virtual computer hardware platforms, storage
-        devices, and computer network resources;
+\item \textbf{Abstraction} hides the complexity of underlying systems: applications run on unnamed physical machines, data locations are concealed, and administration is fully handled by the provider.
+\item \textbf{Virtualization} creates virtual versions of computers, storage, or networks, allowing resources to be pooled, shared, and provisioned independently of their physical hardware. Section~\ref{sec:cloud_architecture} details its practical implementation via hypervisors and virtual machines.
 \end{itemize}
+
+\medskip
+
+Figure~\ref{fig:cloud-computing-architecture} summarizes the reference model that structures the rest of this chapter: a set of \textbf{service attributes} shared by every cloud (Section~\ref{sec:service_attributes}), organized into \textbf{service models} that determine what is offered to the customer and \textbf{deployment models} that determine who it is offered to (Section~\ref{sec:service_deployment_models}).
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig10.png}
-    \caption{Cloud Computing Architecture}
+    \includegraphics[width=0.75\textwidth]{assets/fig10.png}
+    \caption{The NIST cloud computing reference model: four deployment models sit atop three service models, which in turn rest on a common set of service attributes.}
     \label{fig:cloud-computing-architecture}
 \end{figure}
 
-\section{Service Attributes}
+\section{Service Attributes} \label{sec:service_attributes}
+
+\subsection{The Five Essential Attributes}
+
+NIST identifies five essential characteristics that, taken together, distinguish a cloud from an ordinary data centre or hosting service.
+
+\subsubsection{On-demand Self-service}
+
+\textbf{On-demand self-service} means that users can access and use computing resources whenever they need them, without waiting for someone else to set them up. Instead of receiving all resources in advance, users request and receive resources exactly when required. This helps organizations handle unpredictable or changing demand more efficiently, avoiding both over-provisioning (paying for unused resources) and under-provisioning (not having enough resources when needed).
+
+\subsubsection{Broad Network Access}
+
+\textbf{Broad network access} means that capabilities are available over the network and accessible through standard mechanisms, in a way that promotes use by heterogeneous thin or thick client platforms such as mobile phones, tablets, laptops, and workstations. A single cloud data centre can serve a branch office running Windows, Linux, and Mac desktops, as well as remote teleworkers on PCs, tablets, and mobile devices, all through the same wide area network.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{assets/fig11.png}
+    \caption{Broad network access: a single cloud data centre serves heterogeneous client platforms over a wide area network.}
+    \label{fig:broad-network-access}
+\end{figure}
+
+\subsubsection{Resource Pooling}
+
+\textbf{Resource pooling} refers to storage, processing, memory, network bandwidth, and virtual machines: the provider's computing resources are pooled to serve multiple consumers, allocated and deallocated as needed, following a \textbf{multi-tenancy} model in which several customers share the same underlying hardware node while remaining logically isolated from one another (Figure~\ref{fig:resource-pooling}). Pooling also implies \textbf{location independence}: the customer typically has no control over, and often no knowledge of, the exact physical location of their resources, which has direct implications for performance, scalability, and security.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.57\textwidth]{assets/fig12.png}
+
+    \vspace{-0.5em}
+
+    \caption{Multi-tenancy: multiple customers' virtual machines share the same hardware node and hypervisor, instead of each having a dedicated node (single-tenant).}
+    \label{fig:resource-pooling}
+\end{figure}
+
+\vspace{-1.5em}
+
+\subsubsection{Rapid elasticity}
+
+\textbf{Rapid elasticity} means that capabilities can be elastically provisioned and released, in some cases automatically, to scale rapidly outward and inward with demand; to the consumer, the resources available for provisioning often appear unlimited and can be appropriated in any quantity at any time. Elasticity is achieved through two complementary strategies. 
 
 \begin{itemize}
-    \item \textbf{On-demand}
-    On-demand computing is a business computing
-    model in which computing resources are made
-    available to the user
-    on an "as needed" basis.
-    Rather than all at once, on-demand computing
-    allows cloud hosting companies to provide their
-    clients with access to computing resources as they
-    become necessary.
-    The on-demand computing model overcomes the
-    common challenge that enterprises encountered of
-    not being able to meet unpredictable, fluctuating
-    computing demands efficiently.
-    \item \textbf{Broad network access}
-    Capabilities are available
-    over the network and
-    accessible through
-    standard mechanisms that
-    promote use by
-    heterogeneous thin or
-    thick client platforms
-    (e.g., mobile phones,
-    tablets, laptops, and
-    workstations).
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.8\textwidth]{assets/fig11.png}
-        \caption{Broad network access}
-        \label{fig:broad-network-access}
-    \end{figure}
-    \item \textbf{Resource pooling}
-    Computing resources are storage,
-    processing, memory, network
-    bandwidth and virtual machines. 
-    Provider’s computing resources are
-    pooled to serve multiple consumers,
-    allocated and deallocated as needed.
-    Tenants are Isolated. Location independence: there is no
-    control over the exact location of the
-    resources. This has major implications
-    performance, scalability, security.
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.5\textwidth]{assets/fig12.png}
-        \caption{Resource pooling}
-        \label{fig:resource-pooling}
-    \end{figure}
-    \item \textbf{Rapid elasticity}
-    Capabilities can be elastically
-    provisioned and released, in some
-    cases automatically, to scale
-    rapidly outward and inward
-    commensurate with demand.
-    To the consumer, the capabilities
-    available for provisioning often
-    appear to be unlimited and can be
-    appropriated in any quantity at any
-    time.
-    \item \textbf{Vertical and horizontal scaling}
-    \begin{itemize}
-        \item \textbf{Vertical scaling}: adding more resources to a single node
-        \item \textbf{Horizontal scaling}: adding more nodes to a system, such as adding a new computer to a distributed software application
-    \end{itemize}
-    \item \textbf{Measured service}
-    Metering capability of service/resource abstractions in terms of storage,
-    processing, bandwidth, active user accounts etc. Remember the utility computing and pay as you go model.
+    \item \textbf{Vertical scaling} (scaling up) adds more resources, such as CPU, memory, or disk, to a single existing node, increasing its individual capacity.
+    \item \textbf{Horizontal scaling} (scaling out) instead keeps each resource unit unchanged and simply increases the number of such units, for instance by adding a new node to a distributed application.
 \end{itemize}
 
-\section{Cloud Service Models}
+Horizontal scaling tends to deliver better long-term scalability and is easy to scale back, since it can rely on commodity hardware rather than ever-larger individual machines, but it raises the same question already met in the HTC discussion of \cref{sec:cluster_hpc}: once a workload has been split across many units, where does the bottleneck lie, in I/O, in the network, or elsewhere?
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/vh-scaling.png}
+
+    \vspace{-0.5em}
+
+    \caption{Vertical scaling versus horizontal scaling.}
+    \label{fig:scaling}
+\end{figure}
+
+\vspace{-1em}
+
+\subsubsection{Measured Service}
+
+Finally, \textbf{measured service} is the metering capability applied to service and resource abstractions, in terms of storage, processing, bandwidth, active user accounts, and similar quantities. This is precisely the pay-as-you-go model already encountered in the discussion of utility computing (Section~\ref{sec:utility_cloud_edge}): the cloud is, in this respect, utility computing put into practice.
+
+\subsection{Additional Benefits and Limitations of Cloud Computing}
+
+In addition to the five essential characteristics, moving to the cloud offers several significant benefits: \textit{lower costs}, \textit{ease of use}, well-defined \textit{quality of service (QoS)}, better \textit{reliability}, \textit{outsourced IT management}, more straightforward \textit{maintenance and upgrades}, and a \textit{lower barrier to entry} for organizations that might otherwise be unable to afford dedicated infrastructure.
+
+\smallskip
+
+However, these advantages have their tradeoffs, and it's important to carefully consider some key questions before adopting cloud services. For instance: Does a large organization that can already manage its own IT infrastructure truly benefit from the cloud? How much flexibility is lost in customizing applications once they are hosted on someone else's platform?
+
+\smallskip
+
+Because everything depends on the network, wide area latency is inevitable, and any local connectivity issues mean you might lose access to your services. Cloud computing is also inherently stateless (see Section~\ref{sec:cloud_architecture}), so building anything more complex than a basic application usually requires extra components, such as service brokers, transaction managers, or middleware. And as with all utility computing, privacy and security ultimately depend on the reliability and integrity of the third-party provider.
+
+\section{Cloud Service and Deployment Models} \label{sec:service_deployment_models}
+
+\subsection{Cloud Services}
+
+Cloud offerings are commonly described using the \texttt{XaaS} convention, that is, ``\textit{Something} as a Service.'' Three service models form the core of the NIST reference model, with a fourth, container-based model, increasingly recognized as an intermediate layer between the other two:
+
+\smallskip
 
 \begin{itemize}
-    \item \textbf{Infrastructure as a Service (IaaS)}: provides virtualized computing resources over the internet. IaaS is one of the three main categories of cloud computing services, alongside Software as a Service (SaaS) and Platform as a Service (PaaS).
-    \item \textbf{Platform as a Service (PaaS)}: provides a platform allowing customers to develop, run, and manage applications without the complexity of building and maintaining the infrastructure typically associated with developing and launching an app.
-    \item \textbf{Software as a Service (SaaS)}: is a software distribution model in which a third-party provider hosts applications and makes them available to customers over the internet.
+    \item \textbf{Infrastructure as a Service (IaaS)}: provides virtual machines, virtual storage, virtual networking, and other hardware assets as resources that clients can provision directly, without owning any physical equipment.
+    \item \textbf{Container as a Service (CaaS)}: sits between infrastructure and application platforms, providing a managed environment for building, orchestrating, and running containers rather than full virtual machines. Kubernetes and Docker are the dominant technologies here.
+    \item \textbf{Platform as a Service (PaaS)}: provides virtual machines, operating systems, applications, services, development frameworks, transaction handling, and control structures, allowing customers to develop, run, and manage applications without the complexity of building and maintaining the underlying infrastructure.
+    \item \textbf{Software as a Service (SaaS)}: is a complete operating environment, comprising applications, management tools, and the user interface itself, delivered as a service and requiring no infrastructure or platform management at all on the customer's side.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig13.png}
-    \caption{Cloud Service Models}
+    \includegraphics[width=0.85\textwidth]{assets/fig13.png}
+    \caption{The four cloud service models, from bare infrastructure to complete software.}
     \label{fig:cloud-service-models}
 \end{figure}
 
-\section{Cloud Deployment Models}
+\subsection{Cloud Deployments}
+
+NIST defines four deployment models, categorized by who can access them rather than by the services provided:
 
 \begin{itemize}
-    \item \textbf{Public Cloud}: It is a cloud computing model where services (such as compute, storage, and networking) are provided over the internet by a third-party provider and are shared among multiple customers. These services are typically scalable, pay-as-you-go, and maintained by the provider. 
-    \item \textbf{Commercial cloud}: Refers to cloud services offered by a provider for business and enterprise use. It can include public, private, or hybrid cloud solutions, typically with a focus on performance, security, compliance, and enterprise support.
-    \item \textbf{Private cloud}: A private cloud is a cloud infrastructure that is operated solely for a single organization. It may be managed by the organization or a third party and may exist on-premises or off-premises.
-    \item \textbf{Hybrid cloud}: The cloud infrastructure is a composition of two or more distinct cloud infrastructures (private, community, or public) that remain unique entities but are bound together by standardized or proprietary technology that enables data and application portability (e.g., cloud bursting for load balancing between clouds).
-    \item \textbf{Community cloud}: A community cloud is one where the cloud has been
-    organized to serve a common function or purpose.
+    \item \textbf{Public cloud}: the infrastructure is available for open use, or for use by a large industry group, and is owned and operated by an organization that sells cloud services to the general market.
+    \item \textbf{Private cloud}: the infrastructure is operated for the use of a single organization. It may be managed by the organization itself or a third party, and can be hosted on-premises or off-premises.
+    \item \textbf{Community cloud}: the infrastructure is organized to serve a common function or purpose shared by several cooperating organizations, rather than a single tenant or the general public.
+    \item \textbf{Hybrid cloud}: the infrastructure is a composition of two or more of the models above, which remain distinct entities in themselves but are bound together by standardized or proprietary technology that enables data and application portability between them, for instance to allow \textbf{cloud bursting} for load balancing when a private cloud's capacity is temporarily exceeded.
 \end{itemize}
 
-\section{Cloud Computing Infrastructure}
+A closely related but distinct term, \textbf{commercial cloud}, is often used in industry to describe public, private, or hybrid cloud services that are explicitly marketed to businesses and enterprises, typically with an emphasis on performance guarantees, security compliance, and dedicated support.
 
-\begin{itemize}
-    \item \textbf{Data Center}: A data center is a facility composed of networked computers and storage that businesses or other organizations use to organize, process, store and disseminate large amounts of data.
-    \item \textbf{Virtualization}: Virtualization is the process of creating a virtual version of something, including virtual computer hardware platforms, storage devices, and computer network resources.
-    \item \textbf{Hypervisor}: A hypervisor, also known as a virtual machine monitor, is a process that creates and runs virtual machines (VMs).
-    \item \textbf{Containerization}: Containerization is a lightweight alternative to full machine virtualization that involves encapsulating an application in a container with its own operating environment.
-    \item \textbf{Microservices}: Microservices are a software development technique—a variant of the service-oriented architecture (SOA) architectural style that structures an application as a collection of loosely coupled services.
-\end{itemize}
+\vspace{-0.5em}
 
-It is based on the concept of virtualization, which allows for the creation of multiple virtual machines on a single physical machine. This allows for the efficient use of resources and the ability to scale up or down as needed. For this, Virtual Machines (VMs) are used, which are software-based representations of physical machines. These VMs can be created, modified, and deleted as needed, allowing for the efficient use of resources.
+\section{Cloud Architecture} \label{sec:cloud_architecture}
+
+\subsection{Infrastructure and Platforms}
+
+Cloud architecture is built on two mature technologies: system virtualization and the standard networking protocols of the Internet. Virtualization allows resources to be pooled, partitioned, and managed flexibly across multiple physical locations, while networking protocols connect these resources and make them accessible as on-demand services. Unlike physical resources, these virtualized resources can be optimized and modified dynamically.
+
+A typical cloud infrastructure is organized as a layered stack on top of physical \textbf{facilities} (power, cooling, space) and \textbf{hardware} (compute, network, storage). An \textbf{abstraction} layer, along with \textbf{core connectivity and delivery} services for authentication, security, and networking, virtualizes the hardware into grids, clusters, and virtual machine monitors. \textbf{APIs} expose the virtualized stack to a higher-level \textbf{management} layer. The central component is the \bfit{hypervisor} (or virtual machine monitor), which creates and runs \bfit{virtual machines} (VMs): software representations of physical machines. VMs can be created, modified, or deleted entirely in software, enabling efficient, on-demand use of resources.
+
+\vspace{-0.5em}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{assets/fig14.png}
-    \caption{VM Infrastructure}
+
+    \vspace{-0.5em}
+
+    \caption{Layered view of a cloud infrastructure stack, from physical facilities and hardware, through the virtualization and connectivity layer, up to the management APIs.}
     \label{fig:cloud-computing-infrastructure}
 \end{figure}
 
-Applications such as a Web
-server or database server that
-can run on a virtual machine
-image are referred to as virtual
-appliances. Virtual appliances are software
-installed on virtual servers. They are
-self-contained and run on a
-virtual machine. They are
-pre-configured and ready to run
-applications.
+\vspace{-0.5em}
 
-\section{Communication in Cloud Computing}
+A further layer is built on top of this infrastructure. Applications such as a web server or database server that run on a virtual machine image are referred to as \bfit{virtual appliances}: they are software installed on virtual servers, self-contained, pre-configured, and ready to run their intended application. Virtual appliances are the basis for assembling more complex services, each appliance acting as one of the standardized components out of which a larger system is built.
 
-Cloud computing arises from services available over the
-Internet communicating using the standard Internet protocol
-suite underpinned by the HTTP and HTTPS transfer
-protocols.
+\subsection{Composability}
 
+This idea of standardized, interchangeable components is formalized as \textbf{composability}. A cloud can be built from infrastructures, platforms, virtual appliances, communication protocols, and clients, combined into what amounts to a new way of building applications: each component used during development is pluggable, and can be replaced, scaled, and improved independently to meet changing business needs, provided that every component and every microservice in the stack can communicate with the others regardless of differences in language or implementation. A composable system therefore assembles standardized parts into services tailored for a specific purpose, and rests on two defining properties: it is \bfit{modular}, meaning that each unit is self-contained, independent, cooperative, reusable, and replaceable; and it is \bfit{stateless}, meaning that a transaction is executed without regard to any other transaction or request.
+
+\subsubsection{Microservices}
+
+The clearest expression of composability is the \bfit{microservice}: an independent, self-contained unit that performs a single, well-defined task. This stands in contrast to a \textbf{monolithic application}, in which every function, from data storage to business logic to the user interface, is integrated into a single, tightly coupled unit.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/microservices.png}
+    \caption{Monolithic application design versus microservice architecture.}
+    \label{fig:monolithic-microservice}
+\end{figure}
+
+\vspace{-1em}
+
+Three properties characterize a microservice:
 \begin{itemize}
-    \item \textbf{HTTP}: Hypertext Transfer Protocol (HTTP) is an application protocol for distributed, collaborative, hypermedia information systems. HTTP is the foundation of data communication for the World Wide Web.
-    \item \textbf{HTTPS}: Hypertext Transfer Protocol Secure (HTTPS) is an extension of the Hypertext Transfer Protocol (HTTP). It is used for secure communication over a computer network and is widely used on the Internet.
-    \item \textbf{REST}: Representational State Transfer (REST) is a software architectural style that defines a set of constraints to be used for creating Web services.
-    \item \textbf{SOAP}: Simple Object Access Protocol (SOAP) is a messaging protocol that allows programs that run on disparate operating systems (such as Windows and Linux) to communicate using Hypertext Transfer Protocol (HTTP) and its Extensible Markup Language (XML).
+    \item \textbf{Isolates a task}: A microservice handles a distinct function, which can range from a simple operation (e.g., serving a file for download) to a complex process (e.g., classifying images with a neural network).
+    \item \textbf{Standard access}: It exposes its functionality via a well-defined interface, most commonly a REST API over HTTP, though other interfaces such as Secure Shell (SSH) are also possible.
+    \item \textbf{Stateless operations}: Each operation is performed without retaining information about previous requests, aligning with the general composability principle.
 \end{itemize}
 
-\begin{observationblock}[REST]
-    REST is an architectural style that defines a set of constraints to be used for creating web services. RESTful web services allow the requesting systems to access and manipulate textual representations of web resources by using a uniform and predefined set of stateless operations.
-    \begin{figure}[H]
+Microservices are the underlying building blocks of most modern clouds, and are heavily used in the \texttt{DevOps} practice of software development and deployment.
+
+\begin{tipsblock}[Composability has a cost]
+    Breaking a system into many small, pluggable components does not remove complexity; it shifts it into the web of dependencies among those components. A cloud built from many independently versioned microservices and libraries can be hard to test, secure, or reason about. Composability is powerful, but its complexity must be actively managed, not ignored.
+\end{tipsblock}
+
+\section{Communication Protocols and REST Architectural Style} \label{sec:communication_protocols}
+
+Cloud computing, at its core, is a collection of services made available over the Internet, communicating over the standard Internet protocol suite, and underpinned in practice by the \bfit{Hypertext Transfer Protocol} (HTTP) and its secure variant \bfit{HTTPS}. Several higher-level conventions have been built on top of this foundation to let independent programs invoke one another's services over the network.
+
+\begin{itemize}
+    \item \textbf{Remote Procedure Call (RPC)} was an early convention for invoking a function on a remote machine as if it were local; \texttt{XML-RPC} is its natural evolution, encoding the request and response as XML documents.
+    \item \textbf{SOAP} (Simple Object Access Protocol) is a messaging protocol that allows programs running on disparate operating systems to communicate over HTTP using XML, typically described using the Web Service Description Language (WSDL).
+    \item \textbf{REST} (Representational State Transfer) is a software architectural style, rather than a protocol, that defines a set of constraints for building Web services, and traces its lineage back to the Atom publishing protocol.
+\end{itemize}
+
+Of these, REST is the leading approach for building cloud services and warrants a closer look.
+
+\subsection{The REST Architectural Style} \label{subsec:rest_style}
+
+REST was introduced by Roy Fielding, one of the principal authors of the HTTP specification. He described REST as an attempt to capture, in the design of a web service, the same behaviour already familiar from a well-designed website: a network of pages that a user navigates by following links, each link causing the next page, representing the next state of the application, to be transferred and rendered. REST, in other words, treats a web service as a network of uniquely addressable resources rather than as a set of remote procedures to be called.
+
+\begin{definitionblock}[REST]
+    \noindent
+    \begin{minipage}{0.58\textwidth}
+        REST is a design pattern for creating web services, resting on two simple principles:
+
+        \smallskip
+
+        \begin{itemize}
+            \item \textbf{Resources}: every distinguishable entity (a web page, an XML document, a physical device, or anything else) is treated as a resource.
+            \item \textbf{URLs identify resources}: every resource is uniquely identified by a URL.
+        \end{itemize}
+   
+        \medskip
+        
+        This second principle is sometimes called Tim Berners-Lee's \bfit{Axiom~0} of web design, which states that all resources on the Web must be uniquely identified with a URL.
+    \end{minipage}%
+    \hfill
+    \begin{minipage}{0.38\textwidth}
         \centering
-        \includegraphics[width=0.5\textwidth]{assets/fig15.png}
-        \caption{REST}
+        \includegraphics[width=0.95\textwidth]{assets/fig15.png}
+        \captionof{figure}{REST as a client-server, pull-based interaction}
         \label{fig:rest}
-    \end{figure}
-\end{observationblock}
+    \end{minipage}
+\end{definitionblock}
 
-Advantages of REST:
-\begin{itemize}
-    \item \textbf{Scalability}: RESTful web services can be scaled to accommodate a large number of clients.
-    \item \textbf{Performance}: RESTful web services are faster than SOAP web services because they are usually written in a lightweight language like JSON.
-    \item \textbf{Simplicity}: RESTful web services are easier to understand and implement than SOAP web services.
-    \item \textbf{Flexibility}: RESTful web services can be used with any programming language and can be easily integrated with other web services.
-\end{itemize}
+\begin{exampleblock}[An airline reservation service]
+    Consider an airline aiming to direct customer calls to the correct representative based on membership tier. A naive approach funnels all callers through a single \texttt{Airline Reservations} number to a shared answering machine, which then routes them to the proper representative (premier, frequent flyer, or regular) based on the caller's input. This design implicitly treats a phone 
+    number, or its web equivalent, a URL, as an expensive resource that 
+    must be rationed, and it introduces a single point of contact through 
+    which every request must pass.
 
-REST implementation:
+    \medskip
+
+    \begin{center}
+        \centering
+        \includegraphics[width=\textwidth]{assets/rest.png}
+
+        \vspace{-0.5em}
+
+        \captionof{figure}{\small A shared gateway (left) vs.\ uniquely identified endpoints for each resource (right).}
+        \label{fig:airline-reservation}
+    \end{center}
+
+    \medskip
+
+    By contrast, a RESTful design gives each customer category its own direct, unique number (\plaintt{1-800-Premier}, ...), each connecting callers straight to the right representative. There's no shared gateway, no bottleneck, and no single point of failure. Priority is simply managed by, e.g., giving the premier number a faster line, rather than relying on central routing logic. This illustrates Axiom~0: the URL (or number) directly reflects the resource you access.
+\end{exampleblock}
+
+The benefits of treating every resource as independently addressable are clear: URLs become discoverable by search engines and service registries; the meaning and purpose of a service is evident from the URL itself, following the principle of least surprise. There is no need for special routing rules: priorities are managed by the URLs, so high-priority resources just use faster infrastructure. With no shared gateway, there is neither a bottleneck nor a central point of failure.
+
+\subsection{Implementing a RESTful Service} \label{subsec:rest_implementation}
+
+Turning these principles into a working service follows a fairly mechanical sequence of steps.
+
 \begin{enumerate}
-    \item Identify all the conceptual entities that we wish to expose as services. 
-    \item Create a URL to each resource.
-    \item Categorize our resources according to whether clients can just receive a representation of the resource or whether clients can modify the resource.
-    \item All resources accessible via HTTP GET should be side-effect free, i.e., the resource should just return a representation of the resource (not modify it).
-    \item Put hyperlinks in the representation of the resource to allow clients to navigate to related resources.
-    \item Design to reveal data gradually. Don't reveal anything in a single response document. Provide hyperlinks to obtain mode details. 
-    \item Specify the format of response datausing a schema (DTD, W3C Schema, RelaxNG, ...). For those services that require a POST or PUT to it, also provide a schema to specify the format of the response. 
-    \item Describe how our services are to be invoked using either a WSDL document or simply an HTML document. 
+    \item Identify all the conceptual entities that are to be exposed as services.
+    \item Create a URL for each resource.
+    \item Categorize resources according to whether clients may only receive a representation of them (using an HTTP \plaintt{GET}) or may also modify them (using HTTP \plaintt{POST}, \plaintt{PUT}, or \plaintt{DELETE}).
+    \item Ensure that every resource accessible via HTTP \plaintt{GET} is side-effect free: invoking it should return a representation of the resource without modifying it.
+    \item Embed hyperlinks within each resource representation, so that clients can navigate to related resources or drill down for more detail.
+    \item Design the service to reveal data gradually, rather than returning everything in a single response document, again relying on hyperlinks to expose further detail on request.
+    \item Specify the format of response data using a schema (DTD, W3C Schema, ...), and provide an equivalent schema for the request body of any service that accepts a \plaintt{POST} or \plaintt{PUT}.
+    \item Describe how to invoke a service, using either a WSDL or, more simply, an HTML document.
 \end{enumerate}
+
+A minimal example illustrates steps 1 and 2: a VM management service might expose a resource {\footnotesize \ttfamily{http://www.vmservice/VMs/list}} to show existing VMs, and {\footnotesize \ttfamily{http://www.vmservice/VMs/run}} to launch a new one, each URL identifying a distinct action on the same underlying set of VMs.
+
+Taken together, the constraints above amount to a compact set of properties that any RESTful service should satisfy: 
+
+\begin{itemize}
+    \item \textbf{Client-server}, pull-based interaction, in which the client requests data from the server as and when it is needed
+    \item \textbf{Statelessness}, meaning that every request from client to server must carry all the information needed to understand it, without relying on any context stored on the server
+    \item Support for \textbf{caching}, so that responses can be labelled as cacheable or non-cacheable to improve network efficiency
+    \item A \textbf{uniform interface}, whereby every resource is accessed through the same generic set of operations (\plaintt{GET}, \plaintt{POST}, \plaintt{PUT}, \plaintt{DELETE})
+    \item \textbf{Named resources}, each identified by its own URL
+    \item \textbf{Interconnected resource representations}, linked to one another by URLs so that a client can progress from one state of the application to the next, precisely the behaviour Fielding set out to capture in the first place
+\end{itemize}

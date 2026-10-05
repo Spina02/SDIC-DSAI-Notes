@@ -1,182 +1,404 @@
+\chapter{Computing basics} \label{ch:computing_basics}
 
-\chapter{Computing basics}
+Previous chapters explored the evolution from single machines to cloud computing, covering key features, service models, and architectures. Yet, every cloud service ultimately runs on physical hardware. This chapter steps down the stack to revisit the computing fabric beneath clusters, grids, and clouds: how a single computer processes instructions, how multiple processors are combined into parallel and cluster systems, and how a scheduler manages shared hardware for many users.
 
-\textbf{What is a computer?}
+\section{From Serial to Parallel Computation} \label{sec:serial_parallel}
 
-A computer is a machine that can be programmed to automatically carry
-out sequences of arithmetic or logical operations (computation). Modern digital
-electronic computers can perform generic sets of operations known
-as programs. These programs enable computers to perform a wide range of
-tasks. The term computer system may refer to a nominally complete computer
-that includes the hardware, operating system, software,
-and peripheral equipment needed and used for full operation;
+\subsection{Serial Computers and the Von Neumann Architecture}
 
-A Computer cluster is a group of computers that are linked and function
-together.
+\begin{definitionblock}[Computer]
+    A \bfit{computer} is a machine that can be programmed to automatically carry out sequences of arithmetic or logical operations, a process known as \bfit{computation}. Modern digital electronic computers execute generic sets of such operations, called programs, which let them perform an open-ended range of tasks; the term \textit{computer system} denotes the complete assembly, hardware, operating system, software, and peripheral equipment, needed for full operation.
 
-\begin{minipage}[t]{0.45\textwidth}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.9\textwidth]{assets/fig16.png}
-        \caption{Serial Computer}
-    \end{figure}
-\end{minipage}
-\begin{minipage}[t]{0.45\textwidth}
-    \vspace{0.5cm}
-    A \textbf{serial computer} is a computer that processes data one bit at a time. This is in contrast to a parallel computer, which processes multiple bits at the same time. Serial computers are much slower than parallel computers, but they are also much simpler and cheaper to build.
-\end{minipage}
+    \hfill \textit{Wikipedia}
+\end{definitionblock}
 
-Today, the most common form of computer is a digital computer, and computing
-machines have been an integral part of the business and engineering
-world since the late 20th century. Computers are used in a wide range of
-applications, including data processing, business management, and word
-processing. They are also used in scientific research, engineering, and
-medicine. Computers are used to control industrial processes and to
-simulate complex systems. Modern computers are capable of performing
-a wide range of tasks, from simple arithmetic to complex calculations.
+We already introduced the \textbf{cluster} as a group of tightly linked computers cooperating as if they were a single machine. This chapter looks first inside the individual computer, and then inside the individual node, before returning to how many such nodes are combined into a cluster.
 
-\begin{minipage}[t]{0.45\textwidth}
-    \vspace{1cm}
-    A \textbf{parallel computer} is a computer that processes data multiple bits at the same time. This is in contrast to a serial computer, which processes data one bit at a time. Parallel computers are much faster than serial computers, but they are also much more complex and expensive to build.
-\end{minipage}
-\begin{minipage}[t]{0.45\textwidth}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.9\textwidth]{assets/fig17.jpg}
-        \caption{Parallel Computer}
-    \end{figure}
+\begin{definitionblock}[Serial Computer]
+    A \bfit{serial computer} processes data one operation at a time, in contrast to a \textbf{parallel computer}, which performs multiple operations concurrently. Serial machines are simpler and cheaper to build than parallel ones, at the cost of raw throughput.
+\end{definitionblock}
+
+The majority of computers built since the 1940s follow the \bfit{Von Neumann architecture}: a single processing unit, the \textbf{CPU}, coupled to a single, uniformly addressed memory over a shared bus.
+
+\medskip
+
+\begin{minipage}{0.44\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/fig16.png}
+    \captionof{figure}{A serial computer.}
+    \label{fig:serial-computer}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.55\textwidth}
+    The CPU itself is organized into three cooperating components: the \textbf{control unit}, which fetches and decodes instructions and sequences their execution; the \textbf{arithmetic logic unit} (ALU), which carries out arithmetic and logical operations; and a small set of \textbf{registers}, such as the program counter (PC), instruction pointer (IP), and stack pointer (SP), which hold the operands and bookkeeping state needed from one instruction to the next. Input arrives and output leaves through dedicated channels, while the CPU and memory exchange data over a common bus.
 \end{minipage}
 
-\newpage 
-There are two main types of parallel computers: shared memory and distributed memory. In a shared memory system, all processors share the same memory. In a distributed memory system, each processor has its own memory. Parallel computers are used in a wide range of applications, including scientific research, engineering, and business.
-\begin{itemize}
-    \item \textbf{Shared memory:} In a shared memory system, all processors share the same memory. This allows processors to communicate with each other by reading and writing to the same memory locations. Shared memory systems are typically used in applications that require high performance and low latency, such as scientific research and engineering.
-        \begin{itemize}
-            \item Uniform Memory Access (UMA): each processor has uniform access to memory.
-            \begin{figure}[H]
-                \centering
-                \includegraphics[width=0.4\textwidth]{assets/fig18.png}
-                \caption{Uniform Memory Access (UMA)}
-            \end{figure}
-            \item Non-Uniform Memory Access (NUMA): time for memory access depends on location of data. Local access is faster than non-local access. 
-            \begin{figure}[H]
-                \centering
-                \includegraphics[width=0.4\textwidth]{assets/fig19.png}
-                \caption{Non-Uniform Memory Access (NUMA)}
-            \end{figure}
-        \end{itemize}
-    \item \textbf{Distributed memory:} In a distributed memory system, each processor has its own memory. This allows processors to communicate with each other by sending messages over a network. Distributed memory systems are typically used in applications that require scalability and fault tolerance, such as large-scale data processing and cloud computing.
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.4\textwidth]{assets/fig20.png}
-        \caption{Distributed Memory}
-    \end{figure}
-\end{itemize}
 
-\section{Cluster}
 
-A computer cluster is a group of computers that are linked and function
-together. The components of a cluster are usually connected to each other
-through fast local area networks, with each node running its own instance
-of an operating system. Clusters are used for a wide range of applications,
-including scientific research, engineering, and business. They are
-also used in cloud computing and high-performance computing.
+
+This model is defined by two features: it executes one instruction at a time, and uses a \textit{flat} memory model where any address can be accessed with the same cost, similar to the cost of executing an operation. Execution follows a fixed five-step cycle for each instruction:
+
+\smallskip
+
+\noindent
+\begin{minipage}{0.63\textwidth}
+    \begin{enumerate}[leftmargin=1.5em, labelsep=0.3em]
+        \item \textbf{Instruction fetch}: get the next instruction from memory.
+        \item \textbf{Instruction decode}: determine the operation to perform and its operands.
+        \item \textbf{Memory fetch}: retrieve the operands from memory.
+        \item \textbf{Execute}: perform the operation.
+        \item \textbf{Write back}: store the result.
+    \end{enumerate}
+
+    \medskip
+
+    The cycle then restarts for the next instruction.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.37\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/von-neumann-pipeline.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{The execution cycle}
+    \label{fig:von-neumann}
+\end{minipage}
+
+\vspace{-0.5em}
+
+\begin{tipsblock}[The Von Neumann bottleneck]
+    Because a single bus carries both instructions and data between the CPU and a uniformly addressed memory, overall throughput is limited by how quickly that bus can be serviced, no matter how fast the CPU itself can compute. This constraint, known as the \bfit{Von Neumann bottleneck}, is a central motivation for parallel and distributed architectures.
+\end{tipsblock}
+
+\subsection{Parallel Computers}
+
+\begin{definitionblock}[Parallel Computer]
+    A \bfit{parallel computer} performs multiple operations concurrently rather than one at a time. Parallel machines achieve far higher throughput than serial ones, at the cost of additional design and programming complexity.
+\end{definitionblock}
+
+\noindent
+\begin{minipage}{0.6\textwidth}
+    Parallelism is no longer confined to supercomputers: it is present at every level of a modern laptop, from vector instructions performing several arithmetic operations per cycle, to multiple CPU cores, to a discrete GPU with thousands of simple cores. \cref{sec:cluster_hpc} already introduced high-performance and high-throughput computing as two broad ways of exploiting this concurrency at the scale of a whole cluster; the rest of this chapter examines the hardware that makes it possible, from a single chip up to a full cluster.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.38\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/fig17.jpg}
+    \captionof{figure}{A parallel computer.}
+    \label{fig:parallel-computer}
+\end{minipage}
+
+\begin{exampleblock}[Two ways to parallelize a task]
+    Consider a Formula 1 pit stop, in which a crew must service a car as quickly as possible. A \textbf{functional partitioning} strategy assigns each crew member a distinct task, one changes the front-left tyre, another refuels, another adjusts the front wing, so that different people do different things at the same time. A \textbf{domain decomposition} strategy instead has several people perform the same operation on different parts of the same car simultaneously, for instance every wheel nut being loosened at once by a different technician. The same two strategies recur throughout parallel computing: a processing pipeline in which each stage performs a different operation on data as it flows through is a form of functional partitioning, while splitting a large array across many processors that each apply the same operation to their own slice is domain decomposition.
+\end{exampleblock}
+
+\subsection{Flynn's Taxonomy} \label{sec:flynn_taxonomy}
+
+\begin{definitionblock}[Flynn's Taxonomy]
+    \bfit{Flynn's taxonomy}, proposed by Michael J. Flynn in 1966, classifies computer architectures by the number of concurrent instruction streams and data streams they support.
+\end{definitionblock}
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabular}{l|cc}
+         & \textbf{Single instruction stream} & \textbf{Multiple instruction streams} \\
+        \hline
+        \textbf{Single data stream} & SISD & MISD \\
+        \textbf{Multiple data streams} & SIMD & MIMD \\
+    \end{tabular}
+    \renewcommand{\arraystretch}{1}
+    \caption{Flynn's taxonomy of computer architectures.}
+    \label{tab:flynn-taxonomy}
+\end{table}
+
+A \textbf{SISD} machine is the ordinary serial computer: a single instruction stream operating on a single data stream. A \textbf{SIMD} (single instruction, multiple data) machine broadcasts one instruction to many processing elements, each applying it to its own data; this is the model followed by vector units and GPUs. A \textbf{MIMD} (multiple instruction, multiple data) machine instead lets each processor fetch and execute its own instruction stream against its own data, the model followed by clusters and multicore CPUs. The fourth class, \textbf{MISD}, in which multiple instruction streams operate on a single data stream, has few practical implementations and is mostly of theoretical interest.
+
+\vspace{-0.5em}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{assets/fig21.png}
-    \caption{Computer Cluster}
+    \includegraphics[width=0.8\textwidth]{assets/simd-mimd.png}
+    \caption{Hardware organization of SIMD and MIMD architectures.}
+    \label{fig:simd-mimd}
 \end{figure}
 
-Compopnents of a cluster:
-\begin{itemize}
-    \item \textbf{Nodes:} A node is a single computer in a cluster. Each node has its own processor, memory, and storage. Nodes are connected to each other through a network.
-    \item \textbf{Network:} The network is the communication infrastructure that connects the nodes in a cluster. The network allows nodes to communicate with each other and share data.
-    \item \textbf{Operating System:} Each node in a cluster runs its own instance of an operating system. The operating system manages the resources of the node and provides an interface for running applications.
-    \item \textbf{Applications:} Applications are programs that run on the nodes in a cluster. Applications can be parallelized to take advantage of the resources of the cluster.
-\end{itemize}
+\vspace{-0.5em}
+
+Flynn's taxonomy predates today's heterogeneous HPC systems and does not map cleanly onto them: a single modern node may combine SIMD vector units, MIMD multicore CPUs, and a SIMD-oriented GPU accelerator all at once. Even so, the SIMD and MIMD concepts it introduced remain embedded in the vocabulary of modern hardware.
+
+\section{Memory Architectures for Parallel Systems} \label{sec:memory_architectures}
+
+As noted, distributed-memory systems using the \textbf{MPI} standard provide one solution to the memory challenge of large-scale computing. Broadly, parallel computers are classified by processor access to memory: in \textbf{shared memory} systems, all processors access the same address space, while in \textbf{distributed memory} systems, each processor has its own private memory.
+
+\subsection{Shared Memory}
+
+In a shared-memory system, all processors communicate implicitly by reading and writing the same memory locations. This low-latency communication makes shared memory attractive for tightly coupled scientific and engineering workloads, but it does not scale indefinitely: every processor added to the shared address space adds contention for the same memory bus.
+
+\begin{minipage}{0.65\textwidth}
+    \vspace{0.5em}
+    \begin{itemize}
+        \item \textbf{Uniform Memory Access (UMA)}
+        
+        Every processor has uniform access to memory, with the same latency regardless of which processor issues the request. UMA systems are also known as \textbf{symmetric multiprocessors} (SMP).
+        \vspace{0.2em}
+
+        \item \textbf{Non-Uniform Memory Access (NUMA)}
+        
+        The time needed to access memory depends on where the data physically resides; a processor's own local memory is faster to reach than memory attached to a different processor.
+    \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.33\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fig18.png}
+
+    \vspace{-0.5em}
+    
+    \captionof{figure}{UMA.}
+
+    \includegraphics[width=0.9\textwidth]{assets/fig19.png}
+
+    \vspace{-0.5em}
+    
+    \captionof{figure}{NUMA.}
+    \label{fig:uma-numa}
+\end{minipage}
+
+
+\begin{advancedblock}[NUMA in practice: the Intel Sandy Bridge example]
+    A practical example of NUMA is Intel's Sandy Bridge architecture: each of its four CPUs has its own memory bank and memory/I/O controllers, with the sockets connected by Intel's QuickPath Interconnect (QPI). Accessing local memory is fast, but accessing another CPU's memory requires crossing QPI links, creating the characteristic non-uniform latency of NUMA.
+\end{advancedblock}
+
+\subsection{Distributed Memory}
+
+In a distributed-memory system, each CPU has its own private memory: processors exchange data by explicitly sending messages over a network rather than reading a shared address space.
+
+\smallskip
+
+\begin{minipage}{0.58\textwidth}
+    Distributed-memory systems trade the low latency of shared memory for scalability: because no bus or memory controller is shared, thousands of processors can be combined without the contention that limits shared-memory systems, at the price of explicit, network-bound communication.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fig20.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Distributed memory.}
+    \label{fig:distributed-memory}
+\end{minipage}
+
+\smallskip
+
+Far from being a legacy design, distributed memory, coordinated with MPI and interconnected over high-speed fabrics such as Infiniband, is the architecture underlying essentially every large HPC cluster in production today. In practice, most modern nodes combine both models, offering shared memory within a node and distributed memory across nodes.
+
+\section{Cluster Computing} \label{sec:cluster_hardware}
+
+We already defined the \textbf{cluster} as a group of linked computers working closely enough to behave, in many respects, as a single machine. Having examined the internals of an individual processor, this section turns to how many such processors are physically combined into a cluster.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{assets/fig22.png}
-    \caption{Components of a Cluster}
+    \includegraphics[width=0.55\textwidth]{assets/fig21.png}
+    \caption{Computer cluster: each node communicates with others over a network.}
+    \label{fig:computer-cluster}
 \end{figure}
 
-\begin{minipage}[t]{0.45\textwidth}
-    \vspace{2.5cm}
-    What does a node contain?
-\end{minipage}
-\begin{minipage}[t]{0.45\textwidth}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.9\textwidth]{assets/fig23.png}
-        \caption{Node Components}
-    \end{figure}
-\end{minipage}
+\subsection{Essential Cluster Components}
 
-\begin{minipage}[t]{0.45\textwidth}
-        \begin{figure}[H]
-            \centering 
-            \includegraphics[width=0.9\textwidth]{assets/fig24.png}
-            \caption{multicore CPU}
-        \end{figure}
-\end{minipage}
-\begin{minipage}[t]{0.45\textwidth}
-\vspace{1cm}
-\textbf{CPU are multicore proccessors.} Because of power, heat dissipation, ..., increasing tendency to actually lower clock frequency but pack more computing cores onto a chip. These cores will share some resources, i.e. memory, network, disk, etc. but are still capable of independent calculations. 
+Whatever its scale, every cluster is built from the same essential ingredients:
+
+\begin{itemize}
+    \item \textbf{Several computers (nodes)}, often packaged in special 1U cases for easy mounting in a rack.
+    \item \textbf{One or more networks} (interconnects) that hook the nodes together.
+    \item \textbf{Shared storage}, so that data is visible to every node rather than trapped on one.
+    \item \textbf{A login or access node}, through which users reach the cluster and submit work.
+\end{itemize}
+
+Each node in the cluster runs its own instance of an operating system, which manages that node's local resources and provides the environment in which user applications run; those applications may in turn be parallelized, using the shared- or distributed-memory models of \cref{sec:memory_architectures}, to take advantage of the resources of the whole cluster.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{assets/fig22.png}
+    \caption{ Components of a cluster: nodes, network, per-node operating systems, and applications.}
+    \label{fig:cluster-components}
+\end{figure}
+
+\subsection{Anatomy of a Compute Node}
+
+Physically, a single compute node is typically packaged as a rack-mountable 1U or 2U server, containing one or more CPU sockets, banks of RAM slots, local disk bays, and a network card.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[c]{0.65\textwidth}
+        \includegraphics[width=\textwidth]{assets/fig23.png}
+        \caption{\textbf{Left:} Compute node components. \textbf{Right:} Standard modern node architecture, centred on Northbridge/Southbridge chipset.}
+    \end{minipage}%
+    \hfill
+    \begin{minipage}[c]{0.32\textwidth}
+        \includegraphics[width=\textwidth]{assets/cluster-node.png}
+    \end{minipage}
+    \label{fig:node-components}
+\end{figure}
+
+Internally, these components are wired together through a small number of centralized hubs. All communication between one CPU and another travels over the same bus used to reach the \textbf{Northbridge}, the memory controller hub, and all access to RAM passes through the Northbridge as well; the \textbf{Southbridge}, the I/O controller hub, in turn manages slower peripherals such as storage, USB, and audio, and any exchange between a CPU and a Southbridge-attached device is routed through the Northbridge first.
+
+\noindent
+\begin{minipage}{0.57\textwidth}
+    Due to practical limits on power consumption and heat dissipation, CPU architecture has evolved away from increasing clock frequencies and instead now focuses on integrating multiple \textbf{cores} on a single chip. Each of these cores, while sharing certain system resources like memory, network interfaces, and disk access, are nonetheless capable of performing calculations independently. This approach enables CPUs to deliver higher performance and improved parallel processing efficiency.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/fig24.png}
+
+\vspace{-0.5em}
+
+    \captionof{figure}{A multicore CPU.}
+    \label{fig:multicore-cpu}
 \end{minipage}
 
 \begin{definitionblock}[Core]
-    A core is the smallest unit of computing, having one or more (hardware/software) threads and is responsible for executing instructions.
+    A \bfit{core} is the smallest unit of computing, possessing one or more hardware or software threads and responsible for executing instructions.
 \end{definitionblock}
 
-\textbf{Intel \textregistered Hyper-Threading Technology} uses processor resources more efficiently, enabling multiple threads to run on each core. The OS "sees two cores and transparently try to execute two programs on two different "cores". 
+\noindent
+\begin{minipage}{0.65\textwidth}
+    \textbf{Intel\textregistered\ Hyper-Threading Technology} (HT) allows a single core to handle multiple threads by utilizing execution resources more efficiently. To the operating system, each physical core appears as two logical cores, enabling the scheduler to assign two programs to run in parallel on the same core. However, since both threads still share the same underlying execution units, hyper-threading provides limited performance gains for tightly coupled HPC workloads. As a result, it is common practice to disable hyper-threading when running large parallel simulations.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.34\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/hyperthreading.png}
 
-A bit of jargon:
-\begin{itemize}
-    \item \textbf{Multiprocessor} = server with one or more than 1 CPU 
-    \item \textbf{Multicore} = CPU with more than 1 core
-    \item \textbf{Processor} = CPU = socket = chip
-\end{itemize}
+\vspace{-0.5em}
 
-\begin{minipage}[t]{0.35\textwidth}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.9\textwidth]{assets/fig25.png}
-        \caption{Computing Cluster}
-    \end{figure}
-\end{minipage}
-\begin{minipage}[t]{0.55\textwidth}
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.9\textwidth]{assets/fig26.png}
-        \caption{HPC cluster}
-    \end{figure}
+    \captionof{figure}{Hyper-Threading}
 \end{minipage}
 
+\vspace{-0.5em}
 
-The \textbf{scheduler} is a software component that manages the resources of a
-cluster. It is responsible for allocating resources to applications and
-ensuring that they run efficiently. The scheduler is typically part of the
-operating system of the cluster and is responsible for managing the
-resources of the cluster, such as CPU, memory, and storage. The scheduler
-uses algorithms to allocate resources to applications based on their
-requirements and priorities.
+\begin{tipsblock}[A note on terminology]
+    The vocabulary around processors is not always used consistently:
+    \begin{itemize}[noitemsep]
+        \item \textbf{Multiprocessor} = a server with more than one CPU.
+        \item \textbf{Multicore} = a CPU with more than one core.
+        \item \textbf{Processor} = CPU = socket, in the strict sense.
+    \end{itemize}
+    In practice, however, \textit{processor} is sometimes used loosely to mean \textit{core}, so that ``one process per processor'' is understood as one process per core rather than one process per socket.
+\end{tipsblock}
 
+\subsection{From Node to Cluster: Architecture and Software Stack}
+
+Zooming back out, a full HPC cluster nests the components already introduced: a rack of compute nodes, each built from one or more processor sockets, each socket built from several cores.
+
+\smallskip
+
+\begin{minipage}{0.59\textwidth}
+    A production HPC cluster elaborates on the essential components of \cref{sec:cluster_hardware} with several specialized roles: one or more \textbf{login nodes}, through which users connect and submit work; \textbf{boot and management nodes}, which provision and monitor the rest of the cluster over a separate administrative network; a \textbf{networking gateway} and \textbf{switch fabric} that carry the primary interconnect traffic; both ordinary \textbf{compute nodes} and \textbf{accelerated compute nodes} equipped with GPUs or other accelerators; dedicated \textbf{storage acceleration} nodes sitting in front of a \textbf{parallel file system}; and an \textbf{HSM/backup server} that archives data onto a tape library for long-term, offline storage.
+\end{minipage}%
+\begin{minipage}{0.4\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/fig25.png}
+    
+    \vspace{-0.5em}
+    
+    \captionof{figure}{Anatomy of a cluster.}
+    \label{fig:computing-cluster-anatomy}
+\end{minipage}
+
+
+\begin{minipage}{0.79\textwidth}
+    \includegraphics[width=\textwidth]{assets/fig26.png}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.19\textwidth}
+    \captionof{figure}{The architecture of a production HPC cluster, from login and management nodes through the compute and storage fabric to long-term backup.}
+    \label{fig:hpc-cluster-architecture}
+\end{minipage}
+
+\medskip
+
+All of this hardware is exposed to users through a layered software stack. At the base, every node runs a \textbf{Linux} operating system (commonly Red Hat, CentOS, or SUSE). On top of it, a middleware layer handles resource management and job scheduling (SLURM, Grid Engine, MOAB, IBM Platform LSF, or Torque/Maui), the file system (NFS, a local filesystem such as ext3, ext4, or XFS, GPFS, or Lustre), and cluster provisioning and monitoring. Finally, an HPC programming layer provides the compilers, MPI implementations (such as MVAPICH2 or OpenMPI), numerical libraries (BLAS, LAPACK), and performance-monitoring tools that user applications are built and run with.
+
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \setlength{\tabcolsep}{7pt}
+    \begin{tcolorbox}[enhanced, colback=gray!5, boxrule=0.8pt, colframe=black, arc=0mm, left=0mm, right=0mm, top=0.6mm, bottom=0.6mm, boxsep=0mm, sharp corners=south]
+    \begin{tabularx}{\textwidth}{
+        >{\centering\arraybackslash}p{0.2\textwidth}
+        >{\raggedright\arraybackslash}p{0.24\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+        % \toprule
+        \rowcolor{gray!20}
+        \textbf{\textcolor{black}{Layer}} & \textbf{\textcolor{black}{Component}} & \textbf{\textcolor{black}{Technologies / Tools}} \\
+        \midrule
+
+        \multirow{3}{=}{\bfit{HPC Programming Tools}}
+            & \bfit{Performance Monitoring} & HPCC, IOR, PAPI/IPM, NPB, Netperf \\
+            & \bfit{Development Tools}      & Allinea DDT/TAU, Intel Cluster Studio/IBM XC, PGI (PGI SDK), GNU Compiler \\
+            & \bfit{Application Libraries}  & Ferret / GRADS / PARAview / VISIT, MVAPICH2/OpenMPI, ACML/ESSL, MPSS/CUDA, BLAS, LAPACK \\
+        \midrule
+
+        \multirow{4}{=}{\bfit{Middleware Applications \& Management}}
+            & \bfit{Resource Mgmt / Job Scheduling} & SLURM, Grid Engine, MOAB, Altair PBS Pro, IBM Platform LSF, Torque/Maui \\
+            & \bfit{File System}            & NFS, Local FS (ext3, ext4, XFS), GPFS, Lustre \\
+            & \bfit{Provisioning}           & XCAT / ROCKS / C-DAC Developed tools \\
+            & \bfit{Cluster Monitoring}     & XCAT / ROCKS / C-DAC Developed tools \\
+        \midrule
+
+        \bfit{Operating Systems} & \bfit{Operating System} & Linux (Red Hat, CentOS, SUSE) \\
+        % \bottomrule
+    \end{tabularx}
+    \end{tcolorbox}
+    \caption{\bfit{HPC Software Stack Architecture}}
+    \label{tab:hpc_software_stack}
+\end{table}
+
+\section{Using a Cluster: Job Scheduling} \label{sec:job_scheduling}
+
+The middleware layer just introduced is anchored by the \textbf{scheduler}, the software component that mediates access to the cluster's shared resources on behalf of many users.
+
+\begin{definitionblock}[Scheduler]
+    The \bfit{scheduler} allocates exclusive or non-exclusive access to cluster resources, the compute nodes, for a limited amount of time so that users can carry out their work; it provides a framework for starting, executing, and monitoring that work, and it arbitrates contention for resources by managing a queue of pending jobs.
+\end{definitionblock}
+
+A user job submitted to the scheduler is characterized by a handful of parameters: 
 \begin{itemize}
-    \item It allocates exclusive or non-exclusive access to the resouces (the nodes) to users during a limited amout of time so that they can perform their work
-    \item It abitrates contention for resources by managina a queue of pending work 
-    \item It permits to schedule jobs for users on the cluster resources 
+    \item the number of nodes requested,
+    \item the number of CPU cores,
+    \item the amount of memory requested,
+    \item the \textbf{walltime} (the maximum time the job is allowed to run),
+    \item the launcher script that starts the actual tasks.
 \end{itemize}
 
-A user job is characterized by:
-\begin{itemize}
-    \item the number of nodes 
-    \item the number of CPU cores 
-    \item the memory requested 
-    \item the walltime 
-    \item the launcher script, which will initiate your task 
-\end{itemize}
+\begin{definitionblock}[Partition]
+    A \bfit{partition} is a group of compute nodes sharing specific usage characteristics, such as time limits and the maximum number of nodes permitted per job.
+\end{definitionblock}
 
-A \textbf{partition} is a group of compute nodes, with specific usage characteristics, like time limits and maximum number of nodes per job.
+\subsection{Slurm}
 
+\bfit{Slurm} (Simple Linux Utility for Resource Management) is a highly popular open-source scheduler, serving as the workload manager for many production-scale HPC clusters. Slurm orchestrates job scheduling, resource allocation, and process launching across the cluster, ensuring efficient use of available nodes and cores.
+
+\medskip
+
+
+\begin{minipage}{0.52\textwidth}
+
+    Users interact with Slurm primarily through \plaintt{bash} scripts augmented with \plaintt{\#SBATCH} directives. These directives specify job requirements such as the number of nodes and cores (\plaintt{--nodes}, \plaintt{--ntasks}, or \plaintt{--cpus-per-task}), the amount of memory (\plaintt{--mem}), and the walltime limit (\plaintt{--time}). To submit the job to Slurm's queue, users run the \plaintt{sbatch} command, after which the job is held in queue until resources are available within the designated partition.
+
+\medskip
+
+    Slurm's management tools enable users to track and control their jobs efficiently. The \plaintt{squeue} command provides real-time information on queued and running jobs, while jobs can be cancelled if needed with \plaintt{scancel}. Upon allocation of resources and job launch, parallel tasks are initiated using \plaintt{srun}, callable both interactively and within submission scripts. This modular system allows for scalable and flexible job management in HPC environments.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{assets/slurm.png}
+    \captionof{figure}{Slurm Scheduler architecture, illustrating the interaction between users, the controller daemons, compute nodes, and databases.}
+\end{minipage}

@@ -1,182 +1,383 @@
+\chapter{Virtualization} \label{ch:virtualization}
 
-\chapter{Virtualization}
+The previous chapter moved from the cloud down to the physical hardware, showing how processors execute instructions and are grouped into clusters for users. This chapter focuses on the layer between that hardware and the cloud services above it: virtualization. As briefly mentioned in \cref{ch:cloud_concept}, the hypervisor and virtual machines enable resource pooling and multi-tenancy; here, we look more closely at how virtualization works and the problems it solves.
 
-\textbf{Virtualization} uses software to create an \textit{abstraction layer} over computer hardware that allows the hardware elements of a single computer - processors, memory, storage and more - to be divided into multiple virtual computers, commonly called virtual machines (VMs). Each VM runs its own operating system (OS) and behaves like an independent computer, even though it is running on just a portion of the actual underlying computer hardware. 
+\subsubsection{The Case for Virtualization} \label{sec:virtualization_motivation}
+
+Before virtualization became common practice, a service was typically delivered by dedicating an entire physical machine to it: a web server running Windows and IIS, an application server running Linux and Glassfish, a mail server running Windows and Exchange, a database server running Linux and MariaDB, each on its own hardware platform, with its own operating system, application stack, and local storage.
+
+\vspace{-0.5em}
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig27.png}
-    \caption{Virtualization}
+    \includegraphics[width=0.75\textwidth]{assets/before_virtualization.png}
+    \caption{Traditional, siloed service delivery: one physical server per service.}
+    \label{fig:traditional-service-delivery}
 \end{figure}
 
-It is the ability to “simulate” a hardware platform, such as a server,
-storage device or network resource, in software. All the functionality is separated
-(abstracted) from the hardware and “simulated” as a “virtual instance” with the ability to
-operate just like the hardware solution. A single hardware platform can be used to support
-multiple virtual devices or machines, which are easy to spin up or down as needed.
+\vspace{-0.5em}
 
-\textbf{Virtual Machine} refers to a software simulation of a computer. It can run an OS and applications interacting with the virtualized abstracted resources, \textit{not with the physical resources} of the actual host computer.
-
-\textbf{Hypervisor (or VM monitor)} refers to a software tool installed on the physical host system to provide the this software layer of abstraction that decouples the OS from the physical bare-metal. It allows to split a computer in different separate environments, the VMs, distributing them the computer resources. 
-
-Components:
+This model is straightforward but does not scale well as the number of services grows:
 
 \begin{itemize}
-    \item \textbf{Host OS}: the OS running on the physical machine.
-    \item \textbf{Hypervisor}: the software layer that abstracts the hardware and creates the VMs.
-    \item \textbf{Guest OS}: the OS running on the VM.
+    \item Each new service requires deploying and maintaining a separate server.
+    \item More servers mean higher costs for hardware, energy, cooling, and administration.
+    \item Most servers are underutilized, with their resources (CPU, memory, disk) often idle.
+    \item Overall, this leads to inefficient resource use and unnecessarily high operating expenses.
 \end{itemize}
 
-\begin{figure}[H]
+Virtualization directly solves these issues by consolidating multiple independent environments onto the same hardware, with each one appearing to have its own machine.
+
+\section{Virtualization, Virtual Machines, and Hypervisors} \label{sec:virtualization_basics}
+
+\begin{definitionblock}[Virtualization]
+    \bfit{Virtualization} uses software to create an abstraction layer over computer hardware that allows the hardware elements of a single computer, processors, memory, storage, and more, to be divided into multiple virtual computers, commonly called \bfit{virtual machines} (VMs). Each VM runs its own operating system (OS) and behaves like an independent computer, even though it is running on just a portion of the actual underlying computer hardware.
+    \hfill \textit{IBM}
+\end{definitionblock}
+
+
+\begin{minipage}{0.61\textwidth}
+    More informally, virtualization is the ability to ``simulate'' a hardware 
+platform, such as a server, storage device, or network resource, entirely in 
+software. All of the functionality that a piece of hardware would normally 
+provide is abstracted away from the physical device and reproduced as a virtual 
+instance that behaves, from the point of view of whatever runs on top of it, 
+exactly like the real thing. A single physical platform can therefore support 
+many such virtual instances at once, and they can be created or torn down on 
+demand, far more easily than the hardware they imitate.
+\end{minipage}
+\hfill
+\begin{minipage}{0.38\textwidth}
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig28.png}
-    \caption{Virtualization components}
-\end{figure}
+    \includegraphics[width=0.98\textwidth]{assets/fig27.png}
+    \captionof{figure}{Virtualization.}
+    \label{fig:virtualization-layer}
+\end{minipage}
 
-\section{Virtual Machines}
 
-A Virtual Machine is a virtual computing system. It has tighly \textbf{isolated} software with an OS and applications inside. Each VM in a host is \textbf{independent}. 
+\begin{definitionblock}[Virtual Machine]
+    A \bfit{virtual machine} (VM) is the software simulation of a computer. It can run an operating system and applications that interact with virtualized, abstracted resources rather than with the physical resources of the actual host computer.
+\end{definitionblock}
 
-In a single physical server can be put multiple VMs enabling the run of multiple OSes and Applications (\textit{partition/multi-tenancy}).
+\begin{definitionblock}[Hypervisor]
+    A \bfit{hypervisor}, also called \bfit{virtual machine monitor} (VMM), is a software tool installed on the physical host system that provides the thin layer of abstraction decoupling an operating system from the physical bare metal. It splits a computer into several separate environments, the virtual machines, distributing the underlying hardware resources among them.
+\end{definitionblock}
 
-Features:
+Three roles are worth distinguishing whenever virtualization is discussed:
+
 \begin{itemize}
-    \item \textbf{Consolidation}: multiple VMs on a single physical server.
-    \item \textbf{Isolation}: VMs are independent.
-    \item \textbf{Encapsulation}: VMs are portable.
-    \item \textbf{Hardware Independence}: VMs are not tied to the physical hardware.
-    \item \textbf{Security}: VMs are isolated from each other.
+    \item The \textbf{host machine} is the actual, physical machine on which virtualization takes place; when it runs a conventional operating system of its own, that operating system is the \textbf{host OS}.
+    \item The \textbf{hypervisor} (or \textbf{VM manager}) is the software, or in some designs the firmware, that creates the virtualization layer on the host hardware.
+    \item The \textbf{guest machine} is the virtual machine itself, running its own \textbf{guest OS} and applications.
 \end{itemize}
 
-\section{Virtualization models}
+% \begin{figure}[H]
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{assets/fig28.png}
+%     \caption{Virtualization components: several guests, each with its own applications and guest OS, sit above the virtualization layer and the physical, bare-metal host.}
+%     \label{fig:virtualization-components}
+% \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig29.png}
-    \caption{Virtualization models}
-\end{figure}
+\subsection{Virtual Machines} \label{sec:virtual_machines}
+
+A virtual machine is a virtual computing system with tightly isolated software, an operating system and its applications, packaged inside. Every VM hosted on a given physical server is independent of every other, which is precisely what allows a single physical server to host multiple VMs running different operating systems and applications side by side (partitioning, or multi-tenancy). This independence and portability make VMs attractive building blocks for a cloud infrastructure:
+
+\begin{itemize}
+    \item \textbf{Consolidation}: several VMs, each potentially running a different OS, share a single physical server, partitioning its physical resources among them.
+    \item \textbf{Isolation}: faults and security breaches are contained at the hardware level, and advanced resource control lets each VM preserve its expected performance regardless of what its neighbours do.
+    \item \textbf{Encapsulation}: the entire state of a VM can be saved to a set of files, which can then be moved or copied like any other file, a property that underlies VM \textbf{migration}.
+    \item \textbf{Hardware independence}: because a VM only ever sees virtualized resources, it can be copied, moved, or migrated to a different physical server without modification.
+    \item \textbf{Security}: VMs are isolated from each other, so a compromise of one does not expose the others.
+    \item \textbf{Other benefits}: debugging, profiling, reproducibility, and long-term software preservation all become easier once an entire environment can be captured, frozen, and replayed as a VM image.
+\end{itemize}
+
+\begin{tipsblock}[How much performance is left on the table]
+    A virtual machine is designed to deliver native hardware performance as closely as possible, but every layer of abstraction has some cost. Precisely quantifying that cost, the gap between running an application directly on hardware and running it inside a VM, is not always straightforward, and is one of the questions a benchmarking exercise is meant to answer.
+\end{tipsblock}
+
+An application and its operating system, packaged together specifically to run inside a VM, are referred to as a \textbf{virtual appliance}, the same concept already introduced in \cref{sec:cloud_architecture} when the cloud infrastructure stack was described. A web server or database server distributed as a ready-to-run VM image is a typical example: self-contained, pre-configured, and immediately usable as one of the standardized components out of which a larger cloud service is assembled.
+
+\vspace{-0.5em}
+
+\subsection{Virtualization Models} \label{sec:virtualization_models}
+
+\subsubsection{Hypervisor types}
+
+Hypervisors are commonly classified by where they sit relative to the host's operating system.
 
 \begin{enumerate}
-    \item \textbf{Type 1 Hypervisor}: it runs directly on the host's hardware to control the hardware and to manage guest operating systems. It is also called \textit{bare metal hypervisor}. It is the most efficient because it has direct access to the hardware. Examples: VMware ESXi, Microsoft Hyper-V, Citrix XenServer, Oracle VM Server for SPARC.
-    \item \textbf{Type 2 Hypervisor}: it runs on a conventional operating system just as other computer programs do. It is also called \textit{hosted hypervisor}. It is easier to set up and use, but it is less efficient because it must use the host OS to access the hardware. Examples: VMware Workstation, VMware Player, Oracle VirtualBox, Parallels Desktop for Mac.
+    \item \textbf{Type 1 hypervisor}, also called a \bfit{bare-metal} or \bfit{native hypervisor}, runs directly on the host's hardware, controlling it and managing the guest OSs itself. Because it has direct access to the hardware, it is the most efficient of the two models. Examples include VMware ESXi, Microsoft Hyper-V, Citrix XenServer, and Oracle VM Server for SPARC.
+    \item \textbf{Type 2 hypervisor}, or \bfit{hosted hypervisor}, runs as an ordinary program on top of a conventional OS, in the same way any other application does. It is easier to install and use, but less efficient, since every access to the hardware must first pass through the host OS. Examples include VMware Workstation, VMware Player, Oracle VM VirtualBox, and Parallels Desktop for Mac.
 \end{enumerate}
 
-Another distinction can be made w.r.t. virtualization:
+\vspace{-0.5em}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{assets/fig29.png}
+\vspace{-0.5em}
+
+    \caption{Type 1 (bare-metal) versus type 2 (hosted) virtualization models.}
+    \label{fig:virtualization-models}
+\end{figure}
+
+\vspace{-1em}
+
+\begin{advancedblock}[Hypervisor examples in practice]
+    For type 1 hypervisors, \bfit{Xen} and \bfit{VMware ESX} illustrate different strategies for managing system privilege. Xen runs a small, privileged management VM called \plaintt{dom0} to handle hardware and device drivers, while guests (\plaintt{domU}) use limited privileges; Xen itself coordinates virtualization and device access beneath these domains. By contrast, VMware ESX directly manages hardware and drivers within the hypervisor itself, making management features available to administrators via an API, rather than a separate privileged VM.
+
+    For type 2 hypervisors on Linux, a common pairing is \bfit{KVM} and \bfit{QEMU}. {KVM} is a kernel module that enables the Linux kernel to act as a hypervisor, providing CPU and memory virtualization through processor extensions. {QEMU} supplies hardware emulation and device management, allowing support for many different guest operating systems, while KVM ensures efficient performance by leveraging hardware virtualization features.
+\end{advancedblock}
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{l|p{0.4\textwidth}p{0.4\textwidth}}
+         & \textbf{KVM} & \textbf{QEMU} \\
+        \hline
+        \textbf{Role} & Kernel module & Hypervisor and hardware emulator \\
+        \textbf{CPU access} & Low-level interface to the processor's virtualization primitives & Hardware virtualization, without emulation, once paired with KVM \\
+        \textbf{Provides} & Resource allocation & Virtual hard drive \\
+        \textbf{Management} & Kernel extension, with \plaintt{libvirt} for APIs and monitoring & \\
+    \end{tabular}
+    \caption{Division of labour between KVM and QEMU in a type 2 deployment.}
+    \label{tab:type2-hypervisor}
+\end{table}
+
+\vspace{-1.5em}
+
+\subsubsection{Full, Para-, and Hardware-Assisted Virtualization} \label{sec:virtualization_types}
+
+A second, orthogonal classification concerns how much the guest operating system knows about the hypervisor beneath it.
+
 \begin{itemize}
-    \item \textbf{Full virtualization}: the hypervisor provides complete hardware abstraction creating
-    simulated hardware devices. The guest OS don’t know (or care) about the presence
-    of a hypervisor and issue commands to what it thinks is actual hardware.
-    \item \textbf{Paravirtualization}: the guest OS is aware of the hypervisor and interacts with it
-    \item \textbf{Hardware-assisted virtualization}: the hypervisor uses hardware capabilities to
+    \item \textbf{Full virtualization}: the hypervisor provides complete hardware abstraction, creating simulated hardware devices. The guest OS does not know, and does not need to know, that a hypervisor is present, and issues commands to what it believes is real hardware.
+    \item \textbf{Paravirtualization}: The guest OS is aware that it is a guest, 
+    recognizes the presence of a hypervisor, and is modified to use special drivers to communicate certain operations (mainly I/O) directly to the host, improving efficiency over full virtualization.
+    \item \textbf{Hardware-assisted virtualization}: a form of full virtualization in which the processor provides dedicated instructions to support virtualization, allowing the hypervisor to manage hardware directly instead of relying on software emulation.
 \end{itemize}
 
-\begin{warningblock}[Hardware Protection Levels]
-    Since computers run more than on software process, this will bring some issues. Protection rings are one of the key solutions for sharing resources and hardware.
-    \begin{itemize}
-        \item \textbf{Ring 0}: the most privileged level (kernel mode).
-        \item \textbf{Ring 1-2-3}: less privileged levels (user mode).
-    \end{itemize}
-    The hypervisor runs in Ring 0, the guest OS runs in Ring 1-2-3.
+\section{Hardware Protection and the Privilege Rings} \label{sec:protection_rings}
+
+\begin{minipage}{0.38\textwidth}
+    Operating systems manage shared resources, processing time on the CPU, access to memory, on behalf of many software processes at once, and this sharing needs to be enforced rather than merely assumed. \textbf{Protection rings} are one of the key mechanisms commodity hardware uses to do so. The x86 architecture, for instance, defines four such rings.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.58\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/rings.png}
+
+    % \vspace{-0.5em}
+
+    \captionof{figure}{The x86 protection rings.}
+    \label{fig:protection-rings}
+\end{minipage}
+
+\begin{warningblock}[Rings under native execution and under full virtualization]
+    Under a native operating system, \textbf{Ring 3} has the least privilege, and this is where ordinary user applications run, while \textbf{Ring 0} has the highest privilege and is reserved for the operating system itself, the only level allowed to execute every hardware-supported instruction.
+
+    A classic, software-only hypervisor must itself occupy Ring 0 in order to control the hardware, which leaves no privileged ring free for the guest operating system: the guest is demoted to \textbf{Ring 1}, so that any privileged instruction it issues traps into the hypervisor at Ring 0 rather than executing directly. This ring compression is exactly what makes trap-and-emulate processor virtualization (\cref{sec:cpu_virtualization}) necessary, and it is also the overhead that hardware-assisted virtualization, discussed in \cref{sec:hw_assisted_virtualization}, is designed to remove.
 \end{warningblock}
 
-\section{Virtualizing components}
+\section{Virtualizing System Components} \label{sec:virtualizing_components}
 
-\subsection{CPU}
+Once a hypervisor is in place, it must act as a resource multiplexer for every subsystem a real machine offers: the processor, memory, the network, and disk storage. Each of these is virtualized differently, reflecting how directly the guest is allowed to touch the real hardware underneath it.
 
-The hypervisor must manage the CPU resources. It must decide which VM gets CPU time and when. It must also manage the CPU instructions that are executed by the VMs.
+\subsection{Processor Virtualization} \label{sec:cpu_virtualization}
 
-Guest instructions are executed directly by the hardware as much as
-possible: virtual machine monitor does not interfere with every single
-instruction that is issued by the guest operating system, or its applications.
-The non-privileged instructions will operate at hardware speeds.
+The hypervisor is responsible for managing the CPU for each VM: it decides which VM receives CPU time and when, and it manages the instructions that each VM's virtual processor executes.
 
-\textbf{Privileged instructions}: Whenever a privileged instruction gets accessed,
-then the processor causes a trap, and control is automatically switched to
-the most privileged level, that is the hypervisor. At this point, the
-hypervisor can determine whether the operation is to be an allowed or
-not. Illegal operations will cause actions on the VM (as KILL), legal
-operations the hypervisor should perform the necessary emulation so
-that the guest operating system is under the impression that it does have
-control over the hardware.
+\textbf{Guest instructions} are executed directly by the hardware whenever possible: the hypervisor does not interfere with every single instruction issued by the guest operating system or its applications, so non-privileged instructions run at full hardware speed.
 
-\subsection{Memory}
+\textbf{Privileged instructions} are the exception. Whenever a guest issues one, the processor raises a trap and control is switched automatically to the most privileged level, the hypervisor, which then decides whether the operation is allowed. An illegal operation results in an action against the offending VM, such as terminating it, while a legal one is emulated by the hypervisor so that the guest OS remains under the impression that it has direct control over the hardware, even though it does not. This pattern, commonly called \textbf{trap-and-emulate}, is the mechanism referred to in \cref{sec:protection_rings} as the price of running the guest OS one privilege ring below where it expects to be.
 
-\textbf{Full virtualization}: the guest operating system continues to observe a
-contiguous linear physical address space that starts from physical
-address 0.
-Three types of addresses:
+\subsection{Memory Virtualization} \label{sec:memory_virtualization}
+
+Under full virtualization, the guest operating system continues to observe what looks like a single, contiguous, linear physical address space starting at address zero, exactly as it would on real hardware. Underneath that illusion, however, an address actually passes through two independent translations.
+
 \begin{itemize}
-    \item \textbf{Virtual addresses}, these are the ones that are used by the applications in the guest
-    \item \textbf{Physical addresses}, these are the ones that the guest thinks are the addresses of the physical resources 
-    \item \textbf{The machine addresses}, these are the actual machine addresses with the actual physical addresses on the underlying platform. 
+    \item The \textbf{guest virtual address} (GVA) is the address an application inside the guest actually uses.
+    \item The \textbf{guest physical address} (GPA) is the address the guest OS believes corresponds to physical memory, produced by the guest's own page tables from a GVA.
+    \item The \textbf{host virtual address} (HVA) and, ultimately, the \textbf{host physical address} (HPA) are the addresses of the memory that is really being accessed on the underlying platform, produced by a second translation that the hypervisor controls.
 \end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig30.png}
-    \caption{Memory virtualization}
+    \includegraphics[width=0.85\textwidth]{assets/fig30.png}
+    \caption{Memory virtualization: an address is translated twice, first from a guest virtual address (GVA) to a guest physical address (GPA) inside each VM, then from a host virtual address (HVA) to a host physical address (HPA) on the real machine.}
+    \label{fig:memory-virtualization}
 \end{figure}
 
-Every single memory access goes through two separate translation, the first one
-which will be done in software, and then the second one potentially can take
-advantage of hardware.
-
-Moreover, \textbf{Shadow Page Table} estabilishes a shortcut to directly manage the mapping from GVA to HPA. It works the same way virtual addresses is mapped to physical addresses. VMM must maintain consistence between the page tables.
-
-\begin{figure}[H]
+\begin{minipage}{0.56\textwidth}
+    A similar virtual, physical, and machine distinction also applies to page numbers and page frame numbers. Every single memory access therefore goes through two separate translations: the first can be done purely in software, which is comparatively expensive, while the second can potentially take advantage of dedicated hardware support (\cref{sec:hw_assisted_virtualization}). To avoid paying the cost of two full translations on every access, the hypervisor can maintain a \textbf{shadow page table}, which establishes a direct shortcut from a GVA straight to the corresponding HPA, working exactly like an ordinary virtual-to-physical page table. Because this shortcut duplicates information already present in the guest's own page tables, the VMM must keep the two structures consistent with one another whenever either changes.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.43\textwidth}
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig31.png}
-    \caption{Shadow Page Table}
-\end{figure}
+    \includegraphics[width=0.95\textwidth]{assets/fig31.png}
+    \captionof{figure}{Shadow page table.}
+    \label{fig:shadow-page-table}
+\end{minipage}
 
-\textbf{Paravirtualization} allows guest operating systems to be aware of their virtual environment 
-and communicate directly with the hypervisor to manage memory. 
-Instead of fully abstracting the underlying hardware, the guest OS uses an optimized 
-interface to reduce the overhead of trapping into privileged operations. 
-This approach decreases the complexity of mapping guest physical addresses to machine 
-addresses by enabling the hypervisor and guest OS to collaborate on page table management 
-and memory access, leading to more efficient performance overall.
+\smallskip
 
-\subsection{Network}
+With \textbf{paravirtualization}, the guest OS is aware it is running virtualized and communicates directly with the hypervisor to manage memory, instead of relying solely on shadow page tables. The guest is modified to register its page tables with the VMM, and overhead is reduced by batching page table updates and using cooperative memory management schemes that let VMs coordinate.
 
-The hypervisor must manage the network resources. It must decide which VM gets network access and when. It must also manage the network packets that are sent and received by the VMs. Applications run on a virtual network as they
-where running on a physical network.
+\subsection{Device Virtualization Models} \label{subsec:device_virtualization_models}
+ 
+The balance between transparency and overhead seen in memory virtualization also applies to every virtualized I/O device: disks, network cards, graphics adapters. Each VM must access these devices while remaining isolated from others, and three main models exist for device virtualization, each trading off performance, flexibility, and complexity.
+
+\vspace{-0.5em}
+
+\begin{table}[H]
+    \centering
+    % \renewcommand{\arraystretch}{1.1}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tcolorbox}[enhanced, colback=gray!5, boxrule=0.8pt, colframe=black, arc=0mm, left=0mm, right=0mm, top=0.6mm, bottom=0.6mm, boxsep=0mm, sharp corners=south]
+        \small
+    \begin{tabularx}{\textwidth}{
+        >{\centering\arraybackslash}p{0.06\textwidth}
+        >{\raggedright\arraybackslash}p{0.26\textwidth}
+        >{\raggedright\arraybackslash}p{0.29\textwidth}
+        >{\raggedright\arraybackslash}p{0.32\textwidth}
+    }
+        \rowcolor{gray!20}
+        \textbf{} & \textbf{Passthrough} & \textbf{Hypervisor direct mode} & \textbf{Split driver model} \\
+        \midrule
+        \bfit{How it works} & The VMM configures access permissions so the guest VM reaches the device directly, bypassing the VMM (VMM-bypass). & The VMM intercepts every device access request and emulates the device's operations itself. & Device operations are split between a front-end driver in the guest VM and a back-end driver in a privileged service VM that holds the real driver; only available to paravirtualized guests. \\
+        \midrule
+        \bfit{Pros} & The VM has exclusive, direct access to the device, with no hypervisor in the path. & The VM is fully decoupled from the physical device: the VMM handles translation and emulation, enabling easier sharing and migration. & Removes emulation overhead entirely, and the back-end driver limits the VMM's exposure to bugs, improving security. \\
+        \midrule
+        \bfit{Cons} & Sharing the device is costly or impossible, the VM and the hardware must match exactly, and migration loses its decoupling from the underlying hardware. & Emulation adds latency to every device access, and the VMM becomes complex, since it must support every device it emulates and is exposed to bugs in that emulation code. & Works only for paravirtualized guests, and requires modifying the guest VM's front-end device driver. \\
+    \end{tabularx}
+    \end{tcolorbox}
+
+\vspace{-0.5em}
+
+    \caption{\bfit{Device virtualization models}}
+    \label{tab:device-virtualization}
+\end{table}
+
+\vspace{-1em}
+ 
+These three models are not purely theoretical: the network interface and the disk, examined next, are precisely the devices to which they are most commonly applied in practice.
+ 
+\subsection{Network Virtualization} \label{subsec:network_virtualization}
+ 
+The hypervisor manages each VM's network access, handling packets so guest applications behave as if on a real network. Each VM connects through a virtual Network Interface card (VNIC) to a virtual switch, which links to the physical NIC and the external network. VNICs may be fully emulated by the hypervisor or, for better performance, use a split-driver model, with guest operations forwarded to a back-end driver in a privileged VM.
+ 
+\begin{minipage}{0.61\textwidth}
+ 
+    Virtualizing the network this way brings the same kind of benefits already introduced for device virtualization:
+ 
+    \smallskip
+ 
+    \begin{itemize}
+        \item \textbf{Flexibility}: VMs can be moved between physical servers without changing their network configuration.
+        \item \textbf{Manageability}: VMs can be managed as a single entity.
+        \item \textbf{Scalability}: VMs can be added or removed as needed.
+        \item \textbf{Security}: VMs remain isolated from one another.
+        \item \textbf{Programmability}: VMs can be controlled entirely through software.
+        \item \textbf{Heterogeneity}: VMs can run different operating systems and applications side by side on the same virtual network.
+    \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.36\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/fig32.png}
+
+    \vspace{-0.5em}
+
+    \captionof{figure}{Network virtualization}
+    \label{fig:network-virtualization}
+\end{minipage}
+ 
+\vspace{-1em}
+ 
+\subsection{Disk Virtualization} \label{subsec:disk_virtualization}
+ 
+Disk resources are virtualized similarly: the hypervisor controls which VM has disk access at any time, managing disk blocks so each guest sees its own virtual disk behaving just like a real one. A \textbf{virtual disk} is where the guest OS is installed, indistinguishable from a physical hard disk, but actually stored as one or more files on the host's physical disk. This file-based model provides the same benefits (flexibility, manageability, etc.) as network virtualization, and makes migration or copying easy, demonstrating VM encapsulation. Virtual disks can use several image types, each balancing storage efficiency and performance differently:
+ 
+\begin{itemize}
+    \item A \textbf{fixed hard disk image} occupies, from the moment it is created, the same size as the virtual disk it represents: a raw disk image followed by a small footer.
+    \item An \textbf{expandable}, or \textbf{dynamic}, \textbf{hard disk image} instead grows to match only the data it actually contains, at the cost of a header and footer to track that growth.
+    \item A \textbf{differencing hard disk image} records all disk changes in a separate child image, leaving the original unchanged; changes can be reverted or merged back later, enabling a single base image to be cloned efficiently for many VMs.
+    \item A \textbf{pass-through disk image} is not really an image at all, but a direct link to a physical hard drive (or a partitions), given to a single VM: it is the disk-specific instance of the \textit{passthrough} model, trading the flexibility of a stored image for the raw performance of dedicated hardware.
+\end{itemize}
+ 
+Each major hypervisor uses its own, incompatible disk format:
+
+\vspace{-0.5em}
+
+\begin{table}[H]
+    \small
+    \centering
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{p{0.21\textwidth}|p{0.21\textwidth}p{0.52\textwidth}}
+        \textbf{Format} & \textbf{Used by} & \textbf{Notes} \\
+        \hline
+        Virtual Disk Image (VDI) & Oracle VM VirtualBox & Portable, and also supported by other hypervisors; fixed-size or dynamically allocated; no incremental backups. \\
+        Virtual Hard Disk (VHDX) & Microsoft Hyper-V & Default format since Windows 2012; supports a storage capacity of up to 64\,TB. \\
+        Virtual Machine Disk (VMDK) & VMware & Supports cloning and backup of a physical disk; can be dynamic (sparse) or fixed (flat). \\
+    \end{tabular}
+
+    \caption{Common virtual hard disk formats.}
+    \label{tab:disk-formats}
+
+    \vspace{-1em}
+
+\end{table}
+
+\section{Hardware-Assisted Virtualization} \label{sec:hw_assisted_virtualization}
+
+Software-only virtualization, based on trap-and-emulate and shadow page tables, is functional but at a real performance cost. Modern CPUs address this with hardware features for virtualization, reducing VMM overhead and improving speed and functionality. The main examples, Intel VT and AMD-V, enhance multiple aspects of the x86 architecture to support hypervisors:
+
+\smallskip
 
 \begin{itemize}
-    \item \textbf{Flexibility}: VMs can be moved between physical servers without changing the network configuration.
-    \item \textbf{Manageability}: VMs can be managed as a single entity.
-    \item \textbf{Scalability}: VMs can be added or removed as needed.
-    \item \textbf{Security}: VMs are isolated from each other.
-    \item \textbf{Programmability}: VMs can be controlled by software.
-    \item \textbf{Heterogeneity}: VMs can run different OSes and applications.
+    \item \textbf{New root and non-root modes} let the guest OS run natively in Ring 0 of a \textit{non-root} mode, rather than being demoted to Ring 1 as described in \cref{sec:protection_rings}, while the hypervisor itself runs in \textit{root} mode; avoiding the ring-compression problem that made trap-and-emulate necessary.
+    \item A \textbf{VM control structure} describes the complete state of a virtual processor (a vCPU); because the VMM can interpret this structure directly, it avoids intercepting and emulating individual instructions, considerably reducing virtualization overhead.
+    \item \textbf{Memory access} is optimized in two complementary ways: 
+    \begin{itemize}
+        \item \textbf{Extended page tables} let the GPA-to-HPA translation of \cref{sec:memory_virtualization} be performed directly by hardware, rather than by a software shadow page table.
+        \item \textbf{Tagging the translation lookaside buffer with VM IDs} allows entries belonging to different VMs to coexist, avoiding a full flush of the buffer on every context switch between VMs.
+    \end{itemize}
+    \item \textbf{Multiqueue devices}, physical devices exposing several independent logical interfaces, let multiple VMs exchange I/O in parallel through the same piece of hardware.
+    \item Hardware-level \textbf{security} features isolate VMs, rather than relying purely on software isolation.
 \end{itemize}
 
-\begin{figure}[H]
+\vspace{-0.5em}
+
+\section{Emulation} \label{sec:emulation}
+
+\begin{definitionblock}[Emulation]
+    \bfit{Emulation} is the process of fully recreating hardware in software, allowing a system to imitate another platform. This enables software (including OS) written for one architecture to run on hardware that the underlying platform does not actually have, with the hypervisor or emulator replicating the required components.
+\end{definitionblock}
+
+Emulation translates instructions from one CPU architecture to another so that code runs on hardware it was never designed for. While this approach introduces more overhead than virtualization (nothing runs natively) it is cost-effective, easy to access remotely, and vital for keeping legacy or obsolete software available. Emulation is very useful in embedded and OS development, enabling a target environment to be reproduced and tested independently of the host. Unlike virtualization, emulation can model designs unconstrained by the host's resources, though always with a trade-off in speed.
+
+\vspace{-0.5em}
+
+\begin{table}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig32.png}
-    \caption{Network virtualization}
-\end{figure}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.1}
+    \begin{tabular}{p{0.195\textwidth}|p{0.31\textwidth}p{0.44\textwidth}}
+         & \textbf{Virtualization} & \textbf{Emulation} \\
+        \hline
+        Hardware access & Direct & Requires a software connector to reach hardware \\
+        Code execution & Runs the guest's code directly, whatever language it is written in & Requires an interpreter to translate the source code first \\
+        Speed & Relatively fast & Relatively slow \\
+        Cost & Costlier & Comparatively cheaper \\
+        Backup and recovery & Provides better backup solutions & Falls short of virtualization for backup/recovery \\
+    \end{tabular}
+    \caption{Emulation compared with virtualization.}
+    \vspace{-0.5em}
 
-\subsection{Disk}
+    \label{tab:emulation-vs-virtualization}
+    \vspace{-0.5em}
 
-The hypervisor must manage the disk resources. It must decide which VM gets disk access and when. It must also manage the disk blocks that are read and written by the VMs. Applications run on a virtual disk as they where running on a physical disk.
-Virtual Disks are where guest operating systems are installed, making them the
-equivalent of traditional hard disks. They are stored as files on the host system’s
-physical disk.
+\end{table}
 
-\begin{itemize}
-    \item \textbf{Flexibility}: VMs can be moved between physical servers without changing the disk configuration.
-    \item \textbf{Manageability}: VMs can be managed as a single entity.
-    \item \textbf{Scalability}: VMs can be added or removed as needed.
-    \item \textbf{Security}: VMs are isolated from each other.
-    \item \textbf{Programmability}: VMs can be controlled by software.
-    \item \textbf{Heterogeneity}: VMs can run different OSes and applications.
-\end{itemize}
-
-\section{Emulation}
-
-\textbf{Emulation} is the process of simulating hardware using software. It is used when the guest OS is not aware of the hypervisor. The hypervisor must emulate the hardware that the guest OS expects to see.
-
-Emulation brings higher overhead but has its perks too. It is highly inexpensive, easy to access,
-and helps us run the programs that have become obsolete in the available system. Anyone can access the emulation platforms remotely and is easier to use. It is an excellent
-ability to have for embedded/OS development, without affecting the underlying OS.
-
+Virtualization and emulation therefore sit at opposite ends of the same trade-off: virtualization gives up some flexibility in exchange for near-native speed, while emulation gives up speed in exchange for the ability to run absolutely anything, anywhere.

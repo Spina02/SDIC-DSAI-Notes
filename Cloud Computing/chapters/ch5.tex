@@ -1,250 +1,372 @@
+\chapter{Benchmarking a Linux platform} \label{ch:benchmarking}
 
-\chapter{Benchmarking a Linux platform}
+\section{Benchmarking Basics}
 
-Benchmarking is the process of measuring the performance of a system. It is a critical step in the process of designing and deploying a system. 
-It is important for:
+The last three chapters traced the path from abstract cloud services, through physical hardware, to the virtualization layer that turns resources into flexible, shared infrastructure. This chapter asks how to measure whether all these layers (hardware, hypervisors and guests, and their workloads) actually perform as expected. \bfit{Benchmarking} makes these measurements possible, allowing every concept so far, from HPC clusters to virtualization overhead, to be tested and verified in practice.
+
+
+\subsection{Why Benchmark a System?} \label{sec:why_benchmark}
+
+\begin{definitionblock}[Benchmarking]
+\bfit{Benchmarking} is the process of measuring the performance of a system under a controlled, repeatable workload, in order to characterize how efficiently it uses its underlying resources.
+\end{definitionblock}
+
+Benchmarking is valuable only when its findings are applied. It serves several crucial purposes, uniting performance, efficiency, reliability, and cost control into a single ongoing process:
+
+\medskip
+
 \begin{itemize}
-    \item \textbf{Maximize efficiency}: understanding how the server utilizes the CPU, memory, storage and network resources allows for fine-tuning and making better use of the hardwarre full potential.
-    \item \textbf{Cost optimization}: understanding the performance of the system allows to make better decisions on the hardware to buy.
-    \item \textbf{Troubleshooting issues}: benchmarking can help to identify bottlenecks and performance issues.
-    \item \textbf{Security}: benchmarking can help to identify security issues.
-    \item \textbf{Comparing systems}: benchmarking can help to compare different systems.
+    \item \textbf{Maximizing efficiency and optimizing resource allocation}
+    
+    By providing detailed insights into the real usage of CPU, memory, storage, and network, benchmarking enables both hardware and software to be tuned for optimal performance with minimal waste. In virtualized environments, it further helps assign resources to VMs sensibly, avoiding underutilization and resource contention.
+
+    \item \textbf{Identifying bottlenecks and hardware limits}
+    
+    Regular measurements make it possible to spot underperforming components and performance bottlenecks at an early stage, guiding targeted troubleshooting, upgrades, and hardware or configuration optimizations.
+
+    \item \textbf{Cost optimization}
+    
+    Benchmark results highlight areas of over- or under-provisioning, supporting informed decisions about scaling, workload placement, and investment, while reducing unnecessary spending on hardware or cloud services.
+
+    \item \textbf{Capacity planning and system stability}
+    
+    By observing how the system responds to changing workloads, benchmarking provides a basis for forecasting future needs and building confidence that the platform can handle peak loads and performance spikes; essential for critical workloads and long-term service reliability.
+
+    \item \textbf{Measuring the impact of changes}
+    
+    Controlled benchmarking makes it possible to compare system behavior before and after hardware or software updates, validating improvements and providing evidence to support future decisions.
+
+    \item \textbf{Security and anomaly detection}
+    
+    Unexpected drops in performance can be early indicators of misconfigurations, denial-of-service attacks, or malware activity, making benchmarking a supporting tool for operational security.
 \end{itemize}
 
-\section{Components to test}
 
-There are a lot of tools available on the Internet that can perform
-system testing on Linux. We can use them to run different tests and
-benchmark various components, such as the Central Processing
-Unit (CPU), the Graphics Processing Unit (GPU), memory, database,
-and more.
+\subsection{Components to Test} \label{sec:components_to_test}
 
-\begin{figure}[H]
+\begin{minipage}{0.53\textwidth}
+Linux offers a wide range of tools, most of them open source, for benchmarking its key individual components: the \textbf{Central Processing Unit} (CPU), \textbf{memory}, \textbf{disk I/O and storage}, and \textbf{network}. In more specialized environments, additional tools are available for benchmarking components such as the \textbf{Graphics Processing Unit} (GPU) and databases.
+\end{minipage}
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \vspace{-1em}
+        \centering
+        \includegraphics[width=0.95\textwidth]{assets/fig33.png}
+        
+        \vspace{-0.5em}
+
+        \captionof{figure}{Benchmark typical targets.}
+        \label{fig:components-to-test}
+\end{minipage}
+
+\smallskip
+
+\begin{itemize}
+    \item \textbf{CPU:} Handles every computational task the system performs. Measuring CPU performance reveals how efficiently the system schedules processes and threads, and whether processing power itself is the bottleneck. This is especially important in virtualized environments, where physical CPU resources are shared across several VMs.
+    
+    \item \textbf{Memory:} Stores the data and instructions currently in use. Inadequate or slow memory quickly propagates performance issues to every application on the system, particularly databases, VMs, and in-memory data stores such as Redis.
+    
+    \item \textbf{Disk I/O and storage:} Govern how quickly data can be retrieved or written. This is enormously important for databases and web servers, and becomes more complex when several VMs share the same physical storage.
+    
+    \item \textbf{Network:} Carries data between systems. Its throughput and latency are critical wherever a service depends on remote clients or remote data.
+\end{itemize}
+
+\medskip
+
+\cref{tab:benchmarking-tools} summarizes the representative tools for each component; the sections that follow examine them in depth.
+
+\begin{table}[H]
     \centering
-    \includegraphics[width=0.7\textwidth]{assets/fig33.png}
-    \caption{Components to test}
-\end{figure}
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tcolorbox}[enhanced, colback=gray!5, boxrule=0.8pt, colframe=black, arc=0mm, left=0mm, right=0mm, top=0.6mm, bottom=0.6mm, boxsep=0mm, sharp corners=south]
+        \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.12\textwidth}
+        >{\raggedright\arraybackslash}p{0.4\textwidth}
+        >{\raggedright\arraybackslash}X
+    }
+        \rowcolor{gray!20}
+        \textbf{Component} & \textbf{Representative tools} & \textbf{Primary use} \\
+        \midrule
+        CPU & \ttfamily\footnotesize{stress-ng}, \ttfamily\footnotesize{sysbench}, \ttfamily\footnotesize{htop}, \ttfamily\footnotesize{mpstat}, HPL, HPCG, SPEC & Baseline and stress testing, real-time utilization monitoring \\
+        Memory & \ttfamily\footnotesize{memtester}, memtest86, \ttfamily\footnotesize{stress-ng}, \ttfamily\footnotesize{valgrind}, \ttfamily\footnotesize{cachegrind}, \ttfamily\footnotesize{callgrind}, \ttfamily\footnotesize{vmstat}, \ttfamily\footnotesize{numactl} & Error detection, bandwidth and latency testing, cache and NUMA profiling \\
+        Disk I/O and storage & \ttfamily\footnotesize{fio}, \ttfamily\footnotesize{ioping}, \ttfamily\footnotesize{dd}, \ttfamily\footnotesize{hdparm}, \ttfamily\footnotesize{bonnie++}, \ttfamily\footnotesize{iozone}, \ttfamily\footnotesize{iostat}, \ttfamily\footnotesize{mdadm} & Throughput, IOPS, and latency testing across file systems and RAID arrays \\
+        Network & \ttfamily\footnotesize{iperf}, \ttfamily\footnotesize{netperf}, \ttfamily\footnotesize{nttcp}, \ttfamily\footnotesize{ping}, \ttfamily\footnotesize{traceroute}, \ttfamily\footnotesize{mtr}, \ttfamily\footnotesize{netstat}, \ttfamily\footnotesize{iftop} & Bandwidth, latency, packet loss, and connection monitoring \\
+    \end{tabularx}
+    \end{tcolorbox}
+    \caption{Summary of common Linux benchmarking and monitoring tools, grouped by component.}
+    \label{tab:benchmarking-tools}
+\end{table}
 
-\begin{itemize}
-    \item \textbf{CPU}: the CPU handles all computational tasks. Measuring its performances helps in understanding how efficiently it handles processes and threads, or whether there are bottlenecks in processing power. 
-        \begin{itemize}
-            \item stress-ng
-            \item sysbench
-            \item htop 
-            \item mpstat 
-            \item HPL 
-            \item HPCG 
-            \item SPEC
-        \end{itemize}
-    \item \textbf{Memory (RAM)}: the memory is used to store data and instructions that are currently in use. Measuring its performances helps in understanding how efficiently it handles data and instructions, or whether there are bottlenecks in memory usage.
-        \begin{itemize}
-            \item stress-ng
-            \item memtester
-            \item memtest86
-            \item valgrind
-            \item cachegrind
-            \item callgrind
-        \end{itemize}
-    \item \textbf{Dist I/O and Storage}: the storage is used to store data and instructions that are not currently in use. Measuring its performances helps in understanding how efficiently it handles data and instructions, or whether there are bottlenecks in storage usage.
-        \begin{itemize}
-            \item fio
-            \item ioping
-            \item dd
-            \item hdparm
-            \item bonnie++
-            \item iozone
-        \end{itemize}
-    \item \textbf{Network}: the network is used to transfer data and instructions between different systems. Measuring its performances helps in understanding how efficiently it handles data and instructions, or whether there are bottlenecks in network usage.
-        \begin{itemize}
-            \item iperf
-            \item netperf
-            \item nttcp
-            \item ping
-            \item traceroute
-            \item mtr
-        \end{itemize}
-\end{itemize}
+\section{Benchmarking Methodologies} \label{sec:benchmark_methodology}
 
+Two complementary strategies recur throughout the tests presented in this chapter, regardless of which component is under scrutiny. \textbf{Baseline testing} measures a component's performance under a typical, everyday workload, establishing a reference point against which later measurements, whether after a configuration change, a hardware upgrade, or simply the passage of time, can be compared. \textbf{Stress testing} instead pushes the component deliberately to its limits, simulating a heavy workload to find the upper bounds of its capability and to expose bottlenecks that only appear under load.
 
-\section{Benchmarking tools}
+Generic, component-level benchmarks are a useful starting point, but they cannot fully substitute for testing the actual workload a server is meant to run. This is the role of \textbf{contextual, workload-specific testing}: a web server, for instance, is better benchmarked with a tool that simulates realistic HTTP traffic (e.g. {\ttfamily\footnotesize ApacheBench} or {\ttfamily\footnotesize siege}), than with a synthetic CPU or network test alone, and the same principle extends to database servers, message queues, or any other service-specific workload.
 
-\subsection{HP Linpack (HPL)}
+\begin{observationblock}[Power and energy consumption]
+In data centres and other environments bound by strict energy budgets, power efficiency is itself a performance metric worth benchmarking. Tools such as \plaintt{powertop} measure power draw under different workloads, complementing the throughput- and latency-oriented metrics.
+\end{observationblock}
 
-This is the most famous HPC benchmark, used for the "Top500" ranking. 
-It is a software package that solves a random system of linear equations using Gaussian elimination (matrix is dense).
+Finally, in any deployment built on the virtual machines, a benchmark run purely inside a guest tells only half the story. Measuring the same workload on the bare host and inside the VM, and comparing the two, is the most direct way to quantify virtualization overhead: any consistent gap between host and guest results is that overhead made visible, and it draws attention to resource contention between co-located VMs that a single measurement would miss.
 
-For a given problem size N, HPL performs floating point operations proportional
-to N*N*N operations while performing memory reads and write proportional to
-N*N.
-That means, if the problem size doubles, the number of floating-point operations
-increases by a factor of 8 while the number of memory operations only grows by
-a factor of 4.
-This property of HPL means that it performs very well on systems that have many
-flop functional units relative to data movement support. The result is that HPL
-tends to represent a very optimistic performance prediction that can only be
-matched by a small number of real scientific applications.
+\subsection{HPC-Oriented Benchmark Suites} \label{sec:hpc_benchmarks}
 
-\subsection{High Performance Conjugate Gradient (HPCG)}
+Beyond testing one component at a time, a family of benchmarks measures the overall performance of a system, CPU, memory, and network together, and are the tools of choice in HPC.
 
-HPCG uses a simple implementation of the Conjugate Gradients and multigrid
-algorithms. It generates and uses sparse data structures that have a very low
-compute-to-data-movement ratio.
+\subsubsection{HP Linpack (HPL)}
 
-HPCG has a floating-point operations rate proportional to N and a memory access
-rate also proportional to N.
-This property means that HPCG performance is strongly influenced by memory
-bandwidth.
+\textbf{HP Linpack} (HPL) is the best-known HPC benchmark, used to generate the \href{https://www.top500.org}{TOP500} ranking of the world's most powerful clusters. HPL solves large, dense systems of $N$ linear equations using Gaussian elimination. Its floating-point workload scales as $N^3$ while memory traffic grows as $N^2$; doubling $N$ increases computation eightfold but memory use only fourfold. As a result, HPL favors systems with substantial floating-point hardware compared to available bandwidth, typically overstating what real applications achieve. HPL is usually installed via the \plaintt{hpcc} package and is controlled by a handful of tunable parameters. Tools like the HPL Calculator assist in selecting these for a specific system, while tuning guides cover in detail the \plaintt{HPL.dat} configuration file.
 
-\section{Tests}
+\subsubsection{High Performance Conjugate Gradient (HPCG)}
 
-\subsection{CPU}
+Where HPL is deliberately dense and compute-heavy, \textbf{HPCG} takes the opposite approach: it implements the Conjugate Gradient and multigrid algorithms over sparse data structures with a very low compute-to-data-movement ratio. Both its floating-point operation rate and its memory access rate scale proportionally with $N$, so HPCG performance is dictated far more by memory bandwidth than by raw floating-point throughput. This makes it a useful counterbalance to HPL's optimism: a system that excels at HPL but lags on HPCG is one whose performance on memory-bound scientific codes will likely fall well short of its Top500 ranking.
 
-The CPU is responsible for executing all the
-processes, calculations, and tasks. A server’s
-overall speed, responsiveness, and ability to
-handle concurrent workloads are highly
-dependent on the efficiency and power of its
-CPU.
+\subsubsection{Other tests}
 
-In a virtualized environment, CPU testing becomes even more critical since
-physical CPU resources are shared between the virtual machines (VMs)
-running on the host. The virtual CPUs (vCPUs) allocated to each VM must be
-carefully monitored to ensure that the host and all guest VMs operate
-efficiently without resource contention.
+Beyond HPL and HPCG, several other suites are commonly used to characterize the overall performance of an HPC system, memory and network behaviour included, alongside raw compute. \textbf{STREAM} measures sustained memory bandwidth; the \textbf{HPC Challenge} benchmark combines several such measures into a single suite; \textbf{Graph 500} targets graph-analytics workloads rather than dense linear algebra; and the \textbf{NAS Parallel Benchmarks} (NPB) reproduce a set of computational fluid dynamics kernels representative of real aerospace workloads.
 
-To test it, we consider the Floating Point Operations Per Second (FLOPS):
+\section{Testing Individual Components} \label{sec:component_tests}
+
+Let's briefly look at each of the four main components, covering key metrics, useful tools, how to interpret the results, and what changes to expect when they're virtualized.
+
+\vspace{-0.5em}
+
+\subsection{CPU} \label{subsec:cpu_testing}
+
+The CPU is responsible for executing every process, calculation, and task on the system, so a server's overall speed, responsiveness, and ability to handle concurrent workloads are highly dependent on the efficiency and power of the processor architecture In a virtualized environment, CPU testing becomes even more critical, since physical CPU resources are shared between the VMs running on the host, and the virtual CPUs (vCPUs) allocated to each guest must be carefully monitored to keep host and guests operating without resource contention. The standard measure of CPU performance is \textbf{floating-point operations per second} (FLOPS, or flop/s), which can in turn be decomposed into three factors that are each, individually, easier to reason about:
+
+\vspace{-0.5em}
+
 $$
-FLOPS = \frac{Number\ of\ floating\ point\ operations}{Time}
+\text{FLOPS} = \frac{\text{number of floating-point operations}}{\text{time}} = \text{cores} \times \frac{\text{FLOPs}}{\text{cycle}} \times \frac{\text{cycles}}{\text{second}}
 $$
 
-Floating point operations per clock cycle per core is CPU dependent. 
+How many floating-point operations a core can handle per clock cycle depends on the CPU model (g.g., an Intel core might perform about 64 such ops per cycle for 32-bit instructions). Overall FLOPS is determined by the number of cores, clock speed, and how many operations each core can do per cycle, none of these factors alone tells the whole story. 
 
-When testing CPU performance, several key metrics provide insight into how well the CPU handles the system's wordload. 
+When testing performance, key metrics reveal how well the CPU handles the system's workload:
 
-\begin{itemize}
-    \item \textbf{CPU utilization}: the percentage of time the CPU is busy processing instructions.
-    \item \textbf{CPU load}: the number of processes in the run queue.
-    \item \textbf{CPU temperature}: the temperature of the CPU.
-    \item \textbf{CPU frequency}: the frequency of the CPU.
-    \item \textbf{CPU cache}: the cache of the CPU.
-    \item \textbf{CPU Wait Time}: the time the CPU is waiting for I/O operations to complete.
-\end{itemize}
-
-Some tools to test the CPU are:
-\begin{enumerate}
-    \item \textbf{Baseline tests}: Start by measuring CPU performance under typical workloads to establish a baseline.
-    This allows you to understand how the CPU performs under normal conditions. Use as example \texttt{HPL} (see \href{https://hpl-calculator.sourceforge.net/}{HPL Calculator}).
-    \item \textbf{Stress tests}: Push the CPU to its limits to see how it performs under heavy workloads. Use as example \texttt{stress-ng} or \texttt{sysbench}. It can create stress on CPU, cache and memory.
-    \item \textbf{htop}: An interactive system monitor that provides real-time information on CPU utilization,
-    load average, and the number of running processes. It visually represents per-core
-    utilization. Simply run \texttt{htop} from the command line.
-    \item \textbf{mpstat}: A command-line utility that provides real-time CPU statistics. It displays
-    information on CPU utilization, idle time, and wait time. Run \texttt{mpstat} from the
-    command line.
+\begin{enumerate}[leftmargin=1.4em]
+    \item \textbf{CPU Utilization (\%)}: Percentage of CPU actively in use. High or sustained values, especially near 100\%, may indicate a bottleneck or under-provisioned CPUs.
+    \item \textbf{Load Average}: Average number of processes awaiting CPU. A load equal to the number of cores is normal; much higher values show the CPU is overloaded.
+    \item \textbf{Context Switches}: How often the CPU changes tasks. Too many switches reduce efficiency, as the CPU spends more time switching than computing.
+    \item \textbf{Interrupt Rate}: Number of hardware interrupts handled. High rates may indicate problematic or overly active devices, causing unneeded CPU work.
+    \item \textbf{CPU Wait Time (I/O Wait)}: Fraction of time CPU is idle waiting for I/O (disk/network). Frequent waiting points to slow I/O holding back performance.
+    \item \textbf{CPU Frequency}: Actual operating speed; dynamic scaling (e.g. SpeedStep, Cool'n'Quiet) may raise or lower it. Monitoring shows whether the CPU keeps up under load.
+    \item \textbf{vCPU Overcommitment (for VMs)}: Ratio of virtual to physical CPUs; allocating more vCPUs than available cores increases context switching and may cause contention between VMs.
 \end{enumerate}
 
-Analysis on the results:
+\subsubsection{Test: Stressing and Monitoring Tools}
+
+Testing CPU performance generally begins with a \textbf{baseline test} under normal workloads (HPL is a common choice) followed by targeted \textbf{stress tests} with specialized tools such as \tt{stress-ng} or \tt{sysbench}. These stress tools push the CPU to its maximum utilization, while monitoring utilities capture real-time insights into CPU behavior, such as \tt{htop} or \tt{mpstat}.
+
+Interpreting these metrics depends on context rather than fixed thresholds. Sustained CPU usage above 80-90\% usually signals the CPU is a bottleneck, especially if the load average exceeds the number of cores. High context-switch rates suggest too many processes per core, while frequent interrupts may point to hardware issues. In virtualized setups, be aware of \textbf{vCPU overcommitment}: assigning more virtual CPUs than physical cores increases overhead, making the vCPU-to-pCPU ratio as important as tracking VM usage.
+
+\begin{exampleblock}[\tt{stress-ng}, \tt{sysbench}, \tt{htop}, and \tt{mpstat}: usage overview]
+
+\textbf{Stressing tools}
+
 \begin{itemize}
-    \item \textbf{CPU utilization}: the percentage of time the CPU is busy processing instructions. A high CPU utilization indicates that the CPU is working hard to process instructions. A low CPU utilization indicates that the CPU is not working hard to process instructions.
-    \item \textbf{CPU load}: the number of processes in the run queue. A high CPU load indicates that there are many processes waiting to be executed. A low CPU load indicates that there are few processes waiting to be executed.
-    \item \textbf{High Context Switches}: A high number of context switches indicates that the CPU is switching between processes frequently. This can lead to performance issues.
-    \item \textbf{High Interrupts}: A high number of interrupts indicates that the CPU is handling a large number of hardware interrupts. This can lead to performance issues.
-    \item \textbf{vCPU Overcommitment}: Overcommitting vCPUs can lead to performance issues. Make sure that the number of vCPUs allocated to a VM does not exceed the number of physical cores on the host.
+    \item \textbf{stress-ng:} A tool for generating synthetic CPU loads, stressing also cache and memory.
+    \begin{itemize}
+        \item \textit{Example}: Stresses 4 CPU cores for 60 seconds to expose stability or throttling issues.
+
+        \begin{center}
+        \tt{stress-ng --cpu 4 --timeout 60s}
+        \end{center}
+    \end{itemize}
+
+    \item \textbf{sysbench:} A versatile tool for stressing and benchmarking the CPU, frequently used for raw performance testing and subsystem analysis.
+    \begin{itemize}
+        \item \textit{Example}: Benchmarks the CPU by calculating all primes up to 20,000.
+
+        \begin{center}
+        \tt{sysbench --test=cpu --cpu-max-prime=20000 run}
+        \end{center}
+    \end{itemize}
 \end{itemize}
 
-\subsection{Memory}
+\textbf{Monitoring tools}
 
-Memory is used to store data and instructions that are currently in use. Measuring its performance helps in understanding how efficiently it handles data and instructions, or whether there are bottlenecks in memory usage.
-
-Memory is one of the most vital components of a server,
-affecting how quickly applications can access and manipulate
-data. Inadequate memory resources, poor memory
-management, or issues with memory speed can lead to severe
-performance bottlenecks. For example, if the system runs out of
-physical memory, it may start using swap space (disk-based
-memory), which can significantly degrade performance.
-
-Testing memory performance ensures that the system can handle workloads
-effectively without encountering delays due to insufficient or slow memory. This is
-particularly important in environments running databases, virtual machines, or in-
-memory data stores (like Redis).
-
-When testing memory performance, several key metrics provide insight into how well the memory handles the system's workload.
 \begin{itemize}
-    \item \textbf{Memory utilization}: the percentage of memory that is being used.
-    \item \textbf{Memory load}: the number of processes that are using memory.
-    \item \textbf{Memory latency}: the time it takes to access memory.
-    \item \textbf{Memory bandwidth}: the rate at which data can be read from or written to memory.
-    \item \textbf{Memory errors}: the number of memory errors that occur.
-    \item \textbf{Cache Hit/Miss Ratio}: the ratio of cache hits to cache misses.
-\end{itemize}
+    \item \textbf{htop:} An interactive process and system monitor showing real-time CPU utilization, load average, running processes, and per-core usage in a visual manner.
+    \begin{itemize}
+        \item \textit{Usage}: Run \tt{htop} to monitor system metrics in real time.
+    \end{itemize}
 
-Some tools to test the memory are:
-\begin{enumerate}
-    \item \textbf{Baseline tests}: Start by measuring memory performance under typical workloads to establish a baseline. This allows you to understand how the memory performs under normal conditions. Use as example \texttt{memtester} or \texttt{memtest86}.
-    \item \textbf{Stress tests}: Push the memory to its limits to see how it performs under heavy workloads. Use as example \texttt{stress-ng} or \texttt{memtester}.
-    \item \textbf{valgrind}: A memory debugging tool that can be used to profile memory usage and detect memory leaks. Run \texttt{valgrind} from the command line.
-    \item \textbf{cachegrind}: A cache profiling tool that can be used to profile cache usage. Run \texttt{cachegrind} from the command line.
-    \item \textbf{callgrind}: A call graph profiling tool that can be used to profile function calls. Run \texttt{callgrind} from the command line.
+    \item \textbf{mpstat:} shows real-time CPU usage, including breakdowns by user, system, and I/O wait.
+    \begin{itemize}
+        \item \textit{Example}: Show per-core CPU usage every second, with load distribution and utilization.
+
+        \begin{center}
+        \tt{mpstat -P ALL 1}
+        \end{center}
+    \end{itemize}
+\end{itemize}
+\end{exampleblock}
+
+\subsection{Memory} \label{subsec:memory_testing}
+
+Memory holds the data and instructions currently in use and is crucial to server performance: too little, poor management, or slow access quickly create bottlenecks, especially when physical RAM runs out and the system resorts to swap. Testing memory is critical in database servers, VMs, or in-memory stores, and is closely tied to shared/distributed memory architectures and virtualization.
+
+Several key metrics provide insight into how well memory handles the system's workload:
+
+\begin{enumerate}[leftmargin=1.4em]
+    \item \textbf{Memory Usage}: Amount of RAM actively used by processes compared to what is available. Excessive usage may indicate the need for more memory or software optimization.
+    \item \textbf{Swap Activity}: Use of disk space as an extension of RAM once physical memory runs out. Frequent swapping slows down performance significantly.
+    \item \textbf{Page Faults}: Accesses to memory not currently mapped to physical RAM, forcing the system to retrieve it from disk (if swapped out). High rates signal inefficient usage or lack of RAM.
+    \item \textbf{Memory Bandwidth}: Rate at which data can be read from or written to memory. Insufficient bandwidth creates bottlenecks, especially in memory-intensive applications.
+    \item \textbf{Cache Hit/Miss Ratio}: How often the CPU retrieves data from its fast caches (L1, L2, L3) instead of fetching it from slower main memory.
+    \item \textbf{NUMA Performance}: On multi-socket (NUMA) systems, memory access speed varies by which CPU core/node are involved. NUMA aware benchmarks detect latency issues.
+    \item \textbf{Ballooning and Overcommitment (for VMs)}: Hypervisors can use ballooning to dynamically reallocate memory between VMs, sometimes allocating more virtual memory than the host physically has. This boosts utilization, but hurts performance if actual demand exceeds capacity.
 \end{enumerate}
 
-Analysis on the results:
-\begin{itemize}
-    \item \textbf{Memory utilization}: the percentage of memory that is being used. A high memory utilization indicates that the memory is being used heavily. A low memory utilization indicates that the memory is not being used heavily.
-    \item \textbf{Memory load}: the number of processes that are using memory. A high memory load indicates that there are many processes using memory. A low memory load indicates that there are few processes using memory.
-    \item \textbf{Memory latency}: the time it takes to access memory. A low memory latency indicates that memory access is fast. A high memory latency indicates that memory access is slow.
-    \item \textbf{Memory bandwidth}: the rate at which data can be read from or written to memory. A high memory bandwidth indicates that memory access is fast. A low memory bandwidth indicates that memory access is slow.
-    \item \textbf{Memory errors}: the number of memory errors that occur. A high number of memory errors indicates that there are issues with memory.
-    \item \textbf{Cache Hit/Miss Ratio}: the ratio of cache hits to cache misses. A high cache hit/miss ratio indicates that the cache is being used effectively. A low cache hit/miss ratio indicates that the cache is not being used effectively.
-\end{itemize}
+\vspace{-0.5em}
 
-\subsection{Disk I/O and Storage}
+\subsubsection{Test: Stressing and Monitoring Tools}
 
-Disk I/O (Input/Output) is a critical factor in server
-performance, especially for databases, web servers, and
-applications that rely on frequent disk access. Slow disk
-performance can lead to bottlenecks where applications
-are waiting on data retrieval or writing operations,
-causing delays and system slowdowns. In addition,
-storage subsystems like RAID arrays and SSDs have
-different performance characteristics that must be
-optimized for the server’s workload.
+As with the CPU, testing begins with a baseline (\tt{memtester} or \tt{memtest86} under typical load) followed by a stress test that pushes memory to its limits, using \tt{stress-ng}, \tt{memtester} or \tt{sysbench}, by simulating conditions where the system might run out of RAM or need to allocate large amounts of memory to specific applications. Monitoring utilities such as \tt{vmstat} or \tt{numactl} give real-time insights into memory behavior; in virtualized environments the tests should be repeated within the VMs, not only on the host. For finer diagnosis, \tt{valgrind} profiles memory usage and detects leaks.
+A strained memory subsystem rarely fails quietly: when physical RAM is exhausted, the kernel resorts to \tt{swap}, trading nanosecond memory speeds for way slower disk access, making active swapping an excellent early warning sign of trouble. Similarly, a high \textbf{page-fault rate} shows applications are constantly requesting data that isn't currently in RAM. At a finer level, low \textbf{cache hit ratios} indicate the CPU is falling back on slower main memory rather than its fast on-chip caches, suggesting the code's data layout needs optimization. On NUMA systems, performance heavily depends on whether a process accesses local or remote memory, which tools like \tt{numactl} are designed to diagnose. In virtualized environments, hypervisors use \textbf{ballooning} to reallocate idle memory between guests, making it a critical metric to track alongside standard memory usage. Finally, while overcommitting physical RAM boosts resource utilization, it risks severe slowdowns and heavy VM swapping if guests suddenly demand their full virtual allocations.
 
-Cloud and Virtualized environments also introduce additional complexity since
-multiple virtual machines may share the same physical storage, increasing the
-potential for resource contention.
+\begin{exampleblock}[\tt{memtester}, \tt{sysbench}, \tt{vmstat}, and \tt{numactl}: usage overview]
 
-When testing disk I/O and storage performance, several key metrics provide insight into how well the storage subsystem handles the system's workload.
+\textbf{Stressing tools}
 
 \begin{itemize}
-    \item \textbf{Read/Write Throughput}: the rate at which data can be read from or written to disk.
-    \item \textbf{Read/Write Latency}: the time it takes to read from or write to disk.
-    \item \textbf{IOPS (Input/Output Operations Per Second)}: the number of read/write operations that can be performed per second.
-    \item \textbf{Disk Queue Length}: the number of read/write requests that are waiting to be processed.
-    \item \textbf{Disk Errors}: the number of disk errors that occur.
-    \item \textbf{SSD vs HDD}: the performance difference between SSDs and HDDs.
+    \item \textbf{memtester:} A straightforward memory stress-testing tool that allocates and tests memory for errors, useful for checking system stability and detecting faulty memory modules.
+    \begin{itemize}
+        \item \textit{Example}: Tests 512 MB of memory over 5 passes.
+
+        \begin{center}
+        \tt{memtester 512M 5}
+        \end{center}
+    \end{itemize}
+
+    \item \textbf{sysbench (memory mode):} Tests memory bandwidth by continuously reading from and writing to memory.
+    \begin{itemize}
+        \item \textit{Example}: Transfers 10 GB of data in total to measure memory bandwidth.
+
+        \begin{center}
+        \tt{sysbench --test=memory --memory-total-size=10G run}
+        \end{center}
+    \end{itemize}
+
+    \item \textbf{stress-ng:} The same synthetic load generator used for the CPU, which can also stress cache and memory.
 \end{itemize}
 
-Some tools to test the disk I/O and storage are:
-\begin{enumerate}
-    \item \textbf{Baseline tests}: Start by measuring disk I/O and storage performance under typical workloads to establish a baseline. This allows you to understand how the storage subsystem performs under normal conditions. Use as example \texttt{fio} or \texttt{dd}.
-    \item \textbf{Stress tests}: Push the disk I/O and storage to its limits to see how it performs under heavy workloads. Use as example \texttt{fio} or \texttt{dd}.
-    \item \textbf{ioping}: A disk I/O latency tool that can be used to measure disk I/O latency. Run \texttt{ioping} from the command line.
-    \item \textbf{hdparm}: A disk performance tool that can be used to measure disk performance. Run \texttt{hdparm} from the command line.
-    \item \textbf{bonnie++}: A disk benchmarking tool that can be used to measure disk performance. Run \texttt{bonnie++} from the command line.
-    \item \textbf{iozone}: A disk benchmarking tool that can be used to measure disk performance. Run \texttt{iozone} from the command line.
+\medskip
+
+\textbf{Monitoring and profiling tools}
+
+\begin{itemize}
+    \item \textbf{vmstat:} A system monitor displaying memory usage, swap activity, page faults, and more, providing real-time insight into memory performance under various workloads.
+    \begin{itemize}
+        \item \textit{Example}: Refresh the statistics every second.
+
+        \begin{center}
+        \tt{vmstat 1}
+        \end{center}
+    \end{itemize}
+
+    \item \textbf{numactl:} Useful on NUMA architectures, it provides insight into memory access patterns and performance, and allows bandwidth and latency to be tested between different nodes.
+    \begin{itemize}
+        \item \textit{Example}: Show the NUMA hardware layout of the machine.
+
+        \begin{center}
+        \tt{numactl --hardware}
+        \end{center}
+    \end{itemize}
+
+    \item \textbf{free:} Reports how much RAM and swap is used and available.
+    \begin{itemize}
+        \item \textit{Usage}: Run \tt{free} to check memory usage at a glance.
+    \end{itemize}
+
+    \item \textbf{valgrind, cachegrind, callgrind:} Profiling tools that respectively debug memory usage and detect leaks, profile cache usage, and profile the call graph of function calls.
+\end{itemize}
+\end{exampleblock}
+
+\subsection{Disk I/O and Storage} \label{subsec:disk_testing}
+
+Disk I/O is a critical factor in server performance, especially for databases, web servers, and applications that rely on frequent disk access: slow disk performance creates bottlenecks where applications wait on data retrieval or writing operations, causing delays and system slowdowns. Storage subsystems such as RAID arrays and SSDs have different performance characteristics that must be optimized for the server's workload. In a virtualized environment, disk testing becomes even more critical, since multiple VMs may share the same physical storage, increasing the potential for resource contention.
+
+Several key metrics reveal how well the storage subsystem handles the system's workload:
+
+\begin{enumerate}[leftmargin=1.4em]
+    \item \textbf{Read/Write Throughput}: Speed at which data is read from or written to disk (usually in MB/s or GB/s). High throughput is critical for applications that require fast access to large datasets.
+    \item \textbf{IOPS}: Number of individual read or write operations the disk can perform per second. High IOPS is important for transactional databases and applications with frequent small I/O operations.
+    \item \textbf{Disk Latency}: Time a single I/O operation takes to complete. Low latency reduces response times in applications that rely on quick data access.
+    \item \textbf{Queue Depth}: Number of I/O operations waiting to be processed. A high value indicates that the disk is overwhelmed and that more I/O capacity may be needed.
+    \item \textbf{RAID Performance}: RAID configurations such as RAID 0, 1, 5, and 10 differ in performance and in the trade-off between redundancy and speed.
+    \item \textbf{SSD vs HDD Performance}: SSDs provide much higher IOPS and lower latency than HDDs, so benchmarks must account for the type of storage in use. On SSDs, \textbf{TRIM} helps maintain performance over time by managing how data is erased and stored.
+    \item \textbf{I/O Contention and Thin Provisioning (for VMs)}: Multiple VMs sharing the same physical disk may degrade each other's performance, and allocating more virtual disk space than is physically available (thin provisioning) can lead to performance issues.
 \end{enumerate}
 
-Analysis on the results:
+\subsubsection{Test: Stressing and Monitoring Tools}
+
+Baseline and stress tests for disk I/O are commonly built around \plaintt{fio} or \plaintt{dd}, \tt{dd}, \tt{bonnie++}, or \tt{iozone}, which push the disk subsystem to its limits to identify peak performance and potential bottlenecks. Utilities such as \tt{hdparm}, \tt{iostat}, or \tt{ioping} capture real-time insights into disk behavior; in virtualized environments both the host and the VM disk performance should be tested.
+
+Low throughput may signal disk fragmentation, misconfiguration, or capacity issues; high latency usually points to I/O contention or hardware limits; and low IOPS indicate trouble handling frequent small I/O. A high queue depth means requests are piling up faster than the disk can process them. Always consider results in light of RAID level and drive type, as these dictate speed and redundancy. In virtual environments, be especially mindful of \textbf{I/O contention} and \textbf{thin provisioning}: multiple VMs sharing a disk or allocating more virtual disk than physical can significantly degrade performance.
+
+\begin{exampleblock}[\tt{fio}, \tt{dd}, \tt{bonnie++}, \tt{iozone}, and \tt{hdparm}: usage overview]
+
+\textbf{Stressing tools}
+
 \begin{itemize}
-    \item \textbf{Read/Write Throughput}: the rate at which data can be read from or written to disk. A high read/write throughput indicates that the disk I/O and storage subsystem is performing well. A low read/write throughput indicates that the disk I/O and storage subsystem is not performing well.
-    \item \textbf{Read/Write Latency}: the time it takes to read from or write to disk. A low read/write latency indicates that disk I/O and storage access is fast. A high read/write latency indicates that disk I/O and storage access is slow.
-    \item \textbf{IOPS (Input/Output Operations Per Second)}: the number of read/write operations that can be performed per second. A high IOPS indicates that the disk I/O and storage subsystem is performing well. A low IOPS indicates that the disk I/O and storage subsystem is not performing well.
-    \item \textbf{Disk Queue Length}: the number of read/write requests that are waiting to be processed. A high disk queue length indicates that there are many read/write requests waiting to be processed. A low disk queue length indicates that there are few read/write requests waiting to be processed.
-    \item \textbf{Disk Errors}: the number of disk errors that occur. A high number of disk errors indicates that there are issues with the disk I/O and storage subsystem.
-    \item \textbf{SSD vs HDD}: the performance difference between SSDs and HDDs. SSDs are faster than HDDs and have lower latency.
+    \item \textbf{fio (Flexible I/O Tester):} A highly configurable tool for generating disk I/O workloads.
+    \begin{itemize}
+        \item \textit{Example}: A read test using 4 KB blocks on a 1 GB file with 4 parallel jobs, for 60s.
+
+        \begin{center}
+        \tt{fio --name=readtest --rw=read --bs=4k --size=1G --numjobs=4 --runtime=60 --group\_reporting}
+        \end{center}
+    \end{itemize}
+
+    \item \textbf{dd:} Primarily a file-copying utility, it can also benchmark sequential read and write speeds by reading from or writing to disk.
+    \begin{itemize}
+        \item \textit{Example}: writes a 1 GB file of zeros with synchronized writes to measure write speed.
+   
+        \begin{center}
+        \tt{dd if=/dev/zero of=testfile bs=1G count=1 oflag=dsync}
+        \end{center}
+    \end{itemize}
+
+    \item \textbf{bonnie++:} A tool designed to test file system performance, including file creation, deletion, and sequential and random I/O. It provides detailed reports on read/write throughput and CPU usage during I/O operations.
+    \begin{itemize}
+        \item \textit{Example}: Tests the file system of the given directory using a 4 GB file.
+
+        \begin{center}
+        \tt{bonnie++ -d /path/to/directory -s 4G}
+        \end{center}
+    \end{itemize}
+
+    \item \textbf{iozone:} Performs 13 types of test (read, write, re-read, re-write, random read, random write, backward read, record re-write, stride read, fread, fwrite, freread, and frewrite). On a database server, the first 6 tests are the most relevant, as they directly impact database performance. It can also vary the number of threads used, making it suitable to test parallel file systems on multi-node environments.
+    \begin{itemize}
+        \item \textit{Example}: Runs the tests in automatic mode and saves the results in a spreadsheet-compatible file.
+
+        \begin{center}
+        \tt{./iozone -a -b output.xls}
+        \end{center}
+    \end{itemize}
 \end{itemize}
 
+\textbf{Monitoring and tuning tools}
 
+\begin{itemize}
+    \item \textbf{hdparm:} Used for testing and tuning the performance of physical hard drives and SSDs: it can measure read speeds and tweak disk parameters for optimization.
+    \begin{itemize}
+        \item \textit{Example}: Measures the read speed of the given disk.
 
+        \begin{center}
+        \tt{hdparm -t /dev/sda}
+        \end{center}
+    \end{itemize}
 
+    \item \textbf{iostat:} Reports I/O statistics for the storage devices.
+
+    \item \textbf{ioping:} Measures the latency of disk I/O operations.
+
+    \item \textbf{mdadm:} Manages, and allows benchmarking of, RAID arrays.
+\end{itemize}
+\end{exampleblock}

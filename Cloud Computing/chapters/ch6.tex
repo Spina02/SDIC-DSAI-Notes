@@ -1,323 +1,449 @@
+\chapter{Containers} \label{ch:containers}
 
-\chapter{Containers}
+Previous chapters showed how a hypervisor splits one physical machine into multiple VMs, each with its own guest operating system, and discussed the resulting overhead. Here, we explore a lighter approach: \textbf{containers}, which isolate applications (not whole machines) by virtualizing at the operating system level.
 
-\subsection*{Virtual Environments}
-\begin{center}
-    \begin{tabular}{m{7cm}|m{7cm}}
-        \textbf{Pros} & \textbf{Cons} \\ \hline
-        \begin{itemize}
-            \item Reproducible research
-            \item Explicit dependencies
-            \item Improved engineering collaboration
-        \end{itemize} 
-        & 
-        \vspace{0.5cm}
-        \begin{itemize}
-            \item Difficulty setting up your environment
-            \item Not isolation
-            \item Does not always work across different OS
-        \end{itemize} 
-    \end{tabular}
-\end{center}
+\section{From Virtual Machines to Containers} \label{sec:vm_to_containers}
 
-\subsection*{Virtual Machines}
-\begin{center}
-    \begin{tabular}{m{7cm}|m{7cm}}
-        \textbf{Pros} & \textbf{Cons} \\ \hline
-        \begin{itemize}
-            \item Full autonomy
-            \item Very secure
-            \item Isolation
-            \item Lower costs
-            \item used by all Cloud providers
-        \end{itemize} 
-        & 
-        \vspace{0.5cm}
-        \begin{itemize}
-            \item Uses hardware in local machine
-            \item Not very portable since size of VMs are large
-            \item There is an overhead associated with virtual machines 
-        \end{itemize} 
-    \end{tabular}
-\end{center}
+Every application needs an environment: interpreter or runtime, specific library versions, system tools, and configuration files. Reproducing this environment across a laptop, an HPC cluster, or a cloud VM is challenging. Two main approaches exist, each with a different degree of isolation.
 
-\begin{warningblock}[Dependency Hell]
-    \begin{itemize}
-        \item \textbf{Dependency Hell} is a colloquial term for the frustration of some software users who have installed software packages which have dependencies on specific versions of other software packages.
-        \item It is a problem with software dependencies that occurs when a software package is designed to work with particular versions of other software packages.
-        \item If a user wants to install a software package that has dependencies on specific versions of other software packages, it can be difficult to resolve these dependencies.
-    \end{itemize}
+A \textbf{virtual environment} (e.g., Python \texttt{venv}) is simply a directory containing private language-level packages, activated by pointing the interpreter to it. It manages dependencies, supports reproducible setups, and lets teams share environment recipes. However, it isolates only libraries: everything else (OS, interpreter, system libraries and tools, processes, and network) is shared. Setting one up can be laborious (especially when native libraries must be compiled), and recipes may not work across different operating systems. Conversely, a \textbf{virtual machine} bundles a complete OS together with the application. This provides full autonomy and strong isolation, supports workload consolidation, and is the basis for cloud server instances. The tradeoff is that every application must include an entire guest OS: images are large and less portable, VMs consume host resources, and the hypervisor introduces overhead.
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{3pt}
+    \begin{tcolorbox}[enhanced, colback=gray!5, boxrule=0.8pt, colframe=black, arc=0mm, left=0mm, right=0mm, top=0.6mm, bottom=0.6mm, boxsep=0mm, sharp corners=south]
+        \small
+    \begin{tabularx}{\textwidth}{
+        >{\centering\arraybackslash}p{0.05\textwidth}
+        >{\raggedright\arraybackslash}p{0.45\textwidth}
+        >{\raggedright\arraybackslash}p{0.45\textwidth}
+    }
+        \rowcolor{gray!20}
+        \textbf{} & \textbf{Virtual environments} & \textbf{Virtual machines} \\
+        \midrule
+        \bfit{Pros} & Reproducible research; explicit dependencies; improved collaboration among engineers. & Full autonomy; very strong isolation and security; lower costs through consolidation; used by all cloud providers. \\
+        \midrule
+        \bfit{Cons} & Setting up the environment can be difficult; no isolation beyond the libraries; does not always work across different operating systems. & Consumes the hardware of the host machine; large images, hence poor portability; overhead introduced by the hypervisor. \\
+    \end{tabularx}
+    \end{tcolorbox}
+
+\vspace{-0.5em}
+
+    \caption{\bfit{Virtual environments and virtual machines compared}}
+    \label{tab:venv-vs-vm}
+
+    \vspace{-1em}
+\end{table}
+
+
+Neither option is entirely satisfactory. Venvs are cheap but isolate too little, while VMs isolate a lot but are heavy. Both, moreover, leave one of the oldest problems of software deployment unsolved.
+
+\begin{warningblock}[Dependency hell]
+    \bfit{Dependency hell} is the colloquial term for the frustration of users who install software packages that depend on specific versions of other packages. The problem arises whenever a package is designed to work only with particular versions of its dependencies: if two applications on the same machine require incompatible versions of the same library, or if an application requires versions that conflict with those needed by the operating system itself, the dependencies become very difficult, and sometimes impossible, to resolve.
 \end{warningblock}
 
-The solution for all these problems is using \textbf{Containers}.
+Containers were created to solve recurring problems in scientific computing and service deployment. Installing complex software pipelines with many dependencies is often error-prone and tedious. Multiple projects may need different versions of the same software or several isolated instances on the same machine. Complex applications also combine components like databases, web apps, and messaging systems, each with its own requirements. In all these scenarios, it is important for the resulting environments to start quickly.
+
+\section{What Is a Container?} \label{sec:what_is_container}
 
 \begin{definitionblock}[Container]
-    Informally, a \textbf{container} is a standard unit of software
-    that packages up code and all its
-    dependencies in processes isolated from
-    resources, so the application runs quickly
-    and reliably from one computing
-    environment to another. Containers creates an isolated
-    environment at application level and
-    not at server level.
+    A \bfit{container} is a standard unit of software that packages up code and all its dependencies in processes isolated from the other resources of the host, so that the application runs quickly and reliably from one computing environment to another. A container creates an isolated environment at \emph{application} level, and not at \emph{server} level.
 \end{definitionblock}
 
-\newpage
-They come with different advantages:
-\begin{itemize}
-    \item Extremely portable and lightweight
-    \item Fully packaged software with all dependencies included
-    \item Can be used for development, training and and deployment
-    \item Development teams can easily share containers
-\end{itemize}
+The last sentence of the definition is the crucial one: the unit of isolation is no longer a machine, real or virtual, but the application itself. More technically, a container is a \textbf{standard Linux process}, typically created through the \texttt{clone()} system call instead of the usual \texttt{fork()} and \texttt{exec()} pair, and isolated further through cgroups, namespaces, and mandatory access control frameworks such as SELinux or AppArmor. A container, in other words, is a process running together with all its children, and nothing is booted when it starts.
 
-A \textbf{container image} is a lightweight, stand-alone, executable package of a piece of software that includes everything needed to run it: code, runtime, system tools, system libraries, settings. Available for both Linux and Windows based apps, containerized software will always run the same, regardless of the environment.
+\begin{observationblock}[A container is just a process]
+    Because a containerized application is an ordinary process of the host kernel, it is visible from the host with the usual tools (\plaintt{ps}, \plaintt{htop}, \plaintt{systemd-cgtop}), typically under a different PID than the one it sees for itself inside the container. This is also why the CPU, memory, and I/O monitoring tools of \cref{sec:component_tests} work on containers without any special support.
+\end{observationblock}
 
-Container images become containers at runtime and in the case of Docker containers - images become containers when they run on Docker Engine. Available for both Linux and Windows-based applications, containerized software will always run the same, regardless of the infrastructure.   
+A container is created from a \emph{container image}, and the two notions should not be confused.
+
+\begin{definitionblock}[Container image]
+    A \bfit{container image} is a lightweight, standalone, executable package of software that includes everything needed to run an application: code, runtime, system tools, system libraries, and settings. It is used as the mount point (the root file system) of a container and usually bundles several \emph{image layers} together with metadata that describes them. Images exist for both Linux and Windows-based applications.
+\end{definitionblock}
+
+A container is the \textbf{runtime instantiation} of a container image: when an image runs (e.g., on the Docker Engine), it becomes a container. Think of an image as a recipe and a container as a dish prepared from it; or as a class versus an instance in programming. Many containers, each with its own isolated environment, can be created from the same image.
+
+\cref{fig:venv-vm-containers} contrasts the three approaches. Virtual environments keep only the libraries of each application separate, on top of one shared Python installation and operating system. Virtual machines place a hypervisor on the host and give every application a full guest operating system of its own. Containers instead sit directly on the host operating system, managed by a container engine (Docker, in the figure): each application carries its binaries and libraries but no operating system, because all containers share the kernel of the host.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig34.png}
-    \caption{Comparison between Venvs, VMs and Containers}
+    \includegraphics[width=0.85\textwidth]{assets/fig34.png}
+    \caption{Comparison between virtual environments, virtual machines, and containers.}
+    \label{fig:venv-vm-containers}
 \end{figure}
 
-\section{Properties}
+
+The engine is the abstraction and isolation layer between the operating system and the application environments; it starts and stops containers, manages their life cycle, and monitors them.
+
+\begin{table}[H]
+    \centering
+    \setlength{\tabcolsep}{4pt}
+    \begin{tcolorbox}[enhanced, colback=gray!5, boxrule=0.8pt, colframe=black, arc=0mm, left=0mm, right=0mm, top=0.6mm, bottom=0.6mm, boxsep=0mm, sharp corners=south]
+        \small
+    \begin{tabularx}{\textwidth}{
+        >{\raggedright\arraybackslash}p{0.12\textwidth}
+        >{\raggedright\arraybackslash}p{0.415\textwidth}
+        >{\raggedright\arraybackslash}p{0.41\textwidth}
+    }
+        \rowcolor{gray!20}
+        \textbf{Aspect} & \textbf{Virtual machine} & \textbf{Container} \\
+        \midrule
+        \bfit{Level of virtualization} & Hardware: the hypervisor exposes virtual hardware to each guest. & Operating system: containers run directly on the host kernel. \\
+        \midrule
+        \bfit{Operating system} & Each VM boots its own guest OS, which may differ from the host. & All containers share the host kernel; only the user-space files differ. \\
+        \midrule
+        \bfit{Architecture} & Different CPU architecture (ARM, SPARC, RISC-V, ..) is possible through emulation. & Must match the CPU architecture and the kernel type of the host. \\
+        \midrule
+        \bfit{Start-up and footprint} & Boots an entire OS; large images and memory footprint. & Starts a process; much faster, and uses a fraction of the memory. \\
+        \midrule
+        \bfit{Isolation strength} & Very strong: separate kernels, isolation enforced by the hypervisor and by hardware. & Weaker: a single kernel is shared, so a kernel vulnerability affects every container. \\
+        \midrule
+        \bfit{Typical use} & Complete servers, mixed operating systems, strong multi-tenancy. & Packaging and deploying applications and microservices. \\
+    \end{tabularx}
+    \end{tcolorbox}
+
+\vspace{-0.5em}
+
+    \caption{\bfit{Virtual machines and containers compared}}
+    \label{tab:vm-vs-container}
+
+    \vspace{-1em}
+\end{table}
+
+
+\begin{tipsblock}[Containers share the host kernel]
+    Because a container is a process of the host, it always runs on the host's kernel and CPU architecture. A Linux container therefore requires a Linux kernel, and an image built for one architecture does not run on another unless a multi-architecture image is available. When Docker is used on Windows or macOS, the Linux kernel is supplied by a lightweight virtual machine running behind the scenes, so in those cases containers are in fact stacked on top of a VM. In production the two technologies are frequently combined rather than opposed.
+\end{tipsblock}
+
+The same benchmarking approach from \cref{sec:benchmark_methodology} applies: run identical workloads on the bare host, in a VM, and in a container to measure the overhead each layer introduces. Because containers use the host kernel, the performance gap between host and container is usually much smaller than between host and VM, especially for CPU-bound tasks. However, storage and network overheads can vary depending on the configuration.  A practical example of such a comparison is available in one of the authors' GitHub repository (\href{https://github.com/christianfaccio/cluster_analysis.git}{Cluster Analysis}).
+
+\section{Properties of Containers} \label{sec:container_properties}
+
+Containers have several important properties that make them attractive for modern applications:
+
+\medskip
 
 \begin{itemize}
-    \item \textbf{Isolation}: Containers virtualize CPU, memory, storage, and network resources at
-    the OS-level, providing developers with a sandboxed view of
-    the OS logically isolated from other applications. Developers, using containers, are
-    able to create predictable environments isolated from other applications.
-    \item \textbf{Productivity}: enhancement Containers can include software dependencies
-    needed by the application (specific versions of
-    programming language runtimes, software libraries) guaranteed to be consistent no
-    matter where the application is deployed. All this translates to productivity:
-    developers and IT operations teams spend less time debugging and diagnosing
-    differences in environments, and more time
-    shipping new functionality for users.
-    \item \textbf{Deployment simplicity}: Containers can be deployed on any machine that has a container runtime installed. This means that developers can build and test containers on their local machine and then deploy them to any environment that supports containers. This makes it easy to move applications between environments, such as from a developer’s laptop to a test environment, or from a test environment to production.
-    \item \textbf{Portability}: Containers are portable because they include all of the dependencies needed to run the application. This means that containers can run on any machine that has a container runtime installed, regardless of the underlying infrastructure. This makes it easy to move applications between environments, such as from a developer’s laptop to a test environment, or from a test environment to production.
-    \item \textbf{Easy Versioning}: Containers make it easy to version applications. Developers can create a new version of an application by creating a new container image with the new version of the application. This makes it easy to roll back to a previous version of an application if there are any issues with the new version.
-    \item \textbf{Scalability}: Containers are lightweight and can be started and stopped quickly. This makes it easy to scale applications up and down based on demand. For example, if an application is experiencing high traffic, additional containers can be started to handle the load. Once the traffic decreases, the additional containers can be stopped.
-    \item \textbf{Operational efficiency and reliability}: Containers make it easy to automate the deployment and management of applications. This makes it easy to deploy applications quickly and reliably. Containers can also be used to automate the scaling of applications based on demand. This makes it easy to ensure that applications are always available and responsive.
-    \item \textbf{Security}: Containers provide a level of isolation between applications that can help improve security. Containers can be used to run applications in a sandboxed environment that is isolated from other applications. This can help prevent applications from interfering with each other and can help prevent security vulnerabilities from being exploited.
+    \item \textbf{Isolation.} Containers virtualize CPU, memory, storage, and network resources at the operating system level, giving each application a sandboxed view of the OS that is logically isolated from all other applications. Developers can thus create predictable environments that do not interfere with one another, using the namespaces and control groups.
+    
+    \item \textbf{Productivity.} A container includes the software dependencies needed by the application, such as specific versions of programming language runtimes and libraries, and these are guaranteed to be identical wherever the application is deployed. Developers and operations teams consequently spend less time debugging and diagnosing differences between environments, and more time shipping new functionality.
+    
+    \item \textbf{Deployment simplicity and portability.} A container packages the entire application, abstracting away OS and hardware details, so it can run wherever a container runtime is available, on Linux, Windows, macOS, VMs, bare metal, laptops, data centres, or in the cloud. The same artifact can move unchanged from development to testing to production. Portability is further reinforced by the Docker V2 image format, which supports multi-architecture images (one name for multiple CPU types) and content-addressable layers, each identified by a digest of its content.
+    
+    \item \textbf{Easy versioning.} A new image can be built for each new version of an application, including all the dependencies it needs. Rolling back to a previous version after a faulty release then amounts to starting containers from the older image.
+    
+    \item \textbf{Scalability.} Containers are lightweight and start and stop quickly, so an application can be scaled out and back in following the demand: when traffic grows, additional containers are started to absorb the load, and they are stopped when traffic decreases. This is the horizontal scaling discussed among the essential attributes of the cloud (\cref{sec:service_attributes}).
+    
+    \item \textbf{Operational efficiency and reliability.} Containers are a natural fit for service-oriented architectures, since every service, limited to specific resources, can be containerized and treated as a black box. Efficiency follows from the fact that each container can be health-checked, started, and stopped independently of the others, and the whole deployment and scaling process can be automated. Reliability follows from the same separation of concerns: each service keeps running even when others fail, which makes the application as a whole more dependable. This is exactly the structure of the microservice architectures of \cref{sec:cloud_architecture}.
+    
+    \item \textbf{Security.} Containers add a layer of security because applications do not run directly in the user space of the host, and a compromised application is confined to its sandbox. As \cref{tab:vm-vs-container} showed, however, this isolation is weaker than that of a VM, and it depends critically on the privileges given to the processes inside the container.
 \end{itemize}
 
-The differences with the VMs are:
+\medskip
+
+\begin{warningblock}[Root privileges inside a container]
+    Processes inside containers often run as \plaintt{root} by default. If this maps to the host's real root, escaping the container gives an attacker full control of the machine. To reduce risk, run applications as an unprivileged user and use \emph{user namespaces}, which map root in the container to an unprivileged host user (\cref{sec:linux_namespaces}).
+\end{warningblock}
+
+\medskip
+
+Containers therefore do not simply replace virtual machines: they trade some isolation for lightness, speed, and portability, which is the right choice whenever the unit to be deployed is an application and not a whole machine.
+
+\section{Docker and the Linux Kernel} \label{sec:docker}
+
+\subsection{The Docker Platform}
+
+\bfit{Docker} is a containerization platform that bundles an application with all its dependencies into a \bfit{Docker container}, ensuring it runs consistently in any environment. A Docker container is a standardized unit that can be quickly created to deploy a specific application or environment, such as Ubuntu or CentOS, providing the required user-space files and tools. Importantly, only user-space components are included; the underlying kernel is always provided by the host.
+
+\begin{definitionblock}[Container engine]
+    A \bfit{container engine} is a piece of software that accepts user requests, including command line options, pulls images, and, from the end user's perspective, runs the container. Its responsibilities include building images, running, stopping, and removing containers, managing networks, and managing volumes.
+\end{definitionblock}
+
+As for virtual machines, three roles are worth distinguishing:
+
 \begin{itemize}
-    \item Containers are more lightweight than VMs
-    \item Containers are faster to start and stop than VMs
-    \item Containers use less memory than VMs
-    \item Containers are more portable than VMs
-    \item Containers are easier to manage than VMs
+    \item The \textbf{container host} is the system on which containers run.
+    \item The \textbf{container engine} is the user-facing software described above. Docker is the best-known engine; \texttt{podman} plays the same role, as did \texttt{rkt} (now discontinued).
+    \item The \textbf{container runtime} is the lower-level component that actually creates the containerized process, on behalf of the engine.
 \end{itemize}
 
-You can find a practical example of these differences in my GitHub repository: \href{https://github.com/christianfaccio/cluster_analysis.git}{Cluster Analysis}.
+The runtime is responsible for consuming the container mount point provided by the engine (for testing, this can also be a plain directory); for consuming the container metadata provided by the engine (again, for testing, a manually crafted \texttt{config.json} is enough); for communicating with the kernel to start the containerized processes through the \texttt{clone()} system call; and for setting up the cgroups, the SELinux policy, and the AppArmor rules of the container.
 
-\section{Docker}
+\medskip
 
-\textbf{Docker} is a containerization platform that packages your application and all its
-dependencies together in the form of a docker container to ensure that your
-application works seamlessly in any environment.
+\begin{minipage}{0.52\textwidth}
+    Conceptually, Docker performs a form of \textbf{process virtualization}. The \emph{user space} of an operating system is all the code that lives outside the kernel; a process running there reaches the resources managed by the kernel, such as RAM and disk, only through system calls. A containerized process remains an ordinary user-space process issuing system calls to the one shared kernel, which is therefore free to decide, process by process, what each of them is allowed to \emph{see} and how much it is allowed to \emph{use}.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/fig35.png}
+    \captionof{figure}{Process virtualization: a user-space process reaches kernel-managed resources through system calls.}
+    \label{fig:process-virtualization}
+\end{minipage}
 
-\begin{definitionblock}[Container Engine]
-    A \textbf{container engine} is a piece of software that accepts user requests,
-    including command line options, pulls images, and from the end user's
-    perspective runs the container. It is reponsible for:
+\medskip
+
+These two questions are answered by the two main technologies underlying containers: \textbf{Linux namespaces} and \textbf{Linux control groups}.
+
+\subsection{Linux Namespaces} \label{sec:linux_namespaces}
+
+Linux \bfit{namespaces} provide a mechanism for isolating and virtualizing system resources: processes within a namespace have their own view of a given resource, such as the process IDs, and cannot directly interact with processes belonging to another namespace. This prevents unintended interactions between processes and is particularly valuable in containerization and virtualization scenarios, where multiple applications or services share the same host but must be kept separate for security reasons. 
+
+Each kind of namespace isolates a different resource:
+
+\begin{itemize}
+    \item A \textbf{user namespace} has its own set of user and group IDs for assignment to processes. In particular, a process can have root privilege within its user namespace without being root elsewhere.
+    \item A \textbf{process ID (PID) namespace} gives processes their own independent set of PIDs, separate from other namespaces. The first process in a new PID namespace is always PID 1; its children get subsequent PIDs. Each process thus has different PIDs in its own and its parent's namespace.
+    \item A \textbf{network namespace} has an independent network stack: its own private routing table, set of IP addresses, socket lists, connection tracking table, firewall, and other network-related resources.
+    \item A \textbf{mount namespace} has an independent list of mount points seen by the processes in the namespace, so file systems can be mounted and unmounted without affecting the host file system.
+    \item An \textbf{interprocess communication (IPC) namespace} has its own IPC resources, for example POSIX message queues.
+    \item A \textbf{UNIX Time-Sharing (UTS) namespace} allows a single system to appear to have different host and domain names to different processes.
+\end{itemize}
+
+\medskip
+
+\begin{minipage}{0.5\textwidth}
+    The PID namespace is the easiest to visualize. In \cref{fig:pid-namespaces}, four processes named PID1 ... PID4 live in the parent namespace: they are normal processes, which can all see each other and share resources. Two of them have been placed in child namespaces. Inside its child namespace each of these processes is PID1, while the parent sees the same processes as PID2 and PID3, so each one has two PIDs, one per namespace. 
+    
+\end{minipage}%
+\hfill
+\begin{minipage}{0.47\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{assets/fig36.png}
+    \captionof{figure}{PID namespaces example.}
+    \label{fig:pid-namespaces}
+\end{minipage}
+
+\medskip
+
+The visibility is asymmetric: the parent can see into its children, but from within a child namespace the PID 1 process cannot see anything outside.
+
+\begin{exampleblock}[Exploring namespaces with \plaintt{unshare}]
+    The \plaintt{unshare} tool runs a program in new namespaces, useful to test namespace features.
+
+    \vspace{-0.5em}
+
+    \begin{codeblock}[language=bash,basicstyle=\ttfamily\footnotesize, escapeinside={(*@}{@*)}]
+# Show all processes as root (as the current user without sudo)
+sudo ps -ef (*@\vspace{1em}@*)
+# Show all namespaces (and attributes) currently in use on the host
+sudo lsns --output-all (*@\vspace{1em}@*)
+# Run bash in new user and PID namespaces, as "root" there
+unshare --user --pid --map-root-user --munt-proc --fork bash (*@\vspace{1em}@*)
+# Create a new network namespace and start a shell inside it
+sudo ip netns add test
+sudo ip netns exec test bash
+    \end{codeblock}
+
+    \vspace{-0.5em}
+
+    The \plaintt{--pid} flag creates the new PID namespace, and \plaintt{--fork} is needed so that the shell is started as a child and becomes PID 1 of that namespace. \plaintt{--mount-proc} mounts a fresh \plaintt{/proc}, which is what \plaintt{ps} reads, so that only the processes of the new namespace are listed. Finally, \plaintt{--user} together with \plaintt{--map-root-user} creates a user namespace in which the current user is mapped to \plaintt{root}: the shell shows a root prompt, yet it has no special privilege on the host, which is why an unprivileged user may run the command. Inside the new network namespace, the shell sees only a (down) loopback interface, not the host's interfaces.
+\end{exampleblock}
+
+Namespaces are a core technology behind containers, enforcing resource separation. While we created them manually here, tools like Docker and Podman automatically set up the necessary namespaces for each container.
+
+\subsection{Linux Control Groups} \label{sec:linux_cgroups}
+
+Namespaces control what a process can see, but not the resources it can use. This is handled by \bfit{control groups} (cgroups): a Linux kernel feature that limits, monitors, and isolates the resource usage (CPU, memory, disk I/O, ...) of groups of processes. Cgroups offer four main features:
+
+\smallskip
+
+\begin{minipage}{0.57\textwidth}
     \begin{itemize}
-        \item Building images
-        \item Running containers
-        \item Stopping containers
-        \item Removing containers
-        \item Managing networks
-        \item Managing volumes
+        \item \textbf{Resource limiting}: a cgroup can be configured so that its processes cannot use more than a given amount of a resource, for example memory or CPU.
+        \item \textbf{Prioritization}: the share of a resource that a group receives, compared with the processes in other cgroups, can be raised or lowered when there is contention.
+        \item \textbf{Accounting}: resource usage is monitored and reported at the cgroup level.
+        \item \textbf{Control}: the state of all the processes in a cgroup can be changed at once (frozen, stopped, resumed, or killed) with a single command.
     \end{itemize}
-\end{definitionblock}
-
-Docker Container is a standardized unit which can be created on the fly to
-deploy a particular application or environment. It could be an Ubuntu container,
-CentOs container, etc. to full-fill the requirement from an operating system point of
-view.
-
-Containers create an isolated environment at application level: each container is a process running including all its children;
-
-Containers underlying (main) technologies:
-\begin{itemize}
-    \item Linux NAMESPACES: Isolates system resources
-    \item Linux CGroups: Limits resources
-\end{itemize}
-
-User space refers to all the code in an operating system that lives outside of the kernel.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig35.png}
-    \caption{process Virtualization}
-\end{figure}
-
-\subsection{Linux Namespaces}
-
-Linux namespaces provide a mechanism for isolating system resources, enabling
-processes within a namespace to have their own view of the system, such as
-process IDs,
-Namespaces in Linux provide a way to isolate and virtualize system resources, thus
-enhancing security by preventing processes in one namespace from directly
-interacting with processes in another namespace.
-Namespaces increase security by providing a level of isolation that prevents
-unintended interactions between processes. This isolation is particularly valuable in
-containerization and virtualization scenarios, where multiple applications or
-services share the same host system but must be kept separate for security
-reasons.
-
-\begin{itemize}
-    \item A \textbf{user namespace} has its own set of user IDs and group IDs for assignment to
-    processes. In particular, this means that a process can have root privilege within its
-    user namespace without having it in other user namespaces.
-    \item A \textbf{process ID (PID) namespace} assigns a set of PIDs to processes that are
-    independent from the set of PIDs in other namespaces. The first process created in
-    a new namespace has PID 1 and child processes are assigned subsequent PIDs. If a
-    child process is created with its own PID namespace, it has PID 1 in that namespace
-    as well as its PID in the parent process’ namespace.
-    \item A \textbf{network namespace} has an independent network stack: its own private routing
-    table, set of IP addresses, socket listing, connection tracking table, firewall, and
-    other network-related resources.
-    \item A \textbf{mount namespace} has an independent list of mount points seen by the processes
-    in the namespace. This means that you can mount and unmount filesystems in a
-    mount namespace without affecting the host filesystem.
-\end{itemize}
-
-Within the parent namespace, there are four processes, named PID1 through PID4. These are normal processes which can all see each other and share resources.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{assets/fig36.png}
-    \caption{PIDs}
-\end{figure}
-
-To test namespaces, you can use the following commands:
-\begin{codeblock}[language=bash]
-    # Show all processes
-    sudo ps -ef 
-
-    # Show all namespaces
-    sudo lsns 
-
-    # Create a new PID namespace
-    unshare --fork --pid --mount-proc bash
     
-    # Create a new network namespace
-    ip netns add test
-    ip netns exec test bash
-\end{codeblock}
-
-Namespaces are one of the technologies that containers are built on,
-used to enforce segregation of resources. We’ve shown how to
-create namespaces manually, but container runtimes like Docker, rkt,
-and podman make things easier by creating namespaces on your
-behalf.
-
-\subsection{Linux CGroups}
-
-A control group (cgroup) is a Linux kernel feature that limits, accounts for, and
-isolates the resource usage (CPU, memory, disk I/O, network, and so on) of a
-collection of processes.
-
-Main features are:
-\begin{itemize}
-    \item \textbf{Resource limiting}: Set limits on the amount of resources a group of processes can use.
-    \item \textbf{Prioritization}: Give certain groups of processes higher or lower priority.
-    \item \textbf{Accounting}: Keep track of the resources used by a group of processes.
-    \item \textbf{Control}: Freeze, resume, or kill a group of processes.
-\end{itemize}
-
-Kernel uses cgroups to control how much of a given key resource (CPU, memory,
-network, and disk I/O) can be accessed or used by a process or set of processes.
-
-\begin{figure}[H]
+\end{minipage}%
+\hfill
+\begin{minipage}{0.41\textwidth}
     \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig37.png}
-    \caption{CGroups}
-\end{figure}
+    \includegraphics[width=0.95\textwidth]{assets/fig37.png}
 
-You can access cgroups with various tools:
-\begin{codeblock}[language=bash]
-    # Show all cgroups
-    sudo lscgroup
+    \vspace{-0.5em}
 
-    # Show cgroup hierarchy
-    systemd-cgtop
-    
-    # Create a new cgroup
-    sudo cgcreate -g memory:mygroup
+    \captionof{figure}{Cgroups: resources assigned to a group, and what's left for the rest.}
+    \label{fig:cgroups}
+\end{minipage}
 
-    # Set memory limit
-    sudo cgset -r memory.limit_in_bytes=1G mygroup
+% \medskip
 
-    # Add a process to a cgroup
-    sudo cgclassify -g memory:mygroup $PID
+\begin{tipsblock}[Seeing versus using]
+    A useful way to remember is that \emph{namespaces limit what a process can see}, while \emph{cgroups limit what it can use}. A container needs both: without namespaces it would see the whole host, and without cgroups it could exhaust the resources of the host, whatever it sees.
+\end{tipsblock}
 
-    # Control groups can be implemented directly by container engines
-    docker run -d --name mycontainer --memory 1g myimage
-\end{codeblock}
+Control groups can be accessed in several ways: through directives in \texttt{systemd} unit files, which specify limits for services and slices; by accessing the cgroup file system directly; with tools such as \texttt{cgcreate}, \texttt{cgexec}, and \texttt{cgclassify}, distributed in the \texttt{libcgroup} packages; or through the ``rules engine daemon'' (configured by \texttt{/etc/cgrules.conf} and \texttt{cgconfig.service}), which automatically moves given users, groups, or commands into groups.
 
-\subsection{Docker File}
+\begin{exampleblock}[Inspecting and creating cgroups]
+    Every process already belongs to a cgroup, which can be found in the file \plaintt{/proc/self/cgroup}, and \plaintt{systemd-cgtop} shows the resource usage of all groups.
 
-To build a Docker image, you need to create a Dockerfile. A Dockerfile is a text
-document that contains all the commands a user could call on the command line to
-assemble an image. Using docker build users can create an automated build that 
-executes several command-line instructions in succession.
+    \vspace{-0.5em}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.8\textwidth]{assets/fig38.png}
-    \caption{Dockerfile}
-\end{figure}
-
-The Dockerfile has the following structure:
-\begin{itemize}
-    \item \textbf{FROM}: This instruction in the Dockerfile tells the daemon, which
-    base image to use while creating our new Docker image. In the
-    example here, we are using a very minimal OS image called alpine
-    (just 5 MB of size). You can also replace it with Ubuntu, Fedora,
-    Debian or any other OS image.
-    \item \textbf{RUN}: This command instructs the Docker daemon to run the given
-    commands as it is while creating the image. A Dockerfile can have
-    multiple RUN commands, each of these RUN commands create a
-    new layer in the image.
-    \item \textbf{ENTRYPOINT}:  The ENTRYPOINT instruction is used when you
-    would like your container to run the same executable every time.
-    Usually, ENTRYPOINT is used in scenarios where you want the
-    container to behave exclusively as if it were the executable it's
-    wrapping.
-    \item \textbf{CMD}: The CMD sets default commands and/or parameters when a
-    docker container runs. CMD can be overwritten from the command
-    line via the docker run command.
-\end{itemize}
-
-\begin{exampleblock}[Dockerfile]
-    \begin{codeblock}[language=bash]
-        FROM ubuntu:18.04
-        RUN apt update
-        RUN apt upgrade
-        ENTRYPOINT ["echo", "Hello, World!"]
+    \begin{codeblock}[language=bash, escapeinside={(*@}{@*)}]
+# Which cgroup does the current shell belong to?
+cat /proc/self/cgroup
+0::/user.slice/user-1000.slice/session-3.scope (*@\vspace{1em}@*)
+# Resource usage per cgroup
+systemd-cgtop
+> Control Group              Tasks  %CPU   Memory  Input/s Output/s
+> user.slice                   540  152.8    3.3G        -        -
+> user.slice/user-1000.slice   425  149.5    3.1G        -        -
+... (*@\vspace{1em}@*)
+# Show all cgroups
+lscgroup        # or 'systemd-cgls' for modern systems
     \end{codeblock}
 \end{exampleblock}
 
-You can create multiple containers from the same image, and each container will
-have its own isolated environment. You can also create multiple images from the
-same Dockerfile, and each image will have its own set of layers.
+One of the strengths of cgroups is that groups can be created ``ad hoc'' and on the fly. They are also hierarchical, so subgroups can be nested as deep as needed:
 
-Docker images are based on layers. Each layer is a set of read-only files that is
-created when the image is built. When you run a container from an image, Docker
-creates a read-write layer on top of the image layers. This read-write layer is
-where the container writes data.
+\begin{codeblock}[language=bash, escapeinside={(*@}{@*)}]
+# As root: create a group that the given user is allowed to manage
+sudo cgcreate -a $USER -t $USER -g memory,cpu:mygroup (*@\vspace{1em}@*)
+# As a normal user: set a 500 MB memory limit using libcgroup tools...
+cgset -r memory.limit_in_bytes=500M mygroup
+# ...which is equivalent to writing directly to the cgroup filesystem
+echo 524288000 > /sys/fs/cgroup/memory/mygroup/memory.limit_in_bytes (*@\vspace{1em}@*)
+# As a normal user: start a new shell confined by these limits
+cgexec -g memory,cpu:mygroup bash (*@\vspace{1em}@*)
+# Alternatively, move an already running process into the cgroup
+cgclassify -g memory,cpu:mygroup $PID
+\end{codeblock}
+
+\begin{warningblock}[cgroup v2]
+    The newer Linux cgroup v2 uses a unified hierarchy (\plaintt{/sys/fs/cgroup/}), so paths and some file names differ from v1 (e.g., \plaintt{memory.max} instead of \plaintt{memory.limit\_in\_bytes}).
+\end{warningblock}
+
+Container engines do this work directly. A container started with an explicit resource option is simply a process placed in a cgroup configured with that limit:
+
+    \begin{codeblock}[language=bash, escapeinside={(*@}{@*)}]
+# Launch nginx in the background, limiting CPU usage to half a core
+docker run --cpus 0.5 -d nginx(*@\vspace{1em}@*)
+# Create an Ubuntu container named "new-container" with a 256 MB memory limit,
+# running 'sleep infinity' to keep it active for inspection
+docker run -d --name new-container --memory=256M ubuntu sleep infinity(*@\vspace{1em}@*)
+# Apply a 1 GB memory limit to a container built from "myimage"
+docker run -d --name mycontainer --memory 1g myimage
+    \end{codeblock}
+
+The first command launches an \texttt{nginx} server in the background (\texttt{-d}), limiting CPU usage to half a core with \texttt{--cpus 0.5}. The second creates an Ubuntu container named \texttt{new-container} with a 256 MB memory limit, running \texttt{sleep infinity} simply to keep it active for inspection with \texttt{systemd-cgtop}. If the container exceeds the memory cap, the kernel kills its processes. The third applies a 1 GB memory limit to a container built from the \texttt{myimage} image.
+
+\section{Container Images and Dockerfiles} \label{sec:images_dockerfiles}
+
+\subsection{From a Dockerfile to a Container}
+
+Namespaces and cgroups describe the running container; what is left to explain is where it comes from. In Docker, an image is not written by hand but built from a plain text file, the Dockerfile.
+
+\begin{definitionblock}[Dockerfile]
+    A \bfit{Dockerfile} is a text document that contains all the commands a user could call on the command line to assemble an image. With \plaintt{docker build}, a user obtains an automated build that executes these instructions in succession.
+\end{definitionblock}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig39.png}
-    \caption{Docker Layers}
+    \includegraphics[width=\textwidth]{assets/fig38.png}
+    \caption{The image is \emph{built} from the Dockerfile and a container is \emph{run} from the image.}
+    \label{fig:dockerfile}
 \end{figure}
 
+\vspace{-1em}
 
+\cref{fig:dockerfile} shows the whole workflow. Building a Dockerfile produces an image; running the image produces a container, and the same image can be run any number of times. A Dockerfile is made of instructions, of which the following are the essential ones:
 
+\begin{itemize}
+    \item \textbf{FROM} tells the Docker daemon which base image to use while creating the new image. In the example above a very minimal OS image called \texttt{alpine} (just about 5 MB in size) is used, but it can be replaced with Ubuntu, Fedora, Debian, or any other image.
+    \item \textbf{RUN} instructs the daemon to execute the given commands while the image is being created. A Dockerfile may contain many \texttt{RUN} instructions; each of them creates a new layer in the image.
+    \item \textbf{COPY} copies files from the directory being built (the \emph{build context}) into the image.
+    \item \textbf{ENTRYPOINT} is used when the container should run the same executable every time; it makes the container behave exclusively as if it were the executable it wraps.
+    \item \textbf{CMD} sets the default commands and/or parameters used when the container runs. Unlike \texttt{ENTRYPOINT}, it can be overridden from the command line via the \texttt{docker run} command.
+\end{itemize}
 
+In the image, for instance, \texttt{ENTRYPOINT} is the \texttt{nmap} scanner and \texttt{CMD} its default argument, \texttt{localhost}: the container scans the local host unless a different target is passed at \texttt{docker run}.
+
+\begin{exampleblock}[A minimal Dockerfile]
+    \begin{codeblock}[language=bash]
+FROM ubuntu:18.04
+RUN apt update && apt upgrade -y
+ENTRYPOINT ["echo", "Hello, World!"]
+    \end{codeblock}
+
+    \vspace{-0.5em}
+
+    This Dockerfile uses an Ubuntu base image, updates its packages in a \plaintt{RUN} statement (with \plaintt{-y} to auto-confirm prompts), and makes the resulting container print a greeting and exit.
+\end{exampleblock}
+
+\begin{tipsblock}[Exec form and shell form]
+    Instructions such as \plaintt{ENTRYPOINT} and \plaintt{CMD} accept two syntaxes. The \emph{exec form} is a JSON array, as in \plaintt{["echo", "Hello"]}, and runs the executable directly. The \emph{shell form}, as in \plaintt{CMD python FILE.py}, passes the string to a shell. To combine \plaintt{ENTRYPOINT} with a default \plaintt{CMD}, as done in \cref{sec:docker_tutorial}, the exec form should be used. Quotation marks in a real Dockerfile must be plain straight quotes.
+\end{tipsblock}
+
+\subsection{Image Layers} \label{sec:image_layers}
+
+Docker images are based on \textbf{layers}. Each instruction that modifies the image adds a layer, a set of read-only files that records the changes with respect to the layer below (instructions such as \texttt{CMD} only add metadata, so their layer is empty). When a container is started, Docker does not modify the image: it adds on top of the image layers a thin \emph{read-write layer}, which is where the container writes its data.
+
+\medskip
+
+\begin{minipage}{0.52\textwidth}
+    \cref{fig:docker-layers} shows an image made of four layers. Layer 1 is the base image (\texttt{FROM ubuntu:18.04}); layer 2 brings the application files into the directory \texttt{/file} (the figure labels this step \texttt{PULL}, which in an actual Dockerfile is a \texttt{COPY} or \texttt{ADD} instruction); layer 3 builds the application with \texttt{RUN make}; and layer 4 sets the default command, \texttt{CMD python /file/file.py}.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.45\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/fig39.png}
+
+    % \vspace{-0.5em}
+
+    \captionof{figure}{Docker layers.}
+    \label{fig:docker-layers}
+\end{minipage}
+
+\medskip
+
+This organization has several practical consequences. Many containers can be created from the same image, and each one has its own isolated environment; they all share the read-only layers underneath and differ only in their private writable layer, which is why starting one more container is cheap. The layers are shared in the same way between different images that start from the same base. Conversely, deleting a container discards its writable layer, so any data that must outlive the container has to be stored in a volume, one of the resources managed by the engine. Finally, several images can be built from the same Dockerfile, and each one will have its own set of layers.
+
+\medskip
+
+\begin{minipage}{0.62\textwidth}
+    The layers of an image can be classified by their role:
+
+    \smallskip
+    
+    \begin{itemize}
+        \item A \textbf{platform image} (or base image) is an image that has no parent. It defines the runtime environment, packages, and utilities necessary for the containerized application to run.
+        \item A \textbf{layered image} is a static snapshot of the container configuration. Layered images are read-only, and each of them depends on one or more parent images.
+        \item A \textbf{container} is an application sandbox: it is based on an image that holds the necessary configuration data, and launching it adds a writable layer on top of the image.
+    \end{itemize}
+\end{minipage}%
+\hfill
+\begin{minipage}{0.35\textwidth}
+    \centering
+    \includegraphics[width=0.95\textwidth]{assets/docker-stack.png}
+
+    % \vspace{-0.5em}
+
+    \captionof{figure}{Docker image layers and container structure.}
+    \label{fig:image-structure}
+\end{minipage}
+
+\medskip
+
+\begin{minipage}{0.42\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{assets/docker-stack-ex.png}
+
+    % \vspace{-0.5em}
+
+    \captionof{figure}{Example of a container.}
+    \label{fig:layer-example}
+\end{minipage}
+\hfill
+\begin{minipage}{0.55\textwidth}
+    As a concrete example, consider an image running Debian with a Python environment managed by Pipenv. Reading from the bottom to the top, its layers are: the kernel (which is not part of the image and is provided by the host), the Debian Linux base image, the installation of Python and pip, the upgrade of pip, the installation of Pipenv, and finally \texttt{pipenv sync}, which installs the exact versions of the project's dependencies.
+\end{minipage}
+
+\medskip
+
+\begin{tipsblock}[Order the instructions to reuse layers]
+    Since every instruction produces a layer, and unchanged layers can be reused from a previous build, a Dockerfile should place the instructions that change rarely (base image, system packages) before those that change often (the application code). Chaining related commands in one \plaintt{RUN} instruction, as in the example above, also keeps the number of layers small.
+\end{tipsblock}
