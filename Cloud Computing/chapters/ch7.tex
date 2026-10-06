@@ -363,19 +363,23 @@ A minimal deployment (\cref{fig:nc-deployment}) connects a web server, a databas
     \label{fig:nc-deployment}
 \end{figure}
 
-\vspace{-1em}
+\vspace{-0.5em}
 
 
-The same architecture can scale to about 50\,000 to 100\,000 users by replacing each component with a cluster: a load-balanced web server, a database cluster, and a storage cluster, next to the authentication and caching components. \cref{fig:production-deployment} shows a full production deployment, whose parts are the following.
+The same architecture can scale to about 50\,000 to 100\,000 users by replacing each component with a cluster: a load-balanced web server, a database cluster, and a storage cluster, next to the authentication and caching components.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.85\textwidth]{assets/fig48.png} % TODO: check filename against ch7_old.tex
+    \includegraphics[width=0.95\textwidth]{assets/fig48.png}
     \caption{Production deployment.}
     \label{fig:production-deployment}
 \end{figure}
 
-\vspace{-1em}
+\vspace{-0.5em}
+
+\cref{fig:production-deployment} shows a full production deployment, whose parts are the following:
+
+\smallskip
 
 \begin{itemize}
     \item \textbf{Load balancers}: two load balancers built with HAProxy, a virtual IP, and Keepalived distribute the requests over the web servers.
@@ -385,16 +389,20 @@ The same architecture can scale to about 50\,000 to 100\,000 users by replacing 
     \item \textbf{Database}: a master-slave cluster (MySQL Galera recommended) with a database load balancer, based on MaxScale or HAProxy, that sends the writes to the master and the reads to the slaves.
 \end{itemize}
 
-\subsection{Container Deployment}
 
-The chapter on containers (\cref{ch:containers}) makes it possible to reproduce a scaled-down version of this deployment on a single host. It comprises the HAProxy load balancer, two Nextcloud instances, a MariaDB database, and a Redis cache, connected through a bridge network. \cref{fig:compose-graph} shows their dependencies: HAProxy depends on both Nextcloud instances, which in turn depend on the database and on Redis. Each service also carries the resource limits of \cref{sec:linux_cgroups}: 0.5 CPUs and 256\,MB for HAProxy, 2 CPUs and 2\,GB for each Nextcloud instance, and 0.5 CPUs and 512\,MB for Redis.
+\begin{minipage}{0.75\textwidth}
+    \subsection{Container Deployment}
 
-\begin{figure}[H]
-    \centering
-    \figplaceholder{5cm}{dependency graph of the services: haproxy, nextcloud1, nextcloud2, nextclouddb, redis (from the slides)}
-    \caption{Dependency graph of the containerized deployment.}
-    \label{fig:compose-graph}
-\end{figure}
+The container chapter (\cref{ch:containers}) shows how to replicate a simplified deployment on a single host: HAProxy, two Nextcloud instances, MariaDB, and Redis, all linked by a bridge network. As shown in \cref{fig:compose-graph}, HAProxy relies on both Nextcloud containers, which depend on the database and Redis. Each service has resource limits from \cref{sec:linux_cgroups}: 0.5 CPUs and 256\,MB for HAProxy, 2 CPUs and 2\,GB for each Nextcloud, and 0.5 CPUs and 512\,MB for Redis.
+\end{minipage}
+\hfill
+\begin{minipage}{0.22\textwidth}
+        \centering
+        \includegraphics[width=0.9\textwidth]{assets/dependencies.png}
+        \captionof{figure}{\small Container deployment dependencies.}
+   
+        \label{fig:compose-graph}
+\end{minipage}
 
 \vspace{-1em}
 
@@ -403,9 +411,8 @@ The chapter on containers (\cref{ch:containers}) makes it possible to reproduce 
 
     \vspace{-0.5em}
 
-    \begin{codeblock}[language=bash,basicstyle=\ttfamily\scriptsize]
+    \begin{codeblock}[language=bash,basicstyle=\ttfamily\tiny,numberstyle=\tiny]
 version: '3'
-
 services:
   haproxy:
     image: haproxy:lts-alpine3.19
@@ -424,7 +431,15 @@ services:
         limits:
           memory: 256MB
           cpus: "0.5"
+\end{codeblock}
 
+\vspace{-0.7em}
+
+    Here is defined the HAProxy load balancer container: it restarts unless stopped, exposes port 80, mounts its config file read-only, waits for both Nextclouds to be ready before starting (enforced by the \plaintt{depends\_on} condition), and applies memory/CPU resource limits.
+
+\vspace{-0.7em}
+
+\begin{codeblock}[language=bash,basicstyle=\ttfamily\tiny,firstnumber=20, numberstyle=\tiny]
   nextcloud1:
     container_name: nextcloud1
     image: nextcloud:latest
@@ -456,7 +471,15 @@ services:
         limits:
           memory: 2GB
           cpus: "2"
+\end{codeblock}
 
+\vspace{-0.7em}
+
+    This Nextcloud container sets its names, waits for the database (via \plaintt{healthcheck}) and Redis to be ready (\plaintt{depends\_on}), loads environment variables from files, and mounts key directories as persistent volumes to retain data if the container is removed (see \cref{sec:image_layers}). It also includes a readiness healthcheck and enforces CPU and memory limits. A similar configuration exists for \plaintt{nextcloud2}.
+
+\vspace{-0.7em}
+
+\begin{codeblock}[language=bash,basicstyle=\ttfamily\tiny,firstnumber=51, numberstyle=\tiny]
   nextclouddb:
     image: mariadb:latest
     restart: unless-stopped
@@ -470,9 +493,16 @@ services:
     healthcheck:
       interval: 20s
       retries: 3
-      test: ["CMD", "healthcheck.sh", "--su-mysql",
-             "--connect", "--innodb_initialized"]
+      test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
+\end{codeblock}
 
+\vspace{-0.7em}
+
+The database service uses the MariaDB image, mounts persistent storage for data durability (allowing data survival beyond container deletion), and loads configuration from environment files. Its healthcheck script verifies the database is running, responsive, and the storage engine is initialized, so dependent services can safely wait for it to become healthy.
+
+\vspace{-0.5em}
+
+\begin{codeblock}[language=bash,basicstyle=\ttfamily\tiny,firstnumber=65, numberstyle=\tiny]
   redis1:
     image: redis:alpine
     volumes:
@@ -490,65 +520,89 @@ services:
 networks:
   custom_bridge:
     driver: bridge
-    \end{codeblock}
+\end{codeblock}
 
-    \vspace{-0.5em}
+\vspace{-0.5em}
 
-    Two details are worth noting. The \plaintt{depends\_on} conditions make Nextcloud start only when the database reports itself healthy, which is checked by the \plaintt{healthcheck} of the database service; and the data directories are mounted as volumes, so that the data survives the deletion of a container, as discussed for the writable layer in \cref{sec:image_layers}.
+The Redis service is based on the lightweight Alpine image, uses a named volume for persistent data (so cached data survive container restarts or removals), and is connected to the same custom bridge network as the other services; resource limits are set to control usage..
+
 \end{exampleblock}
 
 \subsection{Benchmarking and Monitoring}
 
-Once the service is running, the methods of \cref{ch:benchmarking} are used to identify the capabilities of the server(s). The service is tested on user access and creation, on file upload and download, and on file read and write. \cref{fig:nc-benchmark} compares the deployment with one backend and with two backends, using the failure ratio and the response time as functions of the file size, from 100\,KB to 500\,MB. In both metrics the two configurations behave similarly for small files. For larger files the failure ratio of the two-backend deployment stays lower than that of the single-backend one (about 12 to 20\% against 35 to 43\% from 50\,MB on), whereas at 500\,MB its response time is higher (roughly $6.5\times10^{4}$\,ms against $3.3\times10^{4}$\,ms).\,\todo{the slides give no interpretation of these results; add the explanation given in class}
+Once the service is running, the methods of \cref{ch:benchmarking} are used to identify the capabilities of the server(s). The service is tested on user access and creation, on file upload and download, and on file read and write. \cref{fig:nc-benchmark} compares the deployment with one backend and with two backends, using the failure ratio and the response time as functions of the file size, from 100\,KB to 500\,MB. 
 
-\begin{figure}[H]
+\begin{minipage}{0.4\textwidth}
+In both metrics the two configurations behave similarly for small files. For larger files, the failure ratio of the two-backend deployment remains lower than that of the single-backend one (about 12 to 20\% versus 35 to 43\% from 50\,MB on), whereas at 500\,MB its response time is higher (roughly $6.5\times10^{4}$\,ms compared to $3.3\times10^{4}$\,ms).
+\end{minipage}
+\hfill
+\begin{minipage}{0.57\textwidth}
     \centering
-    \figplaceholder{5cm}{failure ratio [\%] and response time [ms] versus file size (100KB to 500MB), one backend versus two backends (from the slides)}
-    \caption{Benchmark of the Nextcloud deployment with one and two backends.}
-    \label{fig:nc-benchmark}
-\end{figure}
+    \includegraphics[width=\textwidth]{assets/nextcloud-bench.png}
 
-\vspace{-1em}
+    \vspace{-0.5em}
+
+    \captionof{figure}{Benchmark of the Nextcloud deployment with one and two backends.}
+    \label{fig:nc-benchmark}
+\end{minipage}
+
+\medskip
 
 Running services must also be monitored. Three tools are presented:
 
 \begin{itemize}
-    \item \textbf{Docker stats}: a command-line tool providing real-time resource usage statistics for Docker containers;
+    \item \textbf{Docker stats}: a command-line tool for real-time resource usage statistics for Docker containers;
     \item \textbf{Portainer}: a management tool for Docker environments, easy to set up;
-    \item \textbf{Grafana}: an analytics and visualization platform that allows users to query, visualize, and monitor data from multiple sources in real time, at the price of requiring configuration. The slides show a Nextcloud dashboard with, among others, availability, CPU load, database size, shared links, and recent log entries.
+    \item \textbf{Grafana}: an analytics and visualization platform that allows users to query, visualize, and monitor data from multiple sources in real time, at the price of requiring configuration.
 \end{itemize}
 
 \section{Cloud Security} \label{sec:cloud_security}
 
 \subsection{Introduction and General Considerations}
 
-A user who moves to the cloud and wants some privacy faces a first, reassuring fact: many of the security problems of non-cloud environments still apply, and the classical countermeasures remain valid. On top of them, the cloud adds new problems, because resources are shared, outsourced, and managed by a third party. The security of a cloud can be organized in the layers of \cref{fig:cloud-security}: \emph{information security of the infrastructure} (at network, host, and application level), \emph{information security of the data} (encryption, data masking, content protection), and \emph{security management and monitoring services} (monitoring of health, security events, and threats; management of ACLs, vulnerabilities, patches, and configuration).
+When moving to the cloud, privacy concerns often take center stage. While established security principles and existing countermeasures remain relevant, the cloud introduces additional risks due to the shared, outsourced, and third-party-managed nature of cloud resources. Cloud security is best understood as a layered architecture (\cref{fig:cloud-security}), each layer addressing distinct aspects:
+\smallskip
 
-\begin{figure}[H]
+\begin{minipage}{0.56\textwidth}
+    
+    \begin{itemize}
+        \item \textbf{Information security - infrastructure:} Safeguards at the \emph{network}, \emph{host}, and \emph{application} levels form the foundation for protecting cloud systems from intrusions and vulnerabilities.
+        \item \textbf{Information security - data:} Protects data via encryption, masking, and content controls to ensure confidentiality and integrity at rest and in transit.
+        \item \textbf{Security management and monitoring:} The top layer covers monitoring (health checks, event and threat detection) and management (access control, vulnerability assessment, patching, and configuration), enabling responsive oversight and adaptation.
+   
+    \end{itemize}
+\end{minipage}
+\hfill
+\begin{minipage}{0.42\textwidth}
     \centering
-    \includegraphics[width=0.55\textwidth]{assets/fig49.png} % TODO: check filename against ch7_old.tex
-    \caption{Layers of cloud security.}
+    \includegraphics[width=\textwidth]{assets/fig49.png}
+    \captionof{figure}{Layers of cloud security.}
     \label{fig:cloud-security}
-\end{figure}
+\end{minipage}
 
-\vspace{-1em}
+\smallskip
 
-The discussion focuses on public clouds, and starts from the observation that different cloud service models (\cref{sec:service_deployment_models}) provide different levels of security. Whatever the model, a cloud must provide auditing, data integrity, e-discovery for legal compliance, privacy, recovery, and regulatory compliance.
+This layered approach ensures that cloud environments remain robust against both traditional and emerging risks, with each security domain reinforcing the others for comprehensive protection.
+
+This discussion centers on public clouds, noting that each cloud service model (\cref{sec:service_deployment_models}) offers varying security levels. Regardless of the model, essential requirements include auditing, data integrity, e-discovery, privacy, recovery, and regulatory compliance.
 
 \begin{definitionblock}[Security boundary]
-    The \bfit{security boundary} separates the responsibilities of the client from those of the vendor: it answers the questions of who is responsible for a particular security mechanism, and of where the boundary lies between the responsibility of the service provider and that of the customer.
+    The \bfit{security boundary} distinguishes which security responsibilities belong to the client and which to the vendor. It clarifies who is accountable for each security mechanism, and where the line is drawn between the service provider's and the customer's duties.
 \end{definitionblock}
 
-The Cloud Security Alliance (CSA) is an industry working group that studies security issues in cloud computing and offers recommendations to its members. The boundary moves with the service model, as \cref{fig:xaas-boundaries} shows: the layers of the service stack (from the data centre with its mechanical and electrical facilities, through networking and firewalling, physical servers, the virtualization layer, and the operating systems, up to the infrastructure software, the hosted application, and the client devices and people) are covered by the provider in an increasingly large portion as one moves from IaaS to PaaS to SaaS. A consequence is that the security level of a platform is reduced to that of the most vulnerable application running on it, which is why applications should be isolated with VMs and containers.
-
-\begin{figure}[H]
+\begin{minipage}{0.54\textwidth}
+    The Cloud Security Alliance (CSA) is an industry working group that studies security issues in cloud computing and offers recommendations to its members. The boundary moves with the service model, as \cref{fig:xaas-boundaries} shows: the layers of the service stack (from the data centre with its mechanical and electrical facilities, through networking and firewalling, physical servers, the virtualization layer, and the operating systems, up to the infrastructure software, the hosted application, and the client devices and people) are covered by the provider in an increasingly large portion as one moves from IaaS to PaaS to SaaS. A consequence is that the security level of a platform is reduced to that of the most vulnerable application running on it, which is why applications should be isolated with VMs and containers. 
+\end{minipage}%
+\hfill
+\begin{minipage}{0.43\textwidth}
     \centering
-    \includegraphics[width=0.5\textwidth]{assets/fig50.png} % TODO: check filename against ch7_old.tex (service layers and XaaS boundaries)
-    \caption{Service layers and XaaS security boundaries.}
-    \label{fig:xaas-boundaries}
-\end{figure}
+    \includegraphics[width=0.96\textwidth]{assets/boundaries.png}
 
-\vspace{-1em}
+    \vspace{-0.5em}
+
+    \captionof{figure}{Service layers and XaaS security boundaries.}
+    \label{fig:xaas-boundaries}
+\end{minipage}
 
 Multi-tenancy (\cref{sec:service_attributes}) adds a further requirement: different customers must be isolated, their data segmented, and their services identified and isolated. A multi-project approach, such as the OpenStack \emph{tenants}, is one way to achieve it.
 
@@ -575,56 +629,60 @@ The most common security risks and challenges associated with cloud computing ar
 
 \subsection{Infrastructure Security}
 
-Security of the infrastructure is analysed at three levels, from the most basic to the highest.
+Infrastructure security in the cloud is assessed across three distinct layers (Network, Host, Application), progressing from foundational elements to the most advanced.
 
-\textbf{Network level.} Security at the network level concerns the infrastructure connecting the cloud servers to the Internet, with firewalls, intrusion detection systems, and other network security devices that protect the servers from attacks originating from the Internet. The cloud brings specific issues:
+\textbf{Network level:} Security at the network level concerns the infrastructure connecting the cloud servers to the Internet, with firewalls, intrusion detection systems, and other network security devices that protect the servers from attacks originating from the Internet. 
+
+\smallskip
+
+The cloud brings specific issues:
 
 \begin{itemize}
-    \item \emph{confidentiality and integrity of data in transit}: Amazon, for instance, had security bugs with the digital signature on SimpleDB, EC2, and SQS accesses in 2008;
-    \item \emph{little or no system logging and monitoring}: only the cloud provider has this capability, so attacks are difficult to trace;
-    \item \emph{reassigned IP addresses}: services can be exposed unexpectedly, and spammers using EC2 are difficult to identify;
-    \item \emph{availability of cloud resources}: some factors, such as DNS, are controlled by the cloud provider;
-    \item \emph{physically separated tiers become logically separated}, for example in three-tier web applications.
+    \item \textbf{confidentiality and integrity of data in transit}: Amazon, for instance, had security bugs with the digital signature on SimpleDB, EC2, and SQS accesses in 2008;
+    \item \textbf{little or no system logging and monitoring}: only the cloud provider has this capability, so attacks are difficult to trace;
+    \item \textbf{reassigned IP addresses}: services can be exposed unexpectedly, and spammers using EC2 are difficult to identify;
+    \item \textbf{availability of cloud resources}: some factors, such as DNS, are controlled by the cloud provider;
+    \item \textbf{physically separated tiers become logically separated}, e.g., in three-tier web applications.
 \end{itemize}
 
-\textbf{Host level.} Security at the host level concerns the individual servers making up the infrastructure (operating system, applications, and stored data), and protects them from attacks originating from within the infrastructure. Two elements are specific to the cloud. The \emph{hypervisor} manages the virtual machines running on the physical servers, so a compromise of the hypervisor, for example through a zero-day vulnerability, can lead to a compromise of all the VMs running on it; its security is improved by using secure hypervisors, keeping them up to date, and using strong access controls. The \emph{virtual machines} run the applications of the cloud services, and their security is improved in the same way, with secure VM images, updates, and strong access control. The main weak points are SSH private keys (if their file mode is not appropriately set), VM images (especially private VMs), and vulnerable services.
+\textbf{Host level:} Host-level security focuses on the individual servers that make up the infrastructure: the OS, applications, and stored data, protecting them from internal threats. In the cloud, two critical components are the \bfit{hypervisor} and the \bfit{virtual machines (VMs)}. The hypervisor manages VMs running on physical servers; if compromised (e.g., via a zero-day), all hosted VMs can be exposed. Its security depends on using secure, up-to-date hypervisors and strong access controls. VMs, which run cloud service applications, require similar protections: trusted VM images, regular updates, and robust access controls. Key vulnerabilities include weak SSH private key management, insecure or outdated VM images (especially private ones), and unpatched services.
 
 \begin{warningblock}[Risks of VMs and containers]
-    Virtualization and containerization simplify the implementation of resource management policies, improve intrusion prevention and detection, allow secure logging and intrusion protection, and make software testing more efficient and flexible. They also introduce risks: the number of VMs can explode; snapshots allow rolling back to a state that can be exploited; and shared images may contain backdoors and leftover credentials, unsolicited connections, or malware. It was found that 22\% of the scanned Linux AMIs contained credentials allowing an intruder to log into the system remotely.
+    Virtualization and containerization make resource management, intrusion prevention, logging, and software testing more efficient and flexible. However, they introduce risks: VMs can proliferate uncontrollably, snapshots may restore exploitable states, and shared images may contain backdoors, leftover credentials, or malware. Notably, 22\% of scanned Linux AMIs were found with credentials enabling remote intrusions.
 \end{warningblock}
 
-The operating system implements minimal security on access control, authentication usage, and cryptographic usage policies, which are all elements of mandatory OS security. Applications with special privileges that perform security-related functions are called \textbf{trusted applications}, and should be allowed only the lowest level of privileges required to perform their functions. An OS isolates applications from one another poorly: once an application is compromised, the entire physical platform and all the applications running on it can be affected. This is the weakness that the isolation of \cref{sec:linux_namespaces} and \cref{sec:linux_cgroups} mitigates, though not completely (\cref{tab:vm-vs-container}).
+The OS enforces basic security for access control, authentication, and cryptographic policies as part of its mandatory security. Applications with special security-related privileges, known as \bfit{trusted applications}, should have only the minimum privileges needed. OSes typically isolate applications poorly: if one is compromised, the whole system and all applications on it can be at risk.
 
-\textbf{Application level.} Security at the application level, the highest, concerns the applications running on the cloud servers: the code that makes up the application, the data it processes, and the users who access it. It protects the servers from attacks that exploit vulnerabilities in the application code.
+\medskip
+
+\textbf{Application level:} Security at the application level, the highest, concerns the applications running on the cloud servers: the code that makes up the application, the data it processes, and the users who access it. It protects the servers from attacks that exploit vulnerabilities in the application code.
+
+\vspace{-0.5em}
 
 \subsection{Data Security}
 
-For data, the first step is to identify the security boundary between the responsibilities of client and vendor, and to determine the sensitivity of the data to risk. Data should be transferred and stored in an encrypted format, and clients should be separated from direct access to the shared cloud storage. Four mechanisms are used to protect data.
+For data, the first step is to identify the security boundary between the responsibilities of client and vendor, and to determine the sensitivity of the data to risk. Data should be transferred and stored in an encrypted format, and clients should be separated from direct access to the shared cloud storage. 
 
-\begin{itemize}
-    \item \textbf{Access control} determines who can access what data and under which conditions, and is typically implemented by combining authentication, authorization, and auditing.
-    \item \textbf{Auditing} monitors and records access to data, typically through logging, monitoring, and reporting.
-    \item \textbf{Authentication} verifies the identity of a user, typically through passwords, biometrics, and other mechanisms.
-    \item \textbf{Authorization} determines what data a user can access, typically through access control lists, role-based access control, and other mechanisms.
-\end{itemize}
 
-Data must be isolated from direct client access, by creating a layered access to it, and segregated on the basis of tenants. \cref{fig:data-security} shows such a layered access. The client sends a data request over the Internet to a proxy, which applies the rules and restates the request; a broker sends the modified request to the cloud storage; the storage replies to the broker, which relays the data to the proxy, and the proxy finally returns the response to the client. The client never talks to the storage directly.
+\begin{minipage}{0.67\textwidth}
+    Four mechanisms are used to protect data.
+    \begin{itemize}
+        \item \textbf{Access control} determines who can access what data and under which conditions, and is typically implemented by combining authentication, authorization, and auditing.
+        \item \textbf{Auditing} monitors and records access to data, typically through logging, monitoring, and reporting.
+        \item \textbf{Authentication} verifies the identity of a user, typically through passwords, biometrics, and other mechanisms.
+        \item \textbf{Authorization} determines what data a user can access, typically through access control lists, role-based access control, etc.
+    \end{itemize}
 
-\begin{figure}[H]
+    Data must be isolated from direct client access through layered architecture and tenant-based segregation. As shown in \cref{fig:data-security}, the client sends a request to a proxy, which enforces access rules and forwards it to a broker. The broker communicates with cloud storage, relays the response back through the proxy, and finally to the client, who never directly accesses the storage.
+\end{minipage}%
+\hfill
+\begin{minipage}{0.3\textwidth}
     \centering
-    % \includegraphics[width=0.55\textwidth]{assets/fig51.png} % TODO: check filename against ch7_old.tex
-    \caption{Data segregation and isolation through a proxy and a broker.}
+    \includegraphics[width=\textwidth]{assets/fig50.png}
+    \captionof{figure}{Data segregation and isolation.}
     \label{fig:data-security}
-\end{figure}
+\end{minipage}
 
-\vspace{-1em}
+\medskip
 
-Most cloud service providers store data in an encrypted form, on the server side or on the client side (for example Amazon S3 uses the 256-bit Advanced Encryption Standard). The AWS documentation provides Java examples of client-side encryption (\href{https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingClientSideEncryption.html}{UsingClientSideEncryption}). Encryption is not a complete answer, however.
-
-\begin{warningblock}[Keep your keys]
-    A problem with encrypted data may result in data that cannot be recovered, and encryption does nothing to prevent data loss. Whoever holds the data must therefore keep the encryption keys safe.
-\end{warningblock}
-
-\subsection{Identity and Access Management}
-
-\todo{The outline of the slides lists ``Identity and access management'' as the last topic, but no slides on it were provided; add the content once available. Authentication, authorization, and access control are introduced above as data protection mechanisms.}
+Most cloud service providers store data in an encrypted form, on the server side or on the client side. The AWS documentation provides Java examples of client-side encryption (\href{https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingClientSideEncryption.html}{UsingClientSideEncryption}). Encryption is not a complete answer, however: it does not prevent data loss, and lost keys can make data unrecoverable. It is essential to keep encryption keys secure.
